@@ -1,0 +1,11 @@
+{
+    "tiles": [
+        {
+            "invisible": true
+        },
+
+        {
+            "collision": true
+        }
+    ]
+}

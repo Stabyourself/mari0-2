@@ -11,19 +11,23 @@
         },
         
         {
-            "name": "hilltop"
+            "name": "hilltop",
+            "depth": 20
         },
         
         {
-            "name": "bushleft"
+            "name": "bushleft",
+            "depth": 10
         },
         
         {
-            "name": "bushcenter"
+            "name": "bushcenter",
+            "depth": 10
         },
         
         {
-            "name": "bushright"
+            "name": "bushright",
+            "depth": 10
         },
         
         {
@@ -120,23 +124,28 @@
         },
         
         {
-            "name": "hillleft"
+            "name": "hillleft",
+            "depth": 20
         },
         
         {
-            "name": "hillcenter"
+            "name": "hillcenter",
+            "depth": 20
         },
         
         {
-            "name": "hillright"
+            "name": "hillright",
+            "depth": 20
         },
         
         {
-            "name": "hillcenteralt1"
+            "name": "hillcenteralt1",
+            "depth": 20
         },
         
         {
-            "name": "hillcenteralt2"
+            "name": "hillcenteralt2",
+            "depth": 20
         },
         
         {

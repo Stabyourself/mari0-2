@@ -17,7 +17,7 @@ function PhysObj:initialize(world, x, y)
 end
 
 function PhysObj:passiveCollide(otherObj)
-
+    
 end
 
 function PhysObj:floorCollide(otherObj)

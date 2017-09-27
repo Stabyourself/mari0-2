@@ -1,3 +1,7 @@
+-- Stubs for testing
+love.graphics.set3D = love.graphics.set3D or function() end
+love.graphics.setDepth = love.graphics.setDepth or function() end
+
 function love.load()
     JSON = require "lib/JSON"
     class = require "lib/Class"
@@ -16,6 +20,8 @@ function love.load()
     require "class/Block"
 
     require "game"
+    
+    love.graphics.set3D(true)
 
     game.load()
 end
@@ -37,10 +43,6 @@ end
 function love.draw()
     if gameState == "game" then
         game.draw()
-    end
-    
-    if love.system.getOS() == "Horizon" then
-        print(love.timer.getFPS() .. math.random())
     end
 end
 

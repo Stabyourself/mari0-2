@@ -1,6 +1,12 @@
 game = {}
 
 function game.load()
+    is3DS = love.system.getOS() == "Horizon"
+    
+    if not is3DS then
+        love.window.setMode(400, 480)
+    end
+    
     gameState = "game"
     
     smbTileMap = TileMap:new("tilemaps/smb")
@@ -10,17 +16,22 @@ function game.load()
 
     mainCamera = Camera:new()
     mainCamera.x = 0
-    mainCamera.y = 0.5
+    mainCamera.y = 0
+    
+    myLevel:generateDrawList(mainCamera)
 
     marios = {}
     table.insert(marios, Mario:new(myLevel.world, 5, 0))
 end
 
 function game.update(dt)
+    updateGroup(marios, dt)
+    
     myLevel:update(dt)
     
-    updateGroup(marios, dt)
     mainCamera.x = marios[1].x - 5
+    
+    myLevel:checkDrawList(mainCamera)
 end
 
 function game.draw()

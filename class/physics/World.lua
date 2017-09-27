@@ -2,10 +2,23 @@ World = class("World")
 
 function World:initialize()
 	self.objects = {}
+	self.collisionObjects = {}
+	
+	self.blockLookup = {}
 end
 
 function World:addObject(obj)
 	table.insert(self.objects, obj)
+	
+	if obj.block then -- add to lookup table
+		if not self.blockLookup[obj.blockX] then
+			self.blockLookup[obj.blockX] = {}
+		end
+		
+		self.blockLookup[obj.blockX][obj.blockY] = obj
+	else -- add to generic collision check table
+		table.insert(self.collisionObjects, obj)
+	end
 end
 
 function World:draw()
@@ -21,6 +34,9 @@ end
 function World:update(dt)
 	for _, obj1 in ipairs(self.objects) do
 		if obj1.static == false and obj1.active then
+			obj1.prevSpeedY = obj1.speedY
+			obj1.prevSpeedX = obj1.speedX
+			
 			--GRAVITY
 			obj1.speedY = obj1.speedY + (obj1.gravity or GRAVITY)*dt*0.5
 			
@@ -33,8 +49,8 @@ function World:update(dt)
 			local vercollision = false
 			
 			--VS OTHER OBJECTS --but not: portalwall, castlefirefire
-			for _, obj2 in ipairs(self.objects) do
-				if obj1 ~= obj2 then
+			for _, obj2 in ipairs(self.collisionObjects) do
+				if obj1 ~= obj2 and obj2.active then
 					local hor, ver = checkcollision(obj1, obj2, dt)
 
 					if hor then
@@ -46,35 +62,29 @@ function World:update(dt)
 				end
 			end
 			
-			--[[
-			--VS TILES (Because I only wanna check close ones)
-			local xstart = math.floor(obj1.x+obj1.speedX*dt-2/16)+1
-			local ystart = math.floor(obj1.y+obj1.speedY*dt-2/16)+1
 			
-			local xfrom = xstart
+			--VS TILES (Because I only wanna check close ones)
+			local xstart = math.floor(obj1.x+obj1.prevSpeedX*dt-2/16)
+			local ystart = math.floor(obj1.y+obj1.prevSpeedY*dt-2/16)
+			
 			local xto = xstart+math.ceil(obj1.width)
 			local dir = 1
 			
 			if obj1.speedX < 0 then
-				xfrom, xto = xto, xfrom
+				xstart, xto = xto, xstart
 				dir = -1
 			end
 			
-			for x = xfrom, xto, dir do
+			for x = xstart, xto, dir do
 				for y = ystart, ystart+math.ceil(obj1.height) do
 					--check if invisible block
-					if inmap(x, y) then
-						local t = lobjects["tile"][x .. "-" .. y]
-						if t then
-							--    Same object          Active
-							if (i ~= g or j ~= h) and obj2.active then
-								local collision1, collision2 = checkcollision(v, t, dt)
-								if collision1 then
-									horcollision = true
-								elseif collision2 then
-									vercollision = true
-								end
-							end
+					local obj2 = self.blockLookup[x] and self.blockLookup[x][y]
+					if obj2 and obj2.active then
+						local collision1, collision2 = checkcollision(obj1, obj2, dt)
+						if collision1 then
+							horcollision = true
+						elseif collision2 then
+							vercollision = true
 						end
 					end
 				end

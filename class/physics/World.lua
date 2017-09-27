@@ -108,7 +108,7 @@ function checkcollision(obj1, obj2, dt)
 	if math.abs(obj1.x+obj1.speedX*dt-obj2.x) < math.max(obj1.width, obj2.width)+1 and math.abs(obj1.y+obj1.speedY*dt-obj2.y) < math.max(obj1.height, obj2.height)+1 then
 		--check if it's a passive collision (Object is colliding anyway)
 		if aabb(obj1.x, obj1.y, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then --passive collision! (oh noes!)
-			if passivecollision(v, t) then
+			if passivecollision(obj1, obj2) then
 				hadvercollision = true
 			end
 			

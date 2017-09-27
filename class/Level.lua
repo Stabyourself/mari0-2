@@ -15,8 +15,10 @@ function Level:initialize(path, tileMap)
         self.blocks[x] = {}
 
         for y = 1, self.height do
-            if not self.tileMap.tiles[self.map[x][y]].invisible then
-                self.blocks[x][y] = Block:new(self.world, x-1, y-1)
+            if self.tileMap.tiles[self.map[x][y]] then
+                if self.tileMap.tiles[self.map[x][y]].collision then
+                    self.blocks[x][y] = Block:new(self.world, x-1, y-1)
+                end
             end
         end
     end
@@ -26,16 +28,28 @@ function Level:update(dt)
     self.world:update(dt)
 end
 
-function Level:draw()
-    for x = 1, WIDTH do
-        for y = 1, HEIGHT+1 do
+function Level:draw(camera)
+    local xStart = math.floor(camera.x)+1
+    local yStart = math.floor(camera.y)+1
+    local xEnd = xStart + WIDTH
+    local yEnd = yStart + HEIGHT
+    
+    print(xStart, xEnd)
+    
+    for x = xStart, xEnd do
+        for y = yStart, yEnd do
             if self:inMap(x, y) then
-                self.tileMap.tiles[self.map[x][y]]:draw((x-1)*16, (y-1)*16)
+                local tile = self.tileMap.tiles[self.map[x][y]]
+                if tile then
+                    tile:draw((x-1)*16, (y-1)*16)
+                end
             end
         end
     end
 
-    self.world:draw()
+    if PHYSICSDEBUG then
+        self.world:draw()
+    end
 end
 
 function Level:inMap(x, y)

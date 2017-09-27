@@ -7,7 +7,7 @@ end
 
 function Camera:attach()
 	love.graphics.push()
-	love.graphics.translate(self.x, self.y)
+	love.graphics.translate(math.floor(-self.x*TILESIZE), math.floor(-self.y*TILESIZE))
 end
 
 function Camera:detach()

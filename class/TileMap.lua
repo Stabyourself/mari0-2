@@ -6,9 +6,15 @@ function TileMap:initialize(path)
     self.json = JSON:decode(love.filesystem.read(self.path .. "/props.json"))
 
     self.tiles = {}
+    
+    local xW = self.img:getWidth()/TILESIZE
 
-    for x = 0, self.img:getWidth()/TILESIZE-1 do
-        local quad = love.graphics.newQuad(x*TILESIZE, 0, TILESIZE, TILESIZE, self.img:getWidth(), self.img:getHeight())
-        self.tiles[x] = Tile:new(self.img, quad, self.json.tiles[x+1])
+    for y = 1, self.img:getHeight()/TILESIZE do
+        for x = 1, xW do
+            local quad = love.graphics.newQuad((x-1)*TILESIZE, (y-1)*TILESIZE, TILESIZE, TILESIZE, self.img:getWidth(), self.img:getHeight())
+            local num = x + xW*(y-1)
+            
+            table.insert(self.tiles, Tile:new(self.img, quad, self.json.tiles[num] or {}))
+        end
     end
 end

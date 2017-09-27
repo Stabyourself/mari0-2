@@ -4,6 +4,7 @@ function Tile:initialize(img, quad, properties)
     self.img = img
     self.quad = quad
     self.invisible = properties.invisible
+    self.collision = properties.collision
 end
 
 function Tile:draw(x, y)

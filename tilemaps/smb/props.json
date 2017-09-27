@@ -1,11 +1,214 @@
 {
     "tiles": [
         {
+            "name": "sky",
             "invisible": true
         },
 
         {
+            "name": "ground",
             "collision": true
+        },
+        
+        {
+            "name": "hilltop"
+        },
+        
+        {
+            "name": "bushleft"
+        },
+        
+        {
+            "name": "bushcenter"
+        },
+        
+        {
+            "name": "bushright"
+        },
+        
+        {
+            "name": "block",
+            "collision": true,
+            "breakable": true
+        },
+        
+        {
+            "name": "coinblock",
+            "collision": true,
+            "coinblock": true
+        },
+        
+        {
+            "name": "unused",
+            "invisible": true
+        },
+        
+        {
+            "name": "chain"
+        },
+        
+        {
+            "name": "bowserbridge",
+            "collision": true
+        },
+        
+        {
+            "name": "fence"
+        },
+        
+        {
+            "name": "fencewhite"
+        },
+        
+        {
+            "name": "whitepipetopleft",
+            "collision": true
+        },
+        
+        {
+            "name": "whitepipetopright",
+            "collision": true
+        },
+        
+        {
+            "name": "greenpipetopleft",
+            "collision": true
+        },
+        
+        {
+            "name": "greenpipetopright",
+            "collision": true
+        },
+        
+        {
+            "name": "redpipetopleft",
+            "collision": true
+        },
+        
+        {
+            "name": "redpipetopright",
+            "collision": true
+        },
+        
+        {
+            "name": "mushroomleft",
+            "collision": true
+        },
+        
+        {
+            "name": "mushroomcenter",
+            "collision": true
+        },
+        
+        {
+            "name": "mushroomright",
+            "collision": true
+        },
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        {
+            "name": "castlemiddle"
+        },
+        
+        {
+            "name": "hillleft"
+        },
+        
+        {
+            "name": "hillcenter"
+        },
+        
+        {
+            "name": "hillright"
+        },
+        
+        {
+            "name": "hillcenteralt1"
+        },
+        
+        {
+            "name": "hillcenteralt2"
+        },
+        
+        {
+            "name": "castleground",
+            "collision": true
+        },
+        
+        {
+            "name": "redcloudtopleft"
+        },
+        
+        {
+            "name": "redcloudtop"
+        },
+        
+        {
+            "name": "redcloudtopright"
+        },
+        
+        {
+            "name": "bluecloudtopleft"
+        },
+        
+        {
+            "name": "bluecloudtop"
+        },
+        
+        {
+            "name": "bluecloudtopright"
+        },
+        
+        {
+            "name": "whitepipebottomleft",
+            "collision": true
+        },
+        
+        {
+            "name": "whitepipebottomright",
+            "collision": true
+        },
+        
+        {
+            "name": "greenpipebottomleft",
+            "collision": true
+        },
+        
+        {
+            "name": "greenpipebottomright",
+            "collision": true
+        },
+        
+        {
+            "name": "redpipebottomleft",
+            "collision": true
+        },
+        
+        {
+            "name": "redpipebottomright",
+            "collision": true
+        },
+        
+        {
+            "name": "cannontop",
+            "collision": true
+        },
+        
+        {
+            "name": "mushroomcenter"
+        },
+        
+        {
+            "name": "treetop"
         }
     ]
 }

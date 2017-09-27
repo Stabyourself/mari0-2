@@ -10,8 +10,12 @@ end
 
 function World:draw()
 	for _, obj in ipairs(self.objects) do
-		love.graphics.rectangle("line", obj.x*TILESIZE+.5, obj.y*TILESIZE+.5, obj.width*TILESIZE-1, obj.height*TILESIZE-1)
+		self:drawObject(obj)
 	end
+end
+
+function World:drawObject(obj)
+	love.graphics.rectangle("fill", obj.x*TILESIZE+.5, obj.y*TILESIZE+.5, obj.width*TILESIZE, obj.height*TILESIZE)
 end
 
 function World:update(dt)
@@ -84,7 +88,7 @@ function World:update(dt)
 				if obj1.onGround then
 					obj1.onGround = false
 					if obj1.speedY >= 0 then
-						v:startFall()
+						obj1:startFall()
 					end
 				end
 			else
@@ -126,7 +130,7 @@ function checkcollision(obj1, obj2, dt)
 			else 
 				--We're fucked, it's a diagonal collision! run!
 				--Okay actually let's take this slow okay. Let's just see if we're moving faster horizontally than vertically, aight?
-				local grav = yacceleration
+				local grav = GRAVITY
 				if self and self.gravity then
 					grav = self.gravity
 				end

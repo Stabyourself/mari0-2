@@ -183,3 +183,7 @@ function Mario:ceilCollide(obj2)
         playSound(blockSound)
     end
 end
+
+function Mario:startFall()
+    self.animationState = "running"
+end

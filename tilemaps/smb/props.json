@@ -122,7 +122,8 @@
         
         
         {
-            "name": "castlemiddle"
+            "name": "castlemiddle",
+            "depth": 20
         },
         
         {
@@ -236,15 +237,18 @@
 
 
         {
-            "name": "castletopalt"
+            "name": "castletopalt",
+            "depth": 20
         },
         
         {
-            "name": "castledoortop"
+            "name": "castledoortop",
+            "depth": 20
         },
         
         {
-            "name": "castlemiddle"
+            "name": "castlemiddle",
+            "depth": 20
         },
         
         {
@@ -262,7 +266,8 @@
         },
         
         {
-            "name": "whitecastletopalt"
+            "name": "whitecastletopalt",
+            "depth": 20
         },
         
         {
@@ -351,15 +356,18 @@
 
         
         {
-            "name": "castleleft"
+            "name": "castleleft",
+            "depth": 20
         },
 
         {
-            "name": "castledoorbottom"
+            "name": "castledoorbottom",
+            "depth": 20
         },
 
         {
-            "name": "castleright"
+            "name": "castleright",
+            "depth": 20
         },
 
         {
@@ -378,15 +386,18 @@
         },
 
         {
-            "name": "whitecastletop"
+            "name": "whitecastletop",
+            "depth": 20
         },
 
         {
-            "name": "whitecastledoortop"
+            "name": "whitecastledoortop",
+            "depth": 20
         },
 
         {
-            "name": "whitecastlemiddle"
+            "name": "whitecastlemiddle",
+            "depth": 20
         },
 
         {

@@ -5,6 +5,7 @@ function Level:initialize(path, tileMap)
     self.tileMap = tileMap
 
     self.map = self.json.map
+    self.background = self.json.background
     self.width = #self.map
     self.height = #self.map[1]
     
@@ -20,6 +21,14 @@ function Level:initialize(path, tileMap)
                     self.blocks[x][y] = Block:new(self.world, x-1, y-1)
                 end
             end
+        end
+    end
+    
+    -- Parse entities
+    for _, v in ipairs(self.json.entities) do
+        if v.type == "spawn" then
+            self.spawnX = v.x
+            self.spawnY = v.y
         end
     end
 end
@@ -39,16 +48,16 @@ function Level:draw(camera)
 end
 
 function Level:checkDrawList(camera)
-    if math.floor(camera.x)+1 ~= self.drawListX then
+    if math.floor(camera.x)+1-EXTRADRAWING ~= self.drawListX then
         self:generateDrawList(camera)
     end
 end
 
 function Level:generateDrawList(camera)
-    local xStart = math.floor(camera.x)+1
-    local yStart = math.floor(camera.y)+1
-    local xEnd = xStart + WIDTH
-    local yEnd = yStart + HEIGHT
+    local xStart = math.floor(camera.x)+1-EXTRADRAWING
+    local yStart = math.floor(camera.y)+1-EXTRADRAWING
+    local xEnd = xStart + WIDTH+EXTRADRAWING*2
+    local yEnd = yStart + HEIGHT+EXTRADRAWING*2
     
     local toDraw = {}
     
@@ -59,6 +68,16 @@ function Level:generateDrawList(camera)
         for y = yStart, yEnd do
             if self:inMap(x, y) then
                 local tile = self.tileMap.tiles[self.map[x][y]]
+                
+                if tile and not tile.invisible then
+                    table.insert(self.drawList, {
+                        x = x,
+                        y = y,
+                        tile = tile
+                    })
+                end
+                
+                local tile = self.tileMap.tiles[self.background[x][y]]
                 
                 if tile and not tile.invisible then
                     table.insert(self.drawList, {

@@ -48,12 +48,14 @@
         },
         
         {
-            "name": "chain"
+            "name": "chain",
+            "bowserbridge": true
         },
         
         {
             "name": "bowserbridge",
-            "collision": true
+            "collision": true,
+            "bowserbridge": true
         },
         
         {
@@ -154,27 +156,33 @@
         },
         
         {
-            "name": "redcloudtopleft"
+            "name": "redcloudtopleft",
+            "depth": 30
         },
         
         {
-            "name": "redcloudtop"
+            "name": "redcloudtop",
+            "depth": 30
         },
         
         {
-            "name": "redcloudtopright"
+            "name": "redcloudtopright",
+            "depth": 30
         },
         
         {
-            "name": "bluecloudtopleft"
+            "name": "bluecloudtopleft",
+            "depth": 30
         },
         
         {
-            "name": "bluecloudtop"
+            "name": "bluecloudtop",
+            "depth": 30
         },
         
         {
-            "name": "bluecloudtopright"
+            "name": "bluecloudtopright",
+            "depth": 30
         },
         
         {
@@ -218,6 +226,230 @@
         
         {
             "name": "treetop"
+        },
+
+
+
+
+
+
+
+
+        {
+            "name": "castletopalt"
+        },
+        
+        {
+            "name": "castledoortop"
+        },
+        
+        {
+            "name": "castlemiddle"
+        },
+        
+        {
+            "name": "redflagtop"
+        },
+        
+        {
+            "name": "blockunderground",
+            "collision": true
+        },
+        
+        {
+            "name": "groundunderground",
+            "collision": true
+        },
+        
+        {
+            "name": "whitecastletopalt"
+        },
+        
+        {
+            "name": "redcloudbottomleft",
+            "depth": 30
+        },
+        
+        {
+            "name": "redcloudbottom",
+            "depth": 30
+        },
+        
+        {
+            "name": "redcloudbottomright",
+            "depth": 30
+        },
+        
+        {
+            "name": "bluecloudbottomleft",
+            "depth": 30
+        },
+        
+        {
+            "name": "bluecloudbottom",
+            "depth": 30
+        },
+        
+        {
+            "name": "bluecloudbottomright",
+            "depth": 30
+        },
+        
+        {
+            "name": "greenpipelefttopleft",
+            "collision": true
+        },
+        
+        {
+            "name": "greenpipelefttopright",
+            "collision": true
+        },
+        
+        {
+            "name": "greenpipemiddletop",
+            "collision": true
+        },
+        
+        {
+            "name": "underwaterpipetop",
+            "collision": true
+        },
+        
+        {
+            "name": "whitepipetopleft",
+            "collision": true
+        },
+
+        {
+            "name": "whitepipetopright",
+            "collision": true
+        },
+
+        {
+            "name": "cannonbottom",
+            "collision": true
+        },
+        
+        {
+            "name": "mushroombottom"
+        },
+        
+        {
+            "name": "treebottom"
+        },
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        {
+            "name": "castleleft"
+        },
+
+        {
+            "name": "castledoorbottom"
+        },
+
+        {
+            "name": "castleright"
+        },
+
+        {
+            "name": "treeplatformleft",
+            "collision": true
+        },
+        
+        {
+            "name": "treeplatformmiddle",
+            "collision": true
+        },
+        
+        {
+            "name": "treeplatformright",
+            "collision": true
+        },
+
+        {
+            "name": "whitecastletop"
+        },
+
+        {
+            "name": "whitecastledoortop"
+        },
+
+        {
+            "name": "whitecastlemiddle"
+        },
+
+        {
+            "name": "underwaterplant",
+            "collision": true
+        },
+
+        {
+            "name": "whitetreetop"
+        },
+
+        {
+            "name": "blockalt",
+            "collision": true
+        },
+
+        {
+            "name": "cloudplatform",
+            "collision": true
+        },
+
+        {
+            "name": "greenpipeleftbottomleft",
+            "collision": true
+        },
+
+        {
+            "name": "greenpipeleftbottomright",
+            "collision": true
+        },
+
+        {
+            "name": "greenpipemiddlebottom",
+            "collision": true
+        },
+
+        {
+            "name": "underwaterpipebottom",
+            "collision": true
+        },
+
+        {
+            "name": "whitepipebottomleft",
+            "collision": true
+        },
+
+        {
+            "name": "whitepipebottomright",
+            "collision": true
+        },
+
+        {
+            "name": "fence"
+        },
+
+        {
+            "name": "smalltreetop"
+        },
+
+        {
+            "name": "treetrunk"
         }
+
+        
     ]
 }

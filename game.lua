@@ -46,7 +46,7 @@ function game.draw()
 end
 
 function game.keypressed(key)
-    if key == CONTROLS[1].jump and marios[1].onGround then
+    if key == CONTROLS.jump and marios[1].onGround then
         marios[1]:jump()
     end
 end

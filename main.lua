@@ -71,3 +71,7 @@ function updateGroup(group, dt)
 		table.remove(group, v) --remove
 	end
 end
+
+function keyDown(cmd)
+    return love.keyboard.isDown(CONTROLS[cmd])
+end

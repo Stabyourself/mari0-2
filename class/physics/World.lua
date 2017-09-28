@@ -51,13 +51,11 @@ function World:update(dt)
 			--VS OTHER OBJECTS --but not: portalwall, castlefirefire
 			for _, obj2 in ipairs(self.collisionObjects) do
 				if obj1 ~= obj2 and obj2.active then
-					local hor, ver = checkcollision(obj1, obj2, dt)
-
-					if hor then
-						horcollision = true
-					end
-					if ver then
-						vercollision = true
+					local collision1, collision2 = checkcollision(obj1, obj2, dt)
+					if collision1 then
+						horcollision = collision1
+					elseif collision2 then
+						vercollision = collision2
 					end
 				end
 			end
@@ -81,6 +79,7 @@ function World:update(dt)
 					local obj2 = self.blockLookup[x] and self.blockLookup[x][y]
 					if obj2 and obj2.active then
 						local collision1, collision2 = checkcollision(obj1, obj2, dt)
+
 						if collision1 then
 							horcollision = collision1
 						elseif collision2 then
@@ -89,7 +88,6 @@ function World:update(dt)
 					end
 				end
 			end
-			--]]
 			
 			--Move the object
 			if not vercollision then

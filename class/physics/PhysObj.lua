@@ -9,7 +9,7 @@ function PhysObj:initialize(world, x, y)
     self.speedY = 0
     self.width = 1
     self.height = 1
-    self.onGround = false
+    self.onGround = true
     self.static = false
     self.active = true
     self.r = 0
@@ -17,23 +17,23 @@ function PhysObj:initialize(world, x, y)
     self.world:addObject(self)
 end
 
-function PhysObj:passiveCollide(otherObj)
+function PhysObj:passiveCollide(obj2)
     
 end
 
-function PhysObj:floorCollide(otherObj)
+function PhysObj:floorCollide(obj2)
 
 end
 
-function PhysObj:ceilCollide(otherObj)
+function PhysObj:ceilCollide(obj2)
 
 end
 
-function PhysObj:leftCollide(otherObj)
+function PhysObj:leftCollide(obj2)
 
 end
 
-function PhysObj:rightCollide(otherObj)
+function PhysObj:rightCollide(obj2)
 
 end
 

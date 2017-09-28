@@ -5,6 +5,8 @@ love.graphics.setDepth = love.graphics.setDepth or function() end
 is3DS = love.system.getOS() == "Horizon"
 
 function love.load()
+    print("Mari0 3DS POC by Maurice")
+
     JSON = require "lib/JSON"
     class = require "lib/Class"
     Camera = require "lib/camera"
@@ -25,7 +27,14 @@ function love.load()
     
     love.graphics.set3D(true)
 
-    print("Mari0 3DS POC by Maurice")
+    print("Loading sound...")
+    overworldMusic = love.audio.newSource("sound/music/overworld.ogg")
+    overworldMusic:setLooping(true)
+
+    jumpSound = love.audio.newSource("sound/jump.ogg")
+    blockSound = love.audio.newSource("sound/block.ogg") -- Kick punch block!
+
+    print("Alright let's go")
 
     game.load()
 end
@@ -89,4 +98,13 @@ end
 
 function skipUpdate()
     skipNext = true
+end
+
+function playMusic(music)
+    playSound(music)
+end
+
+function playSound(sound)
+    sound:stop()
+    sound:play()
 end

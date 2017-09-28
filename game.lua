@@ -21,6 +21,8 @@ function game.load()
     marios = {}
     table.insert(marios, Mario:new(myLevel.world, 5, 0))
 
+    playMusic(overworldMusic)
+
     skipUpdate()
 end
 

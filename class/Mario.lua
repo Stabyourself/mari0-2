@@ -99,6 +99,7 @@ function Mario:jump()
 
     self.speedY = -jumpforce
     self.animationState = "jumping"
+    playSound(jumpSound)
 end
 
 function Mario:movement(dt)
@@ -174,5 +175,11 @@ function Mario:movement(dt)
     -- Kill movement below a threshold
     if math.abs(self.speedX) < MINSPEED and (not keyDown("right") and not keyDown("left")) then
         self.speedX = 0
+    end
+end
+
+function Mario:ceilCollide(obj2)
+    if obj2:isInstanceOf(Block) then
+        playSound(blockSound)
     end
 end

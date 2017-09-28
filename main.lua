@@ -25,6 +25,8 @@ function love.load()
     
     love.graphics.set3D(true)
 
+    print("Mari0 3DS POC by Maurice")
+
     game.load()
 end
 

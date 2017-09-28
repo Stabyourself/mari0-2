@@ -21,5 +21,6 @@ FRICTIONAIR = 0 --see above, but in air
 AIRSLIDEFACTOR = 0.8 --multiply of acceleration in air when changing direction
 
 TILESIZE = 16
+RUNANIMATIONTIME = 0.1
 
 DEPTHMUL = 0.3

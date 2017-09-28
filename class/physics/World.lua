@@ -82,9 +82,9 @@ function World:update(dt)
 					if obj2 and obj2.active then
 						local collision1, collision2 = checkcollision(obj1, obj2, dt)
 						if collision1 then
-							horcollision = true
+							horcollision = collision1
 						elseif collision2 then
-							vercollision = true
+							vercollision = collision2
 						end
 					end
 				end
@@ -92,7 +92,7 @@ function World:update(dt)
 			--]]
 			
 			--Move the object
-			if vercollision == false then
+			if not vercollision then
 				obj1.y = obj1.y + obj1.speedY*dt
 				
 				if obj1.onGround then
@@ -101,7 +101,7 @@ function World:update(dt)
 						obj1:startFall()
 					end
 				end
-			else
+			elseif vercollision == "floor" then
 				obj1.onGround = true
 			end
 			
@@ -123,18 +123,20 @@ function checkcollision(obj1, obj2, dt)
 		--check if it's a passive collision (Object is colliding anyway)
 		if aabb(obj1.x, obj1.y, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then --passive collision! (oh noes!)
 			if passivecollision(obj1, obj2) then
-				hadvercollision = true
+				hadvercollision = "floor"
 			end
 			
 		elseif aabb(obj1.x + obj1.speedX*dt, obj1.y + obj1.speedY*dt, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then
 			if aabb(obj1.x + obj1.speedX*dt, obj1.y, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then --Collision is horizontal!
-				if horcollision(obj1, obj2) then
-					hadhorcollision = true
+				local horcol = horcollision(obj1, obj2)
+				if horcol then
+					hadhorcollision = horcol
 				end
 				
 			elseif aabb(obj1.x, obj1.y+obj1.speedY*dt, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then --Collision is vertical!
-				if vercollision(obj1, obj2) then
-					hadvercollision = true
+				local vercol = vercollision(obj1, obj2)
+				if vercol then
+					hadvercollision = vercol
 				end
 				
 			else 
@@ -146,14 +148,18 @@ function checkcollision(obj1, obj2, dt)
 				end
 				if math.abs(obj1.speedY-grav*dt) < math.abs(obj1.speedX) then
 					--vertical collision it is.
-					if vercollision(obj1, obj2) then
-						hadvercollision = true
+					local vercol = vercollision(obj1, obj2)
+					if vercol then
+						hadvercollision = vercol
 					end
+
 				else 
 					--okay so we're moving mainly vertically, so let's just pretend it was a horizontal collision? aight cool.
-					if horcollision(obj1, obj2) then
-						hadhorcollision = true
+					local horcol = horcollision(obj1, obj2)
+					if horcol then
+						hadhorcollision = horcol
 					end
+
 				end
 			end
 		end
@@ -183,7 +189,7 @@ function horcollision(obj1, obj2)
 				obj1.speedX = 0
 			end
 			obj1.x = obj2.x + obj2.width
-			return true
+			return "left"
 		end
 	else
 		--move object LEFT (because it was moving right)
@@ -198,7 +204,7 @@ function horcollision(obj1, obj2)
 				obj1.speedX = 0
 			end
 			obj1.x = obj2.x - obj1.width
-			return true
+			return "right"
 		end
 	end
 	
@@ -219,7 +225,7 @@ function vercollision(obj1, obj2)
 				obj1.speedY = 0
 			end
 			obj1.y = obj2.y  + obj2.height
-			return true
+			return "ceil"
 		end
 	else					
 		if obj2:ceilCollide(obj1) ~= false then
@@ -233,7 +239,7 @@ function vercollision(obj1, obj2)
 				obj1.speedY = 0
 			end
 			obj1.y = obj2.y - obj1.height
-			return true
+			return "floor"
 		end
 	end
 	return false

@@ -3,9 +3,20 @@ Mario = class("Mario", PhysObj)
 marioImg = love.graphics.newImage("img/mario.png")
 marioQuad = {}
 marioQuad.idle = {}
+marioQuad.running = {}
+marioQuad.sliding = {}
+marioQuad.jumping = {}
 
 for y = 1, 4 do
     marioQuad.idle[y] = love.graphics.newQuad(0, (y-1)*20, 20, 20, marioImg:getWidth(), marioImg:getHeight())
+
+    marioQuad.running[y] = {}
+    for i = 1, 3 do
+        marioQuad.running[y][i] = love.graphics.newQuad(i*20, (y-1)*20, 20, 20, marioImg:getWidth(), marioImg:getHeight())
+    end
+
+    marioQuad.sliding[y] = love.graphics.newQuad(80, (y-1)*20, 20, 20, marioImg:getWidth(), marioImg:getHeight())
+    marioQuad.jumping[y] = love.graphics.newQuad(100, (y-1)*20, 20, 20, marioImg:getWidth(), marioImg:getHeight())
 end
     
 
@@ -16,12 +27,16 @@ function Mario:initialize(world, x, y)
     self.height = 12/TILESIZE
     self.jumping = false
     self.ducking = false
+
+    self.animationState = "idle"
+    
+    self.runAnimationFrame = 1
+    self.runAnimationTimer = 0
+    self.animationDirection = 1
 end
 
 function Mario:update(dt)
-    self:movement(dt)
-
-    --Jump physics
+    -- Jump physics
     if self.jumping then
         if not keyDown("jump") or self.speedY > 0 then
             self.jumping = false
@@ -29,14 +44,46 @@ function Mario:update(dt)
         end
     end
 
-	if self.animationstate == "running" then
-		--self:runanimation(dt)
+    -- Animation
+    -- idle
+    if self.onGround and self.speedX == 0 then
+        self.animationState = "idle"
+    end
+
+    if self.onGround and ((keyDown("left") and self.speedX > 0) or (keyDown("right") and self.speedX < 0)) then
+        self.animationState = "sliding"
+    elseif self.onGround and self.speedX ~= 0 then
+        self.animationState = "running"
+    end
+
+	if self.animationState == "running" and self.onGround then
+        self.runAnimationTimer = self.runAnimationTimer + (math.abs(self.speedX)+4)/5*dt
+        while self.runAnimationTimer > RUNANIMATIONTIME do
+            self.runAnimationTimer = self.runAnimationTimer - RUNANIMATIONTIME
+            self.runAnimationFrame = self.runAnimationFrame + 1
+
+            if self.runAnimationFrame > 3 then
+                self.runAnimationFrame = self.runAnimationFrame - 3
+            end
+        end
 	end
+
+    if keyDown("left") and self.onGround then
+        self.animationDirection = -1
+    elseif keyDown("right") and self.onGround then
+        self.animationDirection = 1
+    end
+    self:movement(dt)
 end
 
 function Mario:draw()
-    worldDraw(marioImg, marioQuad.idle[3], self.x+self.width/2, self.y+self.height-6/TILESIZE, self.r, 1, 1, 11, 11)
-    --self.world:drawObject(self)
+    local quad = marioQuad[self.animationState][3]
+
+    if self.animationState == "running" then
+        quad = marioQuad[self.animationState][3][self.runAnimationFrame]
+    end
+
+    worldDraw(marioImg, quad, self.x+self.width/2, self.y+self.height-6/TILESIZE, self.r, self.animationDirection, 1, 11, 11)
 end
 
 function Mario:jump()
@@ -51,6 +98,7 @@ function Mario:jump()
     jumpforce = jumpforce + math.max(0, math.min(1, math.abs(self.speedX)/MAXRUNSPEED)) * JUMPFORCEADD
 
     self.speedY = -jumpforce
+    self.animationState = "jumping"
 end
 
 function Mario:movement(dt)

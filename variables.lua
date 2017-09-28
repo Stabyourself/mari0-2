@@ -2,9 +2,12 @@ WIDTH = 25
 HEIGHT = 15
 
 GRAVITY = 80
+GRAVITYJUMPING = 30 --gravity while jumping (Only for mario)
 MAXYSPEED = 100
 
-JUMPFORCE = 27--16
+JUMPFORCE = 16--16
+JUMPFORCEADD = 1.9 --how much jumpforce is added at top speed (linear from 0 to topspeed)
+
 WALKACCELERATION = 8 --acceleration of walking on ground
 RUNACCELERATION = 16 --acceleration of running on ground
 WALKACCELERATIONAIR = 8 --acceleration of walking in the air

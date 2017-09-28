@@ -1,8 +1,6 @@
 game = {}
 
 function game.load()
-    is3DS = love.system.getOS() == "Horizon"
-    
     if not is3DS then
         love.window.setMode(400, 480)
     end
@@ -22,6 +20,8 @@ function game.load()
 
     marios = {}
     table.insert(marios, Mario:new(myLevel.world, 5, 0))
+
+    skipUpdate()
 end
 
 function game.update(dt)
@@ -48,5 +48,29 @@ end
 function game.keypressed(key)
     if key == CONTROLS.jump and marios[1].onGround then
         marios[1]:jump()
+    end
+end
+
+function worldDraw(img, quad, x, y, r, sx, sy, ox, oy)
+    if type(quad) == "number" then
+        img, x, y, r, sx, sy, ox, oy = img, quad, x, y, r, sx, sy, ox
+        quad = false
+    end
+
+    x = round(x*TILESIZE)
+    y = round(y*TILESIZE)
+
+    if not quad then
+        love.graphics.draw(img, x, y, r, sx, sy, ox, oy)
+    else
+        love.graphics.draw(img, quad, x, y, r, sx, sy, ox, oy)
+    end
+end
+
+function round(i)
+    if i > 0 then
+        return math.floor(i+.5)
+    else
+        return math.ceil(i-.5)
     end
 end

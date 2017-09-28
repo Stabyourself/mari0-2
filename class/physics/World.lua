@@ -28,7 +28,7 @@ function World:draw()
 end
 
 function World:drawObject(obj)
-	love.graphics.rectangle("fill", obj.x*TILESIZE+.5, obj.y*TILESIZE+.5, obj.width*TILESIZE, obj.height*TILESIZE)
+	love.graphics.rectangle("line", obj.x*TILESIZE+.5, obj.y*TILESIZE+.5, obj.width*TILESIZE-1, obj.height*TILESIZE-1)
 end
 
 function World:update(dt)

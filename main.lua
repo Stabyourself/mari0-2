@@ -2,6 +2,8 @@
 love.graphics.set3D = love.graphics.set3D or function() end
 love.graphics.setDepth = love.graphics.setDepth or function() end
 
+is3DS = love.system.getOS() == "Horizon"
+
 function love.load()
     JSON = require "lib/JSON"
     class = require "lib/Class"
@@ -27,6 +29,13 @@ function love.load()
 end
 
 function love.update(dt)
+    dt = math.min(1/10, dt)
+
+    if skipNext then
+        skipNext = false
+        return
+    end
+
 	if FFKEYS then
 		for _, v in ipairs(FFKEYS) do
 			if love.keyboard.isDown(v.key) then
@@ -74,4 +83,8 @@ end
 
 function keyDown(cmd)
     return love.keyboard.isDown(CONTROLS[cmd])
+end
+
+function skipUpdate()
+    skipNext = true
 end

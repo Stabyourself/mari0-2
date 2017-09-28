@@ -12,6 +12,7 @@ function PhysObj:initialize(world, x, y)
     self.onGround = false
     self.static = false
     self.active = true
+    self.r = 0
 
     self.world:addObject(self)
 end

@@ -1,17 +1,33 @@
 Mario = class("Mario", PhysObj)
 
+marioImg = love.graphics.newImage("img/mario.png")
+marioQuad = {}
+marioQuad.idle = {}
+
+for y = 1, 4 do
+    marioQuad.idle[y] = love.graphics.newQuad(0, (y-1)*20, 20, 20, marioImg:getWidth(), marioImg:getHeight())
+end
+    
+
 function Mario:initialize(world, x, y)
     PhysObj.initialize(self, world, x, y)
 
     self.width = 12/TILESIZE
     self.height = 12/TILESIZE
     self.jumping = false
-    self.falling = false
     self.ducking = false
 end
 
 function Mario:update(dt)
     self:movement(dt)
+
+    --Jump physics
+    if self.jumping then
+        if not keyDown("jump") or self.speedY > 0 then
+            self.jumping = false
+            self.gravity = GRAVITY
+        end
+    end
 
 	if self.animationstate == "running" then
 		--self:runanimation(dt)
@@ -19,26 +35,35 @@ function Mario:update(dt)
 end
 
 function Mario:draw()
-    self.world:drawObject(self)
+    worldDraw(marioImg, marioQuad.idle[3], self.x+self.width/2, self.y+self.height-6/TILESIZE, self.r, 1, 1, 11, 11)
+    --self.world:drawObject(self)
 end
 
 function Mario:jump()
     self.onGround = false
-    self.speedY = -JUMPFORCE
+    self.jumping = true
+
+    self.gravity = GRAVITYJUMPING
+
+    -- Adjust jumpforce according to speed
+    local jumpforce = JUMPFORCE
+
+    jumpforce = jumpforce + math.max(0, math.min(1, math.abs(self.speedX)/MAXRUNSPEED)) * JUMPFORCEADD
+
+    self.speedY = -jumpforce
 end
 
 function Mario:movement(dt)
-    local friction = 0
     local acceleration = 0
-    local accelerationVal = WALKACCELERATION
-    local maxSpeed
 
     -- Normal left/right acceleration
-    if keyDown("run") then
-        accelerationVal = RUNACCELERATION
-    end
 
     if (not keyDown("run") and math.abs(self.speedX) <= MAXWALKSPEED) or (keyDown("run") and math.abs(self.speedX) <= MAXRUNSPEED) then
+        local accelerationVal = WALKACCELERATION
+        if keyDown("run") then
+            accelerationVal = RUNACCELERATION
+        end
+
         if keyDown("left") then
             acceleration = acceleration - accelerationVal
 
@@ -56,22 +81,21 @@ function Mario:movement(dt)
         end
     end
 
-    -- Friction multiplier
-    if self.jumping or self.falling then
-        friction = FRICTIONAIR
-    elseif math.abs(self.speedX) > MAXRUNSPEED then
-        friction = SUPERFRICTION
-    else
-        friction = FRICTION
-    end
-
     -- Apply friction?
     if  (not keyDown("right") and not keyDown("left")) or 
-        (self.ducking and self.falling == false and self.jumping == false) or
+        (self.ducking and self.onGround) or
         self.disabled or
         (not keyDown("run") and math.abs(self.speedX) > MAXWALKSPEED) or
         math.abs(self.speedX) > MAXRUNSPEED or
         ((acceleration < 0 and self.speedX > 0) or (acceleration > 0 and self.speedX < 0)) then
+
+        -- Friction multiplier
+        local friction = FRICTION
+        if not self.onGround then
+            friction = FRICTIONAIR
+        elseif math.abs(self.speedX) > MAXRUNSPEED then
+            friction = SUPERFRICTION
+        end
 
         if self.speedX > 0 then
             acceleration = acceleration - FRICTION
@@ -81,6 +105,8 @@ function Mario:movement(dt)
     end
 
     -- Clamp max speeds for walk and run
+    local maxSpeed
+
     if (not keyDown("run") and math.abs(self.speedX) < MAXWALKSPEED) then
         maxSpeed = MAXWALKSPEED
     elseif (keyDown("run") and math.abs(self.speedX) < MAXRUNSPEED) then
@@ -101,6 +127,4 @@ function Mario:movement(dt)
     if math.abs(self.speedX) < MINSPEED and (not keyDown("right") and not keyDown("left")) then
         self.speedX = 0
     end
-
-    --print(acceleration, self.speedX)
 end

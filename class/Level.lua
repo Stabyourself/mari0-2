@@ -18,10 +18,16 @@ function Level:initialize(path, tileMap)
         for y = 1, self.height do
             if self.tileMap.tiles[self.map[x][y]] then
                 if self.tileMap.tiles[self.map[x][y]].collision then
-                    self.blocks[x][y] = Block:new(self.world, x-1, y-1)
+                    self.blocks[x][y] = Block:new(self.world, x, y)
                 end
             end
         end
+    end
+    
+    self.blockBounces = {}
+    self.bounceLookup = {}
+    for x = 1, self.width do
+        self.bounceLookup[x] = {}
     end
     
     -- Parse entities
@@ -31,19 +37,36 @@ function Level:initialize(path, tileMap)
             self.spawnY = v.y
         end
     end
+
+    self.marios = {}
+    table.insert(self.marios, Mario:new(self.world, self.spawnX-6/TILESIZE, self.spawnY-12/TILESIZE))
 end
 
 function Level:update(dt, camera)
+    updateGroup(self.blockBounces, dt)
     self.world:update(dt)
 end
 
 function Level:draw(camera)
     for _, v in ipairs(self.drawList) do
-        v.tile:draw((v.x-1)*16, (v.y-1)*16)
+        local offset = 0
+        local bounce = self.bounceLookup[v.x][v.y]
+        
+        if bounce then
+            offset = bounce.offset
+        end
+            
+        v.tile:draw((v.x-1)*16, (v.y-1-offset)*16)
     end
     
     if PHYSICSDEBUG then
         self.world:draw()
+    end
+end
+
+function Level:keypressed(key)
+    if key == CONTROLS.jump and self.marios[1].onGround then
+        self.marios[1]:jump()
     end
 end
 
@@ -97,4 +120,13 @@ function Level:inMap(x, y)
     return x > 0 and x <= self.width and y > 0 and y <= self.height
 end
 
---13.7 ms
+function Level:getTile(x, y)
+    return self.tileMap.tiles[self.map[x][y]]
+end
+
+function Level:bumpBlock(x, y)
+    local blockBounce = BlockBounce:new(x, y)
+    
+    table.insert(self.blockBounces, blockBounce)
+    self.bounceLookup[x][y] = blockBounce
+end

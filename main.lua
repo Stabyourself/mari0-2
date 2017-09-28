@@ -23,6 +23,7 @@ function love.load()
     require "class/Level"
     require "class/Mario"
     require "class/Block"
+    require "class/BlockBounce"
 
     require "game"
     

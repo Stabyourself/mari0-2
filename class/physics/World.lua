@@ -62,8 +62,8 @@ function World:update(dt)
 			
 			
 			--VS TILES (Because I only wanna check close ones)
-			local xstart = math.floor(obj1.x+obj1.prevSpeedX*dt-2/16)
-			local ystart = math.floor(obj1.y+obj1.prevSpeedY*dt-2/16)
+			local xstart = math.floor(obj1.x+obj1.prevSpeedX*dt-2/16)+1
+			local ystart = math.floor(obj1.y+obj1.prevSpeedY*dt-2/16)+1
 			
 			local xto = xstart+math.ceil(obj1.width)
 			local dir = 1

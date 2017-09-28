@@ -2,7 +2,7 @@
     "entities": [
         {
             "type": "spawn",
-            "x": 200,
+            "x": 3,
             "y": 13
         }    
     ],

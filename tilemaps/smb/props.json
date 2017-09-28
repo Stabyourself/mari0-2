@@ -257,7 +257,8 @@
         
         {
             "name": "blockunderground",
-            "collision": true
+            "collision": true,
+            "breakable": true
         },
         
         {

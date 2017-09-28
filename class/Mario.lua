@@ -180,7 +180,14 @@ end
 
 function Mario:ceilCollide(obj2)
     if obj2:isInstanceOf(Block) then
+        -- Todo: see if there's a block closer to mario's center next to obj2
         playSound(blockSound)
+        
+        local tile = game.level:getTile(obj2.blockX, obj2.blockY)
+        
+        if tile.breakable or tile.coinblock then
+            game.level:bumpBlock(obj2.blockX, obj2.blockY)
+        end
     end
 end
 

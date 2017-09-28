@@ -5,6 +5,8 @@ function Tile:initialize(img, quad, properties)
     self.quad = quad
     self.invisible = properties.invisible or false
     self.collision = properties.collision or false
+    self.breakable = properties.breakable or false
+    self.coinblock = properties.coinblock or false
     self.depth = properties.depth or 0
 end
 

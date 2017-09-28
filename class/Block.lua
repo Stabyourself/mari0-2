@@ -5,7 +5,7 @@ function Block:initialize(world, x, y)
     self.blockX = x
     self.blockY = y
     
-    PhysObj.initialize(self, world, x, y)
+    PhysObj.initialize(self, world, x-1, y-1)
 
     self.static = true
 end

@@ -20,9 +20,6 @@ function game.load()
     
     game.timeLeft = 400
 
-    marios = {}
-    table.insert(marios, Mario:new(game.level.world, game.level.spawnX-6/TILESIZE, game.level.spawnY-12/TILESIZE))
-
     playMusic(overworldMusic)
 
     skipUpdate()
@@ -31,7 +28,7 @@ end
 function game.update(dt)
     game.timeLeft = math.max(0, game.timeLeft-2.5*dt)
     
-    updateGroup(marios, dt)
+    updateGroup(game.level.marios, dt)
     
     game.level:update(dt)
     
@@ -44,7 +41,7 @@ function game.draw()
     mainCamera:attach()
     game.level:draw(mainCamera)
     
-    for _, v in ipairs(marios) do
+    for _, v in ipairs(game.level.marios) do
         v:draw()
     end
     
@@ -68,15 +65,13 @@ function game.draw()
 end
 
 function game.keypressed(key)
-    if key == CONTROLS.jump and marios[1].onGround then
-        marios[1]:jump()
-    end
+    game.level:keypressed(key)
 end
 
 function game.updateCamera(camera, dt)
-    local pX = marios[1].x
+    local pX = game.level.marios[1].x
     local pXr = pX - camera.x
-    local pSpeedX = marios[1].speedX
+    local pSpeedX = game.level.marios[1].speedX
     
     -- RIGHT
     if pXr > SCROLLINGCOMPLETE then

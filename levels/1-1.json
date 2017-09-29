@@ -1,7 +1,23 @@
 {
     "entities": [
         {"type": "spawn", "x": 3, "y": 13},
-        {"type": "goomba", "x": 12, "y": 13}
+        {"type": "goomba", "x": 23, "y": 13},
+        {"type": "goomba", "x": 41, "y": 13},
+        {"type": "goomba", "x": 52, "y": 13},
+        {"type": "goomba", "x": 53.5, "y": 13},
+        {"type": "goomba", "x": 81, "y": 5},
+        {"type": "goomba", "x": 83, "y": 5},
+        {"type": "goomba", "x": 98, "y": 13},
+        {"type": "goomba", "x": 99.5, "y": 13},
+        {"type": "koopa", "x": 108, "y": 13},
+        {"type": "goomba", "x": 115, "y": 13},
+        {"type": "goomba", "x": 116.5, "y": 13},
+        {"type": "goomba", "x": 125, "y": 13},
+        {"type": "goomba", "x": 126.5, "y": 13},
+        {"type": "goomba", "x": 129, "y": 13},
+        {"type": "goomba", "x": 130.5, "y": 13},
+        {"type": "goomba", "x": 175, "y": 13},
+        {"type": "goomba", "x": 176.5, "y": 13}
     ],
     
     "map": [ 

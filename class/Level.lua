@@ -32,29 +32,54 @@ function Level:initialize(path, tileMap)
         self.bounceLookup[x] = {}
     end
     
+    self.spawnList = {}
     -- Parse entities
     for _, v in ipairs(self.json.entities) do
         local enemy = self.enemyList[v.type]
 
         if enemy then -- is enemy
-            Enemy:new(self.world, v.x, v.y, enemy.json, enemy.img, enemy.quad)
+            table.insert(self.spawnList, {
+                enemy = enemy,
+                x = v.x,
+                y = v.y
+            })
         elseif v.type == "spawn" then
             self.spawnX = v.x
             self.spawnY = v.y
         end
     end
 
+    table.sort(self.spawnList, function(a, b) return a.x<b.x end)
+
     self.marios = {}
     table.insert(self.marios, Mario:new(self.world, self.spawnX-6/16, self.spawnY-12/16))
+    
+
+    self.camera = Camera:new()
+    self.spawnLine = 0
+    self.spawnI = 1
+
+    self:generateDrawList()
 end
 
-function Level:update(dt, camera)
+function Level:update(dt)
     updateGroup(self.world.activeObjects, dt)
     updateGroup(self.blockBounces, dt)
     self.world:update(dt)
+    self:updateCamera(dt)
+    
+    local newSpawnLine = self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2
+    if newSpawnLine > self.spawnLine then
+        self:spawnEnemies(newSpawnLine)
+        self.spawnLine = newSpawnLine
+    end
+    
+    self:checkDrawList()
 end
 
-function Level:draw(camera)
+function Level:draw()
+    self.camera:attach()
+
     for _, v in ipairs(self.drawList) do
         local offset = 0
         local bounce = self.bounceLookup[v.x][v.y]
@@ -67,6 +92,8 @@ function Level:draw(camera)
     end
     
     self.world:draw()
+
+    self.camera:detach()
 end
 
 function Level:keypressed(key)
@@ -75,15 +102,46 @@ function Level:keypressed(key)
     end
 end
 
-function Level:checkDrawList(camera)
-    if math.floor(camera.x)+1-EXTRADRAWING ~= self.drawListX then
-        self:generateDrawList(camera)
+function Level:spawnEnemies(untilX)
+    while self.spawnI <= #self.spawnList and untilX > self.spawnList[self.spawnI].x do -- Spawn next enemy
+        toSpawn = self.spawnList[self.spawnI]
+        Enemy:new(self.world, toSpawn.x, toSpawn.y, toSpawn.enemy.json, toSpawn.enemy.img, toSpawn.enemy.quad)
+
+        self.spawnI = self.spawnI + 1
     end
 end
 
-function Level:generateDrawList(camera)
-    local xStart = math.floor(camera.x)+1-EXTRADRAWING
-    local yStart = math.floor(camera.y)+1-EXTRADRAWING
+function Level:updateCamera(dt)
+    local pX = game.level.marios[1].x
+    local pXr = pX - self.camera.x
+    local pSpeedX = game.level.marios[1].speedX
+    
+    -- RIGHT
+    if pXr > SCROLLINGCOMPLETE then
+        self.camera.x = pX - SCROLLINGCOMPLETE
+    elseif pXr > SCROLLINGSTART and pSpeedX > SCROLLRATE then
+        self.camera.x = self.camera.x + SCROLLRATE*dt
+    end
+    -- LEFT
+    if pXr < SCROLLINGLEFTCOMPLETE then
+        self.camera.x = pX - SCROLLINGLEFTCOMPLETE
+    elseif pXr < SCROLLINGLEFTSTART and pSpeedX < -SCROLLRATE then
+        self.camera.x = self.camera.x - SCROLLRATE*dt
+    end
+    
+    -- And clamp it to map boundaries
+    self.camera.x = math.max(0, math.min(game.level.width - WIDTH - 1, self.camera.x))
+end
+
+function Level:checkDrawList()
+    if math.floor(self.camera.x)+1-EXTRADRAWING ~= self.drawListX then
+        self:generateDrawList(self.camera)
+    end
+end
+
+function Level:generateDrawList()
+    local xStart = math.floor(self.camera.x)+1-EXTRADRAWING
+    local yStart = math.floor(self.camera.y)+1-EXTRADRAWING
     local xEnd = xStart + WIDTH+EXTRADRAWING*2
     local yEnd = yStart + HEIGHT+EXTRADRAWING*2
     

@@ -59,13 +59,13 @@ function Enemy:move(dt)
 end
 
 function Enemy:leftCollide(obj2)
-    if self.movement == "truffleshuffle" then
+    if self.movement == "truffleshuffle" and self.shuffleDir == -1 then
         self.shuffleDir = -self.shuffleDir
     end
 end
 
 function Enemy:rightCollide(obj2)
-    if self.movement == "truffleshuffle" then
+    if self.movement == "truffleshuffle" and self.shuffleDir == 1 then
         self.shuffleDir = -self.shuffleDir
     end
 end

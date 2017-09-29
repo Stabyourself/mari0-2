@@ -11,12 +11,6 @@ function game.load()
     game.level = Level:new("levels/1-1.json", smbTileMap)
     
     love.graphics.setBackgroundColor(game.level.backgroundColor or {92, 148, 252})
-
-    mainCamera = Camera:new()
-    mainCamera.x = 0
-    mainCamera.y = 0
-    
-    game.level:generateDrawList(mainCamera)
     
     game.coinFrame = 1
     game.coinAnimationTimer = 0
@@ -32,10 +26,6 @@ function game.update(dt)
     
     game.level:update(dt)
     
-    game.updateCamera(mainCamera, dt)
-    
-    game.level:checkDrawList(mainCamera)
-    
 	game.coinAnimationTimer = game.coinAnimationTimer + dt
 	while game.coinAnimationTimer >= COINANIMATIONTIME do
         game.coinFrame = game.coinFrame + 1
@@ -49,10 +39,7 @@ function game.update(dt)
 end
 
 function game.draw()
-    mainCamera:attach()
     game.level:draw(mainCamera)
-    
-    mainCamera:detach()
     
     -- UI
     -- score
@@ -73,28 +60,6 @@ end
 
 function game.keypressed(key)
     game.level:keypressed(key)
-end
-
-function game.updateCamera(camera, dt)
-    local pX = game.level.marios[1].x
-    local pXr = pX - camera.x
-    local pSpeedX = game.level.marios[1].speedX
-    
-    -- RIGHT
-    if pXr > SCROLLINGCOMPLETE then
-        camera.x = pX - SCROLLINGCOMPLETE
-    elseif pXr > SCROLLINGSTART and pSpeedX > SCROLLRATE then
-        camera.x = camera.x + SCROLLRATE*dt
-    end
-    -- LEFT
-    if pXr < SCROLLINGLEFTCOMPLETE then
-        camera.x = pX - SCROLLINGLEFTCOMPLETE
-    elseif pXr < SCROLLINGLEFTSTART and pSpeedX < -SCROLLRATE then
-        camera.x = camera.x - SCROLLRATE*dt
-    end
-    
-    -- And clamp it to map boundaries
-    camera.x = math.max(0, math.min(game.level.width - WIDTH - 1, camera.x))
 end
 
 function worldDraw(img, quad, x, y, r, sx, sy, ox, oy)

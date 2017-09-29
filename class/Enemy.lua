@@ -19,25 +19,25 @@ function Enemy:initialize(world, x, y, json, img, quad)
     -- Set up animation
     self.animationDirection = -1
 
-    if self.animation == "frames" then
+    if self.animationType == "frames" then
         self.frameTimer = 0
         self.frame = 1
         self.quad = quad[self.frame]
     end
 
     -- Set up movement
-    if self.movement == "truffleshuffle" then
+    if self.movementType == "truffleshuffle" then
         self.shuffleDir = -1
     end
 end
 
 function Enemy:update(dt)
-    self:animate(dt)
-    self:move(dt)
+    self:animation(dt)
+    self:movement(dt)
 end
 
-function Enemy:animate(dt)
-    if self.animation == "frames" then
+function Enemy:animation(dt)
+    if self.animationType == "frames" then
         self.frameTimer = self.frameTimer + dt
 
         while self.frameTimer > self.frameTime do
@@ -53,20 +53,24 @@ function Enemy:animate(dt)
     end
 end
 
-function Enemy:move(dt)
-    if self.movement == "truffleshuffle" then
+function Enemy:movement(dt)
+    if self.movementType == "truffleshuffle" then
         self.speedX = self.speed*self.shuffleDir
     end
 end
 
 function Enemy:leftCollide(obj2)
-    if self.movement == "truffleshuffle" and self.shuffleDir == -1 then
+    if self.movementType == "truffleshuffle" and self.shuffleDir == -1 then
         self.shuffleDir = -self.shuffleDir
     end
 end
 
 function Enemy:rightCollide(obj2)
-    if self.movement == "truffleshuffle" and self.shuffleDir == 1 then
+    if self.movementType == "truffleshuffle" and self.shuffleDir == 1 then
         self.shuffleDir = -self.shuffleDir
     end
+end
+
+function Enemy:stomp()
+
 end

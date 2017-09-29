@@ -25,6 +25,8 @@ SUPERFRICTION = 100 --see above, but when speed is greater than MAXRUNSPEED
 FRICTIONAIR = 0 --see above, but in air
 AIRSLIDEFACTOR = 0.8 --multiply of acceleration in air when changing direction
 
+ENEMYBOUNCEHEIGHT = 14/16
+
 SCROLLRATE = 5
 SUPERSCROLLRATE = 40
 
@@ -38,6 +40,7 @@ EXTRADRAWING = 1 -- how many blocks to draw offscreen
 
 BLOCKBOUNCETIME = 0.2
 BLOCKBOUNCEHEIGHT = 0.4
+
 
 JUMPLEEWAY = 6/16
 BLOCKHITFORCE = 2

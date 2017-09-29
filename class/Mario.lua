@@ -29,6 +29,7 @@ function Mario:initialize(world, x, y)
     self.ducking = false
 
     self.animationState = "idle"
+    self.quad = marioQuad[self.animationState][3]
     
     self.runAnimationFrame = 1
     self.runAnimationTimer = 0
@@ -219,6 +220,16 @@ function Mario:ceilCollide(obj2)
         self.speedY = BLOCKHITFORCE
         
         game.level:bumpBlock(x, y)
+    end
+end
+
+function Mario:floorCollide(obj2)
+    if obj2.stompable then
+        obj2:stomp()
+        self.speedY = -getRequiredSpeed(ENEMYBOUNCEHEIGHT)
+        playSound(stompSound)
+        
+        return false
     end
 end
 

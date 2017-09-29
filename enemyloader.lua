@@ -13,7 +13,7 @@ function loadEnemies()
             local quad = {}
 
             -- Generate quads
-            if json.animation == "frames" then
+            if json.animationType == "frames" then
                 for i = 1, json.frames do
                     local width = img:getWidth()/json.frames
                     

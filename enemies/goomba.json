@@ -2,10 +2,12 @@
     "width": 0.75,
     "height": 0.75,
 
-    "movement": "truffleshuffle",
+    "movementType": "truffleshuffle",
     "speed": 2,
+    
+    "stompable": true,
 
-    "animation": "frames",
+    "animationType": "frames",
     "frames": 2,
     "frameTime": 0.2,
 

@@ -1,10 +1,6 @@
 game = {}
 
 function game.load()
-    if not is3DS then
-        love.window.setMode(416, 480)
-    end
-    
     gameState = "game"
     
     smbTileMap = TileMap:new("tilemaps/smb")
@@ -60,28 +56,4 @@ end
 
 function game.keypressed(key)
     game.level:keypressed(key)
-end
-
-function worldDraw(img, quad, x, y, r, sx, sy, ox, oy)
-    if type(quad) == "number" then
-        img, x, y, r, sx, sy, ox, oy = img, quad, x, y, r, sx, sy, ox
-        quad = false
-    end
-
-    x = round(x*TILESIZE)
-    y = round(y*TILESIZE)
-
-    if not quad then
-        love.graphics.draw(img, x, y, r, sx, sy, ox, oy)
-    else
-        love.graphics.draw(img, quad, x, y, r, sx, sy, ox, oy)
-    end
-end
-
-function round(i)
-    if i > 0 then
-        return math.floor(i+.5)
-    else
-        return math.ceil(i-.5)
-    end
 end

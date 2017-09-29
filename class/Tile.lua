@@ -29,9 +29,9 @@ function Tile:draw(x, y)
         love.graphics.setDepth(DEPTHMUL*self.depth)
 
         if self.t == "quad" then
-            love.graphics.draw(self.img, self.quad, x, y)
+            love.graphics.draw(self.img, self.quad, x*SCALE, y*SCALE, 0, SCALE, SCALE)
         elseif self.t == "coin" then
-            love.graphics.draw(self.img, self.quad[game.coinFrame], x, y)
+            love.graphics.draw(self.img, self.quad[game.coinFrame], x*SCALE, y*SCALE, 0, SCALE, SCALE)
         end
     end
 end

@@ -7,13 +7,20 @@ is3DS = love.system.getOS() == "Horizon"
 function love.load()
     print("Mari0 3DS POC by Maurice")
     print("Loading stuff...")
-
+    
+    require "variables"
+    require "environment"
+    
+    love.graphics.setDefaultFilter("nearest", "nearest")
+    
+    if not is3DS then
+        love.window.setMode(400*SCALE, 240*SCALE)
+    end
+    
     JSON = require "lib/JSON"
     class = require "lib/Class"
     Camera = require "lib/camera"
 
-    require "variables"
-    require "environment"
     require "enemyLoader"
 
     require "class/physics/World"
@@ -45,6 +52,7 @@ function love.load()
     jumpSound = love.audio.newSource("sound/jump.ogg")
     blockSound = love.audio.newSource("sound/block.ogg")
     coinSound = love.audio.newSource("sound/coin.ogg")
+    stompSound = love.audio.newSource("sound/stomp.ogg")
 
     print("Alright let's go!")
 
@@ -109,6 +117,7 @@ function keyDown(cmd)
 end
 
 function skipUpdate()
+    print("Skipping next update!")
     skipNext = true
 end
 
@@ -140,7 +149,7 @@ function marioPrint(s, x, y, align, depth)
 		local quad = fontQuad[string.sub(s, i, i)]
         
 		if quad then
-			love.graphics.draw(fontImg, quad, x+(i-1)*8, y)
+			love.graphics.draw(fontImg, quad, (x+(i-1)*8)*SCALE, y*SCALE, 0, SCALE, SCALE)
 		end
 	end
     
@@ -167,4 +176,26 @@ function inTable(t, needle)
 		end
 	end
 	return false
+end
+
+function worldDraw(...)
+    local arg = {...}
+
+    if type(arg[2]) == "number" then
+        love.graphics.draw(arg[1], round(arg[2]*TILESIZE)*SCALE, round(arg[3]*TILESIZE)*SCALE, (arg[4] or 0), (arg[5] or 1)*SCALE, (arg[6] or 1)*SCALE, arg[7], arg[8])
+    else
+        love.graphics.draw(arg[1], arg[2], round(arg[3]*TILESIZE)*SCALE, round(arg[4]*TILESIZE)*SCALE, (arg[5] or 0), (arg[6] or 1)*SCALE, (arg[7] or 1)*SCALE, arg[8], arg[9])
+    end
+end
+
+function round(i)
+    if i > 0 then
+        return math.floor(i+.5)
+    else
+        return math.ceil(i-.5)
+    end
+end
+
+function getRequiredSpeed(height, gravity)
+    return math.sqrt(2*(gravity or GRAVITY)*height)
 end

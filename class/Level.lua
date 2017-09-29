@@ -54,11 +54,11 @@ function Level:initialize(path, tileMap)
     self.marios = {}
     table.insert(self.marios, Mario:new(self.world, self.spawnX-6/16, self.spawnY-12/16))
     
-
     self.camera = Camera:new()
     self.spawnLine = 0
     self.spawnI = 1
 
+    self:spawnEnemies(self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2)
     self:generateDrawList()
 end
 

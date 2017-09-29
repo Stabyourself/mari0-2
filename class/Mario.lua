@@ -23,8 +23,8 @@ end
 function Mario:initialize(world, x, y)
     PhysObj.initialize(self, world, x, y)
 
-    self.width = 12/TILESIZE
-    self.height = 12/TILESIZE
+    self.width = 12/16
+    self.height = 12/16
     self.jumping = false
     self.ducking = false
 
@@ -33,6 +33,9 @@ function Mario:initialize(world, x, y)
     self.runAnimationFrame = 1
     self.runAnimationTimer = 0
     self.animationDirection = 1
+    self.img = marioImg
+    self.centerX = 11
+    self.centerY = 11
 end
 
 function Mario:update(dt)
@@ -44,8 +47,33 @@ function Mario:update(dt)
         end
     end
 
-    -- Animation
-    -- idle
+    self:animation(dt)
+    self:movement(dt)
+
+    self.quad = marioQuad[self.animationState][3]
+
+    if self.animationState == "running" then
+        self.quad = marioQuad[self.animationState][3][self.runAnimationFrame]
+    end
+end
+
+function Mario:jump()
+    self.onGround = false
+    self.jumping = true
+
+    self.gravity = GRAVITYJUMPING
+
+    -- Adjust jumpforce according to speed
+    local jumpforce = JUMPFORCE
+
+    jumpforce = jumpforce + math.max(0, math.min(1, math.abs(self.speedX)/MAXRUNSPEED)) * JUMPFORCEADD
+
+    self.speedY = -jumpforce
+    self.animationState = "jumping"
+    playSound(jumpSound)
+end
+
+function Mario:animation(dt)
     if self.onGround and self.speedX == 0 then
         self.animationState = "idle"
     end
@@ -73,36 +101,11 @@ function Mario:update(dt)
     elseif keyDown("right") and self.onGround then
         self.animationDirection = 1
     end
-    self:movement(dt)
-end
-
-function Mario:draw()
-    local quad = marioQuad[self.animationState][3]
-
-    if self.animationState == "running" then
-        quad = marioQuad[self.animationState][3][self.runAnimationFrame]
-    end
-
-    worldDraw(marioImg, quad, self.x+self.width/2, self.y+self.height-6/TILESIZE, self.r, self.animationDirection, 1, 11, 11)
-end
-
-function Mario:jump()
-    self.onGround = false
-    self.jumping = true
-
-    self.gravity = GRAVITYJUMPING
-
-    -- Adjust jumpforce according to speed
-    local jumpforce = JUMPFORCE
-
-    jumpforce = jumpforce + math.max(0, math.min(1, math.abs(self.speedX)/MAXRUNSPEED)) * JUMPFORCEADD
-
-    self.speedY = -jumpforce
-    self.animationState = "jumping"
-    playSound(jumpSound)
 end
 
 function Mario:movement(dt)
+    --Todo: Don't accelerate past maxwalkspeed in air!
+    --Todo: Some stuff about automatically getting maxrunspeed if on maxwalkspeed when landing
     local acceleration = 0
 
     -- Normal left/right acceleration
@@ -180,14 +183,42 @@ end
 
 function Mario:ceilCollide(obj2)
     if obj2:isInstanceOf(Block) then
-        -- Todo: see if there's a block closer to mario's center next to obj2
-        playSound(blockSound)
-        
-        local tile = game.level:getTile(obj2.blockX, obj2.blockY)
-        
-        if tile.breakable or tile.coinblock then
-            game.level:bumpBlock(obj2.blockX, obj2.blockY)
+        -- See whether it was very close to the edge of a block next to air, in which case allow Mario to keep jumping
+        -- Right side
+        if self.x > obj2.x+obj2.width - JUMPLEEWAY and not game.level:getTile(obj2.blockX+1, obj2.blockY).collision then
+            self.x = obj2.x+obj2.width
+            self.speedX = math.max(self.speedX, 0)
+            return false
         end
+        
+        -- Left side
+        if self.x + self.width < obj2.x + JUMPLEEWAY and not game.level:getTile(obj2.blockX-1, obj2.blockY).collision then
+            self.x = obj2.x-self.width
+            self.speedX = math.min(self.speedX, 0)
+            return false
+        end
+
+        -- See if there's a better matching block (because Mario jumped near the edge of a block)
+        local toCheck = 0
+        local x, y = obj2.blockX, obj2.blockY
+
+        if self.x+self.width/2 > obj2.x+obj2.width then
+            toCheck = 1
+        elseif self.x+self.width/2 < obj2.x then
+            toCheck = -1
+        end
+
+        if toCheck ~= 0 then
+            if game.level:getTile(x+toCheck, y).collision then
+                x = x + toCheck
+                obj2 = game.level.blocks[x][y]
+            end
+        end
+        
+        playSound(blockSound)
+        self.speedY = BLOCKHITFORCE
+        
+        game.level:bumpBlock(x, y)
     end
 end
 

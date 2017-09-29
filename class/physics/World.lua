@@ -2,7 +2,7 @@ World = class("World")
 
 function World:initialize()
 	self.objects = {}
-	self.collisionObjects = {}
+	self.activeObjects = {}
 	
 	self.blockLookup = {}
 end
@@ -17,17 +17,27 @@ function World:addObject(obj)
 		
 		self.blockLookup[obj.blockX][obj.blockY] = obj
 	else -- add to generic collision check table
-		table.insert(self.collisionObjects, obj)
+		table.insert(self.activeObjects, obj)
 	end
 end
 
 function World:draw()
-	for _, obj in ipairs(self.objects) do
+	for _, obj in ipairs(self.activeObjects) do
 		self:drawObject(obj)
+	end
+
+	if(PHYSICSDEBUG) then
+		for _, obj in ipairs(self.objects) do
+			self:debugDrawObject(obj)
+		end
 	end
 end
 
 function World:drawObject(obj)
+    worldDraw(obj.img, obj.quad, obj.x+obj.width/2, obj.y+obj.height/2, obj.r or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
+end
+
+function World:debugDrawObject(obj)
 	love.graphics.rectangle("line", obj.x*TILESIZE+.5, obj.y*TILESIZE+.5, obj.width*TILESIZE-1, obj.height*TILESIZE-1)
 end
 
@@ -49,7 +59,7 @@ function World:update(dt)
 			local vercollision = false
 			
 			--VS OTHER OBJECTS --but not: portalwall, castlefirefire
-			for _, obj2 in ipairs(self.collisionObjects) do
+			for _, obj2 in ipairs(self.activeObjects) do
 				if obj1 ~= obj2 and obj2.active then
 					local collision1, collision2 = checkcollision(obj1, obj2, dt)
 					if collision1 then

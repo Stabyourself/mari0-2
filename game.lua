@@ -18,6 +18,8 @@ function game.load()
     
     game.level:generateDrawList(mainCamera)
     
+    game.coinFrame = 1
+    game.coinAnimationTimer = 0
     game.timeLeft = 400
 
     playMusic(overworldMusic)
@@ -28,22 +30,27 @@ end
 function game.update(dt)
     game.timeLeft = math.max(0, game.timeLeft-2.5*dt)
     
-    updateGroup(game.level.marios, dt)
-    
     game.level:update(dt)
     
     game.updateCamera(mainCamera, dt)
     
     game.level:checkDrawList(mainCamera)
+    
+	game.coinAnimationTimer = game.coinAnimationTimer + dt
+	while game.coinAnimationTimer >= COINANIMATIONTIME do
+        game.coinFrame = game.coinFrame + 1
+        
+        if game.coinFrame > 5 then
+            game.coinFrame = 1
+        end
+
+		game.coinAnimationTimer = game.coinAnimationTimer - COINANIMATIONTIME
+	end
 end
 
 function game.draw()
     mainCamera:attach()
     game.level:draw(mainCamera)
-    
-    for _, v in ipairs(game.level.marios) do
-        v:draw()
-    end
     
     mainCamera:detach()
     

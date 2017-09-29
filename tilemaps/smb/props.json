@@ -37,9 +37,11 @@
         },
         
         {
-            "name": "coinblock",
+            "name": "coinBlock",
             "collision": true,
-            "coinblock": true
+            "coinBlock": true,
+            "globalanimated": true,
+            "img": "img/coinBlock.png"
         },
         
         {
@@ -460,8 +462,222 @@
 
         {
             "name": "treetrunk"
-        }
+        },
+
+
+
+
+
+
+
+
+
+
+
+
 
         
+        {
+            "name": "whitetreeplatformleft",
+            "collision": true
+        },
+        
+        {
+            "name": "whitetreeplatformmiddle",
+            "collision": true
+        },
+        
+        {
+            "name": "whitetreeplatformright",
+            "collision": true
+        },
+        
+        {
+            "name": "whiteground",
+            "collision": true
+        },
+        
+        {
+            "name": "treeplatformtrunk"
+        },
+        
+        {
+            "name": "whitetreeplatformtrunk"
+        },
+        
+        {
+            "name": "whitecastleleft"
+        },
+        
+        {
+            "name": "whitecastlemiddle"
+        },
+        
+        {
+            "name": "whitecastleright"
+        },
+        
+        {
+            "name": "underwaterground"
+        },
+        
+        {
+            "name": "whitetreebottom"
+        },
+        
+        {
+            "name": "greenflagtop"
+        },
+        
+        {
+            "name": "whiteflagtop"
+        },
+        
+        {
+            "name": "anotherflagtop"
+        },
+        
+        {
+            "name": "greenflagpole"
+        },
+        
+        {
+            "name": "whiteflagpole"
+        },
+        
+        {
+            "name": "anotherflagpole"
+        },
+        
+        {
+            "name": "water"
+        },
+        
+        {
+            "name": "lava"
+        },
+        
+        {
+            "name": "differentwater?"
+        },
+        
+        {
+            "name": "whitesmalltree"
+        },
+        
+        {
+            "name": "bridge",
+            "collision": true
+        },
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        {
+            "name": "undergroundblockalt",
+            "collision": true
+        },
+        
+        {
+            "name": "unused"
+        },
+        
+        {
+            "name": "unused"
+        },
+        
+        {
+            "name": "unused"
+        },
+        
+        {
+            "name": "unused"
+        },
+        
+        {
+            "name": "unused"
+        },
+        
+        {
+            "name": "unused"
+        },
+        
+        {
+            "name": "unused"
+        },
+        
+        {
+            "name": "cannonlong",
+            "collision": true
+        },
+        
+        {
+            "name": "lavamiddle"
+        },
+        
+        {
+            "name": "skyvisible"
+        },
+        
+        {
+            "name": "whiteblock",
+            "collision": true
+        },
+        
+        {
+            "name": "morewatermiddle"
+        },
+        
+        {
+            "name": "redpipebottomleft",
+            "collision": true
+        },
+        
+        {
+            "name": "redpipebottomright",
+            "collision": true
+        },
+        
+        {
+            "name": "redpipetopleft",
+            "collision": true
+        },
+        
+        {
+            "name": "redpipetopright",
+            "collision": true
+        },
+        
+        {
+            "name": "underwaterblock",
+            "collision": true
+        },
+        
+        {
+            "name": "anothergoddamnflagpole"
+        },
+        
+        {
+            "name": "unused"
+        },
+        
+        {
+            "name": "unused"
+        },
+        
+        {
+            "name": "unused"
+        }
     ]
 }

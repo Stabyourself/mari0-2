@@ -3,11 +3,13 @@ Level = class("Level")
 function Level:initialize(path, tileMap)
     self.json = JSON:decode(love.filesystem.read(path))
     self.tileMap = tileMap
-
+    
     self.map = self.json.map
     self.background = self.json.background
     self.width = #self.map
     self.height = #self.map[1]
+
+    self.enemyList = loadEnemies()
     
     self.world = World:new()
 
@@ -32,17 +34,22 @@ function Level:initialize(path, tileMap)
     
     -- Parse entities
     for _, v in ipairs(self.json.entities) do
-        if v.type == "spawn" then
+        local enemy = self.enemyList[v.type]
+
+        if enemy then -- is enemy
+            Enemy:new(self.world, v.x, v.y, enemy.json, enemy.img, enemy.quad)
+        elseif v.type == "spawn" then
             self.spawnX = v.x
             self.spawnY = v.y
         end
     end
 
     self.marios = {}
-    table.insert(self.marios, Mario:new(self.world, self.spawnX-6/TILESIZE, self.spawnY-12/TILESIZE))
+    table.insert(self.marios, Mario:new(self.world, self.spawnX-6/16, self.spawnY-12/16))
 end
 
 function Level:update(dt, camera)
+    updateGroup(self.world.activeObjects, dt)
     updateGroup(self.blockBounces, dt)
     self.world:update(dt)
 end
@@ -59,9 +66,7 @@ function Level:draw(camera)
         v.tile:draw((v.x-1)*16, (v.y-1-offset)*16)
     end
     
-    if PHYSICSDEBUG then
-        self.world:draw()
-    end
+    self.world:draw()
 end
 
 function Level:keypressed(key)
@@ -100,7 +105,7 @@ function Level:generateDrawList(camera)
                     })
                 end
                 
-                local tile = self.tileMap.tiles[self.background[x][y]]
+                tile = self.tileMap.tiles[self.background[x][y]]
                 
                 if tile and not tile.invisible then
                     table.insert(self.drawList, {
@@ -125,8 +130,18 @@ function Level:getTile(x, y)
 end
 
 function Level:bumpBlock(x, y)
-    local blockBounce = BlockBounce:new(x, y)
-    
-    table.insert(self.blockBounces, blockBounce)
-    self.bounceLookup[x][y] = blockBounce
+    local tile = self:getTile(x, y)
+    if tile.breakable or tile.coinBlock then
+        local blockBounce = BlockBounce:new(x, y)
+        
+        table.insert(self.blockBounces, blockBounce)
+        self.bounceLookup[x][y] = blockBounce
+
+        if tile.coinBlock then
+            self.map[x][y] = 113
+            self:generateDrawList(mainCamera)
+
+            playSound(coinSound)
+        end
+    end
 end

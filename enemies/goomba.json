@@ -1,0 +1,14 @@
+{
+    "width": 0.75,
+    "height": 0.75,
+
+    "movement": "truffleshuffle",
+    "speed": 2,
+
+    "animation": "frames",
+    "frames": 2,
+    "frameTime": 0.2,
+
+    "centerX": 8,
+    "centerY": 9
+}

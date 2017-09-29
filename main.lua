@@ -14,6 +14,7 @@ function love.load()
 
     require "variables"
     require "environment"
+    require "enemyLoader"
 
     require "class/physics/World"
     require "class/physics/PhysObj"
@@ -24,6 +25,7 @@ function love.load()
     require "class/Mario"
     require "class/Block"
     require "class/BlockBounce"
+    require "class/Enemy"
 
     require "game"
     
@@ -41,7 +43,8 @@ function love.load()
     overworldMusic:setLooping(true)
 
     jumpSound = love.audio.newSource("sound/jump.ogg")
-    blockSound = love.audio.newSource("sound/block.ogg") -- Kick punch block!
+    blockSound = love.audio.newSource("sound/block.ogg")
+    coinSound = love.audio.newSource("sound/coin.ogg")
 
     print("Alright let's go!")
 
@@ -150,4 +153,13 @@ end
 
 function padZeroes(s, num)
     return string.format("%0" .. num .. "d", s)
+end
+
+function inTable(t, needle)
+	for i, v in pairs(t) do
+		if v == needle then
+			return true
+		end
+	end
+	return false
 end

@@ -71,7 +71,6 @@ function Level:update(dt)
     local newSpawnLine = self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2
     if newSpawnLine > self.spawnLine then
         self:spawnEnemies(newSpawnLine)
-        self.spawnLine = newSpawnLine
     end
     
     self:checkDrawList()
@@ -90,6 +89,8 @@ function Level:draw()
             
         v.tile:draw((v.x-1)*16, (v.y-1-offset)*16)
     end
+
+    love.graphics.setDepth(0)
     
     self.world:draw()
 
@@ -108,7 +109,12 @@ function Level:spawnEnemies(untilX)
         Enemy:new(self.world, toSpawn.x, toSpawn.y, toSpawn.enemy.json, toSpawn.enemy.img, toSpawn.enemy.quad)
 
         self.spawnI = self.spawnI + 1
+
+        -- Update untilX so enemies spawn in groups
+        untilX = untilX + 2
     end
+
+    self.spawnLine = untilX
 end
 
 function Level:updateCamera(dt)

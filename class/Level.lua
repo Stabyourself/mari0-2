@@ -63,6 +63,23 @@ function Level:initialize(path, tileMap)
 end
 
 function Level:update(dt)
+    -- Clean up enemies
+	local delete = {}
+    
+    for i, v in ipairs(self.world.activeObjects) do
+        if v.autoRemove and 
+            (v.x+v.width < self.camera.x-1 or
+            v.y > HEIGHT+1) then
+			table.insert(delete, i)
+        end
+    end
+	
+	table.sort(delete, function(a,b) return a>b end)
+	
+	for _, v in ipairs(delete) do
+		table.remove(self.world.activeObjects, v)
+	end
+    
     updateGroup(self.world.activeObjects, dt)
     updateGroup(self.blockBounces, dt)
     self.world:update(dt)
@@ -74,20 +91,26 @@ function Level:update(dt)
     end
     
     self:checkDrawList()
+
+    if self.marios[1].y > HEIGHT then
+        self.marios[1].y = 0
+    end
 end
 
 function Level:draw()
     self.camera:attach()
 
-    for _, v in ipairs(self.drawList) do
-        local offset = 0
-        local bounce = self.bounceLookup[v.x][v.y]
-        
-        if bounce then
-            offset = bounce.offset
-        end
+    for _, depth in ipairs(self.drawDepths) do
+        for _, v in ipairs(self.drawList[depth]) do
+            local offset = 0
+            local bounce = self.bounceLookup[v.x][v.y]
             
-        v.tile:draw((v.x-1)*16, (v.y-1-offset)*16)
+            if bounce then
+                offset = bounce.offset
+            end
+                
+            v.tile:draw((v.x-1)*16, (v.y-1-offset)*16)
+        end
     end
 
     love.graphics.setDepth(0)
@@ -154,35 +177,47 @@ function Level:generateDrawList()
     local toDraw = {}
     
     self.drawList = {}
+    self.drawDepths = {}
     self.drawListX = xStart
+    
+    xStart = math.max(1, xStart)
+    xEnd = math.min(self.width, xEnd)
     
     for x = xStart, xEnd do
         for y = yStart, yEnd do
-            if self:inMap(x, y) then
-                local tile = self.tileMap.tiles[self.map[x][y]]
-                
-                if tile and not tile.invisible then
-                    table.insert(self.drawList, {
-                        x = x,
-                        y = y,
-                        tile = tile
-                    })
+            local tile = self.tileMap.tiles[self.background[x][y]]
+            
+            if tile and not tile.invisible then
+                if not self.drawList[tile.depth] then
+                    table.insert(self.drawDepths, tile.depth)
+                    self.drawList[tile.depth] = {}
                 end
                 
-                tile = self.tileMap.tiles[self.background[x][y]]
-                
-                if tile and not tile.invisible then
-                    table.insert(self.drawList, {
-                        x = x,
-                        y = y,
-                        tile = tile
-                    })
+                table.insert(self.drawList[tile.depth], {
+                    x = x,
+                    y = y,
+                    tile = tile
+                })
+            end
+            
+            local tile = self.tileMap.tiles[self.map[x][y]]
+            
+            if tile and not tile.invisible then
+                if not self.drawList[tile.depth] then
+                    table.insert(self.drawDepths, tile.depth)
+                    self.drawList[tile.depth] = {}
                 end
+                
+                table.insert(self.drawList[tile.depth], {
+                    x = x,
+                    y = y,
+                    tile = tile
+                })
             end
         end
     end
     
-    table.sort(self.drawList, function(a, b) return a.tile.depth>b.tile.depth end)
+    table.sort(self.drawDepths, function(a, b) return a>b end)
 end
 
 function Level:inMap(x, y)

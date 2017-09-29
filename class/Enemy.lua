@@ -7,9 +7,10 @@ function Enemy:initialize(world, x, y, json, img, quad)
     self.json = json
     self.img = img
     self.quadList = quad
-    
 
     PhysObj.initialize(self, world, x-json.width/2-.5, y-json.height)
+    
+    self.autoRemove = true
 
     for i, v in pairs(json) do
         self[i] = v

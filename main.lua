@@ -39,8 +39,8 @@ function love.load()
 	end
 
     print("Loading sound... (might take a while)")
-    overworldMusic = love.audio.newSource("sound/music/overworld.ogg")
-    overworldMusic:setLooping(true)
+    --overworldMusic = love.audio.newSource("sound/music/overworld.ogg")
+    --overworldMusic:setLooping(true)
 
     jumpSound = love.audio.newSource("sound/jump.ogg")
     blockSound = love.audio.newSource("sound/block.ogg")
@@ -117,6 +117,11 @@ function playMusic(music)
 end
 
 function playSound(sound)
+    if not sound then
+        print("Error playing some sound")
+        return
+    end
+    
     sound:stop()
     sound:play()
 end

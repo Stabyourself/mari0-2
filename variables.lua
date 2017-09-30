@@ -1,6 +1,8 @@
 WIDTH = 25
 HEIGHT = 15
 
+SCALE = 1
+
 TILESIZE = 16
 
 SCREENWIDTH = WIDTH*TILESIZE
@@ -50,3 +52,23 @@ COINANIMATIONTIME = 0.14
 ENEMIESPSAWNAHEAD = 0
 
 DEPTHMUL = 0.3
+
+if love.system.getOS() == "Horizon" then -- 3DS controls
+    CONTROLS = {
+        quit = "start",
+    
+        left = "left",
+        right = "right",
+        jump = "b",
+        run = "y"
+    }
+else -- Computer controls
+    CONTROLS = {
+        quit = "escape",
+        
+        left = "a",
+        right = "d",
+        jump = "space",
+        run = "lshift"
+    }
+end

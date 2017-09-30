@@ -35,7 +35,7 @@ function game.update(dt)
 end
 
 function game.draw()
-    game.level:draw(mainCamera)
+    game.level:draw()
     
     -- UI
     -- score

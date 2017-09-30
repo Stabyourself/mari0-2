@@ -1,5 +1,3 @@
-
-
 SCALE = 1
 
 TILESIZE = 16
@@ -62,6 +60,7 @@ DEPTHMUL = 0.3
 if love.system.getOS() == "Horizon" then -- 3DS controls
     CONTROLS = {
         quit = "start",
+        frameTime = "select",
     
         left = "left",
         right = "right",
@@ -71,6 +70,7 @@ if love.system.getOS() == "Horizon" then -- 3DS controls
 else -- Computer controls
     CONTROLS = {
         quit = "escape",
+        frameTime = "f",
         
         left = "a",
         right = "d",

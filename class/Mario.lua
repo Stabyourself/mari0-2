@@ -216,7 +216,6 @@ function Mario:ceilCollide(obj2)
             end
         end
         
-        playSound(blockSound)
         self.speedY = BLOCKHITFORCE
         
         game.level:bumpBlock(x, y)

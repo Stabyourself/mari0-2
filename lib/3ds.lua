@@ -8,7 +8,9 @@ if love.system.getOS() ~= "Horizon" then
     love.system.getLinearMemory = function() return "?" end
 
     function newFrame3ds()
-        currentScreen = "top"
+		if love.graphics.getScreen() == "bottom" then
+            love.graphics.translate(BOTTOMSCREENOFFSET, SCREENHEIGHT)
+		end
     end
     
 	function love.graphics.setScreen(screen)
@@ -16,9 +18,9 @@ if love.system.getOS() ~= "Horizon" then
             currentScreen = screen
             
             if screen == "bottom" then
-                love.graphics.translate(BOTTOMSCREENOFFSET*SCALE, SCREENHEIGHT*SCALE)
+                love.graphics.translate(BOTTOMSCREENOFFSET, SCREENHEIGHT)
             elseif screen == "top" then
-                love.graphics.translate(-BOTTOMSCREENOFFSET*SCALE, -SCREENHEIGHT*SCALE)
+                love.graphics.translate(-BOTTOMSCREENOFFSET, -SCREENHEIGHT)
             else
                 print("wat")
             end

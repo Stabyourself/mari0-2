@@ -1,4 +1,5 @@
--- Stubs for testing
+--Mari0 3DS - MIT License.
+
 is3DS = love.system.getOS() == "Horizon"
 
 function love.load()
@@ -18,7 +19,7 @@ function love.load()
     JSON = require "lib/JSON"
     class = require "lib/Class"
     Camera = require "lib/Camera"
-    FrameTimeAnalyser = require "lib/FrameTimeAnalyser"
+    FTAnalyser = require "lib/FTAnalyser"
 
     require "enemyLoader"
 
@@ -53,7 +54,7 @@ function love.load()
     coinSound = love.audio.newSource("sound/coin.ogg")
     stompSound = love.audio.newSource("sound/stomp.ogg")
     
-    mainFrameTimeAnalyser = FrameTimeAnalyser:new()
+    mainFTAnalyser = FTAnalyser:new()
 
     print("Alright let's go!")
 
@@ -61,11 +62,13 @@ function love.load()
 end
 
 function love.update(dt)
-    mainFrameTimeAnalyser:frameStart()
+    mainFTAnalyser:frameStart()
     dt = math.min(1/10, dt)
+    gdt = dt
 
     if skipNext then
         skipNext = false
+        mainFTAnalyser:frameEnd(dt)
         return
     end
 
@@ -83,13 +86,21 @@ function love.update(dt)
 end
 
 function love.draw()
+    love.graphics.scale(SCALE, SCALE)
+    newFrame3ds()
+    love.graphics.setScreen("top")
     if gameState == "game" then
         game.draw()
     end
     
-    mainFrameTimeAnalyser:frameEnd()
+    mainFTAnalyser:frameEnd(gdt)
+
     love.graphics.setScreen("bottom")
-    mainFrameTimeAnalyser:render(0, 0, BOTTOMSCREENWIDTH, BOTTOMSCREENHEIGHT)
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.rectangle("fill", 0, 0, BOTTOMSCREENWIDTH, BOTTOMSCREENHEIGHT)
+    love.graphics.setColor(255, 255, 255)
+
+    mainFTAnalyser:draw(0, BOTTOMSCREENHEIGHT-100, BOTTOMSCREENWIDTH, 100)
 end
 
 function love.keypressed(key)
@@ -155,7 +166,7 @@ function marioPrint(s, x, y, align, depth)
 		local quad = fontQuad[string.sub(s, i, i)]
         
 		if quad then
-			love.graphics.draw(fontImg, quad, (x+(i-1)*8)*SCALE, y*SCALE, 0, SCALE, SCALE)
+			love.graphics.draw(fontImg, quad, (x+(i-1)*8), y, 0, 1, 1)
 		end
 	end
     
@@ -188,9 +199,9 @@ function worldDraw(...)
     local arg = {...}
 
     if type(arg[2]) == "number" then
-        love.graphics.draw(arg[1], math.round(arg[2]*TILESIZE)*SCALE, math.round(arg[3]*TILESIZE)*SCALE, (arg[4] or 0), (arg[5] or 1)*SCALE, (arg[6] or 1)*SCALE, arg[7], arg[8])
+        love.graphics.draw(arg[1], math.round(arg[2]*TILESIZE), math.round(arg[3]*TILESIZE), arg[4], arg[5], arg[6], arg[7], arg[8])
     else
-        love.graphics.draw(arg[1], arg[2], math.round(arg[3]*TILESIZE)*SCALE, math.round(arg[4]*TILESIZE)*SCALE, (arg[5] or 0), (arg[6] or 1)*SCALE, (arg[7] or 1)*SCALE, arg[8], arg[9])
+        love.graphics.draw(arg[1], arg[2], math.round(arg[3]*TILESIZE), math.round(arg[4]*TILESIZE), arg[5], arg[6], arg[7], arg[8], arg[9])
     end
 end
 

@@ -169,6 +169,8 @@ function Level:checkDrawList()
 end
 
 function Level:generateDrawList()
+    mainFTAnalyser:frameMark(255, 0, 0)
+
     local xStart = math.floor(self.camera.x)+1-EXTRADRAWING
     local yStart = math.floor(self.camera.y)+1-EXTRADRAWING
     local xEnd = xStart + WIDTH+EXTRADRAWING*2
@@ -235,6 +237,8 @@ function Level:bumpBlock(x, y)
         
         table.insert(self.blockBounces, blockBounce)
         self.bounceLookup[x][y] = blockBounce
+        
+        playSound(blockSound)
 
         if tile.coinBlock then
             self.map[x][y] = 113

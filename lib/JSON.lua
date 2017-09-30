@@ -103,7 +103,7 @@ local OBJDEF = { VERSION = VERSION }
 -- DECODING AND STRICT TYPES
 --
 --   Because both JSON objects and JSON arrays are converted to Lua tables, it's not normally
---   possible to tell which a Lua table came from, or guarantee decode-encode round-trip
+--   possible to tell which a Lua table came from, or guarantee decode-encode math.round-trip
 --   equivalency.
 --
 --   However, if you enable strictTypes, e.g.

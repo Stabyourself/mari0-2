@@ -1,25 +1,24 @@
 -- Stubs for testing
-love.graphics.set3D = love.graphics.set3D or function() end
-love.graphics.setDepth = love.graphics.setDepth or function() end
-
 is3DS = love.system.getOS() == "Horizon"
 
 function love.load()
     print("Mari0 3DS POC by Maurice")
     print("Loading stuff...")
     
+    require "lib/3ds"
     require "variables"
     require "environment"
     
     love.graphics.setDefaultFilter("nearest", "nearest")
     
     if not is3DS then
-        love.window.setMode(400*SCALE, 240*SCALE)
+        love.window.setMode(400*SCALE, 480*SCALE)
     end
     
     JSON = require "lib/JSON"
     class = require "lib/Class"
-    Camera = require "lib/camera"
+    Camera = require "lib/Camera"
+    FrameTimeAnalyser = require "lib/FrameTimeAnalyser"
 
     require "enemyLoader"
 
@@ -53,6 +52,8 @@ function love.load()
     blockSound = love.audio.newSource("sound/block.ogg")
     coinSound = love.audio.newSource("sound/coin.ogg")
     stompSound = love.audio.newSource("sound/stomp.ogg")
+    
+    mainFrameTimeAnalyser = FrameTimeAnalyser:new()
 
     print("Alright let's go!")
 
@@ -60,6 +61,7 @@ function love.load()
 end
 
 function love.update(dt)
+    mainFrameTimeAnalyser:frameStart()
     dt = math.min(1/10, dt)
 
     if skipNext then
@@ -84,6 +86,10 @@ function love.draw()
     if gameState == "game" then
         game.draw()
     end
+    
+    mainFrameTimeAnalyser:frameEnd()
+    love.graphics.setScreen("bottom")
+    mainFrameTimeAnalyser:render(0, 0, BOTTOMSCREENWIDTH, BOTTOMSCREENHEIGHT)
 end
 
 function love.keypressed(key)
@@ -182,17 +188,19 @@ function worldDraw(...)
     local arg = {...}
 
     if type(arg[2]) == "number" then
-        love.graphics.draw(arg[1], round(arg[2]*TILESIZE)*SCALE, round(arg[3]*TILESIZE)*SCALE, (arg[4] or 0), (arg[5] or 1)*SCALE, (arg[6] or 1)*SCALE, arg[7], arg[8])
+        love.graphics.draw(arg[1], math.round(arg[2]*TILESIZE)*SCALE, math.round(arg[3]*TILESIZE)*SCALE, (arg[4] or 0), (arg[5] or 1)*SCALE, (arg[6] or 1)*SCALE, arg[7], arg[8])
     else
-        love.graphics.draw(arg[1], arg[2], round(arg[3]*TILESIZE)*SCALE, round(arg[4]*TILESIZE)*SCALE, (arg[5] or 0), (arg[6] or 1)*SCALE, (arg[7] or 1)*SCALE, arg[8], arg[9])
+        love.graphics.draw(arg[1], arg[2], math.round(arg[3]*TILESIZE)*SCALE, math.round(arg[4]*TILESIZE)*SCALE, (arg[5] or 0), (arg[6] or 1)*SCALE, (arg[7] or 1)*SCALE, arg[8], arg[9])
     end
 end
 
-function round(i)
+function math.round(i, decimals)
+    local factor = math.pow(10, decimals or 0)
+    
     if i > 0 then
-        return math.floor(i+.5)
+        return math.floor(i*factor+.5)/factor
     else
-        return math.ceil(i-.5)
+        return math.ceil(i*factor-.5)/factor
     end
 end
 

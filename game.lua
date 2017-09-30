@@ -43,11 +43,11 @@ function game.draw()
     marioPrint("012345", 24, 24, "left", -10*DEPTHMUL)
     
     -- coins (abused as FPS for now)
-    marioPrint("fps*" .. love.timer.getFPS(), round((SCREENWIDTH-80)/3)+40, 24, "center", -10*DEPTHMUL)
+    marioPrint("fps*" .. love.timer.getFPS(), math.round((SCREENWIDTH-80)/3)+40, 24, "center", -10*DEPTHMUL)
     
     -- level
-    marioPrint("world", round((SCREENWIDTH-80)/3*2)+40, 16, "center", -10*DEPTHMUL)
-    marioPrint(" 1-1 ", round((SCREENWIDTH-80)/3*2)+40, 24, "center", -10*DEPTHMUL)
+    marioPrint("world", math.round((SCREENWIDTH-80)/3*2)+40, 16, "center", -10*DEPTHMUL)
+    marioPrint(" 1-1 ", math.round((SCREENWIDTH-80)/3*2)+40, 24, "center", -10*DEPTHMUL)
     
     -- time
     marioPrint("time", SCREENWIDTH-24, 16, "right", -10*DEPTHMUL)

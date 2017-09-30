@@ -29,6 +29,7 @@ function love.load()
     require "class/TileMap"
     require "class/Tile"
     require "class/Level"
+    require "class/LevelCanvas"
     require "class/Mario"
     require "class/Block"
     require "class/BlockBounce"
@@ -63,6 +64,7 @@ end
 
 function love.update(dt)
     mainFTAnalyser:frameStart()
+    
     dt = math.min(1/10, dt)
     gdt = dt
 
@@ -86,9 +88,10 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.scale(SCALE, SCALE)
-    newFrame3ds()
-    love.graphics.setScreen("top")
+    if SCALE ~= 1 then
+        love.graphics.scale(SCALE, SCALE)
+    end
+
     if gameState == "game" then
         game.draw()
     end
@@ -100,7 +103,11 @@ function love.draw()
     love.graphics.rectangle("fill", 0, 0, BOTTOMSCREENWIDTH, BOTTOMSCREENHEIGHT)
     love.graphics.setColor(255, 255, 255)
 
-    mainFTAnalyser:draw(0, BOTTOMSCREENHEIGHT-100, BOTTOMSCREENWIDTH, 100)
+    if keyDown("frameTime") then
+        mainFTAnalyser:draw(0, 0, BOTTOMSCREENWIDTH, BOTTOMSCREENHEIGHT)
+    end
+
+    love.graphics.setScreen("top")
 end
 
 function love.keypressed(key)
@@ -217,4 +224,8 @@ end
 
 function getRequiredSpeed(height, gravity)
     return math.sqrt(2*(gravity or GRAVITY)*height)
+end
+
+function math.clamp(n, low, high) 
+    return math.min(math.max(low, n), high) 
 end

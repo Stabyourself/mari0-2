@@ -27,10 +27,6 @@ function Level:initialize(path, tileMap)
     end
     
     self.blockBounces = {}
-    self.bounceLookup = {}
-    for x = 1, self.width do
-        self.bounceLookup[x] = {}
-    end
     
     self.spawnList = {}
     -- Parse entities
@@ -54,12 +50,16 @@ function Level:initialize(path, tileMap)
     self.marios = {}
     table.insert(self.marios, Mario:new(self.world, self.spawnX-6/16, self.spawnY-12/16))
     
+    -- Camera stuff
     self.camera = Camera:new()
     self.spawnLine = 0
     self.spawnI = 1
 
+    -- Level canvases
+    self.levelCanvas1 = LevelCanvas:new(self)
+    self.levelCanvas1:startJob(math.floor(self.camera.x+WIDTH/2))
+
     self:spawnEnemies(self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2)
-    self:generateDrawList()
 end
 
 function Level:update(dt)
@@ -84,13 +84,14 @@ function Level:update(dt)
     updateGroup(self.blockBounces, dt)
     self.world:update(dt)
     self:updateCamera(dt)
+
+    -- Update our canvases
+    self.levelCanvas1:update(dt)
     
     local newSpawnLine = self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2
     if newSpawnLine > self.spawnLine then
         self:spawnEnemies(newSpawnLine)
     end
-    
-    self:checkDrawList()
 
     if self.marios[1].y > HEIGHT then
         self.marios[1].y = 0
@@ -99,11 +100,14 @@ end
 
 function Level:draw()
     self.camera:attach()
+    
+    love.graphics.draw(self.levelCanvas1.canvas, 0, 0)
 
+    --Todo: redraw blockbounces
+--[[
     for _, depth in ipairs(self.drawDepths) do
         for _, v in ipairs(self.drawList[depth]) do
             local offset = 0
-            local bounce = self.bounceLookup[v.x][v.y]
             
             if bounce then
                 offset = bounce.offset
@@ -112,6 +116,7 @@ function Level:draw()
             v.tile:draw((v.x-1)*16, (v.y-1-offset)*16)
         end
     end
+    --]]
 
     love.graphics.setDepth(0)
     
@@ -162,66 +167,6 @@ function Level:updateCamera(dt)
     self.camera.x = math.max(0, math.min(game.level.width - WIDTH - 1, self.camera.x))
 end
 
-function Level:checkDrawList()
-    if math.floor(self.camera.x)+1-EXTRADRAWING ~= self.drawListX then
-        self:generateDrawList(self.camera)
-    end
-end
-
-function Level:generateDrawList()
-    mainFTAnalyser:frameMark(255, 0, 0)
-
-    local xStart = math.floor(self.camera.x)+1-EXTRADRAWING
-    local yStart = math.floor(self.camera.y)+1-EXTRADRAWING
-    local xEnd = xStart + WIDTH+EXTRADRAWING*2
-    local yEnd = yStart + HEIGHT+EXTRADRAWING*2
-    
-    local toDraw = {}
-    
-    self.drawList = {}
-    self.drawDepths = {}
-    self.drawListX = xStart
-    
-    xStart = math.max(1, xStart)
-    xEnd = math.min(self.width, xEnd)
-    
-    for x = xStart, xEnd do
-        for y = yStart, yEnd do
-            local tile = self.tileMap.tiles[self.background[x][y]]
-            
-            if tile and not tile.invisible then
-                if not self.drawList[tile.depth] then
-                    table.insert(self.drawDepths, tile.depth)
-                    self.drawList[tile.depth] = {}
-                end
-                
-                table.insert(self.drawList[tile.depth], {
-                    x = x,
-                    y = y,
-                    tile = tile
-                })
-            end
-            
-            local tile = self.tileMap.tiles[self.map[x][y]]
-            
-            if tile and not tile.invisible then
-                if not self.drawList[tile.depth] then
-                    table.insert(self.drawDepths, tile.depth)
-                    self.drawList[tile.depth] = {}
-                end
-                
-                table.insert(self.drawList[tile.depth], {
-                    x = x,
-                    y = y,
-                    tile = tile
-                })
-            end
-        end
-    end
-    
-    table.sort(self.drawDepths, function(a, b) return a>b end)
-end
-
 function Level:inMap(x, y)
     return x > 0 and x <= self.width and y > 0 and y <= self.height
 end
@@ -236,13 +181,12 @@ function Level:bumpBlock(x, y)
         local blockBounce = BlockBounce:new(x, y)
         
         table.insert(self.blockBounces, blockBounce)
-        self.bounceLookup[x][y] = blockBounce
         
         playSound(blockSound)
 
         if tile.coinBlock then
             self.map[x][y] = 113
-            self:generateDrawList(mainCamera)
+            --Todo: update canvas
 
             playSound(coinSound)
         end

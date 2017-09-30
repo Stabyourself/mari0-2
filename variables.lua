@@ -42,7 +42,8 @@ SCROLLINGLEFTSTART = 6 --See above, but for scrolling left
 SCROLLINGLEFTCOMPLETE = 4
 
 RUNANIMATIONTIME = 0.1
-EXTRADRAWING = 1 -- how many blocks to draw offscreen
+
+LEVELCANVASWIDTH = 64 -- how many blocks to draw to a canvas
 
 BLOCKBOUNCETIME = 0.2
 BLOCKBOUNCEHEIGHT = 0.4

@@ -69,36 +69,32 @@ function FTAnalyser:frameEnd(dt)
 end
 
 function FTAnalyser:draw(x, y, w, h)
-    if keyDown("frameTime") then
-        local graphHeight = h-16
-        local graphOffset = 8
+    local graphHeight = h-16
+    local graphOffset = 8
 
-        local minMaxDiff = self.maxSmooth - self.minSmooth
+    local minMaxDiff = self.maxSmooth - self.minSmooth
 
-        for x = x+w-1, 0, -1 do
-            local setI = x
-            if self.data[setI] then
-                local t = self.data[setI].t
-                local barHeight = (t - self.minSmooth) / minMaxDiff
-                
-                
-                if t then
-                    if self.data[setI].color then
-                        love.graphics.setColor(self.data[setI].color)
-                    end
-                    love.graphics.rectangle("fill", x+(self.amount-#self.data), (h-graphOffset-graphHeight*barHeight)+y, 1, (h-graphOffset*2)*barHeight)
+    for x = x+w-1, 0, -1 do
+        local setI = x
+        if self.data[setI] then
+            local t = self.data[setI].t
+            local barHeight = (t - self.minSmooth) / minMaxDiff
+            
+            
+            if t then
+                if self.data[setI].color then
+                    love.graphics.setColor(self.data[setI].color)
                 end
+                love.graphics.rectangle("fill", x+(self.amount-#self.data), (h-graphOffset-graphHeight*barHeight)+y, 1, (h-graphOffset*2)*barHeight)
             end
-
-            love.graphics.setColor(255, 255, 255)
         end
-    else
-        marioPrint("hold " .. CONTROLS.frameTime .. " for frametime graph", 0, BOTTOMSCREENHEIGHT-92)
+
+        love.graphics.setColor(255, 255, 255)
     end
     
     love.graphics.setColor(255, 0, 0)
-    marioPrint("max " .. math.round(self.max*1000, 2), 0, y)
-    marioPrint("min " .. math.round(self.min*1000, 2), 0, h-7+y)
+    marioPrint("max ms: " .. math.round(self.max*1000, 2), 0, y)
+    marioPrint("min ms: " .. math.round(self.min*1000, 2), 0, h-7+y)
     love.graphics.setColor(255, 255, 255)
 end
 

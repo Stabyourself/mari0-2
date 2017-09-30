@@ -19,8 +19,5 @@ function BlockBounce:update(dt)
         self.offset = (1-(self.t-halfblockbouncetime)/halfblockbouncetime)*BLOCKBOUNCEHEIGHT
     end
     
-    if self.t > BLOCKBOUNCETIME then
-        game.level.bounceLookup[self.x][self.y] = nil
-        return true
-    end
+    return self.t >= BLOCKBOUNCETIME
 end

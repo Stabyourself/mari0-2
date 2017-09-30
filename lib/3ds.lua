@@ -1,5 +1,3 @@
-newFrame3ds = function() end
-
 if love.system.getOS() ~= "Horizon" then
     local currentScreen = "top"
     
@@ -7,33 +5,20 @@ if love.system.getOS() ~= "Horizon" then
     love.graphics.setDepth = function() end
     love.system.getLinearMemory = function() return "?" end
 
-    function newFrame3ds()
-		if love.graphics.getScreen() == "bottom" then
-            love.graphics.translate(BOTTOMSCREENOFFSET, SCREENHEIGHT)
-		end
-    end
-    
 	function love.graphics.setScreen(screen)
 		if screen ~= currentScreen then
             currentScreen = screen
             
-            if screen == "bottom" then
-                love.graphics.translate(BOTTOMSCREENOFFSET, SCREENHEIGHT)
-            elseif screen == "top" then
-                love.graphics.translate(-BOTTOMSCREENOFFSET, -SCREENHEIGHT)
-            else
-                print("wat")
-            end
+			if screen == "bottom" then
+				love.graphics.translate(BOTTOMSCREENOFFSET, SCREENHEIGHT)
+			elseif screen == "top" then
+				love.graphics.translate(-BOTTOMSCREENOFFSET, -SCREENHEIGHT)
+			end
         end
 	end
     
 	function love.graphics.getScreen()
 		return currentScreen
-	end
-
-	-- Clamps a number to within a certain range.
-	function math.clamp(n, low, high) 
-		return math.min(math.max(low, n), high) 
 	end
 
 	local oldMousePressed = love.mousepressed

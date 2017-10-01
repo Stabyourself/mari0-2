@@ -17,11 +17,11 @@ function TileMap:initialize(path)
             if json and json.globalanimated then
                 local img = love.graphics.newImage(json.img)
 
-                table.insert(self.tiles, Tile:new("coin", json.img, json or {}))
+                table.insert(self.tiles, Tile:new("coinblock", json.img, json or {}))
             else
                 local quad = love.graphics.newQuad((x-1)*TILESIZE, (y-1)*TILESIZE, TILESIZE, TILESIZE, self.img:getWidth(), self.img:getHeight())
                 
-                table.insert(self.tiles, Tile:new("quad", self.img, quad, json or {}))
+                table.insert(self.tiles, Tile:new("regular", self.img, quad, json or {}))
             end
         end
     end

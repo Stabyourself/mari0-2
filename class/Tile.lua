@@ -9,10 +9,10 @@ end
 function Tile:initialize(t, img, quad, properties)
     self.t = t
 
-    if self.t == "quad" then
+    if self.t == "regular" then
         self.img = img
         self.quad = quad
-    elseif self.t == "coin" then
+    elseif self.t == "coinblock" then
         properties = quad
         self.img = love.graphics.newImage(img)
     end
@@ -28,9 +28,9 @@ function Tile:draw(x, y)
     if not self.invisible then
         love.graphics.setDepth(DEPTHMUL*self.depth)
 
-        if self.t == "quad" then
+        if self.t == "regular" then
             love.graphics.draw(self.img, self.quad, x, y)
-        elseif self.t == "coin" then
+        elseif self.t == "coinblock" then
             love.graphics.draw(self.img, self.quad[game.coinFrame or 1], x, y)
         end
     end

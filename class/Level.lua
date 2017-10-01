@@ -12,8 +12,9 @@ function Level:initialize(path, tileMap)
     self.enemyList = loadEnemies()
     
     self.world = World:new()
-
+    
     self.blocks = {}
+    self.liveReplacements = {}
     for x = 1, self.width do
         self.blocks[x] = {}
 
@@ -21,6 +22,13 @@ function Level:initialize(path, tileMap)
             if self.tileMap.tiles[self.map[x][y]] then
                 if self.tileMap.tiles[self.map[x][y]].collision then
                     self.blocks[x][y] = Block:new(self.world, x, y)
+                end
+                
+                if self.tileMap.tiles[self.map[x][y]].t == "coinblock" then
+                    table.insert(self.liveReplacements, {
+                        x = x,
+                        y = y
+                    })
                 end
             end
         end
@@ -101,20 +109,41 @@ end
 function Level:draw()
     self.camera:attach()
     
-    for i = 1, #self.levelCanvases do
-        love.graphics.draw(self.levelCanvases[i].canvas, (i-1)*LEVELCANVASWIDTH*TILESIZE, 0)
-    end
-
-    --Todo: redraw blockbounces
+    -- MAIN LEVELCANVAS
+    local mainCanvasI = math.floor((self.camera.x)/LEVELCANVASWIDTH)+1
+    mainCanvasI = math.max(1, mainCanvasI)
     
-    for _, v in ipairs(self.blockBounces) do
+    love.graphics.draw(self.levelCanvases[mainCanvasI].canvas, ((mainCanvasI-1)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
+    
+    -- LEFT ADDITION (for 3D)
+    if math.fmod(self.camera.x, LEVELCANVASWIDTH) < OFFSCREENDRAW and mainCanvasI > 1 then
+        love.graphics.draw(self.levelCanvases[mainCanvasI-1].canvas, ((mainCanvasI-2)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
+    end
+    
+    -- RIGHT ADDITION (for transition to next levelCanvas and 3D)
+    if math.fmod(self.camera.x, LEVELCANVASWIDTH) > LEVELCANVASWIDTH-WIDTH-OFFSCREENDRAW and mainCanvasI < #self.levelCanvases then
+        love.graphics.draw(self.levelCanvases[mainCanvasI+1].canvas, ((mainCanvasI)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
+    end
+    
+    -- Live replacements: Coinblocks that were hit, blocks that were broken
+    local num = 0
+    
+    for _, v in ipairs(self.liveReplacements) do
+        if self:blockVisible(v.x, v.y) then
+            num = num + 1
+            drawOverBlock(v.x, v.y)
+            
+            local tile = self:getTile(v.x, v.y)
+            tile:draw((v.x-1)*16, (v.y-1)*16)
+        end
+    end
+    
+    -- Blockbounces: If Mario bumps a block, it bounces. Have to draw these seperately because canvases.
+    for _, v in ipairs(self.blockBounces) do -- Not checking for blockVisible because bumped blocks are probably always visible
         drawOverBlock(v.x, v.y)
-        love.graphics.setColor(255, 255, 255)
-        
-        offset = v.offset
         
         local tile = self:getTile(v.x, v.y)
-        tile:draw((v.x-1)*16, (v.y-1-offset)*16)
+        tile:draw((v.x-1)*16, (v.y-1-v.offset)*16)
     end
 
     love.graphics.setDepth(0)
@@ -174,6 +203,26 @@ function Level:getTile(x, y)
     return self.tileMap.tiles[self.map[x][y]]
 end
 
+function Level:setMap(x, y, i)
+    self.map[x][y] = i
+    
+    local found = false
+    
+    for _, v in ipairs(self.liveReplacements) do
+        if v.x == x and v.y == y then
+            found = true
+            break
+        end
+    end
+    
+    if not found then
+        table.insert(self.liveReplacements, {
+            x = x,
+            y = y
+        })
+    end
+end
+
 function Level:bumpBlock(x, y)
     local tile = self:getTile(x, y)
     if tile.breakable or tile.coinBlock then
@@ -184,10 +233,13 @@ function Level:bumpBlock(x, y)
         playSound(blockSound)
 
         if tile.coinBlock then
-            self.map[x][y] = 113
-            --Todo: update canvas
+            self:setMap(x, y, 113)
 
             playSound(coinSound)
         end
     end
+end
+
+function Level:blockVisible(x, y)
+    return x > self.camera.x - OFFSCREENDRAW and x < self.camera.x+WIDTH+OFFSCREENDRAW
 end

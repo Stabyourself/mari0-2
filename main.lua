@@ -57,8 +57,6 @@ function love.load()
     
     mainFTAnalyser = FTAnalyser:new()
 
-    print("Alright let's go!")
-
     game.load()
 end
 
@@ -106,8 +104,12 @@ function love.draw()
     if keyDown("frameTime") then
         mainFTAnalyser:draw(0, 0, BOTTOMSCREENWIDTH, BOTTOMSCREENHEIGHT)
     end
-
+    
     love.graphics.setScreen("top")
+
+    if SCALE ~= 1 then
+        love.graphics.scale(1/SCALE, 1/SCALE)
+    end
 end
 
 function love.keypressed(key)
@@ -228,4 +230,9 @@ end
 
 function math.clamp(n, low, high) 
     return math.min(math.max(low, n), high) 
+end
+
+function drawOverBlock(x, y)
+    love.graphics.setColor(love.graphics.getBackgroundColor())
+    love.graphics.rectangle("fill", (x-1)*TILESIZE, (y-1)*TILESIZE, TILESIZE, TILESIZE)
 end

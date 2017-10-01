@@ -31,7 +31,7 @@ function Tile:draw(x, y)
         if self.t == "quad" then
             love.graphics.draw(self.img, self.quad, x, y)
         elseif self.t == "coin" then
-            love.graphics.draw(self.img, self.quad[game.coinFrame], x, y)
+            love.graphics.draw(self.img, self.quad[game.coinFrame or 1], x, y)
         end
     end
 end

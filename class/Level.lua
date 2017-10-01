@@ -56,8 +56,11 @@ function Level:initialize(path, tileMap)
     self.spawnI = 1
 
     -- Level canvases
-    self.levelCanvas1 = LevelCanvas:new(self)
-    self.levelCanvas1:startJob(math.floor(self.camera.x+WIDTH/2))
+    print("Prerendering level...")
+    self.levelCanvases = {}
+    for x = 0, math.floor(self.width/LEVELCANVASWIDTH) do
+        table.insert(self.levelCanvases, LevelCanvas:new(self, x*LEVELCANVASWIDTH+1))
+    end
 
     self:spawnEnemies(self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2)
 end
@@ -85,9 +88,6 @@ function Level:update(dt)
     self.world:update(dt)
     self:updateCamera(dt)
 
-    -- Update our canvases
-    self.levelCanvas1:update(dt)
-    
     local newSpawnLine = self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2
     if newSpawnLine > self.spawnLine then
         self:spawnEnemies(newSpawnLine)
@@ -101,22 +101,21 @@ end
 function Level:draw()
     self.camera:attach()
     
-    love.graphics.draw(self.levelCanvas1.canvas, 0, 0)
+    for i = 1, #self.levelCanvases do
+        love.graphics.draw(self.levelCanvases[i].canvas, (i-1)*LEVELCANVASWIDTH*TILESIZE, 0)
+    end
 
     --Todo: redraw blockbounces
---[[
-    for _, depth in ipairs(self.drawDepths) do
-        for _, v in ipairs(self.drawList[depth]) do
-            local offset = 0
-            
-            if bounce then
-                offset = bounce.offset
-            end
-                
-            v.tile:draw((v.x-1)*16, (v.y-1-offset)*16)
-        end
+    
+    for _, v in ipairs(self.blockBounces) do
+        drawOverBlock(v.x, v.y)
+        love.graphics.setColor(255, 255, 255)
+        
+        offset = v.offset
+        
+        local tile = self:getTile(v.x, v.y)
+        tile:draw((v.x-1)*16, (v.y-1-offset)*16)
     end
-    --]]
 
     love.graphics.setDepth(0)
     

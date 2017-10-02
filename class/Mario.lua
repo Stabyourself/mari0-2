@@ -189,14 +189,16 @@ function Mario:ceilCollide(obj2)
         if self.x > obj2.x+obj2.width - JUMPLEEWAY and not game.level:getTile(obj2.blockX+1, obj2.blockY).collision then
             self.x = obj2.x+obj2.width
             self.speedX = math.max(self.speedX, 0)
-            return false
+
+            return true
         end
         
         -- Left side
         if self.x + self.width < obj2.x + JUMPLEEWAY and not game.level:getTile(obj2.blockX-1, obj2.blockY).collision then
             self.x = obj2.x-self.width
             self.speedX = math.min(self.speedX, 0)
-            return false
+
+            return true
         end
 
         -- See if there's a better matching block (because Mario jumped near the edge of a block)
@@ -228,7 +230,7 @@ function Mario:floorCollide(obj2)
         self.speedY = -getRequiredSpeed(ENEMYBOUNCEHEIGHT)
         playSound(stompSound)
         
-        return false
+        return true
     end
 end
 

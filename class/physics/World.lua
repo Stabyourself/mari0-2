@@ -152,6 +152,7 @@ end
 function World:checkcollision(obj1, obj2, dt)
 	local horcollision = false
 	local vercollision = false
+	local updateNextPos = false
 	
 	if aabb(obj1.nextX, obj1.nextY, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then
 		if aabb(obj1.nextX, obj1.y, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then -- Collision is horizontal
@@ -167,12 +168,14 @@ function World:checkcollision(obj1, obj2, dt)
 		else -- Diagonal collision
 			if math.abs(obj1.speedX) > math.abs(obj1.speedY) then -- Mainly moving horizontally
 				horcollision = self:horcollision(obj1, obj2)
-
 			else
 				vercollision = self:vercollision(obj1, obj2)
-
 			end
 		end
+
+		-- Update projected next position because it may have been changed in callbacks and by the detection itself
+		obj1.nextX = obj1.x + obj1.speedX*dt
+		obj1.nextY = obj1.y + obj1.speedY*dt
 	end
 	
 	return horcollision, vercollision
@@ -181,37 +184,25 @@ end
 function World:horcollision(obj1, obj2)
 	if obj1.speedX < 0 then
 		--move object RIGHT (because it was moving left)
-		if obj2:rightCollide(obj1) ~= false then
-			if obj2.speedX and obj2.speedX > 0 then
-				obj2.speedX = 0
-			end
+		if not obj2:rightCollide(obj1) then
+			obj2.speedX = math.min(0, obj2.speedX)
 		end
 
-		if obj1:leftCollide(obj2) ~= false then
-			if obj1.speedX < 0 then
-				obj1.speedX = 0
-			end
-
+		if not obj1:leftCollide(obj2) then
+			obj1.speedX = math.max(0, obj1.speedX)
 			obj1.x = obj2.x + obj2.width
-			obj1.nextX = obj1.x
 			
 			return "left"
 		end
 	else
 		--move object LEFT (because it was moving right)
-		if obj2:leftCollide(obj1) ~= false then
-			if obj2.speedX and obj2.speedX < 0 then
-				obj2.speedX = 0
-			end
+		if not obj2:leftCollide(obj1) then
+			obj2.speedX = math.max(0, obj2.speedX)
 		end
 		
-		if obj1:rightCollide(obj2) ~= false then
-			if obj1.speedX > 0 then
-				obj1.speedX = 0
-			end
-
+		if not obj1:rightCollide(obj2) then
+			obj1.speedX = math.min(0, obj1.speedX)
 			obj1.x = obj2.x - obj1.width
-			obj1.nextX = obj1.x
 
 			return "right"
 		end
@@ -223,36 +214,24 @@ end
 function World:vercollision(obj1, obj2)
 	if obj1.speedY < 0 then
 		--move object DOWN (because it was moving up)
-		if obj2:floorCollide(obj1) ~= false then
-			if obj2.speedY and obj2.speedY > 0 then
-				obj2.speedY = 0
-			end
+		if not obj2:floorCollide(obj1) then
+			obj2.speedY = math.min(0, obj2.speedY)
 		end
 		
-		if obj1:ceilCollide(obj2) ~= false then
-			if obj1.speedY < 0 then
-				obj1.speedY = 0
-			end
-
+		if not obj1:ceilCollide(obj2) then
+			obj1.speedY = math.max(0, obj1.speedY)
 			obj1.y = obj2.y  + obj2.height
-			obj1.nextY = obj1.y
 
 			return "ceil"
 		end
 	else					
-		if obj2:ceilCollide(obj1) ~= false then
-			if obj2.speedY and obj2.speedY < 0 then
-				obj2.speedY = 0
-			end
+		if not obj2:ceilCollide(obj1) then
+			obj2.speedY = math.max(0, obj2.speedY)
 		end
 
-		if obj1:floorCollide(obj2) ~= false then
-			if obj1.speedY > 0 then
-				obj1.speedY = 0
-			end
-
+		if not obj1:floorCollide(obj2) then
+			obj1.speedY = math.min(0, obj1.speedY)
 			obj1.y = obj2.y - obj1.height
-			obj1.nextY = obj1.y
 
 			return "floor"
 		end

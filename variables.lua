@@ -43,8 +43,8 @@ SCROLLINGLEFTCOMPLETE = 4
 
 RUNANIMATIONTIME = 0.1
 
-OFFSCREENDRAW = 1
-OBJOFFSCREENDRAW = 0.5
+OFFSCREENDRAW = 1 -- to compensate for 3D offscreen drawing (it offsets images for left/right eye)
+OBJOFFSCREENDRAW = 0.5 -- to compensate for graphics being wider than the physObj
 
 LEVELCANVASWIDTH = 64-OFFSCREENDRAW*2 -- how many blocks to draw to a canvas
 

@@ -1,6 +1,7 @@
 {
     "entities": [
         {"type": "spawn", "x": 3, "y": 13},
+        
         {"type": "goomba", "x": 23, "y": 13},
         {"type": "goomba", "x": 41, "y": 13},
         {"type": "goomba", "x": 52, "y": 13},

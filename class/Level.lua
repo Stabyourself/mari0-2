@@ -236,7 +236,8 @@ function Level:objVisible(x, y, w, h)
         y+h > self.camera.y-OBJOFFSCREENDRAW and y < self.camera.y+HEIGHT+OBJOFFSCREENDRAW
 end
 
-function Level:rayCast(x, y, dir)
+function Level:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/raycasting.html , thanks man
+    -- Todo: limit how far offscreen this goes?
     local rayPosX = x+1
     local rayPosY = y+1
     local rayDirX = math.cos(dir)

@@ -20,6 +20,7 @@ function love.load()
     class = require "lib/Class"
     Camera = require "lib/Camera"
     FTAnalyser = require "lib/FTAnalyser"
+    PerformanceTracker = require "lib/PerformanceTracker"
 
     require "enemyLoader"
 
@@ -56,12 +57,14 @@ function love.load()
     stompSound = love.audio.newSource("sound/stomp.ogg")
     
     mainFTAnalyser = FTAnalyser:new()
+    mainPerformanceTracker = PerformanceTracker:new()
 
     game.load()
 end
 
 function love.update(dt)
     mainFTAnalyser:frameStart()
+    mainPerformanceTracker:reset()
     
     dt = math.min(1/10, dt)
     gdt = dt
@@ -101,8 +104,9 @@ function love.draw()
     love.graphics.rectangle("fill", 0, 0, BOTTOMSCREENWIDTH, BOTTOMSCREENHEIGHT)
     love.graphics.setColor(255, 255, 255)
 
-    if keyDown("frameTime") then
-        mainFTAnalyser:draw(0, 0, BOTTOMSCREENWIDTH, BOTTOMSCREENHEIGHT)
+    if keyDown("frameDataDisplay") then
+        mainFTAnalyser:draw(0, 100, BOTTOMSCREENWIDTH, BOTTOMSCREENHEIGHT-100)
+        mainPerformanceTracker:draw(0, 0)
     end
     
     love.graphics.setScreen("top")
@@ -127,6 +131,7 @@ function updateGroup(group, dt)
 	
 	for i, v in ipairs(group) do
 		if v:update(dt) or v.deleteMe then
+            v.deleteMe = true
 			table.insert(delete, i)
 		end
 	end
@@ -161,7 +166,7 @@ function playSound(sound)
     sound:play()
 end
 
-function marioPrint(s, x, y, align, depth)
+function love.graphics.print(s, x, y, align, depth)
     love.graphics.setDepth(depth or 0)
     local len = string.len(tostring(s))
     

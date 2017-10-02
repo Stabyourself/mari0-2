@@ -93,8 +93,8 @@ function FTAnalyser:draw(x, y, w, h)
     end
     
     love.graphics.setColor(255, 0, 0)
-    marioPrint("max ms: " .. math.round(self.max*1000, 2), 0, y)
-    marioPrint("min ms: " .. math.round(self.min*1000, 2), 0, h-7+y)
+    love.graphics.print("max ms: " .. math.round(self.max*1000, 2), 0, y)
+    love.graphics.print("min ms: " .. math.round(self.min*1000, 2), 0, h-7+y)
     love.graphics.setColor(255, 255, 255)
 end
 

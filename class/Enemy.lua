@@ -34,6 +34,10 @@ end
 function Enemy:update(dt)
     self:animation(dt)
     self:movement(dt)
+
+    if self.autoRemove and (self.x+self.width < game.level.camera.x-1 or self.y > HEIGHT+1) then
+        return true
+    end
 end
 
 function Enemy:animation(dt)

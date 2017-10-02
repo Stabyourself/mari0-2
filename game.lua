@@ -39,19 +39,19 @@ function game.draw()
     
     -- UI
     -- score
-    marioPrint("mario", 24, 16, "left", -10*DEPTHMUL)
-    marioPrint("012345", 24, 24, "left", -10*DEPTHMUL)
+    love.graphics.print("mario", 24, 16, "left", -10*DEPTHMUL)
+    love.graphics.print("012345", 24, 24, "left", -10*DEPTHMUL)
     
     -- coins (abused as FPS for now)
-    marioPrint("fps*" .. love.timer.getFPS(), math.round((SCREENWIDTH-80)/3)+40, 24, "center", -10*DEPTHMUL)
+    love.graphics.print("fps*" .. love.timer.getFPS(), math.round((SCREENWIDTH-80)/3)+40, 24, "center", -10*DEPTHMUL)
     
     -- level
-    marioPrint("world", math.round((SCREENWIDTH-80)/3*2)+40, 16, "center", -10*DEPTHMUL)
-    marioPrint(" 1-1 ", math.round((SCREENWIDTH-80)/3*2)+40, 24, "center", -10*DEPTHMUL)
+    love.graphics.print("world", math.round((SCREENWIDTH-80)/3*2)+40, 16, "center", -10*DEPTHMUL)
+    love.graphics.print(" 1-1 ", math.round((SCREENWIDTH-80)/3*2)+40, 24, "center", -10*DEPTHMUL)
     
     -- time
-    marioPrint("time", SCREENWIDTH-24, 16, "right", -10*DEPTHMUL)
-    marioPrint(padZeroes(math.ceil(game.timeLeft), 3), SCREENWIDTH-24, 24, "right", -10*DEPTHMUL)
+    love.graphics.print("time", SCREENWIDTH-24, 16, "right", -10*DEPTHMUL)
+    love.graphics.print(padZeroes(math.ceil(game.timeLeft), 3), SCREENWIDTH-24, 24, "right", -10*DEPTHMUL)
 end
 
 function game.keypressed(key)

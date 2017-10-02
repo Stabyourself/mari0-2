@@ -41,7 +41,7 @@ function Level:initialize(path, tileMap)
     for _, v in ipairs(self.json.entities) do
         local enemy = self.enemyList[v.type]
 
-        if enemy then -- is enemy
+        if enemy and not NOENEMIES then -- is enemy
             table.insert(self.spawnList, {
                 enemy = enemy,
                 x = v.x,
@@ -74,24 +74,6 @@ function Level:initialize(path, tileMap)
 end
 
 function Level:update(dt)
-    -- Clean up enemies
-	local delete = {}
-    
-    for i, v in ipairs(self.world.activeObjects) do
-        if v.autoRemove and 
-            (v.x+v.width < self.camera.x-1 or
-            v.y > HEIGHT+1) then
-			table.insert(delete, i)
-        end
-    end
-	
-	table.sort(delete, function(a,b) return a>b end)
-	
-	for _, v in ipairs(delete) do
-		table.remove(self.world.activeObjects, v)
-	end
-    
-    updateGroup(self.world.activeObjects, dt)
     updateGroup(self.blockBounces, dt)
     self.world:update(dt)
     self:updateCamera(dt)
@@ -114,14 +96,17 @@ function Level:draw()
     mainCanvasI = math.max(1, mainCanvasI)
     
     love.graphics.draw(self.levelCanvases[mainCanvasI].canvas, ((mainCanvasI-1)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
+    mainPerformanceTracker:track("levelcanvases drawn")
     
     -- LEFT ADDITION (for 3D)
     if math.fmod(self.camera.x, LEVELCANVASWIDTH) < OFFSCREENDRAW and mainCanvasI > 1 then
+        mainPerformanceTracker:track("levelcanvases drawn")
         love.graphics.draw(self.levelCanvases[mainCanvasI-1].canvas, ((mainCanvasI-2)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
     end
     
     -- RIGHT ADDITION (for transition to next levelCanvas and 3D)
     if math.fmod(self.camera.x, LEVELCANVASWIDTH) > LEVELCANVASWIDTH-WIDTH-OFFSCREENDRAW and mainCanvasI < #self.levelCanvases then
+        mainPerformanceTracker:track("levelcanvases drawn")
         love.graphics.draw(self.levelCanvases[mainCanvasI+1].canvas, ((mainCanvasI)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
     end
     
@@ -130,6 +115,7 @@ function Level:draw()
     
     for _, v in ipairs(self.liveReplacements) do
         if self:blockVisible(v.x, v.y) then
+            mainPerformanceTracker:track("live replacements drawn")
             num = num + 1
             drawOverBlock(v.x, v.y)
             
@@ -140,6 +126,7 @@ function Level:draw()
     
     -- Blockbounces: If Mario bumps a block, it bounces. Have to draw these seperately because canvases.
     for _, v in ipairs(self.blockBounces) do -- Not checking for blockVisible because bumped blocks are probably always visible
+        mainPerformanceTracker:track("blockbounces drawn")
         drawOverBlock(v.x, v.y)
         
         local tile = self:getTile(v.x, v.y)
@@ -178,13 +165,13 @@ function Level:updateCamera(dt)
     local pXr = pX - self.camera.x
     local pSpeedX = game.level.marios[1].speedX
     
-    -- RIGHT
+    -- Scroll right?
     if pXr > SCROLLINGCOMPLETE then
         self.camera.x = pX - SCROLLINGCOMPLETE
     elseif pXr > SCROLLINGSTART and pSpeedX > SCROLLRATE then
         self.camera.x = self.camera.x + SCROLLRATE*dt
     end
-    -- LEFT
+    -- Scroll left?
     if pXr < SCROLLINGLEFTCOMPLETE then
         self.camera.x = pX - SCROLLINGLEFTCOMPLETE
     elseif pXr < SCROLLINGLEFTSTART and pSpeedX < -SCROLLRATE then

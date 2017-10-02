@@ -62,7 +62,7 @@ DEPTHMUL = 0.3
 if love.system.getOS() == "Horizon" then -- 3DS controls
     CONTROLS = {
         quit = "start",
-        frameTime = "select",
+        frameDataDisplay = "select",
     
         left = "left",
         right = "right",
@@ -72,7 +72,7 @@ if love.system.getOS() == "Horizon" then -- 3DS controls
 else -- Computer controls
     CONTROLS = {
         quit = "escape",
-        frameTime = "f",
+        frameDataDisplay = "f",
         
         left = "a",
         right = "d",
@@ -80,3 +80,10 @@ else -- Computer controls
         run = "lshift"
     }
 end
+
+FFKEYS = {
+    {
+        key = "-",
+        val = 0.1
+    }
+}

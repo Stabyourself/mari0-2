@@ -10,7 +10,6 @@ function PhysObj:initialize(world, x, y)
     self.width = 1
     self.height = 1
     self.onGround = true
-    self.static = false
     self.active = true
     self.r = 0
 

@@ -3,21 +3,25 @@ World = class("World")
 function World:initialize()
 	self.objects = {}
 	self.activeObjects = {}
+	self.staticObjects = {}
 	
 	self.blockLookup = {}
 end
 
 function World:addObject(obj)
-	table.insert(self.objects, obj)
-	
 	if obj.block then -- add to lookup table
 		if not self.blockLookup[obj.blockX] then
 			self.blockLookup[obj.blockX] = {}
 		end
 		
 		self.blockLookup[obj.blockX][obj.blockY] = obj
+
+	elseif obj.static then -- add to static list (don't have move code or check for their own collision)
+		table.insert(self.staticObjects, obj)
+
 	else -- add to generic collision check table
 		table.insert(self.activeObjects, obj)
+
 	end
 end
 
@@ -34,6 +38,7 @@ function World:draw()
 end
 
 function World:drawObject(obj)
+    mainPerformanceTracker:track("worldobjects drawn")
     worldDraw(obj.img, obj.quad, obj.x+obj.width/2, obj.y+obj.height/2, obj.r or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
 end
 
@@ -42,147 +47,138 @@ function World:debugDrawObject(obj)
 end
 
 function World:update(dt)
-	for _, obj1 in ipairs(self.objects) do
-		if obj1.static == false and obj1.active then
-			obj1.prevSpeedY = obj1.speedY
-			obj1.prevSpeedX = obj1.speedX
-			
-			--GRAVITY
-			obj1.speedY = obj1.speedY + (obj1.gravity or GRAVITY)*dt*0.5
-			
-			if obj1.speedY > MAXYSPEED then
-				obj1.speedY = MAXYSPEED
+    updateGroup(self.activeObjects, dt)
+    updateGroup(self.staticObjects, dt)
+
+	mainPerformanceTracker:track("active objects", #game.level.world.activeObjects)
+	mainPerformanceTracker:track("static objects", #game.level.world.staticObjects)
+	
+	self:physics(dt)
+end
+
+function World:physics(dt)
+	for _, obj1 in ipairs(self.activeObjects) do
+		-- Gravity (half of it before, half after)
+		obj1.speedY = obj1.speedY + (obj1.gravity or GRAVITY)*dt*0.5
+		
+		if obj1.speedY > MAXYSPEED then
+			obj1.speedY = MAXYSPEED
+		end
+
+		-- Precalculate nextX and nextY because I use them a lot
+		obj1.nextX = obj1.x + obj1.speedX*dt
+		obj1.nextY = obj1.y + obj1.speedY*dt
+		
+		-- Collision results
+		local horcollision = false
+		local vercollision = false
+		
+		-- VS other, active objects
+		for _, obj2 in ipairs(self.activeObjects) do
+			if obj1 ~= obj2 then
+				local collision1, collision2 = self:checkcollision(obj1, obj2, dt)
+				if collision1 then
+					horcollision = collision1
+				end
+				if collision2 then
+					vercollision = collision2
+				end
 			end
-			
-			--COLLISIONS ROFL
-			local horcollision = false
-			local vercollision = false
-			
-			--VS OTHER OBJECTS --but not: portalwall, castlefirefire
-			for _, obj2 in ipairs(self.activeObjects) do
-				if obj1 ~= obj2 and obj2.active then
-					local collision1, collision2 = checkcollision(obj1, obj2, dt)
+		end
+		
+		-- VS other, static objects
+		for _, obj2 in ipairs(self.staticObjects) do
+			local collision1, collision2 = self:checkcollision(obj1, obj2, dt)
+			if collision1 then
+				horcollision = collision1
+			end
+			if collision2 then
+				vercollision = collision2
+			end
+		end
+		
+		
+		-- VS blocks (carefuly select which blocks to check against)
+		local xstart = math.floor(obj1.nextX-2/16)+1
+		local ystart = math.floor(obj1.nextY-2/16)+1
+		
+		local xto = xstart+math.ceil(obj1.width)
+		local dir = 1
+		
+		if obj1.speedX < 0 then
+			xstart, xto = xto, xstart
+			dir = -1
+		end
+		
+		for x = xstart, xto, dir do
+			for y = ystart, ystart+math.ceil(obj1.height) do
+				local obj2 = self.blockLookup[x] and self.blockLookup[x][y]
+				if obj2 then
+					local collision1, collision2 = self:checkcollision(obj1, obj2, dt)
+
 					if collision1 then
 						horcollision = collision1
-					elseif collision2 then
+					end
+					if collision2 then
 						vercollision = collision2
 					end
 				end
 			end
-			
-			
-			--VS TILES (Because I only wanna check close ones)
-			local xstart = math.floor(obj1.x+obj1.prevSpeedX*dt-2/16)+1
-			local ystart = math.floor(obj1.y+obj1.prevSpeedY*dt-2/16)+1
-			
-			local xto = xstart+math.ceil(obj1.width)
-			local dir = 1
-			
-			if obj1.speedX < 0 then
-				xstart, xto = xto, xstart
-				dir = -1
-			end
-			
-			for x = xstart, xto, dir do
-				for y = ystart, ystart+math.ceil(obj1.height) do
-					--check if invisible block
-					local obj2 = self.blockLookup[x] and self.blockLookup[x][y]
-					if obj2 and obj2.active then
-						local collision1, collision2 = checkcollision(obj1, obj2, dt)
-
-						if collision1 then
-							horcollision = collision1
-						elseif collision2 then
-							vercollision = collision2
-						end
-					end
-				end
-			end
-			
-			--Move the object
-			if not vercollision then
-				obj1.y = obj1.y + obj1.speedY*dt
-				
-				if obj1.onGround then
-					obj1.onGround = false
-					if obj1.speedY >= 0 then
-						obj1:startFall()
-					end
-				end
-			elseif vercollision == "floor" then
-				obj1.onGround = true
-			end
-			
-			if horcollision == false then
-				obj1.x = obj1.x + obj1.speedX*dt
-			end
-			
-			--GRAVITY
-			obj1.speedY = obj1.speedY + (obj1.gravity or GRAVITY)*dt*0.5
 		end
+
+		-- Move the object if no collision in that direction was noticed
+		if not vercollision then
+			obj1.y = obj1.nextY
+			
+			if obj1.onGround then
+				obj1.onGround = false
+				if obj1.speedY >= 0 then
+					obj1:startFall()
+				end
+			end
+		elseif vercollision == "floor" then
+			obj1.onGround = true
+		end
+		
+		if horcollision == false then
+			obj1.x = obj1.nextX
+		end
+		
+		-- Gravity
+		obj1.speedY = obj1.speedY + (obj1.gravity or GRAVITY)*dt*0.5
 	end
 end
 
-function checkcollision(obj1, obj2, dt)
-	local hadhorcollision = false
-	local hadvercollision = false
+function World:checkcollision(obj1, obj2, dt)
+	local horcollision = false
+	local vercollision = false
 	
-	if math.abs(obj1.x+obj1.speedX*dt-obj2.x) < math.max(obj1.width, obj2.width)+1 and math.abs(obj1.y+obj1.speedY*dt-obj2.y) < math.max(obj1.height, obj2.height)+1 then
-		--check if it's a passive collision (Object is colliding anyway)
-		if aabb(obj1.x + obj1.speedX*dt, obj1.y + obj1.speedY*dt, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then
-			if aabb(obj1.x, obj1.y, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then --passive collision! (oh noes!)
-				if passivecollision(obj1, obj2) then
-					hadvercollision = "floor"
-				end
-			elseif aabb(obj1.x + obj1.speedX*dt, obj1.y, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then --Collision is horizontal!
-				local horcol = horcollision(obj1, obj2)
-				if horcol then
-					hadhorcollision = horcol
-				end
-				
-			elseif aabb(obj1.x, obj1.y+obj1.speedY*dt, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then --Collision is vertical!
-				local vercol = vercollision(obj1, obj2)
-				if vercol then
-					hadvercollision = vercol
-				end
-				
-			else 
-				--We're fucked, it's a diagonal collision! run!
-				--Okay actually let's take this slow okay. Let's just see if we're moving faster horizontally than vertically, aight?
-				local grav = GRAVITY
-				if self and self.gravity then
-					grav = self.gravity
-				end
-				if math.abs(obj1.speedY-grav*dt) < math.abs(obj1.speedX) then
-					--vertical collision it is.
-					local vercol = vercollision(obj1, obj2)
-					if vercol then
-						hadvercollision = vercol
-					end
+	if aabb(obj1.nextX, obj1.nextY, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then
+		if aabb(obj1.nextX, obj1.y, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then -- Collision is horizontal
+			horcollision = self:horcollision(obj1, obj2)
+			
+		elseif aabb(obj1.x, obj1.nextY, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then -- Collision is vertical
+			vercollision = self:vercollision(obj1, obj2)
+			
+		elseif aabb(obj1.x, obj1.y, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height) then -- Passive collision
+			obj1:passiveCollide(obj2)
+			obj2:passiveCollide(obj1)
 
-				else 
-					--okay so we're moving mainly vertically, so let's just pretend it was a horizontal collision? aight cool.
-					local horcol = horcollision(obj1, obj2)
-					if horcol then
-						hadhorcollision = horcol
-					end
+		else -- Diagonal collision
+			if math.abs(obj1.speedX) > math.abs(obj1.speedY) then -- Mainly moving horizontally
+				horcollision = self:horcollision(obj1, obj2)
 
-				end
+			else
+				vercollision = self:vercollision(obj1, obj2)
+
 			end
 		end
 	end
 	
-	return hadhorcollision, hadvercollision
+	return horcollision, vercollision
 end
 
-function passivecollision(obj1, obj2)
-	obj1:passiveCollide(obj2)
-	obj2:passiveCollide(obj1)
-	
-	return false
-end
-
-function horcollision(obj1, obj2)
+function World:horcollision(obj1, obj2)
 	if obj1.speedX < 0 then
 		--move object RIGHT (because it was moving left)
 		if obj2:rightCollide(obj1) ~= false then
@@ -195,7 +191,10 @@ function horcollision(obj1, obj2)
 			if obj1.speedX < 0 then
 				obj1.speedX = 0
 			end
+
 			obj1.x = obj2.x + obj2.width
+			obj1.nextX = obj1.x
+			
 			return "left"
 		end
 	else
@@ -210,7 +209,10 @@ function horcollision(obj1, obj2)
 			if obj1.speedX > 0 then
 				obj1.speedX = 0
 			end
+
 			obj1.x = obj2.x - obj1.width
+			obj1.nextX = obj1.x
+
 			return "right"
 		end
 	end
@@ -218,7 +220,7 @@ function horcollision(obj1, obj2)
 	return false
 end
 
-function vercollision(obj1, obj2)
+function World:vercollision(obj1, obj2)
 	if obj1.speedY < 0 then
 		--move object DOWN (because it was moving up)
 		if obj2:floorCollide(obj1) ~= false then
@@ -231,7 +233,10 @@ function vercollision(obj1, obj2)
 			if obj1.speedY < 0 then
 				obj1.speedY = 0
 			end
+
 			obj1.y = obj2.y  + obj2.height
+			obj1.nextY = obj1.y
+
 			return "ceil"
 		end
 	else					
@@ -245,13 +250,18 @@ function vercollision(obj1, obj2)
 			if obj1.speedY > 0 then
 				obj1.speedY = 0
 			end
+
 			obj1.y = obj2.y - obj1.height
+			obj1.nextY = obj1.y
+
 			return "floor"
 		end
 	end
+
 	return false
 end
 
 function aabb(ax, ay, awidth, aheight, bx, by, bwidth, bheight)
+	mainPerformanceTracker:track("aabb checks")
 	return ax+awidth > bx and ax < bx+bwidth and ay+aheight > by and ay < by+bheight
 end

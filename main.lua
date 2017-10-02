@@ -238,7 +238,7 @@ function math.clamp(n, low, high)
 end
 
 function drawOverBlock(x, y)
-    love.graphics.setColor(love.graphics.getBackgroundColor())
+    love.graphics.setColor(game.level.backgroundColor)
     love.graphics.rectangle("fill", (x-1)*TILESIZE, (y-1)*TILESIZE, TILESIZE, TILESIZE)
     love.graphics.setColor(255, 255, 255)
 end

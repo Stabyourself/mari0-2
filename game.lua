@@ -6,7 +6,7 @@ function game.load()
     smbTileMap = TileMap:new("tilemaps/smb")
     game.level = Level:new("levels/1-1.json", smbTileMap)
     
-    love.graphics.setBackgroundColor(game.level.backgroundColor or {92, 148, 252})
+    love.graphics.setBackgroundColor(game.level.backgroundColor)
     
     game.coinFrame = 1
     game.coinAnimationTimer = 0

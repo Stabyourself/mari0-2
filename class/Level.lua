@@ -8,6 +8,7 @@ function Level:initialize(path, tileMap)
     self.background = self.json.background
     self.width = #self.map
     self.height = #self.map[1]
+    self.backgroundColor = self.json.backgroundColor or {92, 148, 252}
 
     self.enemyList = loadEnemies()
     
@@ -82,7 +83,6 @@ function Level:update(dt)
     if newSpawnLine > self.spawnLine then
         self:spawnEnemies(newSpawnLine)
     end
-
 end
 
 function Level:draw()

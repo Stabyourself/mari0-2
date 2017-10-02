@@ -22,6 +22,10 @@ function game.update(dt)
     
     game.level:update(dt)
     
+    if game.level.marios[1].y > HEIGHT+.5 then
+        game.level.marios[1].y = -1
+    end
+    
 	game.coinAnimationTimer = game.coinAnimationTimer + dt
 	while game.coinAnimationTimer >= COINANIMATIONTIME do
         game.coinFrame = game.coinFrame + 1

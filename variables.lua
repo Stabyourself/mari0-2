@@ -44,6 +44,8 @@ SCROLLINGLEFTCOMPLETE = 4
 RUNANIMATIONTIME = 0.1
 
 OFFSCREENDRAW = 1
+OBJOFFSCREENDRAW = 0.5
+
 LEVELCANVASWIDTH = 64-OFFSCREENDRAW*2 -- how many blocks to draw to a canvas
 
 BLOCKBOUNCETIME = 0.2
@@ -84,6 +86,6 @@ end
 FFKEYS = {
     {
         key = "-",
-        val = 0.1
+        val = 0.02
     }
 }

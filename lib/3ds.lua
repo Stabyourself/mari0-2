@@ -1,3 +1,4 @@
+-- 3DS test thing, written for Mari0 3DS - MIT License.
 if love.system.getOS() ~= "Horizon" then
     local currentScreen = "top"
     

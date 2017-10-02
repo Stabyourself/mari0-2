@@ -1,5 +1,4 @@
 -- Frame time analyser thing, written for Mari0 3DS - MIT License.
-
 local FTAnalyser = class("FTAnalyser")
 
 function FTAnalyser:initialize(amount)

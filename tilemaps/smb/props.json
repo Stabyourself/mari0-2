@@ -594,7 +594,8 @@
         },
         
         {
-            "name": "unused"
+            "name": "coinblockempty",
+            "collision": true
         },
         
         {

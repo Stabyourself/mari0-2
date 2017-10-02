@@ -27,7 +27,9 @@ end
 
 function World:draw()
 	for _, obj in ipairs(self.activeObjects) do
-		self:drawObject(obj)
+		if game.level:objVisible(obj.x, obj.y, obj.width, obj.height) then
+			self:drawObject(obj)
+		end
 	end
 
 	if(PHYSICSDEBUG) then

@@ -83,9 +83,6 @@ function Level:update(dt)
         self:spawnEnemies(newSpawnLine)
     end
 
-    if self.marios[1].y > HEIGHT then
-        self.marios[1].y = 0
-    end
 end
 
 function Level:draw()
@@ -114,7 +111,7 @@ function Level:draw()
     local num = 0
     
     for _, v in ipairs(self.liveReplacements) do
-        if self:blockVisible(v.x, v.y) then
+        if self:objVisible(v.x, v.y, 1, 1) then
             mainPerformanceTracker:track("live replacements drawn")
             num = num + 1
             drawOverBlock(v.x, v.y)
@@ -137,6 +134,13 @@ function Level:draw()
     
     self.world:draw()
 
+    local cx, cy = self.marios[1].x+self.marios[1].width/2, self.marios[1].y+self.marios[1].height/2
+    local mx, my = (love.mouse.getX()/TILESIZE)/SCALE+self.camera.x, love.mouse.getY()/TILESIZE/SCALE
+    local dir = math.atan2(my-cy, mx-cx)
+
+    local x, y, absX, absY, side = self:rayCast(cx, cy, dir)
+
+    love.graphics.line(cx*TILESIZE, cy*TILESIZE, (absX)*TILESIZE, (absY)*TILESIZE)
     self.camera:detach()
 end
 
@@ -227,6 +231,93 @@ function Level:bumpBlock(x, y)
     end
 end
 
-function Level:blockVisible(x, y)
-    return x > self.camera.x - OFFSCREENDRAW and x < self.camera.x+WIDTH+OFFSCREENDRAW
+function Level:objVisible(x, y, w, h)
+    return x+w > self.camera.x-OFFSCREENDRAW-OBJOFFSCREENDRAW and x < self.camera.x+WIDTH+OFFSCREENDRAW+OBJOFFSCREENDRAW and
+        y+h > self.camera.y-OBJOFFSCREENDRAW and y < self.camera.y+HEIGHT+OBJOFFSCREENDRAW
+end
+
+function Level:rayCast(x, y, dir)
+    local rayPosX = x+1
+    local rayPosY = y+1
+    local rayDirX = math.cos(dir)
+    local rayDirY = math.sin(dir)
+    
+    local mapX = math.floor(rayPosX)
+    local mapY = math.floor(rayPosY)
+
+    -- length of ray from one x or y-side to next x or y-side
+    local deltaDistX = math.sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX))
+    local deltaDistY = math.sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY))
+
+    -- what direction to step in x or y-direction (either +1 or -1)
+    local stepX, stepY
+
+    local hit = false -- was there a wall hit?
+    local side -- was a NS or a EW wall hit?
+    -- calculate step and initial sideDist
+    if rayDirX < 0 then
+        stepX = -1
+        sideDistX = (rayPosX - mapX) * deltaDistX
+    else
+        stepX = 1
+        sideDistX = (mapX + 1.0 - rayPosX) * deltaDistX
+    end
+
+    if rayDirY < 0 then
+        stepY = -1
+        sideDistY = (rayPosY - mapY) * deltaDistY
+    else
+        stepY = 1
+        sideDistY = (mapY + 1.0 - rayPosY) * deltaDistY
+    end
+
+    -- perform DDA
+    while not hit do
+        -- jump to next map square, OR in x-direction, OR in y-direction
+        if sideDistX < sideDistY then
+            sideDistX = sideDistX + deltaDistX
+            mapX = mapX + stepX;
+            side = "ver";
+        else
+            sideDistY = sideDistY + deltaDistY
+            mapY = mapY + stepY
+            side = "hor"
+        end
+
+        -- Check if ray has hit something (or went outside the map)
+        if not self:inMap(mapX, mapY) or self:getTile(mapX, mapY).collision then
+            local absX = mapX-1
+            local absY = mapY-1
+
+            if side == "ver" then
+                local dist = (mapX - rayPosX + (1 - stepX) / 2) / rayDirX;
+                hitDist = math.fmod(rayPosY + dist * rayDirY, 1)
+
+                absY = absY + hitDist
+            else
+                local dist = (mapY - rayPosY + (1 - stepY) / 2) / rayDirY;
+                hitDist = math.fmod(rayPosX + dist * rayDirX, 1)
+
+                absX = absX + hitDist
+            end
+
+            if side == "ver" then
+                if stepX > 0 then
+                    side = "left"
+                else
+                    side = "right"
+                    absX = absX + 1
+                end
+            else
+                if stepY > 0 then
+                    side = "top"
+                else
+                    side = "bottom"
+                    absY = absY + 1
+                end
+            end
+
+            return mapX, mapY, absX, absY, side
+        end
+    end
 end

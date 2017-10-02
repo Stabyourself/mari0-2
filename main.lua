@@ -1,5 +1,4 @@
 --Mari0 3DS - MIT License.
-
 is3DS = love.system.getOS() == "Horizon"
 
 function love.load()

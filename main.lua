@@ -99,6 +99,7 @@ function love.draw()
     
     mainFTAnalyser:frameEnd(gdt)
 
+
     love.graphics.setScreen("bottom")
     love.graphics.setColor(0, 0, 0)
     love.graphics.rectangle("fill", 0, 0, BOTTOMSCREENWIDTH, BOTTOMSCREENHEIGHT)

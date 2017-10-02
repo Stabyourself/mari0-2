@@ -74,7 +74,15 @@ function FTAnalyser:draw(x, y, w, h)
 
     local minMaxDiff = self.maxSmooth - self.minSmooth
 
-    for x = x+w-1, 0, -1 do
+    local total = 0
+
+    for _, v in ipairs(self.data) do
+        total = total + v.t
+    end
+
+    local avg = total/#self.data
+
+    for x = x+w, 1, -1 do
         local setI = x
         if self.data[setI] then
             local t = self.data[setI].t
@@ -85,7 +93,7 @@ function FTAnalyser:draw(x, y, w, h)
                 if self.data[setI].color then
                     love.graphics.setColor(self.data[setI].color)
                 end
-                love.graphics.rectangle("fill", x+(self.amount-#self.data), (h-graphOffset-graphHeight*barHeight)+y, 1, (h-graphOffset*2)*barHeight)
+                love.graphics.rectangle("fill", x+(self.amount-#self.data)-1, (h-graphOffset-graphHeight*barHeight)+y, 1, (h-graphOffset*2)*barHeight)
             end
         end
 
@@ -93,8 +101,9 @@ function FTAnalyser:draw(x, y, w, h)
     end
     
     love.graphics.setColor(255, 0, 0)
-    love.graphics.print("max ms: " .. math.round(self.max*1000, 2), 0, y)
-    love.graphics.print("min ms: " .. math.round(self.min*1000, 2), 0, h-7+y)
+    love.graphics.print("max ms: " .. math.round(self.max*1000, 2), x, y)
+    love.graphics.print("min ms: " .. math.round(self.min*1000, 2), x, h-7+y)
+    love.graphics.print("avg ms: " .. math.round(avg*1000, 2), x+w-1, y, "right")
     love.graphics.setColor(255, 255, 255)
 end
 

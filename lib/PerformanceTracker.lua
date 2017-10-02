@@ -3,11 +3,14 @@
 local PerformanceTracker = class("PerformanceTracker")
 
 function PerformanceTracker:initialize()
+    self.data = {}
     self:reset()
 end
 
 function PerformanceTracker:reset()
-    self.data = {}
+    for i, _ in pairs(self.data) do
+        self.data[i] = 0
+    end
 end
 
 function PerformanceTracker:track(type, num)

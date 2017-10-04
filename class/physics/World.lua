@@ -74,30 +74,6 @@ function World:physics(dt)
 		local horcollision = false
 		local vercollision = false
 		
-		-- VS other, active objects
-		for _, obj2 in ipairs(self.activeObjects) do
-			if obj1 ~= obj2 then
-				local collision1, collision2 = self:checkcollision(obj1, obj2, dt)
-				if collision1 then
-					horcollision = collision1
-				end
-				if collision2 then
-					vercollision = collision2
-				end
-			end
-		end
-		
-		-- VS other, static objects
-		for _, obj2 in ipairs(self.staticObjects) do
-			local collision1, collision2 = self:checkcollision(obj1, obj2, dt)
-			if collision1 then
-				horcollision = collision1
-			end
-			if collision2 then
-				vercollision = collision2
-			end
-		end
-		
 		-- Portal check
 		for _, v in ipairs(game.level.portals) do
 			local iX, iY = linesIntersect(obj1.x+obj1.width/2, obj1.y+obj1.height/2, obj1.nextX+obj1.width/2, obj1.nextY+obj1.height/2, v.x1, v.y1, v.x2, v.y2)
@@ -161,6 +137,30 @@ function World:physics(dt)
 						end
 					end
 				end
+			end
+		end
+		
+		-- VS other, active objects
+		for _, obj2 in ipairs(self.activeObjects) do
+			if obj1 ~= obj2 then
+				local collision1, collision2 = self:checkcollision(obj1, obj2, dt)
+				if collision1 then
+					horcollision = collision1
+				end
+				if collision2 then
+					vercollision = collision2
+				end
+			end
+		end
+		
+		-- VS other, static objects
+		for _, obj2 in ipairs(self.staticObjects) do
+			local collision1, collision2 = self:checkcollision(obj1, obj2, dt)
+			if collision1 then
+				horcollision = collision1
+			end
+			if collision2 then
+				vercollision = collision2
 			end
 		end
 

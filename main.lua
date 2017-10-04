@@ -249,7 +249,7 @@ function drawOverBlock(x, y)
     love.graphics.setColor(255, 255, 255)
 end
 
-function sideOfLine(ox, oy, p1x, p1y, p2x, p2y) -- credits to https://stackoverflow.com/a/293052
+function sideOfLine(ox, oy, p1x, p1y, p2x, p2y) -- Credits to https://stackoverflow.com/a/293052
     return (p2y-p1y)*ox + (p1x-p2x)*oy + (p2x*p1y-p1x*p2y)
 end
 
@@ -274,6 +274,15 @@ function rectangleOnLine(x, y, w, h, p1x, p1y, p2x, p2y) -- Todo: optimize this
 
     if above and below then
         -- B
+        local angle = math.atan2(p2y-p1y, p2x-p1x)
+        local newX = pointAroundPoint(x, y, p1x, p1y, angle) - p1x
+        
+        if newX > -0.1 and newX < 1.9 then -- These values may need to be reworked properly
+            return true
+        end
+    
+        --]]
+        --[[
         if p1x > p2x then
             p1x, p2x = p2x, p1x
         end
@@ -283,12 +292,14 @@ function rectangleOnLine(x, y, w, h, p1x, p1y, p2x, p2y) -- Todo: optimize this
         if aabb(x, y, w, h, p1x, p1y, p2x-p1x, p2y-p1y) then
             return true
         end
+        
+        --]]
     end
 
     return false
 end
 
-function linesIntersect(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) -- credits to https://stackoverflow.com/a/1968345
+function linesIntersect(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) -- Credits to https://stackoverflow.com/a/1968345
     local s1_x = p1_x - p0_x 
     local s1_y = p1_y - p0_y
 
@@ -305,7 +316,7 @@ function linesIntersect(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) -- credi
     return false
 end
 
-function pointAroundPoint(x1, y1, x2, y2, r)
+function pointAroundPoint(x1, y1, x2, y2, r) -- Credits to https://stackoverflow.com/a/15109215
     local newX = math.cos(r) * (x1-x2) - math.sin(r) * (y1-y2) + x2
     local newY = math.sin(r) * (x1-x2) + math.cos(r) * (y1-y2) + y2
 

@@ -60,8 +60,8 @@ function Level:initialize(path, tileMap)
     table.insert(self.marios, Mario:new(self.world, self.spawnX-6/16, self.spawnY-12/16))
 
     self.portals = {}
-    table.insert(self.portals, Portal:new(self.world, 9, 13, 0, {60, 188, 252}))
-    table.insert(self.portals, Portal:new(self.world, 6.5, 10, 0, {232, 130, 30}))
+    table.insert(self.portals, Portal:new(self.world, 4, 13, 0, {60, 188, 252}))
+    table.insert(self.portals, Portal:new(self.world, 9, 13, 0, {232, 130, 30}))
 
     self.portals[1].connectsTo = self.portals[2]
     self.portals[2].connectsTo = self.portals[1]

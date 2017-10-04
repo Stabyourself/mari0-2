@@ -14,11 +14,19 @@ function Portal:initialize(world, x, y, r, color)
     self.y2 = y+math.sin(self.r)*self.size
 
     self.open = true
-
+    
     self.portalWalls = {
         PortalWall:new(world, self.x1, self.y1),
         PortalWall:new(world, self.x2, self.y2)
     }
+end
+
+function Portal:updateWallPositions()
+    self.portalWalls[1].x = self.x1
+    self.portalWalls[1].y = self.y1
+
+    self.portalWalls[2].x = self.x2
+    self.portalWalls[2].y = self.y2
 end
 
 function Portal:draw()

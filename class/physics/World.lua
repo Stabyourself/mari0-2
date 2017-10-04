@@ -284,7 +284,6 @@ function aabb(ax, ay, awidth, aheight, bx, by, bwidth, bheight)
 end
 
 function doPortal(obj, portal, iX, iY)
-	print("portaled " .. portal.x)
 	-- Modify speed
 	local speed = math.sqrt(obj.speedX^2 + obj.speedY^2)
 	local r = portal.connectsTo.r - math.atan2(obj.speedY, obj.speedX) + portal.r
@@ -294,14 +293,14 @@ function doPortal(obj, portal, iX, iY)
 
 	-- Modify position
 	-- Rotate aroun entry portal
-	local newX, newY = pointAroundPoint(obj.nextX+obj.width/2, obj.nextY+obj.height/2, portal.x, portal.y, -portal.r)
+	local newX, newY = pointAroundPoint(obj.nextX+obj.width/2, obj.nextY+obj.height/2, portal.x1, portal.y1, -portal.r)
 
 	-- Translate by portal offset
-	newX = newX + (portal.connectsTo.x - portal.x)
-	newY = newY + (portal.connectsTo.y - portal.y)
+	newX = newX + (portal.connectsTo.x1 - portal.x1)
+	newY = newY + (portal.connectsTo.y1 - portal.y1)
 
 	-- Rotate around exit portal
-	newX, newY = pointAroundPoint(newX, newY, portal.connectsTo.x, portal.connectsTo.y, portal.connectsTo.r)
+	newX, newY = pointAroundPoint(newX, newY, portal.connectsTo.x1, portal.connectsTo.y1, portal.connectsTo.r)
 
 	obj.x = newX-obj.width/2
 	obj.y = newY-obj.height/2

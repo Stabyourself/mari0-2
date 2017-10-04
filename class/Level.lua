@@ -60,8 +60,8 @@ function Level:initialize(path, tileMap)
     table.insert(self.marios, Mario:new(self.world, self.spawnX-6/16, self.spawnY-12/16))
 
     self.portals = {}
-    table.insert(self.portals, Portal:new(self.world, 3, 11, 0, {60, 188, 252}))
-    table.insert(self.portals, Portal:new(self.world, 6, 11, -math.pi/4, {232, 130, 30}))
+    table.insert(self.portals, Portal:new(self.world, 9, 13, 0, {60, 188, 252}))
+    table.insert(self.portals, Portal:new(self.world, 6.5, 10, 0, {232, 130, 30}))
 
     self.portals[1].connectsTo = self.portals[2]
     self.portals[2].connectsTo = self.portals[1]
@@ -143,7 +143,7 @@ function Level:draw()
     for _, v in ipairs(self.portals) do
         v:draw()
     end
-    --[[
+    --[[ Line tracing debug
     local cx, cy = self.marios[1].x+self.marios[1].width/2, self.marios[1].y+self.marios[1].height/2
     local mx, my = (love.mouse.getX()/TILESIZE)/SCALE+self.camera.x, love.mouse.getY()/TILESIZE/SCALE
     local dir = math.atan2(my-cy, mx-cx)

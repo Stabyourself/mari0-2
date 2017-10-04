@@ -141,7 +141,7 @@ function updateGroup(group, dt)
 	table.sort(delete, function(a,b) return a>b end)
 	
 	for _, v in ipairs(delete) do
-		table.remove(group, v) --remove
+		table.remove(group, v)
 	end
 end
 
@@ -249,7 +249,7 @@ function drawOverBlock(x, y)
     love.graphics.setColor(255, 255, 255)
 end
 
-function sideOfLine(ox, oy, p1x, p1y, p2x, p2y) -- Honestly no idea how or why this works, thanks to Alejo https://stackoverflow.com/a/293052
+function sideOfLine(ox, oy, p1x, p1y, p2x, p2y) -- credits to https://stackoverflow.com/a/293052
     return (p2y-p1y)*ox + (p1x-p2x)*oy + (p2x*p1y-p1x*p2y)
 end
 
@@ -286,4 +286,28 @@ function rectangleOnLine(x, y, w, h, p1x, p1y, p2x, p2y) -- Todo: optimize this
     end
 
     return false
+end
+
+function linesIntersect(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) -- credits to https://stackoverflow.com/a/1968345
+    local s1_x = p1_x - p0_x 
+    local s1_y = p1_y - p0_y
+
+    local s2_x = p3_x - p2_x  
+    local s2_y = p3_y - p2_y
+
+    local s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y)
+    local t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y)
+
+    if (s >= 0 and s <= 1 and t >= 0 and t <= 1) then
+        return p0_x + (t * s1_x), p0_y + (t * s1_y)
+    end
+
+    return false
+end
+
+function pointAroundPoint(x1, y1, x2, y2, r)
+    local newX = math.cos(r) * (x1-x2) - math.sin(r) * (y1-y2) + x2
+    local newY = math.sin(r) * (x1-x2) + math.cos(r) * (y1-y2) + y2
+
+    return newX, newY
 end

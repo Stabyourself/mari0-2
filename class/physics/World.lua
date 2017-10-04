@@ -69,9 +69,6 @@ function World:physics(dt)
 		-- Precalculate nextX and nextY because I use them a lot
 		obj1.nextX = obj1.x + obj1.speedX*dt
 		obj1.nextY = obj1.y + obj1.speedY*dt
-
-
-
 		
 		-- Collision results
 		local horcollision = false
@@ -102,32 +99,29 @@ function World:physics(dt)
 		end
 		
 		-- Portal check
-		local nextSide
-		local inPortal = false
-
 		for _, v in ipairs(game.level.portals) do
-			if rectangleOnLine(obj1.nextX, obj1.nextY, obj1.width, obj1.height, v.x1, v.y1, v.x2, v.y2) then
-				inPortal = v
-				break
-			end
-		end
-
-		if inPortal then
-			nextSide = sideOfLine(obj1.nextX+obj1.width/2, obj1.nextY+obj1.height/2, inPortal.x1, inPortal.y1, inPortal.x2, inPortal.y2)
-			local prevSide = sideOfLine(obj1.x+obj1.width/2, obj1.y+obj1.height/2, inPortal.x1, inPortal.y1, inPortal.x2, inPortal.y2)
-			
-			if (prevSide > 0 and nextSide < 0) or (prevSide < 0 and nextSide > 0) then
-				doPortal(obj1, inPortal)
-				inPortal = inPortal.connectsTo
+			local iX, iY = linesIntersect(obj1.x+obj1.width/2, obj1.y+obj1.height/2, obj1.nextX+obj1.width/2, obj1.nextY+obj1.height/2, v.x1, v.y1, v.x2, v.y2)
+			if iX then
+				doPortal(obj1, v, iX, iY)
 
 				obj1.nextX = obj1.x + obj1.speedX*dt
 				obj1.nextY = obj1.y + obj1.speedY*dt
 
 				sameframe = true
-				nextSide = -nextSide
+				break
 			end
 		end
-		
+
+		local obj1Side
+		local inPortal = false
+		for _, v in ipairs(game.level.portals) do
+			if rectangleOnLine(obj1.nextX, obj1.nextY, obj1.width, obj1.height, v.x1, v.y1, v.x2, v.y2) then
+				inPortal = v
+
+				obj1Side = sideOfLine(obj1.nextX+obj1.width/2, obj1.nextY+obj1.height/2, inPortal.x1, inPortal.y1, inPortal.x2, inPortal.y2)
+				local prevSide = sideOfLine(obj1.x+obj1.width/2, obj1.y+obj1.height/2, inPortal.x1, inPortal.y1, inPortal.x2, inPortal.y2)
+			end
+		end
 		
 		-- VS blocks (carefuly select which blocks to check against)
 		-- Don't do any of this if inside a portal!
@@ -151,7 +145,7 @@ function World:physics(dt)
 					if inPortal then
 						local blockSide = sideOfLine(x-.5, y-.5, inPortal.x1, inPortal.y1, inPortal.x2, inPortal.y2)
 
-						if (blockSide > 0 and nextSide < 0) or (blockSide < 0 and nextSide > 0) then
+						if (blockSide > 0 and obj1Side < 0) or (blockSide < 0 and obj1Side > 0) then
 							noCollision = true
 						end
 					end
@@ -289,7 +283,8 @@ function aabb(ax, ay, awidth, aheight, bx, by, bwidth, bheight)
 	return ax+awidth > bx and ax < bx+bwidth and ay+aheight > by and ay < by+bheight
 end
 
-function doPortal(obj, portal)
+function doPortal(obj, portal, iX, iY)
+	print("portaled " .. portal.x)
 	-- Modify speed
 	local speed = math.sqrt(obj.speedX^2 + obj.speedY^2)
 	local r = portal.connectsTo.r - math.atan2(obj.speedY, obj.speedX) + portal.r
@@ -298,6 +293,16 @@ function doPortal(obj, portal)
 	obj.speedY = math.sin(r)*speed
 
 	-- Modify position
-	obj.x = obj.x + (portal.connectsTo.x - portal.x)
-	obj.y = obj.y + (portal.connectsTo.y - portal.y)
+	-- Rotate aroun entry portal
+	local newX, newY = pointAroundPoint(obj.nextX+obj.width/2, obj.nextY+obj.height/2, portal.x, portal.y, -portal.r)
+
+	-- Translate by portal offset
+	newX = newX + (portal.connectsTo.x - portal.x)
+	newY = newY + (portal.connectsTo.y - portal.y)
+
+	-- Rotate around exit portal
+	newX, newY = pointAroundPoint(newX, newY, portal.connectsTo.x, portal.connectsTo.y, portal.connectsTo.r)
+
+	obj.x = newX-obj.width/2
+	obj.y = newY-obj.height/2
 end

@@ -280,37 +280,23 @@ function rectangleOnLine(x, y, w, h, p1x, p1y, p2x, p2y) -- Todo: optimize this
         if newX > -0.1 and newX < 1.9 then -- These values may need to be reworked properly
             return true
         end
-    
-        --]]
-        --[[
-        if p1x > p2x then
-            p1x, p2x = p2x, p1x
-        end
-        if p1y > p2y then
-            p1y, p2y = p2y, p1y
-        end
-        if aabb(x, y, w, h, p1x, p1y, p2x-p1x, p2y-p1y) then
-            return true
-        end
-        
-        --]]
     end
 
     return false
 end
 
-function linesIntersect(p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y) -- Credits to https://stackoverflow.com/a/1968345
-    local s1_x = p1_x - p0_x 
-    local s1_y = p1_y - p0_y
+function linesIntersect(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) -- Credits to https://stackoverflow.com/a/1968345
+    local s0x = p2x - p1x 
+    local s0y = p2y - p1y
 
-    local s2_x = p3_x - p2_x  
-    local s2_y = p3_y - p2_y
+    local s2_x = p4x - p3x  
+    local s2_y = p4y - p3y
 
-    local s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y)
-    local t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y)
+    local s = (-s0y * (p1x - p3x) + s0x * (p1y - p3y)) / (-s2_x * s0y + s0x * s2_y)
+    local t = ( s2_x * (p1y - p3y) - s2_y * (p1x - p3x)) / (-s2_x * s0y + s0x * s2_y)
 
     if (s >= 0 and s <= 1 and t >= 0 and t <= 1) then
-        return p0_x + (t * s1_x), p0_y + (t * s1_y)
+        return p1x + (t * s0x), p1y + (t * s0y)
     end
 
     return false

@@ -7,9 +7,9 @@ function TileMap:initialize(path)
 
     self.tiles = {}
     
-    local xW = self.img:getWidth()/TILESIZE
+    local xW = self.img:getWidth()/(TILESIZE+1)
 
-    for y = 1, self.img:getHeight()/TILESIZE do
+    for y = 1, self.img:getHeight()/(TILESIZE+1) do
         for x = 1, xW do
             local num = x + xW*(y-1)
             local json = self.json.tiles[num]
@@ -19,7 +19,7 @@ function TileMap:initialize(path)
 
                 table.insert(self.tiles, Tile:new("coinblock", json.img, json or {}))
             else
-                local quad = love.graphics.newQuad((x-1)*TILESIZE, (y-1)*TILESIZE, TILESIZE, TILESIZE, self.img:getWidth(), self.img:getHeight())
+                local quad = love.graphics.newQuad((x-1)*(TILESIZE+1), (y-1)*(TILESIZE+1), TILESIZE, TILESIZE, self.img:getWidth(), self.img:getHeight())
                 
                 table.insert(self.tiles, Tile:new("regular", self.img, quad, json or {}))
             end

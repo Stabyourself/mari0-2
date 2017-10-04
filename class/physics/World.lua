@@ -33,7 +33,10 @@ function World:draw()
 	end
 
 	if(PHYSICSDEBUG) then
-		for _, obj in ipairs(self.objects) do
+		for _, obj in ipairs(self.activeObjects) do
+			self:debugDrawObject(obj)
+		end
+		for _, obj in ipairs(self.staticObjects) do
 			self:debugDrawObject(obj)
 		end
 	end

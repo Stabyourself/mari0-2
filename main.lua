@@ -34,6 +34,8 @@ function love.load()
     require "class/Block"
     require "class/BlockBounce"
     require "class/Enemy"
+    require "class/Portal" -- the juicy bits
+    require "class/PortalWall"
 
     require "game"
     
@@ -88,7 +90,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    if SCALE ~= 1 then
+    if SCALE ~= 1 and not is3DS then
         love.graphics.scale(SCALE, SCALE)
     end
 
@@ -111,7 +113,7 @@ function love.draw()
     
     love.graphics.setScreen("top")
 
-    if SCALE ~= 1 then
+    if SCALE ~= 1 and not is3DS then
         love.graphics.scale(1/SCALE, 1/SCALE)
     end
 end
@@ -219,6 +221,10 @@ function worldDraw(...)
     end
 end
 
+function worldLine(x1, y1, x2, y2)
+    love.graphics.line(x1*TILESIZE, y1*TILESIZE, x2*TILESIZE, y2*TILESIZE)
+end
+
 function math.round(i, decimals)
     local factor = math.pow(10, decimals or 0)
     
@@ -241,4 +247,43 @@ function drawOverBlock(x, y)
     love.graphics.setColor(game.level.backgroundColor)
     love.graphics.rectangle("fill", (x-1)*TILESIZE, (y-1)*TILESIZE, TILESIZE, TILESIZE)
     love.graphics.setColor(255, 255, 255)
+end
+
+function sideOfLine(ox, oy, p1x, p1y, p2x, p2y) -- Honestly no idea how or why this works, thanks to Alejo https://stackoverflow.com/a/293052
+    return (p2y-p1y)*ox + (p1x-p2x)*oy + (p2x*p1y-p1x*p2y)
+end
+
+function rectangleOnLine(x, y, w, h, p1x, p1y, p2x, p2y) -- Todo: optimize this
+    -- A
+    local pointPositions = {
+        sideOfLine(x, y, p1x, p1y, p2x, p2y),
+        sideOfLine(x+w, y, p1x, p1y, p2x, p2y),
+        sideOfLine(x, y+h, p1x, p1y, p2x, p2y),
+        sideOfLine(x+w, y+h, p1x, p1y, p2x, p2y)
+    }
+
+    local above, below = false, false
+
+    for i = 1, 4 do
+        if pointPositions[i] > 0 then
+            above = true
+        elseif pointPositions[i] < 0 then
+            below = true
+        end
+    end
+
+    if above and below then
+        -- B
+        if p1x > p2x then
+            p1x, p2x = p2x, p1x
+        end
+        if p1y > p2y then
+            p1y, p2y = p2y, p1y
+        end
+        if aabb(x, y, w, h, p1x, p1y, p2x-p1x, p2y-p1y) then
+            return true
+        end
+    end
+
+    return false
 end

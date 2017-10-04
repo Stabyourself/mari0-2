@@ -58,6 +58,13 @@ function Level:initialize(path, tileMap)
 
     self.marios = {}
     table.insert(self.marios, Mario:new(self.world, self.spawnX-6/16, self.spawnY-12/16))
+
+    self.portals = {}
+    table.insert(self.portals, Portal:new(self.world, 3, 11, 0, {60, 188, 252}))
+    table.insert(self.portals, Portal:new(self.world, 6, 11, 0, {232, 130, 30}))
+
+    self.portals[1].connectsTo = self.portals[2]
+    self.portals[2].connectsTo = self.portals[1]
     
     -- Camera stuff
     self.camera = Camera:new()
@@ -68,7 +75,7 @@ function Level:initialize(path, tileMap)
     print("Prerendering level...")
     self.levelCanvases = {}
     for x = 0, math.floor(self.width/LEVELCANVASWIDTH) do
-        table.insert(self.levelCanvases, LevelCanvas:new(self, x*LEVELCANVASWIDTH+1))
+        --table.insert(self.levelCanvases, LevelCanvas:new(self, x*LEVELCANVASWIDTH+1))
     end
 
     self:spawnEnemies(self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2)
@@ -89,6 +96,7 @@ function Level:draw()
     self.camera:attach()
     
     -- MAIN LEVELCANVAS
+    --[[
     local mainCanvasI = math.floor((self.camera.x)/LEVELCANVASWIDTH)+1
     mainCanvasI = math.max(1, mainCanvasI)
     
@@ -105,7 +113,7 @@ function Level:draw()
     if math.fmod(self.camera.x, LEVELCANVASWIDTH) > LEVELCANVASWIDTH-WIDTH-OFFSCREENDRAW and mainCanvasI < #self.levelCanvases then
         mainPerformanceTracker:track("levelcanvases drawn")
         love.graphics.draw(self.levelCanvases[mainCanvasI+1].canvas, ((mainCanvasI)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
-    end
+    end--]]
     
     -- Live replacements: Coinblocks that were hit, blocks that were broken
     local num = 0
@@ -133,7 +141,10 @@ function Level:draw()
     love.graphics.setDepth(0)
     
     self.world:draw()
-
+    for _, v in ipairs(self.portals) do
+        v:draw()
+    end
+    --[[
     local cx, cy = self.marios[1].x+self.marios[1].width/2, self.marios[1].y+self.marios[1].height/2
     local mx, my = (love.mouse.getX()/TILESIZE)/SCALE+self.camera.x, love.mouse.getY()/TILESIZE/SCALE
     local dir = math.atan2(my-cy, mx-cx)
@@ -141,6 +152,8 @@ function Level:draw()
     local x, y, absX, absY, side = self:rayCast(cx, cy, dir)
 
     love.graphics.line(cx*TILESIZE, cy*TILESIZE, (absX)*TILESIZE, (absY)*TILESIZE)
+
+    --]]
     self.camera:detach()
 end
 

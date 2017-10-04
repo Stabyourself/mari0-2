@@ -40,6 +40,8 @@ end
 
 function game.draw()
     game.level:draw()
+
+    love.graphics.setColor(255, 255, 255)
     
     -- UI
     -- score

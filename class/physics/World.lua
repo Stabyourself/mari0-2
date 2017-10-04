@@ -50,7 +50,6 @@ end
 
 function World:update(dt)
     updateGroup(self.activeObjects, dt)
-    updateGroup(self.staticObjects, dt)
 
 	mainPerformanceTracker:track("active objects", #game.level.world.activeObjects)
 	mainPerformanceTracker:track("static objects", #game.level.world.staticObjects)
@@ -70,6 +69,9 @@ function World:physics(dt)
 		-- Precalculate nextX and nextY because I use them a lot
 		obj1.nextX = obj1.x + obj1.speedX*dt
 		obj1.nextY = obj1.y + obj1.speedY*dt
+
+
+
 		
 		-- Collision results
 		local horcollision = false
@@ -99,8 +101,36 @@ function World:physics(dt)
 			end
 		end
 		
+		-- Portal check
+		local nextSide
+		local inPortal = false
+
+		for _, v in ipairs(game.level.portals) do
+			if rectangleOnLine(obj1.nextX, obj1.nextY, obj1.width, obj1.height, v.x1, v.y1, v.x2, v.y2) then
+				inPortal = v
+				break
+			end
+		end
+
+		if inPortal then
+			nextSide = sideOfLine(obj1.nextX+obj1.width/2, obj1.nextY+obj1.height/2, inPortal.x1, inPortal.y1, inPortal.x2, inPortal.y2)
+			local prevSide = sideOfLine(obj1.x+obj1.width/2, obj1.y+obj1.height/2, inPortal.x1, inPortal.y1, inPortal.x2, inPortal.y2)
+			
+			if (prevSide > 0 and nextSide < 0) or (prevSide < 0 and nextSide > 0) then
+				doPortal(obj1, inPortal)
+				inPortal = inPortal.connectsTo
+
+				obj1.nextX = obj1.x + obj1.speedX*dt
+				obj1.nextY = obj1.y + obj1.speedY*dt
+
+				sameframe = true
+				nextSide = -nextSide
+			end
+		end
+		
 		
 		-- VS blocks (carefuly select which blocks to check against)
+		-- Don't do any of this if inside a portal!
 		local xstart = math.floor(obj1.nextX-2/16)+1
 		local ystart = math.floor(obj1.nextY-2/16)+1
 		
@@ -116,13 +146,25 @@ function World:physics(dt)
 			for y = ystart, ystart+math.ceil(obj1.height) do
 				local obj2 = self.blockLookup[x] and self.blockLookup[x][y]
 				if obj2 then
-					local collision1, collision2 = self:checkcollision(obj1, obj2, dt)
+					-- Check if on other side of portal
+					local noCollision = false
+					if inPortal then
+						local blockSide = sideOfLine(x-.5, y-.5, inPortal.x1, inPortal.y1, inPortal.x2, inPortal.y2)
 
-					if collision1 then
-						horcollision = collision1
+						if (blockSide > 0 and nextSide < 0) or (blockSide < 0 and nextSide > 0) then
+							noCollision = true
+						end
 					end
-					if collision2 then
-						vercollision = collision2
+
+					if not noCollision then
+						local collision1, collision2 = self:checkcollision(obj1, obj2, dt)
+
+						if collision1 then
+							horcollision = collision1
+						end
+						if collision2 then
+							vercollision = collision2
+						end
 					end
 				end
 			end
@@ -245,4 +287,17 @@ end
 function aabb(ax, ay, awidth, aheight, bx, by, bwidth, bheight)
 	mainPerformanceTracker:track("aabb checks")
 	return ax+awidth > bx and ax < bx+bwidth and ay+aheight > by and ay < by+bheight
+end
+
+function doPortal(obj, portal)
+	-- Modify speed
+	local speed = math.sqrt(obj.speedX^2 + obj.speedY^2)
+	local r = portal.connectsTo.r - math.atan2(obj.speedY, obj.speedX) + portal.r
+
+	obj.speedX = math.cos(r)*speed
+	obj.speedY = math.sin(r)*speed
+
+	-- Modify position
+	obj.x = obj.x + (portal.connectsTo.x - portal.x)
+	obj.y = obj.y + (portal.connectsTo.y - portal.y)
 end

@@ -22,7 +22,7 @@ function LevelCanvas:render(renderX)
     
     for x = xStart, xEnd do
         for y = yStart, yEnd do
-            local tile = self.level.tileMap.tiles[self.level.background[x][y]]
+            local tile = self.level.background[x] and self.level.tileMap.tiles[self.level.background[x][y]]
             if tile and not tile.invisible and tile.t ~= "coinblock" then -- Don't prerender coin type blocks because I need to animate them anyway
                 tile:draw((x-xStart+OFFSCREENDRAW)*16, (y-1)*16)
             end

@@ -97,6 +97,8 @@ function World:physics(dt)
 			if rectangleOnLine(obj1.nextX, obj1.nextY, obj1.width, obj1.height, v.x1, v.y1, v.x2, v.y2) then
 				inPortal = v
 
+				print("!")
+
 				obj1Side = sideOfLine(obj1.nextX+obj1.width/2, obj1.nextY+obj1.height/2, inPortal.x1, inPortal.y1, inPortal.x2, inPortal.y2)
 				local prevSide = sideOfLine(obj1.x+obj1.width/2, obj1.y+obj1.height/2, inPortal.x1, inPortal.y1, inPortal.x2, inPortal.y2)
 			end

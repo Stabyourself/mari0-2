@@ -21,10 +21,10 @@ function love.load()
     FTAnalyser = require "lib/FTAnalyser"
     PerformanceTracker = require "lib/PerformanceTracker"
 
-    require "enemyLoader"
-
     require "class/physics/World"
     require "class/physics/PhysObj"
+
+    require "enemyLoader"
 
     require "class/TileMap"
     require "class/Tile"
@@ -150,7 +150,6 @@ function keyDown(cmd)
 end
 
 function skipUpdate()
-    print("Skipping next update!")
     skipNext = true
 end
 

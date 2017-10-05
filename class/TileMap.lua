@@ -3,7 +3,8 @@ TileMap = class("TileMap")
 function TileMap:initialize(path)
     self.path = path
     self.img = love.graphics.newImage(self.path .. "/tiles.png")
-    self.json = JSON:decode(love.filesystem.read(self.path .. "/props.json"))
+    
+    self.json = require(self.path .. "/props")
 
     self.tiles = {}
     

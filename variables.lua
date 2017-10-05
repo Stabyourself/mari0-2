@@ -1,4 +1,5 @@
 SCALE = 1
+VOLUME = 1
 
 TILESIZE = 16
 

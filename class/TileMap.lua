@@ -4,6 +4,11 @@ function TileMap:initialize(path)
     self.path = path
     self.img = love.graphics.newImage(self.path .. "/tiles.png")
     
+    if love.filesystem.exists(self.path .. "/collision.png") then
+        self.collisionImgData = love.image.newImageData(self.path .. "/collision.png")
+        self.collisionImg = love.graphics.newImage(self.path .. "/collision.png")
+    end
+    
     self.json = require(self.path .. "/props")
 
     self.tiles = {}
@@ -18,11 +23,11 @@ function TileMap:initialize(path)
             if json and json.globalanimated then
                 local img = love.graphics.newImage(json.img)
 
-                table.insert(self.tiles, Tile:new("coinblock", json.img, json or {}))
+                table.insert(self.tiles, Tile:new("coinblock", img, x, y, self.collisionImg, self.collisionImgData, json or {}))
             else
                 local quad = love.graphics.newQuad((x-1)*(TILESIZE+1), (y-1)*(TILESIZE+1), TILESIZE, TILESIZE, self.img:getWidth(), self.img:getHeight())
                 
-                table.insert(self.tiles, Tile:new("regular", self.img, quad, json or {}))
+                table.insert(self.tiles, Tile:new("regular", self.img, x, y, self.collisionImg, self.collisionImgData, quad, json or {}))
             end
         end
     end

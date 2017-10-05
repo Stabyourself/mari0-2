@@ -685,4 +685,4 @@ local props = {
     tiles = tiles
 }
 
-return tiles
+return props

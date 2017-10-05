@@ -6,28 +6,33 @@ for i = 1, 5 do
     Tile.quad[i] = love.graphics.newQuad((i-1)*TILESIZE, 0, TILESIZE, TILESIZE, TILESIZE*5, TILESIZE)
 end
 
-function Tile:initialize(t, img, quad, properties)
+function Tile:initialize(t, img, x, y, collisionImg, collisionImgData, quad, properties)
     self.t = t
+    self.x = x
+    self.y = y
 
     if self.t == "regular" then
-        self.img = img
         self.quad = quad
     elseif self.t == "coinblock" then
         properties = quad
-        self.img = love.graphics.newImage(img)
     end
+    
+    for i, v in pairs(properties) do
+        self[i] = v
+    end
+    
+    self.img = img
+    
+    self.collisionImg = collisionImg
+    self.collisionImgData = collisionImgData
 
-    self.invisible = properties.invisible or false
-    self.collision = properties.collision or false
-    self.breakable = properties.breakable or false
-    self.coinBlock = properties.coinBlock or false
-    self.depth = properties.depth or 0
+    self.depth = self.depth or 0
 end
 
 function Tile:draw(x, y)
     if not self.invisible then
         love.graphics.setDepth(DEPTHMUL*self.depth)
-
+        
         if self.t == "regular" then
             love.graphics.draw(self.img, self.quad, x, y)
         elseif self.t == "coinblock" then

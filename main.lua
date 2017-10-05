@@ -12,7 +12,7 @@ function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
     
     if not is3DS then
-        love.window.setMode(400*SCALE, 480*SCALE)
+        love.window.setMode(400*SCALE, 240*SCALE)
     end
     
     JSON = require "lib/JSON"
@@ -53,9 +53,13 @@ function love.load()
     --overworldMusic:setLooping(true)
 
     jumpSound = love.audio.newSource("sound/jump.ogg")
+    jumpSound:setVolume(VOLUME)
     blockSound = love.audio.newSource("sound/block.ogg")
+    blockSound:setVolume(VOLUME)
     coinSound = love.audio.newSource("sound/coin.ogg")
+    coinSound:setVolume(VOLUME)
     stompSound = love.audio.newSource("sound/stomp.ogg")
+    stompSound:setVolume(VOLUME)
     
     mainFTAnalyser = FTAnalyser:new()
     mainPerformanceTracker = PerformanceTracker:new()
@@ -224,6 +228,10 @@ function worldLine(x1, y1, x2, y2)
     love.graphics.line(x1*TILESIZE, y1*TILESIZE, x2*TILESIZE, y2*TILESIZE)
 end
 
+function worldRectangle(style, x, y, w, h)
+    love.graphics.rectangle(style, x*TILESIZE, y*TILESIZE, w*TILESIZE, h*TILESIZE)
+end
+
 function math.round(i, decimals)
     local factor = math.pow(10, decimals or 0)
     
@@ -274,7 +282,7 @@ function rectangleOnLine(x, y, w, h, p1x, p1y, p2x, p2y) -- Todo: optimize this
     if above and below then
         -- B
         local angle = math.atan2(p2y-p1y, p2x-p1x)
-        local newX = pointAroundPoint(x, y, p1x, p1y, angle) - p1x
+        local newX = pointAroundPoint(x, y, p1x, p1y, -angle) - p1x
         
         if newX > -0.1 and newX < 1.9 then -- These values may need to be reworked properly
             return true

@@ -81,13 +81,9 @@ function PhysObj:initialize(world, x, y, width, height)
 	end
 end
 
-function PhysObj:horCollisions()
+function PhysObj:leftColCheck()
 	local colX, colY
-	local currentTraceX, currentTraceY
-	local collisions = {}
 
-	--Left side
-	colX, colY = false
 	for i, v in ipairs(self.tracers.left) do
 		local currentTraceX, currentTraceY = v:trace()
 		
@@ -100,94 +96,107 @@ function PhysObj:horCollisions()
 		if not self.leftCollision() then
 			self.x = colX+1
 			self.speedX = math.max(self.speedX, 0)
-			collisions.left = true
+			return {x = colX, y = colY}
 		end
 	end
 	
-	--Right side
-	if not colX then
-		for i, v in ipairs(self.tracers.right) do
-			local currentTraceX, currentTraceY = v:trace()
-			
-			if currentTraceX and (not col or currentTraceX < col) then
-				colX, colY = currentTraceX, currentTraceY
-			end
-		end
-		
-		if colX then --Right collision
-			if not self.rightCollision() then
-				self.x = colX-self.width
-				self.speedX = math.min(self.speedX, 0)
-				collisions.right = true
-			end
-		end
-	end
+	return false
 end
 
-function PhysObj:verCollisions()
+function PhysObj:rightColCheck()
 	local colX, colY
-	local currentTraceX, currentTraceY
-	local collisions = {}
-	local currentlyOnGround = self.onGround
 
-	--Bottom
-	if self.speedY > 0 then
-		colX, colY = false
-		for i, v in ipairs(self.tracers.down) do
-			local currentTraceX, currentTraceY = v:trace()
-			
-			if currentTraceX and (not colX or currentTraceY < colY) then
-				colX, colY = currentTraceX, currentTraceY
-			end
-		end
+	for i, v in ipairs(self.tracers.right) do
+		local currentTraceX, currentTraceY = v:trace()
 		
-		
-		if colY then --Ground collision
-			if not self.bottomCollision() then
-				if self.onGround then
-					self.y = colY-self.height
-					self.speedY = math.min(self.speedY, 0)
-				else
-					if colY <= self.y + self.height then
-						self.y = colY-self.height
-						self.speedY = math.min(self.speedY, 0)
-						self.onGround = true
-					end
-				end
-				collisions.down = true
-			end
+		if currentTraceX and (not col or currentTraceX < col) then
+			colX, colY = currentTraceX, currentTraceY
 		end
 	end
 	
-	--Top
-	if not colX then
-		for i, v in ipairs(self.tracers.up) do
-			local currentTraceX, currentTraceY = v:trace()
-			
-			if currentTraceX and (not colX or currentTraceY > colY) then
-				colX, colY = currentTraceX, currentTraceY
-			end
+	if colX then --Right collision
+		if not self.rightCollision() then
+			self.x = colX-self.width
+			self.speedX = math.min(self.speedX, 0)
+			return {x = colX, y = colY}
 		end
+	end
+	
+	return false
+end
+
+function PhysObj:topColCheck()
+	local colX, colY
+	
+	for i, v in ipairs(self.tracers.up) do
+		local currentTraceX, currentTraceY = v:trace()
 		
-		if colY then --Ceiling collision
+		if currentTraceX and (not colX or currentTraceY > colY) then
+			colX, colY = currentTraceX, currentTraceY
+		end
+	end
+	
+	if colY then --Top collision
+		if not self.topCollision() then
 			self.y = colY+1
 			self.speedY = math.max(self.speedY, 0)
-			collisions.up = true
+			
+			return {x = colX, y = colY}
 		end
+	end
+	
+	return false
+end
+
+function PhysObj:bottomColCheck()
+	local colX, colY
+	
+	for i, v in ipairs(self.tracers.down) do
+		local currentTraceX, currentTraceY = v:trace()
+		
+		if currentTraceX and (not colX or currentTraceY < colY) then
+			colX, colY = currentTraceX, currentTraceY
+		end
+	end
+	
+	if colY then --Ground collision
+		if not self.bottomCollision() then
+			if self.onGround then
+				self.y = colY-self.height
+				self.speedY = math.min(self.speedY, 0)
+			else
+				if colY <= self.y + self.height then
+					self.y = colY-self.height
+					self.speedY = math.min(self.speedY, 0)
+					self.onGround = true
+				end
+			end
+			
+			return {x = colX, y = colY}
+		end
+	end
+	
+	return false
+end
+
+function PhysObj:checkCollisions()	
+	local collisions = {}
+	
+	collisions.left = self:leftColCheck()
+	if not collisions.left then
+		collisions.right = self:rightColCheck()
+	end
+	
+	if self.speedY > 0 then
+		collisions.bottom = self:bottomColCheck()
+	end
+	
+	if not collisions.bottom then
+		collisions.top = self:topColCheck()
 	end
 	
 	if currentlyOnGround and not collisions.down then
 		self.onGround = false
-	end
-end
-
-function PhysObj:checkCollisions()
-	if math.abs(self.speedX) > math.abs(self.speedY) then
-		self:horCollisions()
-		self:verCollisions()
-	else
-		self:verCollisions()
-		self:horCollisions()
 	end
 end
 
@@ -200,8 +209,8 @@ function PhysObj:getY()
 end
 
 function PhysObj:debugDraw(xOff, yOff)
-	--love.graphics.setColor(255, 0, 0)
-	--love.graphics.rectangle("line", self:getX()+.5, self:getY()+.5, self.width-1, self.height-1)
+	love.graphics.setColor(255, 0, 0)
+	love.graphics.rectangle("line", self:getX()+.5, self:getY()+.5, self.width-1, self.height-1)
 	
 	love.graphics.setColor(0, 255, 0, 127)
 	for j, w in ipairs(self.tracers.right) do

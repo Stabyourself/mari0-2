@@ -12,7 +12,7 @@ function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
     
     if not is3DS then
-        love.window.setMode(400*SCALE, 480*SCALE)
+        love.window.setMode(400*SCALE, 240*SCALE)
     end
     
     JSON = require "lib/JSON"

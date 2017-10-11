@@ -12,7 +12,7 @@ function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
     
     if not is3DS then
-        love.window.setMode(400*SCALE, 240*SCALE)
+        love.window.setMode(400*SCALE, 480*SCALE)
     end
     
     JSON = require "lib/JSON"
@@ -21,17 +21,13 @@ function love.load()
     FTAnalyser = require "lib/FTAnalyser"
     PerformanceTracker = require "lib/PerformanceTracker"
 
-    require "class/physics/World"
-    require "class/physics/PhysObj"
+    require "lib/fissix"
 
     require "enemyLoader"
 
-    require "class/TileMap"
-    require "class/Tile"
     require "class/Level"
-    require "class/LevelCanvas"
+    require "class/WorldCanvas"
     require "class/Mario"
-    require "class/Block"
     require "class/BlockBounce"
     require "class/Enemy"
     require "class/Portal" -- the juicy bits
@@ -218,9 +214,9 @@ function worldDraw(...)
     local arg = {...}
 
     if type(arg[2]) == "number" then
-        love.graphics.draw(arg[1], math.round(arg[2]*TILESIZE), math.round(arg[3]*TILESIZE), arg[4], arg[5], arg[6], arg[7], arg[8])
+        love.graphics.draw(arg[1], math.round(arg[2]), math.round(arg[3]), arg[4], arg[5], arg[6], arg[7], arg[8])
     else
-        love.graphics.draw(arg[1], arg[2], math.round(arg[3]*TILESIZE), math.round(arg[4]*TILESIZE), arg[5], arg[6], arg[7], arg[8], arg[9])
+        love.graphics.draw(arg[1], arg[2], math.round(arg[3]), math.round(arg[4]), arg[5], arg[6], arg[7], arg[8], arg[9])
     end
 end
 
@@ -314,4 +310,8 @@ function pointAroundPoint(x1, y1, x2, y2, r) -- Credits to https://stackoverflow
     local newY = math.sin(r) * (x1-x2) + math.cos(r) * (y1-y2) + y2
 
     return newX, newY
+end
+
+function mapToWorld(x, y)
+    return (x-1)*16, (y-1)*16
 end

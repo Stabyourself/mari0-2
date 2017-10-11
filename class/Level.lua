@@ -1,31 +1,24 @@
-Level = class("Level")
+Level = class("Level", fissix.World)
 
 function Level:initialize(path, tileMap)
     self.json = JSON:decode(love.filesystem.read(path))
     self.tileMap = tileMap
+
+    fissix.World.initialize(self, tileMap)
+    self:loadMap(self.json.map)
     
-    self.map = self.json.map
+    
     self.background = self.json.background
-    self.width = #self.map
-    self.height = #self.map[1]
     self.backgroundColor = self.json.backgroundColor or {92, 148, 252}
 
     self.enemyList = loadEnemies()
     
-    self.world = World:new()
-    
     self.blocks = {}
     self.liveReplacements = {}
     for x = 1, self.width do
-        self.blocks[x] = {}
-
         for y = 1, self.height do
             if self.tileMap.tiles[self.map[x][y]] then
-                if self.tileMap.tiles[self.map[x][y]].collision then
-                    self.blocks[x][y] = Block:new(self.world, x, y)
-                end
-                
-                if self.tileMap.tiles[self.map[x][y]].t == "coinblock" then
+                if self:getTile(x, y).t == "coinblock" then
                     table.insert(self.liveReplacements, {
                         x = x,
                         y = y
@@ -57,14 +50,18 @@ function Level:initialize(path, tileMap)
     table.sort(self.spawnList, function(a, b) return a.x<b.x end)
 
     self.marios = {}
-    table.insert(self.marios, Mario:new(self.world, self.spawnX-6/16, self.spawnY-12/16))
+
+    local x, y = mapToWorld(self.spawnX, self.spawnY)
+    table.insert(self.marios, Mario:new(self, x+12, y+4))
 
     self.portals = {}
-        table.insert(self.portals, Portal:new(self.world, 4, 7, math.pi/4, {60, 188, 252}))
-        table.insert(self.portals, Portal:new(self.world, 8, 12, 0, {232, 130, 30}))
+    --[[
+    table.insert(self.portals, Portal:new(self, 4, 7, math.pi/4, {60, 188, 252}))
+    table.insert(self.portals, Portal:new(self, 8, 12, 0, {232, 130, 30}))
 
-        self.portals[1].connectsTo = self.portals[2]
-        self.portals[2].connectsTo = self.portals[1]
+    self.portals[1].connectsTo = self.portals[2]
+    self.portals[2].connectsTo = self.portals[1]
+    --]]
     
     -- Camera stuff
     self.camera = Camera:new()
@@ -75,7 +72,7 @@ function Level:initialize(path, tileMap)
     print("Prerendering level...")
     self.levelCanvases = {}
     for x = 0, math.floor(self.width/LEVELCANVASWIDTH) do
-        table.insert(self.levelCanvases, LevelCanvas:new(self, x*LEVELCANVASWIDTH+1))
+        table.insert(self.levelCanvases, WorldCanvas:new(self, x*LEVELCANVASWIDTH+1))
     end
 
     self:spawnEnemies(self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2)
@@ -83,7 +80,7 @@ end
 
 function Level:update(dt)
     updateGroup(self.blockBounces, dt)
-    self.world:update(dt)
+    fissix.World.update(self, dt)
     self:updateCamera(dt)
 
     local newSpawnLine = self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2
@@ -95,7 +92,7 @@ end
 function Level:draw()
     self.camera:attach()
     
-    -- MAIN LEVELCANVAS
+    -- MAIN WORLDCANVAS
     local mainCanvasI = math.floor((self.camera.x)/LEVELCANVASWIDTH)+1
     mainCanvasI = math.max(1, mainCanvasI)
     
@@ -108,7 +105,7 @@ function Level:draw()
         love.graphics.draw(self.levelCanvases[mainCanvasI-1].canvas, ((mainCanvasI-2)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
     end
     
-    -- RIGHT ADDITION (for transition to next levelCanvas and 3D)
+    -- RIGHT ADDITION (for transition to next WorldCanvas and 3D)
     if math.fmod(self.camera.x, LEVELCANVASWIDTH) > LEVELCANVASWIDTH-WIDTH-OFFSCREENDRAW and mainCanvasI < #self.levelCanvases then
         mainPerformanceTracker:track("levelcanvases drawn")
         love.graphics.draw(self.levelCanvases[mainCanvasI+1].canvas, ((mainCanvasI)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
@@ -123,8 +120,8 @@ function Level:draw()
             num = num + 1
             drawOverBlock(v.x, v.y)
             
-            local tile = self:getTile(v.x, v.y)
-            tile:draw((v.x-1)*16, (v.y-1)*16)
+            local Tile = self:getTile(v.x, v.y)
+            Tile:draw((v.x-1)*16, (v.y-1)*16)
         end
     end
     
@@ -133,13 +130,13 @@ function Level:draw()
         mainPerformanceTracker:track("blockbounces drawn")
         drawOverBlock(v.x, v.y)
         
-        local tile = self:getTile(v.x, v.y)
-        tile:draw((v.x-1)*16, (v.y-1-v.offset)*16)
+        local Tile = self:getTile(v.x, v.y)
+        Tile:draw((v.x-1)*16, (v.y-1-v.offset)*16)
     end
 
     love.graphics.setDepth(0)
     
-    self.world:draw()
+    fissix.World.draw(self)
     for _, v in ipairs(self.portals) do
         v:draw()
     end
@@ -165,7 +162,7 @@ end
 function Level:spawnEnemies(untilX)
     while self.spawnI <= #self.spawnList and untilX > self.spawnList[self.spawnI].x do -- Spawn next enemy
         toSpawn = self.spawnList[self.spawnI]
-        Enemy:new(self.world, toSpawn.x, toSpawn.y, toSpawn.enemy.json, toSpawn.enemy.img, toSpawn.enemy.quad)
+        Enemy:new(self, toSpawn.x, toSpawn.y, toSpawn.enemy.json, toSpawn.enemy.img, toSpawn.enemy.quad)
 
         self.spawnI = self.spawnI + 1
 
@@ -198,10 +195,6 @@ function Level:updateCamera(dt)
     self.camera.x = math.max(0, math.min(game.level.width - WIDTH - 1, self.camera.x))
 end
 
-function Level:inMap(x, y)
-    return x > 0 and x <= self.width and y > 0 and y <= self.height
-end
-
 function Level:getTile(x, y)
     return self.tileMap.tiles[self.map[x][y]]
 end
@@ -227,15 +220,15 @@ function Level:setMap(x, y, i)
 end
 
 function Level:bumpBlock(x, y)
-    local tile = self:getTile(x, y)
-    if tile.breakable or tile.coinBlock then
+    local Tile = self:getTile(x, y)
+    if Tile.breakable or Tile.coinBlock then
         local blockBounce = BlockBounce:new(x, y)
         
         table.insert(self.blockBounces, blockBounce)
         
         playSound(blockSound)
 
-        if tile.coinBlock then
+        if Tile.coinBlock then
             self:setMap(x, y, 113)
 
             playSound(coinSound)
@@ -246,91 +239,4 @@ end
 function Level:objVisible(x, y, w, h)
     return x+w > self.camera.x-OFFSCREENDRAW-OBJOFFSCREENDRAW and x < self.camera.x+WIDTH+OFFSCREENDRAW+OBJOFFSCREENDRAW and
         y+h > self.camera.y-OBJOFFSCREENDRAW and y < self.camera.y+HEIGHT+OBJOFFSCREENDRAW
-end
-
-function Level:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/raycasting.html , thanks man
-    -- Todo: limit how far offscreen this goes?
-    local rayPosX = x+1
-    local rayPosY = y+1
-    local rayDirX = math.cos(dir)
-    local rayDirY = math.sin(dir)
-    
-    local mapX = math.floor(rayPosX)
-    local mapY = math.floor(rayPosY)
-
-    -- length of ray from one x or y-side to next x or y-side
-    local deltaDistX = math.sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX))
-    local deltaDistY = math.sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY))
-
-    -- what direction to step in x or y-direction (either +1 or -1)
-    local stepX, stepY
-
-    local hit = false -- was there a wall hit?
-    local side -- was a NS or a EW wall hit?
-    -- calculate step and initial sideDist
-    if rayDirX < 0 then
-        stepX = -1
-        sideDistX = (rayPosX - mapX) * deltaDistX
-    else
-        stepX = 1
-        sideDistX = (mapX + 1.0 - rayPosX) * deltaDistX
-    end
-
-    if rayDirY < 0 then
-        stepY = -1
-        sideDistY = (rayPosY - mapY) * deltaDistY
-    else
-        stepY = 1
-        sideDistY = (mapY + 1.0 - rayPosY) * deltaDistY
-    end
-
-    -- perform DDA
-    while not hit do
-        -- jump to next map square, OR in x-direction, OR in y-direction
-        if sideDistX < sideDistY then
-            sideDistX = sideDistX + deltaDistX
-            mapX = mapX + stepX;
-            side = "ver";
-        else
-            sideDistY = sideDistY + deltaDistY
-            mapY = mapY + stepY
-            side = "hor"
-        end
-
-        -- Check if ray has hit something (or went outside the map)
-        if not self:inMap(mapX, mapY) or self:getTile(mapX, mapY).collision then
-            local absX = mapX-1
-            local absY = mapY-1
-
-            if side == "ver" then
-                local dist = (mapX - rayPosX + (1 - stepX) / 2) / rayDirX;
-                hitDist = math.fmod(rayPosY + dist * rayDirY, 1)
-
-                absY = absY + hitDist
-            else
-                local dist = (mapY - rayPosY + (1 - stepY) / 2) / rayDirY;
-                hitDist = math.fmod(rayPosX + dist * rayDirX, 1)
-
-                absX = absX + hitDist
-            end
-
-            if side == "ver" then
-                if stepX > 0 then
-                    side = "left"
-                else
-                    side = "right"
-                    absX = absX + 1
-                end
-            else
-                if stepY > 0 then
-                    side = "top"
-                else
-                    side = "bottom"
-                    absY = absY + 1
-                end
-            end
-
-            return mapX, mapY, absX, absY, side
-        end
-    end
 end

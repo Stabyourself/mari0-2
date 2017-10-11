@@ -9,6 +9,9 @@ tiles[1338] = {collision = true, partialCollision = true}
 tiles[1340] = {collision = true, partialCollision = true}
 
 local props = {
+    tileSize = 16,
+    collisionMap = "collision.png",
+    tileMap = "tiles.png",
     tiles = tiles
 }
 

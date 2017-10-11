@@ -3,8 +3,8 @@ game = {}
 function game.load()
     gameState = "game"
     
-    smbTileMap = TileMap:new("tilemaps/smb")
-    game.level = Level:new("levels/1-1.json", smbTileMap)
+    smbTileMap = fissix.TileMap:new("tilemaps/smb3")
+    game.level = Level:new("levels/smb3test.json", smbTileMap)
     
     love.graphics.setBackgroundColor(game.level.backgroundColor)
     
@@ -22,7 +22,7 @@ function game.update(dt)
     
     game.level:update(dt)
     
-    if game.level.marios[1].y > HEIGHT+.5 then
+    if game.level.marios[1].y > HEIGHT*game.level.tileMap.tileSize+.5 then
         game.level.marios[1].y = -1
     end
     
@@ -52,7 +52,7 @@ function game.draw()
     love.graphics.print("fps*" .. love.timer.getFPS(), math.round((SCREENWIDTH-80)/3)+40, 24, "center", -10*DEPTHMUL)
     
     -- level
-    love.graphics.print("world", math.round((SCREENWIDTH-80)/3*2)+40, 16, "center", -10*DEPTHMUL)
+    love.graphics.print("World", math.round((SCREENWIDTH-80)/3*2)+40, 16, "center", -10*DEPTHMUL)
     love.graphics.print(" 1-1 ", math.round((SCREENWIDTH-80)/3*2)+40, 24, "center", -10*DEPTHMUL)
     
     -- time

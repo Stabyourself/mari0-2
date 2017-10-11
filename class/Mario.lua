@@ -1,4 +1,4 @@
-Mario = class("Mario", PhysObj)
+Mario = class("Mario", fissix.PhysObj)
 
 marioImg = love.graphics.newImage("img/mario.png")
 marioQuad = {}
@@ -21,10 +21,8 @@ end
     
 
 function Mario:initialize(world, x, y)
-    PhysObj.initialize(self, world, x, y)
+    fissix.PhysObj.initialize(self, world, x, y, 12, 12)
 
-    self.width = 12/16
-    self.height = 12/16
     self.jumping = false
     self.ducking = false
 

@@ -65,8 +65,14 @@ end
 function World:debugDraw()
 	for x = 1, #self.map do
 		for y = 1, #self.map[x] do
-			if self.tileMap.tiles[self.map[x][y]] then
+			local tile = self:getTile(x, y)
+			
+			if tile.partialCollision then
 				love.graphics.draw(self.tileMap.collisionImg, self.tileMap.tiles[self.map[x][y]].quad, (x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
+			elseif tile.collision then
+
+			else
+
 			end
 		end
 	end
@@ -77,11 +83,8 @@ function World:debugDraw()
 end
 
 function World:getTile(x, y)
-	if self.map[x] then
-		return self.tileMap.tiles[self.map[x][y]]
-	end
+    return self.tileMap.tiles[self.map[x][y]]
 end
-
 
 function World:inMap(x, y)
     return x > 0 and x <= self.width and y > 0 and y <= self.height

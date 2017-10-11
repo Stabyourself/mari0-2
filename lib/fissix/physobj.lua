@@ -80,7 +80,6 @@ function PhysObj:initialize(world, x, y, width, height)
 		table.insert(self.tracers.up, fissix.Tracer:new(self, xOff, yOff, 0, -1, distance))
 	end
 end
-
 function PhysObj:checkCollisions()
 	local currentlyOnGround = self.onGround
 	
@@ -99,24 +98,26 @@ function PhysObj:checkCollisions()
 		end
 	end
 	
-	if colX then --Left wall collision
-		self.x = colX+1
-		self.speedX = 0
-		collisions.left = true
+	if colX then --Left collision
+		if not self.leftCollision() then
+			self.x = colX+1
+			self.speedX = 0
+			collisions.left = true
+		end
 	end
 	
 	--Right side
-	if not colX then
-		colX, colY = false
-		for i, v in ipairs(self.tracers.right) do
-			local currentTraceX, currentTraceY = v:trace()
-			
-			if currentTraceX and (not col or currentTraceX < col) then
-				colX, colY = currentTraceX, currentTraceY
-			end
-		end
+	colX, colY = false
+	for i, v in ipairs(self.tracers.right) do
+		local currentTraceX, currentTraceY = v:trace()
 		
-		if colX then --Left wall collision
+		if currentTraceX and (not col or currentTraceX < col) then
+			colX, colY = currentTraceX, currentTraceY
+		end
+	end
+	
+	if colX then --Right collision
+		if not self.rightCollision() then
 			self.x = colX-self.width
 			self.speedX = 0
 			collisions.right = true
@@ -136,17 +137,19 @@ function PhysObj:checkCollisions()
 		
 		
 		if colY then --Ground collision
-			if self.onGround then
-				self.y = colY-self.height
-				self.speedY = 0
-			else
-				if colY <= self.y + self.height then
+			if not self.bottomCollision() then
+				if self.onGround then
 					self.y = colY-self.height
 					self.speedY = 0
-					self.onGround = true
+				else
+					if colY <= self.y + self.height then
+						self.y = colY-self.height
+						self.speedY = 0
+						self.onGround = true
+					end
 				end
+				collisions.down = true
 			end
-			collisions.down = true
 		end
 	end
 	
@@ -205,5 +208,10 @@ function PhysObj:debugDraw(xOff, yOff)
 	
 	love.graphics.setColor(255, 255, 255)
 end
+
+function PhysObj:leftCollision() end
+function PhysObj:rightCollision() end
+function PhysObj:bottomCollision() end
+function PhysObj:topCollision() end
 
 return PhysObj

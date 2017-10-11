@@ -7,8 +7,11 @@ function TileMap:initialize(path)
 	self.tileMargin = self.data.tileMargin or 1
 
 	self.img = love.graphics.newImage(self.path .. self.data.tileMap)
-	self.collisionImg = love.graphics.newImage(self.path .. self.data.collisionMap)
-	self.collisionImgData = love.image.newImageData(self.path .. self.data.collisionMap)
+	
+	if self.data.collisionMap then
+		self.collisionImg = love.graphics.newImage(self.path .. self.data.collisionMap)
+		self.collisionImgData = love.image.newImageData(self.path .. self.data.collisionMap)
+	end
 	
 	self.tiles = {}
 

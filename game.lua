@@ -3,8 +3,8 @@ game = {}
 function game.load()
     gameState = "game"
     
-    smbTileMap = fissix.TileMap:new("tilemaps/smb3")
-    game.level = Level:new("levels/smb3test.json", smbTileMap)
+    smbTileMap = fissix.TileMap:new("tilemaps/smb")
+    game.level = Level:new("levels/1-1.json", smbTileMap)
     
     love.graphics.setBackgroundColor(game.level.backgroundColor)
     

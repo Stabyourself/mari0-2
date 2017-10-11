@@ -7,7 +7,6 @@ function Level:initialize(path, tileMap)
     fissix.World.initialize(self, tileMap)
     self:loadMap(self.json.map)
     
-    
     self.background = self.json.background
     self.backgroundColor = self.json.backgroundColor or {92, 148, 252}
 
@@ -93,20 +92,20 @@ function Level:draw()
     self.camera:attach()
     
     -- MAIN WORLDCANVAS
-    local mainCanvasI = math.floor((self.camera.x)/LEVELCANVASWIDTH)+1
+    local mainCanvasI = math.floor((self.camera.x/self.tileMap.tileSize)/LEVELCANVASWIDTH)+1
     mainCanvasI = math.max(1, mainCanvasI)
     
     love.graphics.draw(self.levelCanvases[mainCanvasI].canvas, ((mainCanvasI-1)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
     mainPerformanceTracker:track("levelcanvases drawn")
     
     -- LEFT ADDITION (for 3D)
-    if math.fmod(self.camera.x, LEVELCANVASWIDTH) < OFFSCREENDRAW and mainCanvasI > 1 then
+    if math.fmod((self.camera.x/self.tileMap.tileSize), LEVELCANVASWIDTH) < OFFSCREENDRAW and mainCanvasI > 1 then
         mainPerformanceTracker:track("levelcanvases drawn")
         love.graphics.draw(self.levelCanvases[mainCanvasI-1].canvas, ((mainCanvasI-2)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
     end
     
     -- RIGHT ADDITION (for transition to next WorldCanvas and 3D)
-    if math.fmod(self.camera.x, LEVELCANVASWIDTH) > LEVELCANVASWIDTH-WIDTH-OFFSCREENDRAW and mainCanvasI < #self.levelCanvases then
+    if math.fmod((self.camera.x/self.tileMap.tileSize), LEVELCANVASWIDTH) > LEVELCANVASWIDTH-WIDTH-OFFSCREENDRAW and mainCanvasI < #self.levelCanvases then
         mainPerformanceTracker:track("levelcanvases drawn")
         love.graphics.draw(self.levelCanvases[mainCanvasI+1].canvas, ((mainCanvasI)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
     end
@@ -179,24 +178,20 @@ function Level:updateCamera(dt)
     local pSpeedX = game.level.marios[1].speedX
     
     -- Scroll right?
-    if pXr > SCROLLINGCOMPLETE then
-        self.camera.x = pX - SCROLLINGCOMPLETE
-    elseif pXr > SCROLLINGSTART and pSpeedX > SCROLLRATE then
+    if pXr > SCROLLINGCOMPLETE*self.tileMap.tileSize then
+        self.camera.x = pX - SCROLLINGCOMPLETE*self.tileMap.tileSize
+    elseif pXr > SCROLLINGSTART*self.tileMap.tileSize and pSpeedX > SCROLLRATE then
         self.camera.x = self.camera.x + SCROLLRATE*dt
     end
     -- Scroll left?
-    if pXr < SCROLLINGLEFTCOMPLETE then
-        self.camera.x = pX - SCROLLINGLEFTCOMPLETE
-    elseif pXr < SCROLLINGLEFTSTART and pSpeedX < -SCROLLRATE then
+    if pXr < SCROLLINGLEFTCOMPLETE*self.tileMap.tileSize then
+        self.camera.x = pX - SCROLLINGLEFTCOMPLETE*self.tileMap.tileSize
+    elseif pXr < SCROLLINGLEFTSTART*self.tileMap.tileSize and pSpeedX < -SCROLLRATE then
         self.camera.x = self.camera.x - SCROLLRATE*dt
     end
     
     -- And clamp it to map boundaries
-    self.camera.x = math.max(0, math.min(game.level.width - WIDTH - 1, self.camera.x))
-end
-
-function Level:getTile(x, y)
-    return self.tileMap.tiles[self.map[x][y]]
+    self.camera.x = math.clamp(self.camera.x, 0, (game.level.width - WIDTH - 1)*self.tileMap.tileSize)
 end
 
 function Level:setMap(x, y, i)

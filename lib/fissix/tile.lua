@@ -11,6 +11,7 @@ function Tile:initialize(tileMap, img, collisionImg, collisionImgData, x, y, t)
 
 	self.collision = self.t.collision or false
 	self.partialCollision = self.t.partialCollision or false
+	self.invisible = self.t.invisible or false
 	
 	self.quad = love.graphics.newQuad((self.x-1)*(self.tileMap.tileSize+self.tileMap.tileMargin), (self.y-1)*(self.tileMap.tileSize+self.tileMap.tileMargin), self.tileMap.tileSize, self.tileMap.tileSize, self.img:getWidth(), self.img:getHeight())
 end
@@ -31,7 +32,9 @@ function Tile:checkCollision(x, y)
 end
 
 function Tile:draw(x, y)
-	worldDraw(self.img, self.quad, x, y)
+	if not self.invisible then
+		worldDraw(self.img, self.quad, x, y)
+	end
 end
 
 return Tile

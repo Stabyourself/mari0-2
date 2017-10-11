@@ -80,15 +80,13 @@ function PhysObj:initialize(world, x, y, width, height)
 		table.insert(self.tracers.up, fissix.Tracer:new(self, xOff, yOff, 0, -1, distance))
 	end
 end
-function PhysObj:checkCollisions()
-	local currentlyOnGround = self.onGround
-	
+
+function PhysObj:horCollisions()
+	local colX, colY
+	local currentTraceX, currentTraceY
 	local collisions = {}
 
 	--Left side
-	local colX, colY
-	local currentTraceX, currentTraceY
-	
 	colX, colY = false
 	for i, v in ipairs(self.tracers.left) do
 		local currentTraceX, currentTraceY = v:trace()
@@ -99,7 +97,6 @@ function PhysObj:checkCollisions()
 	end
 	
 	if colX then --Left collision
-		print("left")
 		if not self.leftCollision() then
 			self.x = colX+1
 			self.speedX = math.max(self.speedX, 0)
@@ -108,24 +105,31 @@ function PhysObj:checkCollisions()
 	end
 	
 	--Right side
-	colX, colY = false
-	for i, v in ipairs(self.tracers.right) do
-		local currentTraceX, currentTraceY = v:trace()
+	if not colX then
+		for i, v in ipairs(self.tracers.right) do
+			local currentTraceX, currentTraceY = v:trace()
+			
+			if currentTraceX and (not col or currentTraceX < col) then
+				colX, colY = currentTraceX, currentTraceY
+			end
+		end
 		
-		if currentTraceX and (not col or currentTraceX < col) then
-			colX, colY = currentTraceX, currentTraceY
+		if colX then --Right collision
+			if not self.rightCollision() then
+				self.x = colX-self.width
+				self.speedX = math.min(self.speedX, 0)
+				collisions.right = true
+			end
 		end
 	end
-	
-	if colX then --Right collision
-			print("right")
-		if not self.rightCollision() then
-			self.x = colX-self.width
-			self.speedX = math.min(self.speedX, 0)
-			collisions.right = true
-		end
-	end
-	
+end
+
+function PhysObj:verCollisions()
+	local colX, colY
+	local currentTraceX, currentTraceY
+	local collisions = {}
+	local currentlyOnGround = self.onGround
+
 	--Bottom
 	if self.speedY > 0 then
 		colX, colY = false
@@ -156,23 +160,34 @@ function PhysObj:checkCollisions()
 	end
 	
 	--Top
-	colX, colY = false
-	for i, v in ipairs(self.tracers.up) do
-		local currentTraceX, currentTraceY = v:trace()
-		
-		if currentTraceX and (not colX or currentTraceY > colY) then
-			colX, colY = currentTraceX, currentTraceY
+	if not colX then
+		for i, v in ipairs(self.tracers.up) do
+			local currentTraceX, currentTraceY = v:trace()
+			
+			if currentTraceX and (not colX or currentTraceY > colY) then
+				colX, colY = currentTraceX, currentTraceY
+			end
 		end
-	end
-	
-	if colY then --Ceiling collision
-		self.y = colY+1
-		self.speedY = math.max(self.speedY, 0)
-		collisions.up = true
+		
+		if colY then --Ceiling collision
+			self.y = colY+1
+			self.speedY = math.max(self.speedY, 0)
+			collisions.up = true
+		end
 	end
 	
 	if currentlyOnGround and not collisions.down then
 		self.onGround = false
+	end
+end
+
+function PhysObj:checkCollisions()
+	if math.abs(self.speedX) > math.abs(self.speedY) then
+		self:horCollisions()
+		self:verCollisions()
+	else
+		self:verCollisions()
+		self:horCollisions()
 	end
 end
 
@@ -185,8 +200,8 @@ function PhysObj:getY()
 end
 
 function PhysObj:debugDraw(xOff, yOff)
-	love.graphics.setColor(255, 0, 0)
-	love.graphics.rectangle("line", self:getX()+.5, self:getY()+.5, self.width-1, self.height-1)
+	--love.graphics.setColor(255, 0, 0)
+	--love.graphics.rectangle("line", self:getX()+.5, self:getY()+.5, self.width-1, self.height-1)
 	
 	love.graphics.setColor(0, 255, 0, 127)
 	for j, w in ipairs(self.tracers.right) do

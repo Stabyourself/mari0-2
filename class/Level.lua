@@ -69,9 +69,9 @@ function Level:initialize(path, tileMap)
 
     -- Level canvases
     print("Prerendering level...")
-    self.levelCanvases = {}
+    self.worldCanvases = {}
     for x = 0, math.floor(self.width/LEVELCANVASWIDTH) do
-        table.insert(self.levelCanvases, WorldCanvas:new(self, x*LEVELCANVASWIDTH+1))
+        table.insert(self.worldCanvases, WorldCanvas:new(self, x*LEVELCANVASWIDTH+1))
     end
 
     self:spawnEnemies(self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2)
@@ -95,19 +95,19 @@ function Level:draw()
     local mainCanvasI = math.floor((self.camera.x/self.tileMap.tileSize)/LEVELCANVASWIDTH)+1
     mainCanvasI = math.max(1, mainCanvasI)
     
-    love.graphics.draw(self.levelCanvases[mainCanvasI].canvas, ((mainCanvasI-1)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
-    mainPerformanceTracker:track("levelcanvases drawn")
+    love.graphics.draw(self.worldCanvases[mainCanvasI].canvas, ((mainCanvasI-1)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
+    mainPerformanceTracker:track("worldCanvases drawn")
     
     -- LEFT ADDITION (for 3D)
     if math.fmod((self.camera.x/self.tileMap.tileSize), LEVELCANVASWIDTH) < OFFSCREENDRAW and mainCanvasI > 1 then
-        mainPerformanceTracker:track("levelcanvases drawn")
-        love.graphics.draw(self.levelCanvases[mainCanvasI-1].canvas, ((mainCanvasI-2)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
+        mainPerformanceTracker:track("worldCanvases drawn")
+        love.graphics.draw(self.worldCanvases[mainCanvasI-1].canvas, ((mainCanvasI-2)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
     end
     
     -- RIGHT ADDITION (for transition to next WorldCanvas and 3D)
-    if math.fmod((self.camera.x/self.tileMap.tileSize), LEVELCANVASWIDTH) > LEVELCANVASWIDTH-WIDTH-OFFSCREENDRAW and mainCanvasI < #self.levelCanvases then
-        mainPerformanceTracker:track("levelcanvases drawn")
-        love.graphics.draw(self.levelCanvases[mainCanvasI+1].canvas, ((mainCanvasI)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
+    if math.fmod((self.camera.x/self.tileMap.tileSize), LEVELCANVASWIDTH) > LEVELCANVASWIDTH-WIDTH-OFFSCREENDRAW and mainCanvasI < #self.worldCanvases then
+        mainPerformanceTracker:track("worldCanvases drawn")
+        love.graphics.draw(self.worldCanvases[mainCanvasI+1].canvas, ((mainCanvasI)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
     end
     
     -- Live replacements: Coinblocks that were hit, blocks that were broken

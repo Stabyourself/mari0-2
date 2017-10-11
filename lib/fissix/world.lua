@@ -64,16 +64,18 @@ end
 
 function World:debugDraw()
 	for x = 1, #self.map[1] do
-		for y = 1, #self.map[1][x] do
-			local tile = self:getTile(x, y)
-			
-			if tile.partialCollision then
-				love.graphics.draw(self.tileMap.collisionImg, tile.quad, (x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
-			elseif tile.collision then
+        for y = 1, #self.map[1][x] do
+            if self:objVisible(x, y, 1, 1) then
+                local tile = self:getTile(x, y)
+                
+                if tile.partialCollision then
+                    love.graphics.draw(self.tileMap.collisionImg, tile.quad, (x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
+                elseif tile.collision then
+                    worldRectangle("fill", x-1, y-1, 1, 1)
+                else
 
-			else
-
-			end
+                end
+            end
 		end
 	end
 	

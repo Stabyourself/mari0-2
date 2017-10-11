@@ -39,7 +39,7 @@ local tiles = {
         name = "coinBlock",
         collision = true,
         coinBlock = true,
-        globalanimated = true,
+        type = "coinAnimation",
         img = "img/coinBlock.png"
     },
     

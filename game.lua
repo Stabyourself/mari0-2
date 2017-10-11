@@ -3,14 +3,14 @@ game = {}
 function game.load()
     gameState = "game"
     
+    game.coinAnimationFrame = 1
+    game.coinAnimationTimer = 0
+    game.timeLeft = 400
+    
     smbTileMap = fissix.TileMap:new("tilemaps/smb")
     game.level = Level:new("levels/1-1.json", smbTileMap)
     
     love.graphics.setBackgroundColor(game.level.backgroundColor)
-    
-    game.coinFrame = 1
-    game.coinAnimationTimer = 0
-    game.timeLeft = 400
 
     playMusic(overworldMusic)
 
@@ -28,10 +28,10 @@ function game.update(dt)
     
 	game.coinAnimationTimer = game.coinAnimationTimer + dt
 	while game.coinAnimationTimer >= COINANIMATIONTIME do
-        game.coinFrame = game.coinFrame + 1
+        game.coinAnimationFrame = game.coinAnimationFrame + 1
         
-        if game.coinFrame > 5 then
-            game.coinFrame = 1
+        if game.coinAnimationFrame > 5 then
+            game.coinAnimationFrame = 1
         end
 
 		game.coinAnimationTimer = game.coinAnimationTimer - COINANIMATIONTIME

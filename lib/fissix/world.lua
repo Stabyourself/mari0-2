@@ -15,8 +15,8 @@ end
 function World:loadMap(map)
 	self.map = map
 
-    self.width = #self.map
-	self.height = #self.map[1]
+    self.width = #self.map[1]
+	self.height = #self.map[1][1]
 end
 
 function World:update(dt)
@@ -63,12 +63,12 @@ function World:checkMapCollision(x, y)
 end
 
 function World:debugDraw()
-	for x = 1, #self.map do
-		for y = 1, #self.map[x] do
+	for x = 1, #self.map[1] do
+		for y = 1, #self.map[1][x] do
 			local tile = self:getTile(x, y)
 			
 			if tile.partialCollision then
-				love.graphics.draw(self.tileMap.collisionImg, self.tileMap.tiles[self.map[x][y]].quad, (x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
+				love.graphics.draw(self.tileMap.collisionImg, tile.quad, (x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
 			elseif tile.collision then
 
 			else
@@ -82,8 +82,8 @@ function World:debugDraw()
 	end
 end
 
-function World:getTile(x, y)
-    return self.tileMap.tiles[self.map[x][y]]
+function World:getTile(x, y, i)
+    return self.tileMap.tiles[self.map[i or 1][x][y]]
 end
 
 function World:inMap(x, y)
@@ -175,6 +175,10 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
             return mapX, mapY, absX, absY, side
         end
     end
+end
+
+function World:mapToWorld(x, y)
+    return x*self.tileMap.tileSize, y*self.tileMap.tileSize
 end
 
 return World

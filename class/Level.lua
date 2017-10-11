@@ -5,7 +5,7 @@ function Level:initialize(path, tileMap)
     self.tileMap = tileMap
 
     fissix.World.initialize(self, tileMap)
-    self:loadMap(self.json.map)
+    self:loadMap(self.json.maps)
     
     self.background = self.json.background
     self.backgroundColor = self.json.backgroundColor or {92, 148, 252}
@@ -16,13 +16,12 @@ function Level:initialize(path, tileMap)
     self.liveReplacements = {}
     for x = 1, self.width do
         for y = 1, self.height do
-            if self.tileMap.tiles[self.map[x][y]] then
-                if self:getTile(x, y).t == "coinblock" then
-                    table.insert(self.liveReplacements, {
-                        x = x,
-                        y = y
-                    })
-                end
+            local tile = self:getTile(x, y)
+            if tile and tile.type == "coinAnimation" then
+                table.insert(self.liveReplacements, {
+                    x = x,
+                    y = y
+                })
             end
         end
     end
@@ -50,8 +49,9 @@ function Level:initialize(path, tileMap)
 
     self.marios = {}
 
-    local x, y = mapToWorld(self.spawnX, self.spawnY)
-    table.insert(self.marios, Mario:new(self, x+12, y+4))
+    local x, y = self:mapToWorld(self.spawnX, self.spawnY)
+    
+    table.insert(self.marios, Mario:new(self, x-6, y-12))
 
     self.portals = {}
     --[[
@@ -82,7 +82,7 @@ function Level:update(dt)
     fissix.World.update(self, dt)
     self:updateCamera(dt)
 
-    local newSpawnLine = self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2
+    local newSpawnLine = self.camera.x/self.tileMap.tileSize+WIDTH+ENEMIESPSAWNAHEAD+2
     if newSpawnLine > self.spawnLine then
         self:spawnEnemies(newSpawnLine)
     end
@@ -120,7 +120,7 @@ function Level:draw()
             drawOverBlock(v.x, v.y)
             
             local Tile = self:getTile(v.x, v.y)
-            Tile:draw((v.x-1)*16, (v.y-1)*16)
+            Tile:draw((v.x-1)*self.tileMap.tileSize, (v.y-1)*self.tileMap.tileSize)
         end
     end
     
@@ -130,7 +130,7 @@ function Level:draw()
         drawOverBlock(v.x, v.y)
         
         local Tile = self:getTile(v.x, v.y)
-        Tile:draw((v.x-1)*16, (v.y-1-v.offset)*16)
+        Tile:draw((v.x-1)*self.tileMap.tileSize, (v.y-1-v.offset)*self.tileMap.tileSize)
     end
 
     love.graphics.setDepth(0)
@@ -161,7 +161,8 @@ end
 function Level:spawnEnemies(untilX)
     while self.spawnI <= #self.spawnList and untilX > self.spawnList[self.spawnI].x do -- Spawn next enemy
         toSpawn = self.spawnList[self.spawnI]
-        Enemy:new(self, toSpawn.x, toSpawn.y, toSpawn.enemy.json, toSpawn.enemy.img, toSpawn.enemy.quad)
+        local x, y = self:mapToWorld(toSpawn.x-.5, toSpawn.y)
+        Enemy:new(self, x, y, toSpawn.enemy.json, toSpawn.enemy.img, toSpawn.enemy.quad)
 
         self.spawnI = self.spawnI + 1
 
@@ -195,7 +196,7 @@ function Level:updateCamera(dt)
 end
 
 function Level:setMap(x, y, i)
-    self.map[x][y] = i
+    self.map[1][x][y] = i
     
     local found = false
     
@@ -232,6 +233,6 @@ function Level:bumpBlock(x, y)
 end
 
 function Level:objVisible(x, y, w, h)
-    return x+w > self.camera.x-OFFSCREENDRAW-OBJOFFSCREENDRAW and x < self.camera.x+WIDTH+OFFSCREENDRAW+OBJOFFSCREENDRAW and
-        y+h > self.camera.y-OBJOFFSCREENDRAW and y < self.camera.y+HEIGHT+OBJOFFSCREENDRAW
+    return x+w > self.camera.x/self.tileMap.tileSize-OFFSCREENDRAW-OBJOFFSCREENDRAW and x < self.camera.x/self.tileMap.tileSize+WIDTH+OFFSCREENDRAW+OBJOFFSCREENDRAW and
+        y+h > self.camera.y/self.tileMap.tileSize-OBJOFFSCREENDRAW and y < self.camera.y/self.tileMap.tileSize+HEIGHT+OBJOFFSCREENDRAW
 end

@@ -1,9 +1,9 @@
 {
-    "width": 0.75,
-    "height": 0.75,
+    "width": 12,
+    "height": 12,
 
     "movementType": "truffleshuffle",
-    "speed": 2,
+    "speed": 32,
     
     "stompable": true,
 

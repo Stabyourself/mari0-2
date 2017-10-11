@@ -1,14 +1,11 @@
-Enemy = class("Enemy", PhysObj)
+Enemy = class("Enemy", fissix.PhysObj)
 
 function Enemy:initialize(world, x, y, json, img, quad)
-    self.world = world
-    self.x = x
-    self.y = y
     self.json = json
+    fissix.PhysObj.initialize(self, world, x-json.width/2, y-json.height, json.width, json.height)
+
     self.img = img
     self.quadList = quad
-
-    PhysObj.initialize(self, world, x-json.width/2-.5, y-json.height)
     
     self.autoRemove = true
 

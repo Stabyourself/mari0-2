@@ -99,9 +99,10 @@ function PhysObj:checkCollisions()
 	end
 	
 	if colX then --Left collision
+		print("left")
 		if not self.leftCollision() then
 			self.x = colX+1
-			self.speedX = 0
+			self.speedX = math.max(self.speedX, 0)
 			collisions.left = true
 		end
 	end
@@ -117,9 +118,10 @@ function PhysObj:checkCollisions()
 	end
 	
 	if colX then --Right collision
+			print("right")
 		if not self.rightCollision() then
 			self.x = colX-self.width
-			self.speedX = 0
+			self.speedX = math.min(self.speedX, 0)
 			collisions.right = true
 		end
 	end
@@ -140,11 +142,11 @@ function PhysObj:checkCollisions()
 			if not self.bottomCollision() then
 				if self.onGround then
 					self.y = colY-self.height
-					self.speedY = 0
+					self.speedY = math.min(self.speedY, 0)
 				else
 					if colY <= self.y + self.height then
 						self.y = colY-self.height
-						self.speedY = 0
+						self.speedY = math.min(self.speedY, 0)
 						self.onGround = true
 					end
 				end

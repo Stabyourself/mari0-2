@@ -14,6 +14,11 @@ function TileMap:initialize(path)
 	end
 	
 	self.tiles = {}
+	
+	self.coinQuad = {}
+	for i = 1, 5 do
+		self.coinQuad[i] = love.graphics.newQuad((i-1)*16, 0, TILESIZE, TILESIZE, TILESIZE*5, TILESIZE)
+	end
 
 	local i = 1
 	for y = 1, self.img:getHeight()/(self.tileSize+self.tileMargin) do

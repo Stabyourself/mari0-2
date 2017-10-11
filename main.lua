@@ -243,7 +243,7 @@ function getRequiredSpeed(height, gravity)
 end
 
 function math.clamp(n, low, high) 
-    return math.min(math.max(low, n), high) 
+    return math.max(math.min(high, n), low) 
 end
 
 function drawOverBlock(x, y)
@@ -310,8 +310,4 @@ function pointAroundPoint(x1, y1, x2, y2, r) -- Credits to https://stackoverflow
     local newY = math.sin(r) * (x1-x2) + math.cos(r) * (y1-y2) + y2
 
     return newX, newY
-end
-
-function mapToWorld(x, y)
-    return (x-1)*16, (y-1)*16
 end

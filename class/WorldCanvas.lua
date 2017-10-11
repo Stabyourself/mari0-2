@@ -22,15 +22,11 @@ function WorldCanvas:render(renderX)
     
     for x = xStart, xEnd do
         for y = yStart, yEnd do
-            -- [[local Tile = self.world.world:getTile(x, y)
-            if Tile and not Tile.invisible and Tile.t ~= "coinblock" then -- Don't prerender coin type blocks because I need to animate them anyway
-                Tile:draw(x-xStart+OFFSCREENDRAW, y-1)
-            end
-            --]]
-
-            local Tile = self.world:getTile(x, y)
-            if Tile and not Tile.invisible and Tile.t ~= "coinblock" then
-                Tile:draw((x-xStart+OFFSCREENDRAW)*16, (y-1)*16)
+            for i = #self.world.map, 1, -1 do
+                local Tile = self.world:getTile(x, y, i)
+                if Tile and not Tile.invisible and Tile.type ~= "coinAnimation" then
+                    Tile:draw((x-xStart+OFFSCREENDRAW)*self.world.tileMap.tileSize, (y-1)*self.world.tileMap.tileSize)
+                end
             end
         end
     end

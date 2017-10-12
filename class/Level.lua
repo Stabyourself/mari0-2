@@ -82,7 +82,7 @@ function Level:update(dt)
     fissix.World.update(self, dt)
     self:updateCamera(dt)
 
-    local newSpawnLine = self.camera.x/self.tileMap.tileSize+WIDTH+ENEMIESPSAWNAHEAD+2
+    local newSpawnLine = self.camera.x/self.tileSize+WIDTH+ENEMIESPSAWNAHEAD+2
     if newSpawnLine > self.spawnLine then
         self:spawnEnemies(newSpawnLine)
     end
@@ -92,20 +92,20 @@ function Level:draw()
     self.camera:attach()
     
     -- MAIN WORLDCANVAS
-    local mainCanvasI = math.floor((self.camera.x/self.tileMap.tileSize)/LEVELCANVASWIDTH)+1
+    local mainCanvasI = math.floor((self.camera.x/self.tileSize)/LEVELCANVASWIDTH)+1
     mainCanvasI = math.max(1, mainCanvasI)
     
     love.graphics.draw(self.worldCanvases[mainCanvasI].canvas, ((mainCanvasI-1)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
     mainPerformanceTracker:track("worldCanvases drawn")
     
     -- LEFT ADDITION (for 3D)
-    if math.fmod((self.camera.x/self.tileMap.tileSize), LEVELCANVASWIDTH) < OFFSCREENDRAW and mainCanvasI > 1 then
+    if math.fmod((self.camera.x/self.tileSize), LEVELCANVASWIDTH) < OFFSCREENDRAW and mainCanvasI > 1 then
         mainPerformanceTracker:track("worldCanvases drawn")
         love.graphics.draw(self.worldCanvases[mainCanvasI-1].canvas, ((mainCanvasI-2)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
     end
     
     -- RIGHT ADDITION (for transition to next WorldCanvas and 3D)
-    if math.fmod((self.camera.x/self.tileMap.tileSize), LEVELCANVASWIDTH) > LEVELCANVASWIDTH-WIDTH-OFFSCREENDRAW and mainCanvasI < #self.worldCanvases then
+    if math.fmod((self.camera.x/self.tileSize), LEVELCANVASWIDTH) > LEVELCANVASWIDTH-WIDTH-OFFSCREENDRAW and mainCanvasI < #self.worldCanvases then
         mainPerformanceTracker:track("worldCanvases drawn")
         love.graphics.draw(self.worldCanvases[mainCanvasI+1].canvas, ((mainCanvasI)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
     end
@@ -120,7 +120,7 @@ function Level:draw()
             drawOverBlock(v.x, v.y)
             
             local Tile = self:getTile(v.x, v.y)
-            Tile:draw((v.x-1)*self.tileMap.tileSize, (v.y-1)*self.tileMap.tileSize)
+            Tile:draw((v.x-1)*self.tileSize, (v.y-1)*self.tileSize)
         end
     end
     
@@ -130,7 +130,7 @@ function Level:draw()
         drawOverBlock(v.x, v.y)
         
         local Tile = self:getTile(v.x, v.y)
-        Tile:draw((v.x-1)*self.tileMap.tileSize, (v.y-1-v.offset)*self.tileMap.tileSize)
+        Tile:draw((v.x-1)*self.tileSize, (v.y-1-v.offset)*self.tileSize)
     end
 
     love.graphics.setDepth(0)
@@ -139,16 +139,17 @@ function Level:draw()
     for _, v in ipairs(self.portals) do
         v:draw()
     end
-    --[[ Line tracing debug
+    -- Line tracing debug
     local cx, cy = self.marios[1].x+self.marios[1].width/2, self.marios[1].y+self.marios[1].height/2
-    local mx, my = (love.mouse.getX()/TILESIZE)/SCALE+self.camera.x, love.mouse.getY()/TILESIZE/SCALE
+    local mx, my = (love.mouse.getX())/SCALE+self.camera.x, love.mouse.getY()/SCALE
     local dir = math.atan2(my-cy, mx-cx)
 
-    local x, y, absX, absY, side = self:rayCast(cx, cy, dir)
+    local x, y, absX, absY, side = self:rayCast(cx/self.tileSize, cy/self.tileSize, dir)
 
-    love.graphics.line(cx*TILESIZE, cy*TILESIZE, (absX)*TILESIZE, (absY)*TILESIZE)
+    absX, absY = self:mapToWorld(absX, absY)
 
-    --]]
+    love.graphics.line(cx, cy, absX, absY)
+
     self.camera:detach()
 end
 
@@ -179,20 +180,20 @@ function Level:updateCamera(dt)
     local pSpeedX = game.level.marios[1].speedX
     
     -- Scroll right?
-    if pXr > SCROLLINGCOMPLETE*self.tileMap.tileSize then
-        self.camera.x = pX - SCROLLINGCOMPLETE*self.tileMap.tileSize
-    elseif pXr > SCROLLINGSTART*self.tileMap.tileSize and pSpeedX > SCROLLRATE then
+    if pXr > SCROLLINGCOMPLETE*self.tileSize then
+        self.camera.x = pX - SCROLLINGCOMPLETE*self.tileSize
+    elseif pXr > SCROLLINGSTART*self.tileSize and pSpeedX > SCROLLRATE then
         self.camera.x = self.camera.x + SCROLLRATE*dt
     end
     -- Scroll left?
-    if pXr < SCROLLINGLEFTCOMPLETE*self.tileMap.tileSize then
-        self.camera.x = pX - SCROLLINGLEFTCOMPLETE*self.tileMap.tileSize
-    elseif pXr < SCROLLINGLEFTSTART*self.tileMap.tileSize and pSpeedX < -SCROLLRATE then
+    if pXr < SCROLLINGLEFTCOMPLETE*self.tileSize then
+        self.camera.x = pX - SCROLLINGLEFTCOMPLETE*self.tileSize
+    elseif pXr < SCROLLINGLEFTSTART*self.tileSize and pSpeedX < -SCROLLRATE then
         self.camera.x = self.camera.x - SCROLLRATE*dt
     end
     
     -- And clamp it to map boundaries
-    self.camera.x = math.clamp(self.camera.x, 0, (game.level.width - WIDTH - 1)*self.tileMap.tileSize)
+    self.camera.x = math.clamp(self.camera.x, 0, (game.level.width - WIDTH - 1)*self.tileSize)
 end
 
 function Level:setMap(x, y, i)
@@ -233,6 +234,6 @@ function Level:bumpBlock(x, y)
 end
 
 function Level:objVisible(x, y, w, h)
-    return x+w > self.camera.x/self.tileMap.tileSize-OFFSCREENDRAW-OBJOFFSCREENDRAW and x < self.camera.x/self.tileMap.tileSize+WIDTH+OFFSCREENDRAW+OBJOFFSCREENDRAW and
-        y+h > self.camera.y/self.tileMap.tileSize-OBJOFFSCREENDRAW and y < self.camera.y/self.tileMap.tileSize+HEIGHT+OBJOFFSCREENDRAW
+    return x+w > self.camera.x/self.tileSize-OFFSCREENDRAW-OBJOFFSCREENDRAW and x < self.camera.x/self.tileSize+WIDTH+OFFSCREENDRAW+OBJOFFSCREENDRAW and
+        y+h > self.camera.y/self.tileSize-OBJOFFSCREENDRAW and y < self.camera.y/self.tileSize+HEIGHT+OBJOFFSCREENDRAW
 end

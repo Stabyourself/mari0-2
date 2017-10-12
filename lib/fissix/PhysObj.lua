@@ -195,7 +195,7 @@ function PhysObj:checkCollisions()
 		collisions.top = self:topColCheck()
 	end
 	
-	if currentlyOnGround and not collisions.down then
+	if not collisions.bottom then
 		self.onGround = false
 	end
 end

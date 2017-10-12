@@ -2,6 +2,7 @@ local World = class("fissix.World")
 
 function World:initialize(tileMap)
 	self.tileMap = tileMap
+    self.tileSize = self.tileMap.tileSize
 	
 	self.objects = {}
 	self.map = {}
@@ -48,14 +49,14 @@ function World:draw()
 end
 
 function World:checkMapCollision(x, y)
-	local tileX = math.floor(x/self.tileMap.tileSize)+1
-	local tileY = math.floor(y/self.tileMap.tileSize)+1
-	local inTileX = math.fmod(x, self.tileMap.tileSize)
-	local inTileY = math.fmod(y, self.tileMap.tileSize)
+    local tileX, tileY = self:worldToMap(x, y)
 	
 	if not self:inMap(tileX, tileY) then
 		return false
-	end
+    end
+    
+	local inTileX = math.fmod(x, self.tileSize)
+	local inTileY = math.fmod(y, self.tileSize)
 	
 	local col = self:getTile(tileX, tileY):checkCollision(inTileX, inTileY)
 	
@@ -69,7 +70,7 @@ function World:debugDraw()
                 local tile = self:getTile(x, y)
                 
                 if tile.partialCollision then
-                    love.graphics.draw(self.tileMap.collisionImg, tile.quad, (x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
+                    love.graphics.draw(self.tileMap.collisionImg, tile.quad, (x-1)*self.tileSize, (y-1)*self.tileSize)
                 elseif tile.collision then
                     worldRectangle("fill", x-1, y-1, 1, 1)
                 else
@@ -180,7 +181,11 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
 end
 
 function World:mapToWorld(x, y)
-    return x*self.tileMap.tileSize, y*self.tileMap.tileSize
+    return x*self.tileSize, y*self.tileSize
+end
+
+function World:worldToMap(x, y)
+    return math.floor(x/self.tileSize)+1, math.floor(y/self.tileSize)+1
 end
 
 return World

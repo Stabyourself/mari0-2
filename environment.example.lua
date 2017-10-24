@@ -1,4 +1,6 @@
 PHYSICSDEBUG = false
+NOENEMIES = false
+VOLUME = 1
 SCALE = 1
 
 FFKEYS = {

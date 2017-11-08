@@ -12,7 +12,9 @@ function game.load()
     
     love.graphics.setBackgroundColor(game.level.backgroundColor)
 
-    playMusic(overworldMusic)
+    if not MUSICDISABLED then
+        playMusic(overworldMusic)
+    end
 
     skipUpdate()
 end

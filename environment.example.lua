@@ -1,5 +1,6 @@
 PHYSICSDEBUG = false
 NOENEMIES = false
+MUSICDISABLED = false
 VOLUME = 1
 SCALE = 1
 

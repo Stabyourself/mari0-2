@@ -45,8 +45,10 @@ function love.load()
 	end
 
     print("Loading sound... (might take a while)")
-    --overworldMusic = love.audio.newSource("sound/music/overworld.ogg")
-    --overworldMusic:setLooping(true)
+    if not MUSICDISABLED then
+        overworldMusic = love.audio.newSource("sound/music/overworld.ogg")
+        overworldMusic:setLooping(true)
+    end
 
     jumpSound = love.audio.newSource("sound/jump.ogg")
     jumpSound:setVolume(VOLUME)

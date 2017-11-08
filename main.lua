@@ -16,7 +16,7 @@ function love.load()
     end
     
     JSON = require "lib/JSON"
-    class = require "lib/Class"
+    class = require "lib/middleclass"
     Camera = require "lib/Camera"
     FTAnalyser = require "lib/FTAnalyser"
     PerformanceTracker = require "lib/PerformanceTracker"

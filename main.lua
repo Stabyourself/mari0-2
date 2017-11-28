@@ -7,7 +7,9 @@ function love.load()
     
     require "lib/3ds"
     require "variables"
-    require "environment"
+    if love.filesystem.exists("environment.lua") then
+        require "environment"
+    end
     
     love.graphics.setDefaultFilter("nearest", "nearest")
     

@@ -2,7 +2,7 @@
 
 fissix = {}
 
-fissix.TRACER_DOWN_SPACE = 16
+fissix.TRACER_DOWN_SPACE = 1
 fissix.TRACER_DOWN_EXTEND = 8
 fissix.TRACER_BOTTOM_DIST = 8
 fissix.TRACER_TOP_SPACE = 4

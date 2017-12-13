@@ -1,6 +1,6 @@
 Portal = class("Portal")
 
-Portal.size = 2
+Portal.size = 32
 
 function Portal:initialize(world, x, y, r, color)
     self.x = x
@@ -13,23 +13,15 @@ function Portal:initialize(world, x, y, r, color)
     self.x2 = x+math.cos(self.r)*self.size
     self.y2 = y+math.sin(self.r)*self.size
 
-    self.open = true
-    
-    self.portalWalls = {
-        PortalWall:new(world, self.x1, self.y1),
-        PortalWall:new(world, self.x2, self.y2)
-    }
-end
-
-function Portal:updateWallPositions()
-    self.portalWalls[1].x = self.x1
-    self.portalWalls[1].y = self.y1
-
-    self.portalWalls[2].x = self.x2
-    self.portalWalls[2].y = self.y2
+    self.open = false
 end
 
 function Portal:draw()
     love.graphics.setColor(self.color)
-    worldLine(self.x1, self.y1, self.x2, self.y2)
+    love.graphics.line(self.x1, self.y1, self.x2, self.y2)
+end
+
+function Portal:connectTo(portal)
+   self.connectsTo = portal
+   self.open = true 
 end

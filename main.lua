@@ -33,7 +33,6 @@ function love.load()
     require "class/BlockBounce"
     require "class/Enemy"
     require "class/Portal" -- the juicy bits
-    require "class/PortalWall"
 
     require "game"
     

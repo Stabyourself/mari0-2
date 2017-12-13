@@ -54,13 +54,11 @@ function Level:initialize(path, tileMap)
     table.insert(self.marios, Mario:new(self, x-6, y-12))
 
     self.portals = {}
-    --[[
-    table.insert(self.portals, Portal:new(self, 4, 7, math.pi/4, {60, 188, 252}))
-    table.insert(self.portals, Portal:new(self, 8, 12, 0, {232, 130, 30}))
+    table.insert(self.portals, Portal:new(self, 16, 160, math.pi/4, {60, 188, 252}))
+    table.insert(self.portals, Portal:new(self, 128, 208, 0, {232, 130, 30}))
 
-    self.portals[1].connectsTo = self.portals[2]
-    self.portals[2].connectsTo = self.portals[1]
-    --]]
+    self.portals[1].connectTo(self.portals[2])
+    self.portals[2].connectTo(self.portals[1])
     
     -- Camera stuff
     self.camera = Camera:new()
@@ -140,6 +138,7 @@ function Level:draw()
         v:draw()
     end
     -- Line tracing debug
+    --[[
     local cx, cy = self.marios[1].x+self.marios[1].width/2, self.marios[1].y+self.marios[1].height/2
     local mx, my = (love.mouse.getX())/SCALE+self.camera.x, love.mouse.getY()/SCALE
     local dir = math.atan2(my-cy, mx-cx)
@@ -149,6 +148,7 @@ function Level:draw()
     absX, absY = self:mapToWorld(absX, absY)
 
     love.graphics.line(cx, cy, absX, absY)
+    --]]
 
     self.camera:detach()
 end
@@ -236,4 +236,22 @@ end
 function Level:objVisible(x, y, w, h)
     return x+w > self.camera.x/self.tileSize-OFFSCREENDRAW-OBJOFFSCREENDRAW and x < self.camera.x/self.tileSize+WIDTH+OFFSCREENDRAW+OBJOFFSCREENDRAW and
         y+h > self.camera.y/self.tileSize-OBJOFFSCREENDRAW and y < self.camera.y/self.tileSize+HEIGHT+OBJOFFSCREENDRAW
+end
+
+function Level:checkMapCollision(x, y)
+    -- Portal hijacking
+    for _, v in ipairs(self.portals) do
+        if v.open then
+            -- check if pixel is inside portal wallspace
+            -- rotate x, y around portal origin
+            local nx, ny = pointAroundPoint(x, y, v.x, v.y, -v.r)
+            
+            if  nx >= v.x and nx < v.x+v.size and
+                ny >= v.y and ny < v.y+16 then
+                return false
+            end
+        end
+    end
+    
+    return fissix.World.checkMapCollision(self, x, y)
 end

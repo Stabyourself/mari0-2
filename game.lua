@@ -54,7 +54,7 @@ function game.draw()
     love.graphics.print("fps*" .. love.timer.getFPS(), math.round((SCREENWIDTH-80)/3)+40, 24, "center", -10*DEPTHMUL)
     
     -- level
-    love.graphics.print("World", math.round((SCREENWIDTH-80)/3*2)+40, 16, "center", -10*DEPTHMUL)
+    love.graphics.print("world", math.round((SCREENWIDTH-80)/3*2)+40, 16, "center", -10*DEPTHMUL)
     love.graphics.print(" 1-1 ", math.round((SCREENWIDTH-80)/3*2)+40, 24, "center", -10*DEPTHMUL)
     
     -- time

@@ -24,15 +24,26 @@ function World:update(dt)
 	for i, v in ipairs(self.objects) do
 		v:update(dt)
 		
-		--Add gravity
-		v.speedY = math.min((v.maxSpeedY or MAXYSPEED), v.speedY + (v.gravity or GRAVITY) * 0.5 * dt)
-		
+		-- Add gravity
+        v.speedY = math.min((v.maxSpeedY or MAXYSPEED), v.speedY + (v.gravity or GRAVITY) * 0.5 * dt)
+        
+        local oldX, oldY = v.x, v.y
+        
 		v.x = v.x + v.speedX * dt
 		v.y = v.y + v.speedY * dt
 		
 		v:checkCollisions()
+        
+        -- Portal checks
+		for _, p in ipairs(self.portals) do
+			local iX, iY = linesIntersect(oldX+v.width/2, oldY+v.height/2, v.x+v.width/2, v.y+v.height/2, p.x1, p.y1, p.x2, p.y2)
+			if iX then
+				self:doPortal(v, p, oldX, oldY)
+				break
+			end
+		end
 		
-		--Add gravity again
+		-- Add gravity again
 		v.speedY = math.min((v.maxSpeedY or MAXYSPEED), v.speedY + (v.gravity or GRAVITY) * 0.5 * dt)
 	end
 end
@@ -44,8 +55,12 @@ function World:draw()
 	end
 
 	if PHYSICSDEBUG then
-		self:debugDraw()
-	end
+		self:physicsDebug()
+    end
+    
+    if PORTALMESHDEBUG then
+        self:portalMeshDebug()
+    end
 end
 
 function World:checkMapCollision(x, y)
@@ -63,7 +78,7 @@ function World:checkMapCollision(x, y)
 	return col
 end
 
-function World:debugDraw()
+function World:physicsDebug()
 	for x = 1, #self.map[1] do
         for y = 1, #self.map[1][x] do
             if self:objVisible(x, y, 1, 1) then
@@ -83,6 +98,30 @@ function World:debugDraw()
 	for i, v in ipairs(self.objects) do
 		v:debugDraw()
 	end
+end
+
+function World:portalMeshDebug()
+	for x = 1, #self.map[1] do
+        for y = 1, #self.map[1][x] do
+            if self:objVisible(x, y, 1, 1) then
+                local tile = self:getTile(x, y)
+                
+                if tile.collision then
+                    if tile.mesh then
+                        local points = {}
+                        for i, v in ipairs(tile.mesh) do
+                            table.insert(points, v[1]/self.tileSize+x-1)
+                            table.insert(points, v[2]/self.tileSize+y-1)
+                        end
+                        
+                        worldPolygon("line", unpack(points))
+                    else
+                        worldRectangle("line", x-1, y-1, 1, 1)
+                    end
+                end
+            end
+        end
+    end
 end
 
 function World:getTile(x, y, i)
@@ -186,6 +225,30 @@ end
 
 function World:worldToMap(x, y)
     return math.floor(x/self.tileSize)+1, math.floor(y/self.tileSize)+1
+end
+
+function World:doPortal(obj, portal, oldX, oldY)
+	-- Modify speed
+    local speed = math.sqrt(obj.speedX^2 + obj.speedY^2)
+    local r = portal.connectsTo.r - math.atan2(obj.speedY, obj.speedX) + portal.r
+    
+	obj.speedX = math.cos(r)*speed
+	obj.speedY = math.sin(r)*speed
+
+	-- Modify position
+    -- Rotate around entry portal
+	local newX, newY = pointAroundPoint(oldX+obj.width/2, oldY+obj.height/2, portal.x1, portal.y1, -portal.r)
+    
+	-- Translate by portal offset
+	newX = newX + (portal.connectsTo.x1 - portal.x1)
+	newY = newY + (portal.connectsTo.y1 - portal.y1)
+
+	-- Rotate around exit portal
+	newX, newY = pointAroundPoint(newX, newY, portal.connectsTo.x1, portal.connectsTo.y1, portal.connectsTo.r)
+
+	obj.x = newX-obj.width/2
+    obj.y = newY-obj.height/2
+    
 end
 
 return World

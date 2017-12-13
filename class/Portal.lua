@@ -22,6 +22,6 @@ function Portal:draw()
 end
 
 function Portal:connectTo(portal)
-   self.connectsTo = portal
-   self.open = true 
+    self.connectsTo = portal
+    self.open = true
 end

@@ -10,6 +10,7 @@ function Tile:initialize(tileMap, img, collisionImg, collisionImgData, x, y, pro
 	self.props = props or {}
 
 	self.collision = self.props.collision or false
+	self.mesh = self.props.mesh or false
 	self.partialCollision = self.props.partialCollision or false
 	self.invisible = self.props.invisible or false
 	self.type = self.props.type or "normal"

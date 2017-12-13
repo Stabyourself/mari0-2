@@ -231,6 +231,16 @@ function worldRectangle(style, x, y, w, h)
     love.graphics.rectangle(style, x*TILESIZE, y*TILESIZE, w*TILESIZE, h*TILESIZE)
 end
 
+function worldPolygon(style, ...)
+    local points = {}
+    
+    for i, v in ipairs({...}) do
+       table.insert(points, v*TILESIZE)
+    end
+    
+    love.graphics.polygon(style, unpack(points))
+end
+
 function math.round(i, decimals)
     local factor = math.pow(10, decimals or 0)
     

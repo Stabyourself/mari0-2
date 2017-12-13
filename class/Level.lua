@@ -57,8 +57,8 @@ function Level:initialize(path, tileMap)
     table.insert(self.portals, Portal:new(self, 16, 160, math.pi/4, {60, 188, 252}))
     table.insert(self.portals, Portal:new(self, 128, 208, 0, {232, 130, 30}))
 
-    self.portals[1].connectTo(self.portals[2])
-    self.portals[2].connectTo(self.portals[1])
+    self.portals[1]:connectTo(self.portals[2])
+    self.portals[2]:connectTo(self.portals[1])
     
     -- Camera stuff
     self.camera = Camera:new()

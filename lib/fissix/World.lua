@@ -57,10 +57,6 @@ function World:draw()
 	if PHYSICSDEBUG then
 		self:physicsDebug()
     end
-    
-    if PORTALMESHDEBUG then
-        self:portalMeshDebug()
-    end
 end
 
 function World:checkMapCollision(x, y)
@@ -84,34 +80,12 @@ function World:physicsDebug()
             if self:objVisible(x, y, 1, 1) then
                 local tile = self:getTile(x, y)
                 
-                if tile.partialCollision then
-                    love.graphics.draw(self.tileMap.collisionImg, tile.quad, (x-1)*self.tileSize, (y-1)*self.tileSize)
-                elseif tile.collision then
-                    worldRectangle("fill", x-1, y-1, 1, 1)
-                else
-
-                end
-            end
-		end
-	end
-	
-	for i, v in ipairs(self.objects) do
-		v:debugDraw()
-	end
-end
-
-function World:portalMeshDebug()
-	for x = 1, #self.map[1] do
-        for y = 1, #self.map[1][x] do
-            if self:objVisible(x, y, 1, 1) then
-                local tile = self:getTile(x, y)
-                
                 if tile.collision then
-                    if tile.mesh then
+                    if type(tile.collision) == "table" then
                         local points = {}
-                        for i, v in ipairs(tile.mesh) do
-                            table.insert(points, v[1]/self.tileSize+x-1)
-                            table.insert(points, v[2]/self.tileSize+y-1)
+                        for i = 1, #tile.collision, 2 do
+                            table.insert(points, tile.collision[i]/self.tileSize+x-1)
+                            table.insert(points, tile.collision[i+1]/self.tileSize+y-1)
                         end
                         
                         worldPolygon("line", unpack(points))
@@ -122,6 +96,10 @@ function World:portalMeshDebug()
             end
         end
     end
+    
+	for i, v in ipairs(self.objects) do
+		v:debugDraw()
+	end
 end
 
 function World:getTile(x, y, i)

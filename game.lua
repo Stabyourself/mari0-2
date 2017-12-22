@@ -8,7 +8,7 @@ function game.load()
     game.timeLeft = 400
     
     smbTileMap = fissix.TileMap:new("tilemaps/smb3")
-    game.level = Level:new("levels/smb3test.json", smbTileMap)
+    game.level = Level:new("levels/smb3test", smbTileMap)
     
     love.graphics.setBackgroundColor(game.level.backgroundColor)
 
@@ -47,19 +47,19 @@ function game.draw()
     
     -- UI
     -- score
-    love.graphics.print("mario", 24, 16, "left", -10*DEPTHMUL)
-    love.graphics.print("012345", 24, 24, "left", -10*DEPTHMUL)
+    love.graphics.print("mario", 24, 16, "left")
+    love.graphics.print("012345", 24, 24, "left")
     
     -- coins (abused as FPS for now)
-    love.graphics.print("fps*" .. love.timer.getFPS(), math.round((SCREENWIDTH-80)/3)+40, 24, "center", -10*DEPTHMUL)
+    love.graphics.print("fps*" .. love.timer.getFPS(), math.round((SCREENWIDTH-80)/3)+40, 24, "center")
     
     -- level
-    love.graphics.print("world", math.round((SCREENWIDTH-80)/3*2)+40, 16, "center", -10*DEPTHMUL)
-    love.graphics.print(" 1-1 ", math.round((SCREENWIDTH-80)/3*2)+40, 24, "center", -10*DEPTHMUL)
+    love.graphics.print("world", math.round((SCREENWIDTH-80)/3*2)+40, 16, "center")
+    love.graphics.print(" 1-1 ", math.round((SCREENWIDTH-80)/3*2)+40, 24, "center")
     
     -- time
-    love.graphics.print("time", SCREENWIDTH-24, 16, "right", -10*DEPTHMUL)
-    love.graphics.print(padZeroes(math.ceil(game.timeLeft), 3), SCREENWIDTH-24, 24, "right", -10*DEPTHMUL)
+    love.graphics.print("time", SCREENWIDTH-24, 16, "right")
+    love.graphics.print(padZeroes(math.ceil(game.timeLeft), 3), SCREENWIDTH-24, 24, "right")
 end
 
 function game.keypressed(key)

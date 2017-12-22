@@ -1,19 +1,19 @@
 local Tile = class("fissix.Tile")
 
-function Tile:initialize(tileMap, img, collisionImg, collisionImgData, x, y, props)
+function Tile:initialize(tileMap, img, x, y, props)
 	self.tileMap = tileMap
 	self.img = img
-	self.collisionImg = collisionImg
-	self.collisionImgData = collisionImgData
 	self.x = x
 	self.y = y
 	self.props = props or {}
-
-	self.collision = self.props.collision or false
-	self.mesh = self.props.mesh or false
-	self.partialCollision = self.props.partialCollision or false
+	
 	self.invisible = self.props.invisible or false
 	self.type = self.props.type or "normal"
+
+	self.collision = self.props.collision or false
+	if type(self.collision) == "table" then
+		self.collisionTriangulated = love.math.triangulate(self.collision)
+	end
 	
 	if self.type == "normal" then
 		self.quad = love.graphics.newQuad((self.x-1)*(self.tileMap.tileSize+self.tileMap.tileMargin), (self.y-1)*(self.tileMap.tileSize+self.tileMap.tileMargin), self.tileMap.tileSize, self.tileMap.tileSize, self.img:getWidth(), self.img:getHeight())
@@ -29,10 +29,15 @@ function Tile:checkCollision(x, y)
 		return false
 	end
 	
-	if self.partialCollision then
-		local r, g, b, a = self.collisionImgData:getPixel((self.x-1)*(self.tileMap.tileSize+self.tileMap.tileMargin)+x, (self.y-1)*(self.tileMap.tileSize+self.tileMap.tileMargin)+y)
-
-		return a > 127
+	if type(self.collision) == "table" then
+		-- Polygon collision code here!
+		for _, points in ipairs(self.collisionTriangulated) do
+			if pointInTriangle(x, y, points) then
+				return true
+			end
+		end
+		
+		return false
 	else
 		return true
 	end

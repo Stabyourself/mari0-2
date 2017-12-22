@@ -11,22 +11,18 @@ local tiles = {
     
     {
         name = "hilltop",
-        depth = 20
     },
     
     {
         name = "bushleft",
-        depth = 10
     },
     
     {
         name = "bushcenter",
-        depth = 10
     },
     
     {
         name = "bushright",
-        depth = 10
     },
     
     {
@@ -124,32 +120,26 @@ local tiles = {
     
     {
         name = "castlemiddle",
-        depth = 20
     },
     
     {
         name = "hillleft",
-        depth = 20
     },
     
     {
         name = "hillcenter",
-        depth = 20
     },
     
     {
         name = "hillright",
-        depth = 20
     },
     
     {
         name = "hillcenteralt1",
-        depth = 20
     },
     
     {
         name = "hillcenteralt2",
-        depth = 20
     },
     
     {
@@ -159,32 +149,26 @@ local tiles = {
     
     {
         name = "redcloudtopleft",
-        depth = 30
     },
     
     {
         name = "redcloudtop",
-        depth = 30
     },
     
     {
         name = "redcloudtopright",
-        depth = 30
     },
     
     {
         name = "bluecloudtopleft",
-        depth = 30
     },
     
     {
         name = "bluecloudtop",
-        depth = 30
     },
     
     {
         name = "bluecloudtopright",
-        depth = 30
     },
     
     {
@@ -239,17 +223,14 @@ local tiles = {
 
     {
         name = "castletopalt",
-        depth = 20
     },
     
     {
         name = "castledoortop",
-        depth = 20
     },
     
     {
         name = "castlemiddle",
-        depth = 20
     },
     
     {
@@ -269,37 +250,30 @@ local tiles = {
     
     {
         name = "whitecastletopalt",
-        depth = 20
     },
     
     {
         name = "redcloudbottomleft",
-        depth = 30
     },
     
     {
         name = "redcloudbottom",
-        depth = 30
     },
     
     {
         name = "redcloudbottomright",
-        depth = 30
     },
     
     {
         name = "bluecloudbottomleft",
-        depth = 30
     },
     
     {
         name = "bluecloudbottom",
-        depth = 30
     },
     
     {
         name = "bluecloudbottomright",
-        depth = 30
     },
     
     {
@@ -359,17 +333,14 @@ local tiles = {
     
     {
         name = "castleleft",
-        depth = 20
     },
 
     {
         name = "castledoorbottom",
-        depth = 20
     },
 
     {
         name = "castleright",
-        depth = 20
     },
 
     {
@@ -389,17 +360,14 @@ local tiles = {
 
     {
         name = "whitecastletop",
-        depth = 20
     },
 
     {
         name = "whitecastledoortop",
-        depth = 20
     },
 
     {
         name = "whitecastlemiddle",
-        depth = 20
     },
 
     {

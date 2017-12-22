@@ -1,14 +1,13 @@
 Level = class("Level", fissix.World)
 
 function Level:initialize(path, tileMap)
-    self.json = JSON:decode(love.filesystem.read(path))
+    self.data = require(path)
     self.tileMap = tileMap
 
     fissix.World.initialize(self, tileMap)
-    self:loadMap(self.json.maps)
+    self:loadMap(self.data.map)
     
-    self.background = self.json.background
-    self.backgroundColor = self.json.backgroundColor or {92, 148, 252}
+    self.backgroundColor = self.data.backgroundColor or {92, 148, 252}
 
     self.enemyList = loadEnemies()
     
@@ -30,7 +29,7 @@ function Level:initialize(path, tileMap)
     
     self.spawnList = {}
     -- Parse entities
-    for _, v in ipairs(self.json.entities) do
+    for _, v in ipairs(self.data.entities) do
         local enemy = self.enemyList[v.type]
 
         if enemy and not NOENEMIES then -- is enemy
@@ -65,13 +64,6 @@ function Level:initialize(path, tileMap)
     self.spawnLine = 0
     self.spawnI = 1
 
-    -- Level canvases
-    print("Prerendering level...")
-    self.worldCanvases = {}
-    for x = 0, math.floor(self.width/LEVELCANVASWIDTH) do
-        table.insert(self.worldCanvases, WorldCanvas:new(self, x*LEVELCANVASWIDTH+1))
-    end
-
     self:spawnEnemies(self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2)
 end
 
@@ -89,54 +81,32 @@ end
 function Level:draw()
     self.camera:attach()
     
-    -- MAIN WORLDCANVAS
-    local mainCanvasI = math.floor((self.camera.x/self.tileSize)/LEVELCANVASWIDTH)+1
-    mainCanvasI = math.max(1, mainCanvasI)
     
-    love.graphics.draw(self.worldCanvases[mainCanvasI].canvas, ((mainCanvasI-1)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
-    mainPerformanceTracker:track("worldCanvases drawn")
+    local xStart = math.max(1, self.camera.x)
+    local xEnd = math.min(self.width, xStart+WIDTH-1)
+    xEnd = math.min(self.width, xEnd)
+
+    local yStart = 1
+    local yEnd = HEIGHT
     
-    -- LEFT ADDITION (for 3D)
-    if math.fmod((self.camera.x/self.tileSize), LEVELCANVASWIDTH) < OFFSCREENDRAW and mainCanvasI > 1 then
-        mainPerformanceTracker:track("worldCanvases drawn")
-        love.graphics.draw(self.worldCanvases[mainCanvasI-1].canvas, ((mainCanvasI-2)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
-    end
+    self.drawList = {}
     
-    -- RIGHT ADDITION (for transition to next WorldCanvas and 3D)
-    if math.fmod((self.camera.x/self.tileSize), LEVELCANVASWIDTH) > LEVELCANVASWIDTH-WIDTH-OFFSCREENDRAW and mainCanvasI < #self.worldCanvases then
-        mainPerformanceTracker:track("worldCanvases drawn")
-        love.graphics.draw(self.worldCanvases[mainCanvasI+1].canvas, ((mainCanvasI)*LEVELCANVASWIDTH-OFFSCREENDRAW)*TILESIZE, 0)
-    end
-    
-    -- Live replacements: Coinblocks that were hit, blocks that were broken
-    local num = 0
-    
-    for _, v in ipairs(self.liveReplacements) do
-        if self:objVisible(v.x, v.y, 1, 1) then
-            mainPerformanceTracker:track("live replacements drawn")
-            num = num + 1
-            drawOverBlock(v.x, v.y)
-            
-            local Tile = self:getTile(v.x, v.y)
-            Tile:draw((v.x-1)*self.tileSize, (v.y-1)*self.tileSize)
+    for x = xStart, xEnd do
+        for y = yStart, yEnd do
+            for i = #self.map, 1, -1 do
+                local Tile = self:getTile(x, y, i)
+                if Tile and not Tile.invisible and Tile.type ~= "coinAnimation" then
+                    Tile:draw((x-xStart)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
+                end
+            end
         end
     end
-    
-    -- Blockbounces: If Mario bumps a block, it bounces. Have to draw these seperately because canvases.
-    for _, v in ipairs(self.blockBounces) do -- Not checking for blockVisible because bumped blocks are probably always visible
-        mainPerformanceTracker:track("blockbounces drawn")
-        drawOverBlock(v.x, v.y)
-        
-        local Tile = self:getTile(v.x, v.y)
-        Tile:draw((v.x-1)*self.tileSize, (v.y-1-v.offset)*self.tileSize)
-    end
 
-    love.graphics.setDepth(0)
-    
     fissix.World.draw(self)
     for _, v in ipairs(self.portals) do
         v:draw()
     end
+    
     -- Line tracing debug
     --[[
     local cx, cy = self.marios[1].x+self.marios[1].width/2, self.marios[1].y+self.marios[1].height/2
@@ -234,7 +204,7 @@ function Level:bumpBlock(x, y)
 end
 
 function Level:objVisible(x, y, w, h)
-    return x+w > self.camera.x/self.tileSize-OFFSCREENDRAW-OBJOFFSCREENDRAW and x < self.camera.x/self.tileSize+WIDTH+OFFSCREENDRAW+OBJOFFSCREENDRAW and
+    return x+w > self.camera.x/self.tileSize-OBJOFFSCREENDRAW and x < self.camera.x/self.tileSize+WIDTH+OBJOFFSCREENDRAW and
         y+h > self.camera.y/self.tileSize-OBJOFFSCREENDRAW and y < self.camera.y/self.tileSize+HEIGHT+OBJOFFSCREENDRAW
 end
 

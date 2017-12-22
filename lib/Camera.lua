@@ -1,4 +1,4 @@
--- Camera thing, written for Mari0 3DS - MIT License.
+-- Camera thing, written for Mari3  - MIT License.
 local Camera = class("Camera")
 
 function Camera:initialize()

@@ -1,4 +1,4 @@
--- Performance tracker thing, written for Mari0 3DS - MIT License.
+-- Performance tracker thing, written for Mari3 - MIT License.
 local PerformanceTracker = class("PerformanceTracker")
 
 function PerformanceTracker:initialize()

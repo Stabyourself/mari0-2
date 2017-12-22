@@ -6,10 +6,6 @@ TILESIZE = 16
 SCREENWIDTH = 400
 SCREENHEIGHT = 240
 
-BOTTOMSCREENWIDTH = 320
-BOTTOMSCREENHEIGHT = 240
-BOTTOMSCREENOFFSET = 40
-
 WIDTH = SCREENWIDTH/TILESIZE
 HEIGHT = SCREENHEIGHT/TILESIZE
 
@@ -44,14 +40,10 @@ SCROLLINGLEFTCOMPLETE = 4
 
 RUNANIMATIONTIME = 1.6
 
-OFFSCREENDRAW = 1 -- to compensate for 3D offscreen drawing (it offsets images for left/right eye)
 OBJOFFSCREENDRAW = 0.5 -- to compensate for graphics being wider than the PhysObj
-
-LEVELCANVASWIDTH = 64-OFFSCREENDRAW*2 -- how many blocks to draw to a canvas
 
 BLOCKBOUNCETIME = 0.2
 BLOCKBOUNCEHEIGHT = 0.4
-
 
 JUMPLEEWAY = 6/16
 BLOCKHITFORCE = 2
@@ -60,29 +52,15 @@ COINANIMATIONTIME = 0.14
 
 ENEMIESPSAWNAHEAD = 0
 
-DEPTHMUL = 0.3
-
-if love.system.getOS() == "Horizon" then -- 3DS controls
-    CONTROLS = {
-        quit = "start",
-        frameDataDisplay = "select",
+CONTROLS = {
+    quit = "escape",
+    frameDataDisplay = "f",
     
-        left = "left",
-        right = "right",
-        jump = "b",
-        run = "y"
-    }
-else -- Computer controls
-    CONTROLS = {
-        quit = "escape",
-        frameDataDisplay = "f",
-        
-        left = "a",
-        right = "d",
-        jump = "space",
-        run = "lshift"
-    }
-end
+    left = "a",
+    right = "d",
+    jump = "space",
+    run = "lshift"
+}
 
 FFKEYS = {
     {

@@ -57,12 +57,6 @@ function math.clamp(n, low, high)
     return math.max(math.min(high, n), low) 
 end
 
-function drawOverBlock(x, y)
-    love.graphics.setColor(game.level.backgroundColor)
-    love.graphics.rectangle("fill", (x-1)*TILESIZE, (y-1)*TILESIZE, TILESIZE, TILESIZE)
-    love.graphics.setColor(255, 255, 255)
-end
-
 function sideOfLine(ox, oy, p1x, p1y, p2x, p2y) -- Credits to https://stackoverflow.com/a/293052
     return (p2y-p1y)*ox + (p1x-p2x)*oy + (p2x*p1y-p1x*p2y)
 end
@@ -123,11 +117,11 @@ function pointAroundPoint(x1, y1, x2, y2, r) -- Credits to https://stackoverflow
     return newX, newY
 end
 
-function pointInTriangle(x, y, t)
-    local A = 1/2 * (-t[4] * t[5] + t[2] * (-t[3] + t[5]) + t[1] * (t[4] - t[6]) + t[3] * t[6])
+function pointInTriangle(x, y, t) -- Credits to https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle#comment22628102_2049712
+    local A = 0.5 * (-t[4] * t[5] + t[2] * (-t[3] + t[5]) + t[1] * (t[4] - t[6]) + t[3] * t[6])
     local sign = A < 0 and -1 or 1
     local s = (t[2] * t[5] - t[1] * t[6] + (t[6] - t[2]) * x + (t[1] - t[5]) * y) * sign
     local t = (t[1] * t[4] - t[2] * t[3] + (t[2] - t[4]) * x + (t[3] - t[1]) * y) * sign
 
-    return s > 0 and t > 0 and (s + t) < 2 * A * sign
+    return s >= 0 and t >= 0 and (s + t) < 2 * A * sign
 end

@@ -67,8 +67,8 @@ function World:checkMapCollision(x, y)
     end
     
 	local inTileX = math.fmod(x, self.tileSize)
-	local inTileY = math.fmod(y, self.tileSize)
-	
+    local inTileY = math.fmod(y, self.tileSize)
+    
 	local col = self:getTile(tileX, tileY):checkCollision(inTileX, inTileY)
 	
 	return col
@@ -81,7 +81,7 @@ function World:physicsDebug()
                 local tile = self:getTile(x, y)
                 
                 if tile.collision then
-                    if type(tile.collision) == "table" then
+                    if tile.collision ~= COLLISION.CUBE then -- optimization for cubes
                         local points = {}
                         for i = 1, #tile.collision, 2 do
                             table.insert(points, tile.collision[i]/self.tileSize+x-1)

@@ -2,7 +2,10 @@ local TileMap = class("fissix.TileMap")
 
 function TileMap:initialize(path)
 	self.path = path .. "/"
-	self.data = require(self.path .. "props")
+	local tileMapCode = love.filesystem.read(self.path .. "props.lua")
+    self.data = sandbox.run(tileMapCode, {env={
+		COLLISION = COLLISION
+	}})
 	self.tileSize = self.data.tileSize
 	self.tileMargin = self.data.tileMargin or 1
 

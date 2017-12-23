@@ -10,9 +10,10 @@ function love.load()
     
     love.graphics.setDefaultFilter("nearest", "nearest")
     
-    love.window.setMode(400*SCALE, 240*SCALE)
+    love.window.setMode(400*SCALE, 240*SCALE, {vsync = false})
     
     require "util"
+    sandbox = require "lib/sandbox"
     JSON = require "lib/JSON"
     class = require "lib/middleclass"
     Camera = require "lib/Camera"
@@ -21,6 +22,7 @@ function love.load()
 
     require "lib/fissix"
 
+    require "class/Character"
     require "enemyLoader"
 
     require "class/Level"

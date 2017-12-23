@@ -8,7 +8,8 @@ function game.load()
     game.timeLeft = 400
     
     smbTileMap = fissix.TileMap:new("tilemaps/smb3")
-    game.level = Level:new("levels/smb3test", smbTileMap)
+    smb3_mario = Character:new("characters/smb3-mario")
+    game.level = Level:new("levels/smb3test.lua", smbTileMap)
     
     love.graphics.setBackgroundColor(game.level.backgroundColor)
 

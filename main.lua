@@ -121,6 +121,12 @@ function love.keypressed(key)
     end
 end
 
+function love.mousepressed(x, y, button)
+    if gameState == "game" then
+        game.mousepressed(x, y, button)
+    end
+end
+
 function updateGroup(group, dt)
 	local delete = {}
 	

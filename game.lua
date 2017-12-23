@@ -66,3 +66,7 @@ end
 function game.keypressed(key)
     game.level:keypressed(key)
 end
+
+function game.mousepressed(x, y, button)
+    game.level:mousepressed(x, y, button)
+end

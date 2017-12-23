@@ -54,13 +54,6 @@ function Level:initialize(path, tileMap)
     table.insert(self.marios, Mario:new(self, smb3_mario, x-6, y-12))
 
     self.portals = {}
-    --[[
-    table.insert(self.portals, Portal:new(self, 16, 160, math.pi/4, {60, 188, 252}))
-    table.insert(self.portals, Portal:new(self, 128, 208, 0, {232, 130, 30}))
-
-    self.portals[1]:connectTo(self.portals[2])
-    self.portals[2]:connectTo(self.portals[1])
-    --]]
     
     -- Camera stuff
     self.camera = Camera:new()
@@ -104,41 +97,45 @@ function Level:draw()
             end
         end
     end
+    
+    for _, v in ipairs(self.marios) do
+        love.graphics.line(v.x+v.width/2, v.y+v.height/2, v.crosshairX, v.crosshairY)
+    end
+    
 
     fissix.World.draw(self)
     for _, v in ipairs(self.portals) do
         v:draw()
     end
     
-    -- Line tracing debug
-    local cx, cy = self.marios[1].x+self.marios[1].width/2, self.marios[1].y+self.marios[1].height/2
-    local mx, my = (love.mouse.getX())/SCALE+self.camera.x, love.mouse.getY()/SCALE
-    local dir = math.atan2(my-cy, mx-cx)
-
-    local x, y, absX, absY, side = self:rayCast(cx/self.tileSize, cy/self.tileSize, dir)
-
-    absX, absY = self:mapToWorld(absX, absY)
-
-    love.graphics.line(cx, cy, absX, absY)
-    
-    -- Portal finding debug
-    local checkProgress = 0.5
-    
-    --todo: calculate progress along line
-    
-    local x1, y1, x2, y2 = self:checkPortalSurface(x, y, side, checkProgress)
-    
-    if x1 then
-        worldLine(x1, y1, x2, y2)
-    end
-    
-
     self.camera:detach()
 end
 
 function Level:keypressed(key)
     if key == CONTROLS.jump and self.marios[1].onGround then
         self.marios[1]:jump()
+    end
+end
+
+function Level:mousepressed(x, y, button)
+    local x1, y1, x2, y2 = self:checkPortalSurface(self.marios[1].crosshairTileX, self.marios[1].crosshairTileY, self.marios[1].crosshairSide, 0)
+    
+    x1, y1 = self:mapToWorld(x1, y1)
+    x2, y2 = self:mapToWorld(x2, y2)
+    
+    if button == 1 then
+        local portal = Portal:new(self, x1, y1, x2, y2, {60, 188, 252})
+        self.marios[1].portals[1] = portal
+        table.insert(self.portals, portal)
+    elseif button == 2 then
+        local portal = Portal:new(self, x1, y1, x2, y2, {232, 130, 30})
+        self.marios[1].portals[2] = portal
+        table.insert(self.portals, portal)
+    end
+    
+    if self.marios[1].portals[1] and self.marios[1].portals[2] then
+        self.marios[1].portals[1]:connectTo(self.marios[1].portals[2])
+        self.marios[1].portals[2]:connectTo(self.marios[1].portals[1])
     end
 end
 
@@ -227,10 +224,10 @@ function Level:checkMapCollision(x, y)
         if v.open then
             -- check if pixel is inside portal wallspace
             -- rotate x, y around portal origin
-            local nx, ny = pointAroundPoint(x, y, v.x, v.y, -v.r)
+            local nx, ny = pointAroundPoint(x, y, v.x1, v.y1, -v.r)
             
-            if  nx >= v.x and nx < v.x+v.size and
-                ny >= v.y and ny < v.y+16 then
+            if  nx >= v.x1 and nx < v.x1+v.size and
+                ny >= v.y1 and ny < v.y1+16 then
                 return false
             end
         end

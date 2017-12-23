@@ -8,6 +8,7 @@ function Mario:initialize(world, char, x, y)
     
     self.jumping = false
     self.ducking = false
+    self.portals = {}
 
     self.animationState = "idle"
     self.quad = self.char.quad[self.animationState][3]
@@ -31,12 +32,30 @@ function Mario:update(dt)
 
     self.char:movement(dt, self)
     self.char:animation(dt, self)
+    self:updateCrosshair()
 
     self.quad = self.char.quad[self.animationState][3]
 
     if self.animationState == "running" then
         self.quad = self.char.quad[self.animationState][3][self.runAnimationFrame]
     end
+end
+
+function Mario:updateCrosshair()
+    local cx, cy = self.x+self.width/2, self.y+self.height/2
+    local mx, my = (love.mouse.getX())/SCALE+game.level.camera.x, love.mouse.getY()/SCALE
+    local dir = math.atan2(my-cy, mx-cx)
+
+    local x, y, absX, absY, side = game.level:rayCast(cx/game.level.tileSize, cy/game.level.tileSize, dir)
+
+    absX, absY = game.level:mapToWorld(absX, absY)
+    
+    -- CHANGE THIS
+    self.crosshairX = absX
+    self.crosshairY = absY
+    self.crosshairTileX = x
+    self.crosshairTileY = y
+    self.crosshairSide = side
 end
 
 function Mario:jump()

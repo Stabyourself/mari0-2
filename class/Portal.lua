@@ -1,17 +1,15 @@
 Portal = class("Portal")
 
-Portal.size = 32
-
-function Portal:initialize(world, x, y, r, color)
-    self.x = x
-    self.y = y
-    self.r = r
+function Portal:initialize(world, x1, y1, x2, y2, color)
+    self.x1 = x1
+    self.y1 = y1
+    self.x2 = x2
+    self.y2 = y2
+    
+    self.r = math.atan2(self.y2-self.y1, self.x2-self.x1)
+    self.size = math.sqrt((self.x1-self.x2)^2 + (self.y1-self.y2)^2)
+    
     self.color = color
-
-    self.x1 = x
-    self.y1 = y
-    self.x2 = x+math.cos(self.r)*self.size
-    self.y2 = y+math.sin(self.r)*self.size
 
     self.open = false
 end

@@ -1,16 +1,18 @@
 local character = {}
 
-local WALKACCELERATION = 128 --acceleration of walking on ground
+local WALKACCELERATION = 196.875 --acceleration of walking on ground
 local RUNACCELERATION = 256 --acceleration of running on ground
-local WALKACCELERATIONAIR = 128 --acceleration of walking in the air
-local RUNACCLERATIONAIR = 256 --acceleration of running in the air
-local MINSPEED = 11.2 --When FRICTION is in effect and speed falls below this, speed is set to 0
-local MAXWALKSPEED = 102.4 --fastest speedx when walking
-local MAXRUNSPEED = 144 --fastest speedx when running
-local FRICTION = 224 --amount of speed that is substracted when not pushing buttons, as well as speed added to acceleration when changing directions
-local SUPERFRICTION = 1600 --see above, but when speed is greater than MAXRUNSPEED
-local FRICTIONAIR = 0 --see above, but in air
-local AIRSLIDEFACTOR = 0.8 --multiply of acceleration in air when changing direction
+
+local MINSPEED = 0 --When FRICTION is in effect and speed falls below this, speed is set to 0
+local MAXWALKSPEED = 90 --fastest speedx when walking
+local MAXRUNSPEED = 150 --fastest speedx when running
+local MAXSPRINTSPEED = 210 --fastest speedx when sprinting (P-meter full)
+
+local FRICTION = 125 --amount of speed that is substracted when not pushing buttons
+local FRICTIONICE = 42.1875 --duh
+
+local FRICTIONSKID = 450 --turnaround speed
+local FRICTIONSKIDICE = 182.8125 --turnaround speed on ice
 
 local RUNANIMATIONTIME = 1.6 --
 
@@ -31,20 +33,12 @@ function character.movement(dt, mario)
             accelerationVal = RUNACCELERATION
         end
 
-        if keyDown("left") then
+        if keyDown("left") and mario.speedX <= 0 then
             acceleration = acceleration - accelerationVal
-
-            if not mario.onGround and mario.speedX > 0 then
-                acceleration = acceleration * AIRSLIDEFACTOR
-            end
         end
 
-        if keyDown("right") then
+        if keyDown("right") and mario.speedX >= 0 then
             acceleration = acceleration + accelerationVal
-
-            if not mario.onGround and mario.speedX < 0 then
-                acceleration = acceleration * AIRSLIDEFACTOR
-            end
         end
     end
 
@@ -53,22 +47,21 @@ function character.movement(dt, mario)
         (mario.ducking and mario.onGround) or
         mario.disabled or
         (not keyDown("run") and math.abs(mario.speedX) > MAXWALKSPEED) or
-        math.abs(mario.speedX) > MAXRUNSPEED or
-        ((acceleration < 0 and mario.speedX > 0) or (acceleration > 0 and mario.speedX < 0)) then
-
-        -- Friction multiplier
-        local friction = FRICTION
-        if not mario.onGround then
-            friction = FRICTIONAIR
-        elseif math.abs(mario.speedX) > MAXRUNSPEED then
-            friction = SUPERFRICTION
-        end
-
+        math.abs(mario.speedX) > MAXRUNSPEED then
+            
         if mario.speedX > 0 then
             acceleration = acceleration - FRICTION
         elseif mario.speedX < 0 then
             acceleration = acceleration + FRICTION
         end
+    end
+    
+    if keyDown("right") and mario.speedX < 0 then
+        acceleration = acceleration + FRICTIONSKID
+    end
+    
+    if keyDown("left") and mario.speedX > 0 then
+        acceleration = acceleration - FRICTIONSKID
     end
 
     -- Clamp max speeds for walk and run
@@ -79,8 +72,25 @@ function character.movement(dt, mario)
     elseif (keyDown("run") and math.abs(mario.speedX) < MAXRUNSPEED) then
         maxSpeed = MAXRUNSPEED
     end
-
+    
+    local oldSpeedX = mario.speedX
     mario.speedX = mario.speedX + acceleration*dt
+    
+    -- Stop mario completely if going over 0 with no direction held
+    if not keyDown("left") and not keyDown("right") and 
+        ((mario.speedX > 0 and oldSpeedX < 0) or (mario.speedX < 0 and oldSpeedX > 0)) then
+        mario.speedX = 0
+    end
+    
+    -- Stop mario from going over runspeed by simply accelerating
+    if (keyDown("left") or keyDown("right")) and 
+        ((mario.speedX >= MAXRUNSPEED and oldSpeedX <= MAXRUNSPEED) or (mario.speedX <= -MAXRUNSPEED and oldSpeedX >= -MAXRUNSPEED)) then
+        if mario.speedX > 0 then
+            mario.speedX = MAXRUNSPEED
+        else
+            mario.speedX = -MAXRUNSPEED
+        end
+    end
 
     if maxSpeed then
         if acceleration > 0 then

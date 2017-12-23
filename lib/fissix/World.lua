@@ -30,15 +30,15 @@ function World:update(dt)
         local oldX, oldY = v.x, v.y
         
 		v.x = v.x + v.speedX * dt
-		v.y = v.y + v.speedY * dt
-		
+        v.y = v.y + v.speedY * dt
+        
 		v:checkCollisions()
         
         -- Portal checks
 		for _, p in ipairs(self.portals) do
 			local iX, iY = linesIntersect(oldX+v.width/2, oldY+v.height/2, v.x+v.width/2, v.y+v.height/2, p.x1, p.y1, p.x2, p.y2)
 			if iX then
-				self:doPortal(v, p, oldX, oldY)
+				self:doPortal(v, p, v.x, v.y)
 				break
 			end
 		end
@@ -262,22 +262,31 @@ end
 function World:doPortal(obj, portal, oldX, oldY)
 	-- Modify speed
     local speed = math.sqrt(obj.speedX^2 + obj.speedY^2)
-    local r = portal.connectsTo.r - math.atan2(obj.speedY, obj.speedX) + portal.r
+    local inR = math.atan2(obj.speedY, obj.speedX)
+    local r = portal.connectsTo.r - portal.r - math.pi + inR
     
 	obj.speedX = math.cos(r)*speed
-	obj.speedY = math.sin(r)*speed
-
+    obj.speedY = math.sin(r)*speed
+    print("===============")
+    print("inportalY: ", portal.y1)
+    print("outportalY: ", portal.connectsTo.y1)
+    print("===============")
+    
+    print("prerotate 1: ", oldX+obj.width/2, oldY+obj.height/2)
 	-- Modify position
     -- Rotate around entry portal
-	local newX, newY = pointAroundPoint(oldX+obj.width/2, oldY+obj.height/2, portal.x1, portal.y1, -portal.r)
+    local newX, newY = pointAroundPoint(oldX+obj.width/2, oldY+obj.height/2, portal.x2, portal.y2, -portal.r-math.pi)
     
+    print("premove: ", newX, newY)
 	-- Translate by portal offset
-	newX = newX + (portal.connectsTo.x1 - portal.x1)
-	newY = newY + (portal.connectsTo.y1 - portal.y1)
+	newX = newX + (portal.connectsTo.x1 - portal.x2)
+	newY = newY + (portal.connectsTo.y1 - portal.y2)
 
+    print("prerotated2: ", newX, newY)
 	-- Rotate around exit portal
 	newX, newY = pointAroundPoint(newX, newY, portal.connectsTo.x1, portal.connectsTo.y1, portal.connectsTo.r)
 
+    print("final: ", newX, newY)
 	obj.x = newX-obj.width/2
     obj.y = newY-obj.height/2
     

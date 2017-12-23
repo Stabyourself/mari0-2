@@ -120,22 +120,25 @@ end
 function Level:mousepressed(x, y, button)
     local x1, y1, x2, y2 = self:checkPortalSurface(self.marios[1].crosshairTileX, self.marios[1].crosshairTileY, self.marios[1].crosshairSide, 0)
     
-    x1, y1 = self:mapToWorld(x1, y1)
-    x2, y2 = self:mapToWorld(x2, y2)
-    
-    if button == 1 then
-        local portal = Portal:new(self, x1, y1, x2, y2, {60, 188, 252})
-        self.marios[1].portals[1] = portal
-        table.insert(self.portals, portal)
-    elseif button == 2 then
-        local portal = Portal:new(self, x1, y1, x2, y2, {232, 130, 30})
-        self.marios[1].portals[2] = portal
-        table.insert(self.portals, portal)
-    end
-    
-    if self.marios[1].portals[1] and self.marios[1].portals[2] then
-        self.marios[1].portals[1]:connectTo(self.marios[1].portals[2])
-        self.marios[1].portals[2]:connectTo(self.marios[1].portals[1])
+    if x1 then
+        x1, y1 = self:mapToWorld(x1, y1)
+        x2, y2 = self:mapToWorld(x2, y2)
+        
+        if button == 1 then
+            local portal = Portal:new(self, x1, y1, x2, y2, {255, 0, 255})
+            self.marios[1].portals[1] = portal
+            table.insert(self.portals, portal)
+            print(portal.r)
+        elseif button == 2 then
+            local portal = Portal:new(self, x1, y1, x2, y2, {255, 0, 0})
+            self.marios[1].portals[2] = portal
+            table.insert(self.portals, portal)
+        end
+        
+        if self.marios[1].portals[1] and self.marios[1].portals[2] then
+            self.marios[1].portals[1]:connectTo(self.marios[1].portals[2])
+            self.marios[1].portals[2]:connectTo(self.marios[1].portals[1])
+        end
     end
 end
 
@@ -226,8 +229,8 @@ function Level:checkMapCollision(x, y)
             -- rotate x, y around portal origin
             local nx, ny = pointAroundPoint(x, y, v.x1, v.y1, -v.r)
             
-            if  nx >= v.x1 and nx < v.x1+v.size and
-                ny >= v.y1 and ny < v.y1+16 then
+            if  nx > v.x1+1 and nx < v.x1+v.size-1 and
+                ny >= v.y1 and ny < v.y1+10 then
                 return false
             end
         end

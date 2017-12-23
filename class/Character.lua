@@ -3,7 +3,8 @@ Character = class("character")
 function Character:initialize(path)
     local characterData = love.filesystem.read(path .. "/code.lua")
     self.data = sandbox.run(characterData, {env = {
-        keyDown = keyDown
+        keyDown = keyDown,
+        print = print
     }})
     
     self.img = love.graphics.newImage(path .. "/graphics.png")

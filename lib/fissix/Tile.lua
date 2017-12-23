@@ -11,7 +11,7 @@ function Tile:initialize(tileMap, img, x, y, props)
 	self.type = self.props.type or "normal"
 
 	self.collision = self.props.collision or false
-	if type(self.collision) == "table" then
+	if self.collision then
 		self.collisionTriangulated = love.math.triangulate(self.collision)
 	end
 	
@@ -29,7 +29,7 @@ function Tile:checkCollision(x, y)
 		return false
 	end
 	
-	if type(self.collision) == "table" then
+	if type(self.collision) ~= COLLISION.CUBE then -- optimization for cubes
 		-- Polygon collision code here!
 		for _, points in ipairs(self.collisionTriangulated) do
 			if pointInTriangle(x, y, points) then

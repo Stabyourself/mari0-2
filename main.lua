@@ -10,7 +10,12 @@ function love.load()
     
     love.graphics.setDefaultFilter("nearest", "nearest")
     
-    love.window.setMode(400*SCALE, 240*SCALE, {vsync = false})
+    love.window.setMode(400*SCALE, 240*SCALE, {
+        vsync = false,
+        resizable = true,
+    })
+    
+    love.resize(400*SCALE, 240*SCALE)
     
     require "util"
     sandbox = require "lib/sandbox"
@@ -125,6 +130,20 @@ function love.mousepressed(x, y, button)
     if gameState == "game" then
         game.mousepressed(x, y, button)
     end
+end
+
+function love.resize(w, h)
+    SCREENWIDTH = w/SCALE
+    SCREENHEIGHT = h/SCALE
+
+    WIDTH = math.ceil(SCREENWIDTH/TILESIZE)
+    HEIGHT = math.ceil(SCREENHEIGHT/TILESIZE)
+
+    SCROLLINGSTART = math.max(5, WIDTH-13) --when the scrolling begins to set in
+    SCROLLINGCOMPLETE = math.max(2, WIDTH-10) --when the scrolling will be as fast as mario can run
+
+    SCROLLINGLEFTSTART = 6 --See above, but for scrolling left
+    SCROLLINGLEFTCOMPLETE = 4
 end
 
 function updateGroup(group, dt)

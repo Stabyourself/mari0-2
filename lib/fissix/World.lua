@@ -16,8 +16,8 @@ end
 function World:loadMap(map)
 	self.map = map
 
-    self.width = #self.map[1]
-	self.height = #self.map[1][1]
+    self.width = #self.map
+	self.height = #self.map[1]
 end
 
 function World:update(dt)
@@ -102,8 +102,8 @@ function World:physicsDebug()
 	end
 end
 
-function World:getTile(x, y, i)
-    return self.tileMap.tiles[self.map[i or 1][x][y]]
+function World:getTile(x, y)
+    return self.tileMap.tiles[self.map[x][y]]
 end
 
 function World:inMap(x, y)
@@ -267,26 +267,18 @@ function World:doPortal(obj, portal, oldX, oldY)
     
 	obj.speedX = math.cos(r)*speed
     obj.speedY = math.sin(r)*speed
-    print("===============")
-    print("inportalY: ", portal.y1)
-    print("outportalY: ", portal.connectsTo.y1)
-    print("===============")
     
-    print("prerotate 1: ", oldX+obj.width/2, oldY+obj.height/2)
 	-- Modify position
     -- Rotate around entry portal
     local newX, newY = pointAroundPoint(oldX+obj.width/2, oldY+obj.height/2, portal.x2, portal.y2, -portal.r-math.pi)
     
-    print("premove: ", newX, newY)
 	-- Translate by portal offset
 	newX = newX + (portal.connectsTo.x1 - portal.x2)
 	newY = newY + (portal.connectsTo.y1 - portal.y2)
 
-    print("prerotated2: ", newX, newY)
 	-- Rotate around exit portal
 	newX, newY = pointAroundPoint(newX, newY, portal.connectsTo.x1, portal.connectsTo.y1, portal.connectsTo.r)
 
-    print("final: ", newX, newY)
 	obj.x = newX-obj.width/2
     obj.y = newY-obj.height/2
     

@@ -77,9 +77,8 @@ end
 function Level:draw()
     self.camera:attach()
     
-    
-    local xStart = math.max(1, self.camera.x)
-    local xEnd = math.min(self.width, xStart+WIDTH-1)
+    local xStart = math.floor(self.camera.x/self.tileSize)+1
+    local xEnd = math.min(self.width, xStart+WIDTH)
     xEnd = math.min(self.width, xEnd)
 
     local yStart = 1
@@ -89,17 +88,16 @@ function Level:draw()
     
     for x = xStart, xEnd do
         for y = yStart, yEnd do
-            for i = #self.map, 1, -1 do
-                local Tile = self:getTile(x, y, i)
-                if Tile and not Tile.invisible and Tile.type ~= "coinAnimation" then
-                    Tile:draw((x-xStart)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
-                end
+            local Tile = self:getTile(x, y)
+            
+            if Tile and not Tile.invisible then
+                Tile:draw((x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
             end
         end
     end
     
     for _, v in ipairs(self.marios) do
-        love.graphics.line(v.x+v.width/2, v.y+v.height/2, v.crosshairX, v.crosshairY)
+        love.graphics.line(v.x+v.width/2, v.y+v.height/2+2, v.crosshairX, v.crosshairY)
     end
     
 
@@ -115,31 +113,56 @@ function Level:keypressed(key)
     if key == CONTROLS.jump and self.marios[1].onGround then
         self.marios[1]:jump()
     end
+    
+    if key == CONTROLS.boost then
+        self.marios[1].speedX = 1000
+    end
 end
 
 function Level:mousepressed(x, y, button)
-    local x1, y1, x2, y2 = self:checkPortalSurface(self.marios[1].crosshairTileX, self.marios[1].crosshairTileY, self.marios[1].crosshairSide, 0)
+    self:attemptPortal(1, button)
+end
+
+function Level:attemptPortal(ply, portalI)
+    local mario = self.marios[ply]
+    local x1, y1, x2, y2 = self:checkPortalSurface(mario.crosshairTileX, mario.crosshairTileY, mario.crosshairSide, 0)
     
     if x1 then
-        x1, y1 = self:mapToWorld(x1, y1)
-        x2, y2 = self:mapToWorld(x2, y2)
+        -- make sure that the surface is big enough to hold a portal
+        local angle = math.atan2(y2-y1, x2-x1)
+        local length = math.sqrt((x1-x2)^2+(y1-y2)^2)
         
-        if button == 1 then
-            local portal = Portal:new(self, x1, y1, x2, y2, {255, 0, 255})
-            self.marios[1].portals[1] = portal
+        if length >= PORTALSIZE then
+            local middleProgress = math.sqrt((mario.crosshairX-x1)^2+(mario.crosshairY-y1)^2)/length
+            
+            local leftSpace = middleProgress*length
+            local rightSpace = (1-middleProgress)*length
+            
+            if leftSpace < PORTALSIZE/2 then -- move final portal position to the right
+                middleProgress = (PORTALSIZE/2/length)
+            elseif rightSpace < PORTALSIZE/2 then -- move final portal position to the left
+                middleProgress = 1-(PORTALSIZE/2/length)
+            end
+            
+            local mX = x1 + (x2-x1)*middleProgress
+            local mY = y1 + (y2-y1)*middleProgress
+            
+            local p1x = math.cos(angle+math.pi)*PORTALSIZE/2+mX
+            local p1y = math.sin(angle+math.pi)*PORTALSIZE/2+mY
+            
+            local p2x = math.cos(angle)*PORTALSIZE/2+mX
+            local p2y = math.sin(angle)*PORTALSIZE/2+mY
+            
+            local portal = Portal:new(self, p1x, p1y, p2x, p2y, mario.portalColor[portalI])
+            mario.portals[portalI] = portal
             table.insert(self.portals, portal)
-            print(portal.r)
-        elseif button == 2 then
-            local portal = Portal:new(self, x1, y1, x2, y2, {255, 0, 0})
-            self.marios[1].portals[2] = portal
-            table.insert(self.portals, portal)
+            
+            if mario.portals[1] and mario.portals[2] then
+                mario.portals[1]:connectTo(mario.portals[2])
+                mario.portals[2]:connectTo(mario.portals[1])
+            end
         end
-        
-        if self.marios[1].portals[1] and self.marios[1].portals[2] then
-            self.marios[1].portals[1]:connectTo(self.marios[1].portals[2])
-            self.marios[1].portals[2]:connectTo(self.marios[1].portals[1])
-        end
-    end
+    end 
 end
 
 function Level:spawnEnemies(untilX)
@@ -162,21 +185,27 @@ function Level:updateCamera(dt)
     local pXr = pX - self.camera.x
     local pSpeedX = game.level.marios[1].speedX
     
-    -- Scroll right?
-    if pXr > SCROLLINGCOMPLETE*self.tileSize then
-        self.camera.x = pX - SCROLLINGCOMPLETE*self.tileSize
-    elseif pXr > SCROLLINGSTART*self.tileSize and pSpeedX > SCROLLRATE then
-        self.camera.x = self.camera.x + SCROLLRATE*dt
-    end
-    -- Scroll left?
-    if pXr < SCROLLINGLEFTCOMPLETE*self.tileSize then
-        self.camera.x = pX - SCROLLINGLEFTCOMPLETE*self.tileSize
-    elseif pXr < SCROLLINGLEFTSTART*self.tileSize and pSpeedX < -SCROLLRATE then
-        self.camera.x = self.camera.x - SCROLLRATE*dt
+    if WIDTH > 13 then
+        -- Scroll right?
+        if pXr > SCROLLINGCOMPLETE*self.tileSize then
+            self.camera.x = pX - SCROLLINGCOMPLETE*self.tileSize
+        elseif pXr > SCROLLINGSTART*self.tileSize and pSpeedX > SCROLLRATE then
+            self.camera.x = self.camera.x + SCROLLRATE*dt
+        end
+        
+        -- Scroll left?
+        if pXr < SCROLLINGLEFTCOMPLETE*self.tileSize then
+            self.camera.x = pX - SCROLLINGLEFTCOMPLETE*self.tileSize
+        elseif pXr < SCROLLINGLEFTSTART*self.tileSize and pSpeedX < -SCROLLRATE then
+            self.camera.x = self.camera.x - SCROLLRATE*dt
+        end
+    else
+        self.camera.x = pX-3*self.tileSize
     end
     
     -- And clamp it to map boundaries
-    self.camera.x = math.clamp(self.camera.x, 0, (game.level.width - WIDTH - 1)*self.tileSize)
+    self.camera.x = math.min(self.camera.x, (game.level.width - WIDTH)*self.tileSize)
+    self.camera.x = math.max(self.camera.x, 0)
 end
 
 function Level:setMap(x, y, i)
@@ -444,5 +473,8 @@ function Level:checkPortalSurface(tileX, tileY, side, progress)
     local startX, startY = walkSide(tile, tileX, tileY, side, "anticlockwise")
     local endX, endY = walkSide(tile, tileX, tileY, side, "clockwise")
     
+    startX, startY = self:mapToWorld(startX, startY)
+    endX, endY = self:mapToWorld(endX, endY)
+
     return startX, startY, endX, endY
 end

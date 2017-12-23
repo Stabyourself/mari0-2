@@ -93,7 +93,7 @@ function PhysObj:leftColCheck()
 	end
 	
 	if colX then --Left collision
-		if not self.leftCollision() then
+		if not self:leftCollision() then
 			self.x = colX+1
 			self.speedX = math.max(self.speedX, 0)
 			return {x = colX, y = colY}
@@ -115,7 +115,7 @@ function PhysObj:rightColCheck()
 	end
 	
 	if colX then --Right collision
-		if not self.rightCollision() then
+		if not self:rightCollision() then
 			self.x = colX-self.width
 			self.speedX = math.min(self.speedX, 0)
 			return {x = colX, y = colY}
@@ -137,7 +137,7 @@ function PhysObj:topColCheck()
 	end
 	
 	if colY then --Top collision
-		if not self.topCollision() then
+		if not self:topCollision() then
 			self.y = colY+1
 			self.speedY = math.max(self.speedY, 0)
 			
@@ -160,7 +160,7 @@ function PhysObj:bottomColCheck()
 	end
 	
 	if colY then --Ground collision
-		if not self.bottomCollision() then
+		if not self:bottomCollision() then
 			if self.onGround then
 				self.y = colY-self.height
 				self.speedY = math.min(self.speedY, 0)

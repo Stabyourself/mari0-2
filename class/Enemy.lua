@@ -60,13 +60,13 @@ function Enemy:movement(dt)
     end
 end
 
-function Enemy:leftCollide(obj2)
+function Enemy:leftCollision(obj2)
     if self.movementType == "truffleshuffle" and self.shuffleDir == -1 then
         self.shuffleDir = -self.shuffleDir
     end
 end
 
-function Enemy:rightCollide(obj2)
+function Enemy:rightCollision(obj2)
     if self.movementType == "truffleshuffle" and self.shuffleDir == 1 then
         self.shuffleDir = -self.shuffleDir
     end

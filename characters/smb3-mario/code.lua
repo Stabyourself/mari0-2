@@ -8,7 +8,7 @@ local MAXWALKSPEED = 90 --fastest speedx when walking
 local MAXRUNSPEED = 150 --fastest speedx when running
 local MAXSPRINTSPEED = 210 --fastest speedx when sprinting (P-meter full)
 
-local FRICTION = 125 --amount of speed that is substracted when not pushing buttons
+local FRICTION = 140.625 --amount of speed that is substracted when not pushing buttons
 local FRICTIONICE = 42.1875 --duh
 
 local FRICTIONSKID = 450 --turnaround speed

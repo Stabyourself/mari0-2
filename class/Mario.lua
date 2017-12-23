@@ -19,6 +19,11 @@ function Mario:initialize(world, char, x, y)
     self.img = self.char.img
     self.centerX = 10
     self.centerY = 10
+    
+    self.portalColor = {
+        {60, 188, 252},
+		{232, 130, 30}
+    }
 end
 
 function Mario:update(dt)
@@ -34,19 +39,19 @@ function Mario:update(dt)
     self.char:animation(dt, self)
     self:updateCrosshair()
 
-    self.quad = self.char.quad[self.animationState][3]
+    self.quad = self.char.quad[self.animationState][self.getAngleFrame(self.portalGunAngle)]
 
     if self.animationState == "running" then
-        self.quad = self.char.quad[self.animationState][3][self.runAnimationFrame]
+        self.quad = self.char.quad[self.animationState][self.getAngleFrame(self.portalGunAngle)][self.runAnimationFrame]
     end
 end
 
 function Mario:updateCrosshair()
-    local cx, cy = self.x+self.width/2, self.y+self.height/2
+    local cx, cy = self.x+self.width/2, self.y+self.height/2+2
     local mx, my = (love.mouse.getX())/SCALE+game.level.camera.x, love.mouse.getY()/SCALE
-    local dir = math.atan2(my-cy, mx-cx)
+    self.portalGunAngle = math.atan2(my-cy, mx-cx)
 
-    local x, y, absX, absY, side = game.level:rayCast(cx/game.level.tileSize, cy/game.level.tileSize, dir)
+    local x, y, absX, absY, side = game.level:rayCast(cx/game.level.tileSize, cy/game.level.tileSize, self.portalGunAngle)
 
     absX, absY = game.level:mapToWorld(absX, absY)
     
@@ -67,6 +72,26 @@ function Mario:jump()
     self.char:jump(dt, self)
     
     playSound(jumpSound)
+end
+
+function Mario.getAngleFrame(angle)
+    if angle > math.pi*.5 then
+        angle = math.pi - angle
+    elseif angle < -math.pi*.5 then
+        angle = -math.pi - angle
+    end
+    
+	if angle < -math.pi*0.375 then
+		return 1
+	elseif angle < -math.pi*0.125 then
+		return 2
+	elseif angle < math.pi*0.125  then
+		return 3
+	elseif angle < math.pi*0.375 then
+		return 4
+	else -- Downward frame looks dumb
+		return 4
+    end
 end
 
 function Mario:ceilCollide(obj2)

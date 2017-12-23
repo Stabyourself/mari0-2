@@ -121,20 +121,12 @@ function Level:draw()
 
     love.graphics.line(cx, cy, absX, absY)
     
-    if side == "top" then
-        checkSide = 1
-    elseif side == "right" then
-        checkSide = 2
-    elseif side == "bottom" then
-        checkSide = 3
-    elseif side == "left" then
-        checkSide = 4
-    end
-    
     -- Portal finding debug
     local checkProgress = 0.5
     
-    local x1, y1, x2, y2 = self:checkPortalSurface(x, y, checkSide, checkProgress)
+    --todo: calculate progress along line
+    
+    local x1, y1, x2, y2 = self:checkPortalSurface(x, y, side, checkProgress)
     
     if x1 then
         worldLine(x1, y1, x2, y2)

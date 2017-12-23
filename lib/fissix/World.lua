@@ -148,19 +148,59 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
 
     -- perform DDA
     while not hit do
-        -- jump to next map square, OR in x-direction, OR in y-direction
-        if sideDistX < sideDistY then
-            sideDistX = sideDistX + deltaDistX
-            mapX = mapX + stepX;
-            side = "ver";
-        else
-            sideDistY = sideDistY + deltaDistY
-            mapY = mapY + stepY
-            side = "hor"
-        end
-
         -- Check if ray has hit something (or went outside the map)
-        if not self:inMap(mapX, mapY) or self:getTile(mapX, mapY).collision then
+        local cubeCol = false
+        
+        if not self:inMap(mapX, mapY) then
+            cubeCol = true
+        else
+            local tile = self:getTile(mapX, mapY)
+            if tile.collision then
+                if tile.collision == COLLISION.CUBE then
+                    cubeCol = true
+                else
+                
+                    -- complicated polygon stuff
+                    local col
+                        
+                    -- Trace line
+                    local t1x, t1y = x, y
+                    local t2x, t2y = x+math.cos(dir)*100000, y+math.sin(dir)*100000
+                    
+                    for i = 1, #tile.collision, 2 do
+                        local nextI = i + 2
+                        
+                        if nextI > #tile.collision then
+                            nextI = 1
+                        end
+                        
+                        -- Polygon edge line
+                        local p1x, p1y = tile.collision[i]/self.tileSize+mapX-1, tile.collision[i+1]/self.tileSize+mapY-1
+                        local p2x, p2y = tile.collision[nextI]/self.tileSize+mapX-1, tile.collision[nextI+1]/self.tileSize+mapY-1
+                        
+                        local interX, interY = linesIntersect(p1x, p1y, p2x, p2y, t1x, t1y, t2x, t2y)
+                        if interX then
+                            local dist = math.sqrt((t1x-interX)^2 + (t1y-interY)^2)
+                            
+                            if not col or dist < col.dist then
+                                col = {
+                                    dist = dist,
+                                    x = interX,
+                                    y = interY,
+                                    side = (i+1)/2
+                                }
+                            end
+                        end
+                    end
+                    
+                    if col then
+                        return mapX, mapY, col.x, col.y, col.side
+                    end
+                end
+            end
+        end
+        
+        if cubeCol then
             local absX = mapX-1
             local absY = mapY-1
 
@@ -178,22 +218,36 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
 
             if side == "ver" then
                 if stepX > 0 then
-                    side = "left"
+                    side = 4
                 else
-                    side = "right"
+                    side = 2
                     absX = absX + 1
                 end
             else
                 if stepY > 0 then
-                    side = "top"
+                    side = 1
                 else
-                    side = "bottom"
+                    side = 3
                     absY = absY + 1
                 end
             end
 
             return mapX, mapY, absX, absY, side
+        elseif polyCol then
+            
+            return mapX, mapY, absX, absY, side
         end
+        -- jump to next map square, OR in x-direction, OR in y-direction
+        if sideDistX < sideDistY then
+            sideDistX = sideDistX + deltaDistX
+            mapX = mapX + stepX;
+            side = "ver";
+        else
+            sideDistY = sideDistY + deltaDistY
+            mapY = mapY + stepY
+            side = "hor"
+        end
+
     end
 end
 

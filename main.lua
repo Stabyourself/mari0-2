@@ -10,12 +10,12 @@ function love.load()
     
     love.graphics.setDefaultFilter("nearest", "nearest")
     
-    love.window.setMode(400*SCALE, 240*SCALE, {
+    love.window.setMode(400*SCALE, 224*SCALE, {
         vsync = false,
         resizable = true,
     })
     
-    love.resize(400*SCALE, 240*SCALE)
+    love.resize(400*SCALE, 224*SCALE)
     
     require "util"
     sandbox = require "lib/sandbox"
@@ -35,15 +35,80 @@ function love.load()
     require "class/BlockBounce"
     require "class/Enemy"
     require "class/Portal" -- the juicy bits
+    require "class/UI"
+    require "class/Smb3Ui"
 
     require "game"
     
 	fontImg = love.graphics.newImage("img/font.png")
-	fontGlyphs = "0123456789abcdefghijklmnopqrstuvwxyz.:/,'C-_>* !{}?"
-	fontQuad = {}
-	for i = 1, string.len(fontGlyphs) do
-		fontQuad[string.sub(fontGlyphs, i, i)] = love.graphics.newQuad((i-1)*8, 0, 8, 8, 512, 8)
-	end
+    fontGlyphs = [[
+        0123456789ab
+        cdefghijklmn
+        opqrstuvwxyz
+        &pMeterTick;
+        &pMeterTickOn;
+        &World1;
+        &World2;
+        &World3;
+        &World4;
+        &pMeter1;
+        &pMeter2;
+        &pMeterOn1;
+        &pMeterOn2;
+        &Mario1;
+        &Mario2;
+        &Luigi1;
+        &Luigi2;
+        &Dollarinos;
+        &Time;
+        &Times;
+        &Space;
+    ]]
+    
+    fontIgnore = {32}
+    
+    local i = 1
+    local glyphNum = 1
+    local inLongName = false
+    local currentGlyph = ""
+    local glyphSize = 8
+    local glyphWidth = fontImg:getWidth()/glyphSize
+    fontQuad = {}
+    
+    local function assignGlyph(glyph)
+        local x = math.floor((glyphNum-1)%glyphWidth+1)
+        local y = math.ceil(glyphNum/glyphWidth)
+        
+        fontQuad[glyph] = love.graphics.newQuad((x-1)*glyphSize, (y-1)*glyphSize, glyphSize, glyphSize, fontImg:getWidth(), fontImg:getHeight())
+        
+        glyphNum = glyphNum + 1
+    end
+    
+    for i = 1, #fontGlyphs do
+        local glyph = string.sub(fontGlyphs, i, i)
+        local byte = string.byte(glyph)
+        
+        if byte ~= string.byte("\n") and byte ~= string.byte(" ") then
+            if byte == string.byte(";") then
+                if inLongName then
+                    assignGlyph(currentGlyph)
+                    currentGlyph = ""
+                    inLongName = false
+                end
+            elseif byte == string.byte("&") then
+                inLongName = true
+                currentGlyph = ""
+            else
+                if inLongName then
+                    currentGlyph = currentGlyph .. glyph
+                else
+                    assignGlyph(glyph)
+                end
+            end
+        end
+    end
+    
+    fontQuad[" "] = fontQuad["Space"]
 
     print("Loading sound... (might take a while)")
     if not MUSICDISABLED then
@@ -62,6 +127,8 @@ function love.load()
     
     mainFTAnalyser = FTAnalyser:new()
     mainPerformanceTracker = PerformanceTracker:new()
+    
+    defaultUI = UI:new("img/ui/default.png")
 
     print("Loading game")
     game.load()
@@ -103,13 +170,6 @@ function love.draw()
     end
     
     mainFTAnalyser:frameEnd(gdt)
-    
-    love.graphics.setColor(255, 255, 255)
-
-    if keyDown("frameDataDisplay") then
-        mainFTAnalyser:draw(0, 100, BOTTOMSCREENWIDTH, BOTTOMSCREENHEIGHT-100)
-        mainPerformanceTracker:draw(0, 0)
-    end
 
     if SCALE ~= 1 then
         love.graphics.scale(1/SCALE, 1/SCALE)
@@ -137,7 +197,7 @@ function love.resize(w, h)
     SCREENHEIGHT = h/SCALE
 
     WIDTH = math.ceil(SCREENWIDTH/TILESIZE)
-    HEIGHT = math.ceil(SCREENHEIGHT/TILESIZE)
+    HEIGHT = math.ceil((SCREENHEIGHT-UIHEIGHT)/TILESIZE)
 
     SCROLLINGSTART = math.max(5, WIDTH-13) --when the scrolling begins to set in
     SCROLLINGCOMPLETE = math.max(2, WIDTH-10) --when the scrolling will be as fast as mario can run
@@ -161,6 +221,34 @@ function updateGroup(group, dt)
 	for _, v in ipairs(delete) do
 		table.remove(group, v)
 	end
+end
+
+function marioPrint(s, x, y)
+    local longGlyph = false
+    local char = 0
+    for i = 1, #s do
+        local toPrint = false
+        local glyph = string.sub(s, i, i)
+        local byte = string.byte(glyph)
+        
+        if byte == string.byte("&") then
+            longGlyph = ""
+        elseif byte == string.byte(";") and longGlyph then
+            toPrint = longGlyph
+            longGlyph = false
+        else
+            if longGlyph then
+                longGlyph = longGlyph .. glyph
+            else
+                toPrint = glyph
+            end
+        end
+        
+        if toPrint then
+            love.graphics.draw(fontImg, fontQuad[toPrint], char*8+x, y)
+            char = char + 1
+        end
+    end
 end
 
 function keyDown(cmd)

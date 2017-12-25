@@ -13,19 +13,27 @@ function Character:initialize(path)
     self.quad = {}
     self.quad.idle = {}
     self.quad.running = {}
+    self.quad.sprinting = {}
     self.quad.sliding = {}
     self.quad.jumping = {}
+    self.quad.jumpingWithPassion = {}
     
-    for y = 1, 4 do
+    for y = 1, 5 do
         self.quad.idle[y] = love.graphics.newQuad(0, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
 
         self.quad.running[y] = {}
         for i = 1, self.data.runFrames do
             self.quad.running[y][i] = love.graphics.newQuad(i*20, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
         end
+
+        self.quad.sprinting[y] = {}
+        for i = 1, self.data.runFrames do
+            self.quad.sprinting[y][i] = love.graphics.newQuad((i+2)*20, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
+        end
         
-        self.quad.sliding[y] = love.graphics.newQuad(60, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
-        self.quad.jumping[y] = love.graphics.newQuad(80, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
+        self.quad.sliding[y] = love.graphics.newQuad(100, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
+        self.quad.jumping[y] = love.graphics.newQuad(120, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
+        self.quad.jumpingWithPassion[y] = love.graphics.newQuad(140, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
     end
 end
 

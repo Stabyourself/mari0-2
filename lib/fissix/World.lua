@@ -75,8 +75,8 @@ function World:checkMapCollision(x, y)
 end
 
 function World:physicsDebug()
-	for x = 1, #self.map[1] do
-        for y = 1, #self.map[1][x] do
+	for x = 1, #self.map do
+        for y = 1, #self.map[x] do
             if self:objVisible(x, y, 1, 1) then
                 local tile = self:getTile(x, y)
                 

@@ -19,6 +19,9 @@ function Mario:initialize(world, char, x, y)
     self.img = self.char.img
     self.centerX = 10
     self.centerY = 10
+    self.pMeter = 0
+    self.pMeterTimer = 0
+    self.pMeterTime = 8/60
     
     self.portalColor = {
         {60, 188, 252},
@@ -39,16 +42,16 @@ function Mario:update(dt)
     self.char:animation(dt, self)
     self:updateCrosshair()
 
-    self.quad = self.char.quad[self.animationState][self.getAngleFrame(self.portalGunAngle)]
-
-    if self.animationState == "running" then
+    if (self.animationState == "running" or self.animationState == "sprinting") then
         self.quad = self.char.quad[self.animationState][self.getAngleFrame(self.portalGunAngle)][self.runAnimationFrame]
+    else
+        self.quad = self.char.quad[self.animationState][self.getAngleFrame(self.portalGunAngle)]
     end
 end
 
 function Mario:updateCrosshair()
     local cx, cy = self.x+self.width/2, self.y+self.height/2+2
-    local mx, my = (love.mouse.getX())/SCALE+game.level.camera.x, love.mouse.getY()/SCALE
+    local mx, my = (love.mouse.getX())/SCALE+game.level.camera.x, love.mouse.getY()/SCALE+game.level.camera.y
     self.portalGunAngle = math.atan2(my-cy, mx-cx)
 
     local x, y, absX, absY, side = game.level:rayCast(cx/game.level.tileSize, cy/game.level.tileSize, self.portalGunAngle)
@@ -75,6 +78,9 @@ function Mario:jump()
 end
 
 function Mario.getAngleFrame(angle)
+    
+    if true then return 5 end
+    
     if angle > math.pi*.5 then
         angle = math.pi - angle
     elseif angle < -math.pi*.5 then

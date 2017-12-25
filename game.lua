@@ -9,7 +9,10 @@ function game.load()
     
     smbTileMap = fissix.TileMap:new("tilemaps/smb3")
     smb3_mario = Character:new("characters/smb3-mario")
+    
     game.level = Level:new("levels/smb3test.lua", smbTileMap)
+    
+    smb3ui = Smb3Ui:new()
     
     love.graphics.setBackgroundColor(game.level.backgroundColor)
 
@@ -25,7 +28,7 @@ function game.update(dt)
     
     game.level:update(dt)
     
-    if game.level.marios[1].y > HEIGHT*game.level.tileMap.tileSize+.5 then
+    if game.level.marios[1].y > game.level.height*game.level.tileMap.tileSize+.5 then
         game.level.marios[1].y = -1
     end
     
@@ -45,9 +48,18 @@ function game.draw()
     game.level:draw()
 
     love.graphics.setColor(255, 255, 255)
+    smb3ui.time = math.ceil(game.timeLeft)
+    smb3ui.pMeter = game.level.marios[1].pMeter
+    smb3ui.score = 1234567
+    smb3ui.lives = 4
+    smb3ui.coins = 23
+    smb3ui.world = 1
+    smb3ui:draw()
     
     -- UI
     -- score
+    
+    --[[
     love.graphics.print("mario", 24, 16, "left")
     love.graphics.print("012345", 24, 24, "left")
     
@@ -61,6 +73,7 @@ function game.draw()
     -- time
     love.graphics.print("time", SCREENWIDTH-24, 16, "right")
     love.graphics.print(padZeroes(math.ceil(game.timeLeft), 3), SCREENWIDTH-24, 24, "right")
+    --]]
 end
 
 function game.keypressed(key)

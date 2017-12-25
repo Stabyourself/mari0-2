@@ -8,7 +8,7 @@ function Level:initialize(path, tileMap)
     fissix.World.initialize(self, tileMap)
     self:loadMap(self.data.map)
     
-    self.backgroundColor = self.data.backgroundColor or {92, 148, 252}
+    self.backgroundColor = self.data.backgroundColor or {156, 252, 240}
 
     self.enemyList = loadEnemies()
     
@@ -57,6 +57,7 @@ function Level:initialize(path, tileMap)
     
     -- Camera stuff
     self.camera = Camera:new()
+    self.camera.y = (self.height - HEIGHT)*self.tileSize
     self.spawnLine = 0
     self.spawnI = 1
 
@@ -81,8 +82,8 @@ function Level:draw()
     local xEnd = math.min(self.width, xStart+WIDTH)
     xEnd = math.min(self.width, xEnd)
 
-    local yStart = 1
-    local yEnd = HEIGHT
+    local yStart = math.floor(self.camera.y/self.tileSize)+1
+    local yEnd = self.height
     
     self.drawList = {}
     

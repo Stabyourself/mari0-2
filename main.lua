@@ -314,3 +314,22 @@ function worldPolygon(style, ...)
     
     love.graphics.polygon(style, unpack(points))
 end
+
+function worldArrow(x, y, xDir, yDir)
+    local scale = math.sqrt(xDir^2+yDir^2)/8
+    local angle = math.atan2(yDir, xDir)
+    local arrowTipScale = 0.2
+    
+    --body
+    local x2, y2 = x+math.cos(angle)*scale, y+math.sin(angle)*scale
+    
+    love.graphics.line(x, y, x2, y2)
+    
+    --tipleft
+    local x3, y3 = x2+math.cos(angle-math.pi*0.75)*scale*arrowTipScale, y2+math.sin(angle-math.pi*0.75)*scale*arrowTipScale
+    love.graphics.line(x2, y2, x3, y3)
+    
+    --tipright
+    local x4, y4 = x2+math.cos(angle+math.pi*0.75)*scale*arrowTipScale, y2+math.sin(angle+math.pi*0.75)*scale*arrowTipScale
+    love.graphics.line(x2, y2, x4, y4)
+end

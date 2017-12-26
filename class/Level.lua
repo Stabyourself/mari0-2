@@ -260,7 +260,7 @@ function Level:checkMapCollision(x, y)
             local nx, ny = pointAroundPoint(x, y, v.x1, v.y1, -v.r)
             
             if  nx > v.x1+1 and nx < v.x1+v.size-1 and
-                ny >= v.y1 and ny < v.y1+10 then
+                ny >= v.y1-1 and ny < v.y1+10 then
                 return false
             end
         end
@@ -282,7 +282,6 @@ function Level:checkPortalSurface(tileX, tileY, side, progress)
     }
     
     local function walkSide(tile, tileX, tileY, side, dir)
-        
         local nextX, nextY, angle, nextAngle, nextTileX, nextTileY, nextSide, x, y
         local first = true
         

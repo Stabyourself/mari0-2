@@ -8,6 +8,7 @@ function PhysObj:initialize(world, x, y, width, height)
 	self.world = world
 	
 	self.speedX = 0
+	self.groundSpeedX = 0
 	self.speedY = 0
 	
     self.surfaceAngle = 0

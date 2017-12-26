@@ -5,7 +5,8 @@ function World:initialize(tileMap)
     self.tileSize = self.tileMap.tileSize
 	
 	self.objects = {}
-	self.map = {}
+    self.map = {}
+    self.portalVectorDebugs = {}
 end
 
 function World:addObject(PhysObj)
@@ -25,11 +26,13 @@ function World:update(dt)
 		v:update(dt)
 		
 		-- Add gravity
-        v.speedY = math.min((v.maxSpeedY or VAR("maxYSpeed")), v.speedY + (v.gravity or VAR("gravity")) * 0.5 * dt)
+        v.speedY = v.speedY + (v.gravity or VAR("gravity")) * 0.5 * dt
+        -- Cap speedY
+        v.speedY = math.min((v.maxSpeedY or VAR("maxYSpeed")), v.speedY)
         
         local oldX, oldY = v.x, v.y
         
-        v.x = v.x + (v.speedX + (v.speedXAdd or 0)) * (v.speedXFactor or 1) * dt
+        v.x = v.x + v.speedX * dt
         v.y = v.y + v.speedY * dt
         
 		v:checkCollisions()
@@ -38,13 +41,15 @@ function World:update(dt)
 		for _, p in ipairs(self.portals) do
 			local iX, iY = linesIntersect(oldX+v.width/2, oldY+v.height/2, v.x+v.width/2, v.y+v.height/2, p.x1, p.y1, p.x2, p.y2)
 			if iX then
-				self:doPortal(v, p, v.x, v.y, oldX, oldY)
+				self:doPortal(v, p, v.x, v.y, v.groundSpeedX, v.speedY, oldX, oldY)
 				break
 			end
         end
 		
 		-- Add gravity again
-		v.speedY = math.min((v.maxSpeedY or VAR("maxYSpeed")), v.speedY + (v.gravity or VAR("gravity")) * 0.5 * dt)
+        v.speedY = v.speedY + (v.gravity or VAR("gravity")) * 0.5 * dt
+        -- Cap speedY
+        v.speedY = math.min((v.maxSpeedY or VAR("maxYSpeed")), v.speedY)
 	end
 end
 
@@ -56,6 +61,10 @@ function World:draw()
 
 	if VAR("physicsDebug") then
 		self:physicsDebug()
+    end
+    
+    if VAR("portalVectorDebug") then
+        self:portalVectorDebug()
     end
 end
 
@@ -100,6 +109,19 @@ function World:physicsDebug()
 	for i, v in ipairs(self.objects) do
 		v:debugDraw()
 	end
+end
+
+function World:portalVectorDebug()
+    for _, v in ipairs(self.portalVectorDebugs) do
+        if not v.reversed then
+            love.graphics.setColor(255, 255, 0)
+        else
+            love.graphics.setColor(255, 0, 0)
+        end
+        
+        worldArrow(v.inX, v.inY, v.inVX, v.inVY)
+        worldArrow(v.outX, v.outY, v.outVX, v.outVY)
+    end
 end
 
 function World:getTile(x, y)
@@ -259,18 +281,20 @@ function World:worldToMap(x, y)
     return math.floor(x/self.tileSize)+1, math.floor(y/self.tileSize)+1
 end
 
-function World:doPortal(obj, portal, x, y, oldX, oldY)
-    print(obj.speedX, obj.speedY)
+function World:doPortal(obj, portal, x, y, speedX, speedY, oldX, oldY)
     -- Check whether to reverse portal direction (when portal face the same way)
     local reversed = false
+    
     if  portal.r+math.pi < portal.connectsTo.r+math.pi+VAR("portalReverseRange") and
         portal.r+math.pi > portal.connectsTo.r+math.pi-VAR("portalReverseRange") then
         reversed = true
     end
     
+    local oldSpeedX, oldSpeedY = speedX, speedY
+    
 	-- Modify speed
-    local speed = math.sqrt(obj.speedX^2 + obj.speedY^2)
-    local inR = math.atan2(obj.speedY, obj.speedX)
+    local speed = math.sqrt(speedX^2 + speedY^2)
+    local inR = math.atan2(speedY, speedX)
     local r
     
     if not reversed then
@@ -279,7 +303,7 @@ function World:doPortal(obj, portal, x, y, oldX, oldY)
         r = portal.connectsTo.r - inR + portal.r
     end
     
-	obj.speedX = math.cos(r)*speed
+	obj.groundSpeedX = math.cos(r)*speed
     obj.speedY = math.sin(r)*speed
     
 	-- Modify position
@@ -305,6 +329,21 @@ function World:doPortal(obj, portal, x, y, oldX, oldY)
 
 	obj.x = newX-obj.width/2
     obj.y = newY-obj.height/2
+    
+    self.portalVectorDebugs = {}
+    table.insert(self.portalVectorDebugs, {
+        inX = x+obj.width/2,
+        inY = y+obj.height/2,
+        inVX = speedX,
+        inVY = speedY,
+        
+        outX = obj.x+obj.width/2,
+        outY = obj.y+obj.height/2,
+        outVX = obj.groundSpeedX,
+        outVY = obj.speedY,
+        
+        reversed = reversed
+    })
 end
 
 return World

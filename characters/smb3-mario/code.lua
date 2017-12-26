@@ -49,18 +49,18 @@ function character.movement(dt, self)
     end
 
     -- Normal left/right acceleration
-    if math.abs(self.speedX) < maxSpeed then
-        if keyDown("left") and not keyDown("right") and self.speedX <= 0 then
-            self.speedX = math.max(-maxSpeed, self.speedX - ACCELERATION*dt)
+    if math.abs(self.groundSpeedX) < maxSpeed then
+        if keyDown("left") and not keyDown("right") and self.groundSpeedX <= 0 then
+            self.groundSpeedX = math.max(-maxSpeed, self.groundSpeedX - ACCELERATION*dt)
         end
 
-        if keyDown("right") and not keyDown("left") and self.speedX >= 0 then
-            self.speedX = math.min(maxSpeed, self.speedX + ACCELERATION*dt)
+        if keyDown("right") and not keyDown("left") and self.groundSpeedX >= 0 then
+            self.groundSpeedX = math.min(maxSpeed, self.groundSpeedX + ACCELERATION*dt)
         end
     end
     
     -- Butt slide
-    if keyDown("right") or keyDown("left") or keyDown("jump") or (self.speedX == 0 and self.surfaceAngle == 0) then
+    if keyDown("right") or keyDown("left") or keyDown("jump") or (self.groundSpeedX == 0 and self.surfaceAngle == 0) then
         self.buttSliding = false
     end
     
@@ -68,9 +68,9 @@ function character.movement(dt, self)
         self.buttSliding = true
         
         if self.surfaceAngle > 0 then
-            self.speedX = math.max(0, self.speedX)
+            self.groundSpeedX = math.max(0, self.groundSpeedX)
         else
-            self.speedX = math.min(0, self.speedX)
+            self.groundSpeedX = math.min(0, self.groundSpeedX)
         end
     end
     
@@ -78,8 +78,7 @@ function character.movement(dt, self)
         local buttAcceleration = 225 * (self.surfaceAngle/(math.pi/8))
         
         self.buttSliding = true
-        self.speedX = self.speedX + buttAcceleration*dt
-        print(buttAcceleration)
+        self.groundSpeedX = self.groundSpeedX + buttAcceleration*dt
     end
 
     -- Apply friction?
@@ -87,7 +86,7 @@ function character.movement(dt, self)
         if (not keyDown("right") and not keyDown("left")) or 
             self.ducking or
             self.disabled or
-            math.abs(self.speedX) > maxSpeed then
+            math.abs(self.groundSpeedX) > maxSpeed then
                 
             local friction = FRICTION
             
@@ -97,26 +96,26 @@ function character.movement(dt, self)
                 friction = BUTTFRICTION
             end
                 
-            if self.speedX > 0 then
-                self.speedX = math.max(0, self.speedX - friction*dt)
-            elseif self.speedX < 0 then
-                self.speedX = math.min(0, self.speedX + friction*dt)
+            if self.groundSpeedX > 0 then
+                self.groundSpeedX = math.max(0, self.groundSpeedX - friction*dt)
+            elseif self.groundSpeedX < 0 then
+                self.groundSpeedX = math.min(0, self.groundSpeedX + friction*dt)
             end
         end
     end
     
-    if keyDown("right") and self.speedX < 0 then
-        self.speedX = math.min(0, self.speedX + FRICTIONSKID*dt)
+    if keyDown("right") and self.groundSpeedX < 0 then
+        self.groundSpeedX = math.min(0, self.groundSpeedX + FRICTIONSKID*dt)
     end
     
-    if keyDown("left") and self.speedX > 0 then
-        self.speedX = math.max(0, self.speedX - FRICTIONSKID*dt)
+    if keyDown("left") and self.groundSpeedX > 0 then
+        self.groundSpeedX = math.max(0, self.groundSpeedX - FRICTIONSKID*dt)
     end
     
     -- P meter
     self.pMeterTimer = self.pMeterTimer + dt
     
-    if self.speedX == MAXSPEEDS[2] and self.pMeter == 0 then
+    if self.groundSpeedX == MAXSPEEDS[2] and self.pMeter == 0 then
         self.pMeterTime = PMETERTIMEUP
         self.pMeterTimer = PMETERTIMEUP
     end
@@ -124,9 +123,9 @@ function character.movement(dt, self)
     -- Maintain fullspeed when pMeter full
     if self.pMeter == VAR("pMeterTicks") and
         (not self.onGround or 
-        (math.abs(self.speedX) >= MAXSPEEDS[2] and
+        (math.abs(self.groundSpeedX) >= MAXSPEEDS[2] and
         keyDown("run") and 
-        ((self.speedX > 0 and keyDown("right")) or (self.speedX < 0 and keyDown("left"))))) then
+        ((self.groundSpeedX > 0 and keyDown("right")) or (self.groundSpeedX < 0 and keyDown("left"))))) then
         self.pMeterTimer = 0
         self.pMeterTime = PMETERTIMEMARGIN
     end
@@ -151,21 +150,21 @@ function character.movement(dt, self)
         end
     end
     
+    self.speedX = self.groundSpeedX
+    
     -- Adjust speedx if going downhill or uphill
-    self.speedXAdd = 0
-    self.speedXFactor = 1
     if self.onGround then
         if self.surfaceAngle > 0 then
-            if self.speedX > 0 then
-                self.speedXAdd = 7.5
+            if self.groundSpeedX > 0 then
+                self.speedX = self.speedX + 7.5
             else
-                self.speedXFactor = math.cos(self.surfaceAngle)
+                self.speedX = self.speedX * math.cos(self.surfaceAngle)
             end
         elseif self.surfaceAngle < 0 then
-            if self.speedX < 0 then
-                self.speedXAdd = -7.5
+            if self.groundSpeedX < 0 then
+                self.speedX = self.speedX - 7.5
             else
-                self.speedXFactor = math.cos(-self.surfaceAngle)
+                self.speedX = self.speedX * math.cos(-self.surfaceAngle)
             end
         end
     end
@@ -216,10 +215,19 @@ function character.animation(dt, self)
         self.animationState = "buttSliding"
     end
 
-    if keyDown("left") then
-        self.animationDirection = -1
-    elseif keyDown("right") then
-        self.animationDirection = 1
+    if self.hasPortalGun then -- look towards portalGunAngle
+        if math.abs(self.portalGunAngle) <= math.pi*.5 then
+            self.animationDirection = 1
+        else
+            self.animationDirection = -1
+        end
+        
+    else -- look towards last pressed direction
+        if keyDown("left") then
+            self.animationDirection = -1
+        elseif keyDown("right") then
+            self.animationDirection = 1
+        end
     end
 end
 
@@ -227,7 +235,7 @@ function character.jump(dt, self)
     -- Adjust jumpforce according to speed
     local speedY = 0
     for i = 1, #JUMPTABLE do
-        if math.abs(self.speedX) <= JUMPTABLE[i].speedX then
+        if math.abs(self.groundSpeedX) <= JUMPTABLE[i].speedX then
             speedY = JUMPTABLE[i].speedY
             break
         end
@@ -237,7 +245,7 @@ function character.jump(dt, self)
     local maxSpeedJump
     
     for i = 1, #MAXSPEEDS do
-        if math.abs(self.speedX) <= MAXSPEEDS[i] then
+        if math.abs(self.groundSpeedX) <= MAXSPEEDS[i] then
             maxSpeedJump = MAXSPEEDS[i]
             break
         end

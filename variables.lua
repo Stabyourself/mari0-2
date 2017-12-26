@@ -27,7 +27,7 @@ return {
     enemiesSpawnAhead = 0,
 
     portalSize = 32,
-    portalReverseRange = math.pi/4,
+    portalReverseRange = math.pi/4+.001,
 
     pMeterTicks = 7,
     pMeterBlinkTime = 8/60,

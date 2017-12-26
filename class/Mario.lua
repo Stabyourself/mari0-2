@@ -22,6 +22,9 @@ function Mario:initialize(world, char, x, y)
     self.pMeterTimer = 0
     self.pMeterTime = 8/60
     
+    self.hasPortalGun = true
+    self.portalGunAngle = 0
+    
     self.portalColor = {
         {60, 188, 252},
 		{232, 130, 30}
@@ -42,9 +45,9 @@ function Mario:update(dt)
     self:updateCrosshair()
 
     if (self.animationState == "running" or self.animationState == "sprinting") then
-        self.quad = self.char.quad[self.animationState][self.getAngleFrame(self.portalGunAngle)][self.runAnimationFrame]
+        self.quad = self.char.quad[self.animationState][self:getAngleFrame(self.portalGunAngle)][self.runAnimationFrame]
     else
-        self.quad = self.char.quad[self.animationState][self.getAngleFrame(self.portalGunAngle)]
+        self.quad = self.char.quad[self.animationState][self:getAngleFrame(self.portalGunAngle)]
     end
 end
 
@@ -76,9 +79,10 @@ function Mario:jump()
     playSound(jumpSound)
 end
 
-function Mario.getAngleFrame(angle)
-    
-    if true then return 5 end
+function Mario:getAngleFrame(angle)
+    if not self.hasPortalGun then
+        return 5
+    end
     
     if angle > math.pi*.5 then
         angle = math.pi - angle
@@ -99,7 +103,7 @@ function Mario.getAngleFrame(angle)
     end
 end
 
-function Mario:ceilCollide(obj2)
+function Mario:ceilCollision(obj2)
     if obj2:isInstanceOf(Block) then
         -- See whether it was very close to the edge of a block next to air, in which case allow Mario to keep jumping
         -- Right side
@@ -141,7 +145,7 @@ function Mario:ceilCollide(obj2)
     end
 end
 
-function Mario:floorCollide(obj2)
+function Mario:floorCollision(obj2)
     if obj2.stompable then
         obj2:stomp()
         self.speedY = -getRequiredSpeed(VAR("enemyBounceHeight"))
@@ -149,6 +153,14 @@ function Mario:floorCollide(obj2)
         
         return true
     end
+end
+
+function Mario:leftCollision(obj2)
+    self.groundSpeedX = 0
+end
+
+function Mario:rightCollision(obj2)
+    self.groundSpeedX = 0
 end
 
 function Mario:startFall()

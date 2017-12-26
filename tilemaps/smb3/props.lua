@@ -65,6 +65,23 @@ tiles[1340] = {
     }
 }
 
+
+tiles[1341] = {
+    collision = {
+         0,  0,
+        16, 0,
+        16, 16,
+        0, 8
+    }
+}
+tiles[1342] = {
+    collision = {
+         0,  0,
+        16, 0,
+        16, 8
+    }
+}
+
 local props = {
     tileSize = 16,
     tileMap = "tiles.png",

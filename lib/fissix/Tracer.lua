@@ -1,7 +1,7 @@
 local Tracer = class("fissix.Tracer")
 
-function Tracer:initialize(PhysObj, xOff, yOff, xDir, yDir, distance)
-	self.PhysObj = PhysObj
+function Tracer:initialize(physObj, xOff, yOff, xDir, yDir, distance)
+	self.physObj = physObj
 	self.xOff = xOff
 	self.yOff = yOff
 	self.xDir = xDir
@@ -13,10 +13,10 @@ function Tracer:trace()
 	local x, y, col
 	
 	for i = 0, self.distance-1 do
-		x = self.PhysObj:getX() + self.xOff + i*self.xDir
-		y = self.PhysObj:getY() + self.yOff + i*self.yDir
+		x = self.physObj:getX() + self.xOff + i*self.xDir
+		y = self.physObj:getY() + self.yOff + i*self.yDir
 		
-		col = self.PhysObj.World:checkMapCollision(x, y)
+		col = self.physObj.World:checkMapCollision(x, y)
 		if col then
 			return x, y
 		end
@@ -41,7 +41,7 @@ function Tracer:debugDraw()
 		yWidth = 1
 	end
 
-	love.graphics.rectangle("fill", self.PhysObj:getX() + xOff, self.PhysObj:getY() + yOff, xWidth, yWidth)
+	love.graphics.rectangle("fill", self.physObj:getX() + xOff, self.physObj:getY() + yOff, xWidth, yWidth)
 end
 
 return Tracer

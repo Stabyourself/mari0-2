@@ -16,7 +16,7 @@ function game.load()
     
     love.graphics.setBackgroundColor(game.level.backgroundColor)
 
-    if not MUSICDISABLED then
+    if not VAR("musicDisabled") then
         playMusic(overworldMusic)
     end
 
@@ -33,22 +33,24 @@ function game.update(dt)
     end
     
 	game.coinAnimationTimer = game.coinAnimationTimer + dt
-	while game.coinAnimationTimer >= COINANIMATIONTIME do
+	while game.coinAnimationTimer >= VAR("coinAnimationTime") do
         game.coinAnimationFrame = game.coinAnimationFrame + 1
         
         if game.coinAnimationFrame > 5 then
             game.coinAnimationFrame = 1
         end
 
-		game.coinAnimationTimer = game.coinAnimationTimer - COINANIMATIONTIME
-	end
+		game.coinAnimationTimer = game.coinAnimationTimer - VAR("coinAnimationTime")
+    end
+    
+    smb3ui:update(dt)
 end
 
 function game.draw()
     game.level:draw()
 
     love.graphics.setColor(255, 255, 255)
-    smb3ui.time = math.ceil(game.timeLeft)
+    smb3ui.time = math.floor(love.timer.getFPS())--math.ceil(game.timeLeft)
     smb3ui.pMeter = game.level.marios[1].pMeter
     smb3ui.score = 1234567
     smb3ui.lives = 4

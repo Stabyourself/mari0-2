@@ -1,3 +1,17 @@
+local VARIABLES = require "variables"
+
+if love.filesystem.exists("environment.lua") then
+    local envTemp = require "environment"
+    
+    for i, v in pairs(envTemp) do
+        VARIABLES[i] = v
+    end
+end
+
+function VAR(i, default)
+    return VARIABLES[i] or default
+end
+
 function print_r (t, name, indent) -- http://www.hpelbers.org/lua/print_r
     local tableList = {}
     function table_r (t, name, indent, full)
@@ -50,7 +64,7 @@ function math.round(i, decimals)
 end
 
 function getRequiredSpeed(height, gravity)
-    return math.sqrt(2*(gravity or GRAVITY)*height)
+    return math.sqrt(2*(gravity or VAR("gravity"))*height)
 end
 
 function math.clamp(n, low, high) 

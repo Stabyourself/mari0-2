@@ -33,7 +33,7 @@ function Level:initialize(path, tileMap)
     for _, v in ipairs(self.data.entities) do
         local enemy = self.enemyList[v.type]
 
-        if enemy and not NOENEMIES then -- is enemy
+        if enemy and not VAR("noEnemies") then -- is enemy
             table.insert(self.spawnList, {
                 enemy = enemy,
                 x = v.x,
@@ -61,7 +61,7 @@ function Level:initialize(path, tileMap)
     self.spawnLine = 0
     self.spawnI = 1
 
-    self:spawnEnemies(self.camera.x+WIDTH+ENEMIESPSAWNAHEAD+2)
+    self:spawnEnemies(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end
 
 function Level:update(dt)
@@ -69,7 +69,7 @@ function Level:update(dt)
     fissix.World.update(self, dt)
     self:updateCamera(dt)
 
-    local newSpawnLine = self.camera.x/self.tileSize+WIDTH+ENEMIESPSAWNAHEAD+2
+    local newSpawnLine = self.camera.x/self.tileSize+WIDTH+VAR("enemiesSpawnAhead")+2
     if newSpawnLine > self.spawnLine then
         self:spawnEnemies(newSpawnLine)
     end
@@ -111,11 +111,11 @@ function Level:draw()
 end
 
 function Level:keypressed(key)
-    if key == CONTROLS.jump and self.marios[1].onGround then
+    if key == VAR("controls").jump and self.marios[1].onGround then
         self.marios[1]:jump()
     end
     
-    if key == CONTROLS.boost then
+    if key == VAR("controls").boost then
         self.marios[1].speedX = 1000
     end
 end
@@ -133,26 +133,26 @@ function Level:attemptPortal(ply, portalI)
         local angle = math.atan2(y2-y1, x2-x1)
         local length = math.sqrt((x1-x2)^2+(y1-y2)^2)
         
-        if length >= PORTALSIZE then
+        if length >= VAR("portalSize") then
             local middleProgress = math.sqrt((mario.crosshairX-x1)^2+(mario.crosshairY-y1)^2)/length
             
             local leftSpace = middleProgress*length
             local rightSpace = (1-middleProgress)*length
             
-            if leftSpace < PORTALSIZE/2 then -- move final portal position to the right
-                middleProgress = (PORTALSIZE/2/length)
-            elseif rightSpace < PORTALSIZE/2 then -- move final portal position to the left
-                middleProgress = 1-(PORTALSIZE/2/length)
+            if leftSpace < VAR("portalSize")/2 then -- move final portal position to the right
+                middleProgress = (VAR("portalSize")/2/length)
+            elseif rightSpace < VAR("portalSize")/2 then -- move final portal position to the left
+                middleProgress = 1-(VAR("portalSize")/2/length)
             end
             
             local mX = x1 + (x2-x1)*middleProgress
             local mY = y1 + (y2-y1)*middleProgress
             
-            local p1x = math.cos(angle+math.pi)*PORTALSIZE/2+mX
-            local p1y = math.sin(angle+math.pi)*PORTALSIZE/2+mY
+            local p1x = math.cos(angle+math.pi)*VAR("portalSize")/2+mX
+            local p1y = math.sin(angle+math.pi)*VAR("portalSize")/2+mY
             
-            local p2x = math.cos(angle)*PORTALSIZE/2+mX
-            local p2y = math.sin(angle)*PORTALSIZE/2+mY
+            local p2x = math.cos(angle)*VAR("portalSize")/2+mX
+            local p2y = math.sin(angle)*VAR("portalSize")/2+mY
             
             local portal = Portal:new(self, p1x, p1y, p2x, p2y, mario.portalColor[portalI])
             mario.portals[portalI] = portal
@@ -190,15 +190,15 @@ function Level:updateCamera(dt)
         -- Scroll right?
         if pXr > SCROLLINGCOMPLETE*self.tileSize then
             self.camera.x = pX - SCROLLINGCOMPLETE*self.tileSize
-        elseif pXr > SCROLLINGSTART*self.tileSize and pSpeedX > SCROLLRATE then
-            self.camera.x = self.camera.x + SCROLLRATE*dt
+        elseif pXr > SCROLLINGSTART*self.tileSize and pSpeedX > VAR("scrollRate") then
+            self.camera.x = self.camera.x + VAR("scrollRate")*dt
         end
         
         -- Scroll left?
         if pXr < SCROLLINGLEFTCOMPLETE*self.tileSize then
             self.camera.x = pX - SCROLLINGLEFTCOMPLETE*self.tileSize
-        elseif pXr < SCROLLINGLEFTSTART*self.tileSize and pSpeedX < -SCROLLRATE then
-            self.camera.x = self.camera.x - SCROLLRATE*dt
+        elseif pXr < SCROLLINGLEFTSTART*self.tileSize and pSpeedX < -VAR("scrollRate") then
+            self.camera.x = self.camera.x - VAR("scrollRate")*dt
         end
     else
         self.camera.x = pX-3*self.tileSize
@@ -247,8 +247,8 @@ function Level:bumpBlock(x, y)
 end
 
 function Level:objVisible(x, y, w, h)
-    return x+w > self.camera.x/self.tileSize-OBJOFFSCREENDRAW and x < self.camera.x/self.tileSize+WIDTH+OBJOFFSCREENDRAW and
-        y+h > self.camera.y/self.tileSize-OBJOFFSCREENDRAW and y < self.camera.y/self.tileSize+HEIGHT+OBJOFFSCREENDRAW
+    return x+w > self.camera.x/self.tileSize and x < self.camera.x/self.tileSize+WIDTH and
+        y+h > self.camera.y/self.tileSize and y < self.camera.y/self.tileSize+HEIGHT
 end
 
 function Level:checkMapCollision(x, y)

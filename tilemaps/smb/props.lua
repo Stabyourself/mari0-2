@@ -6,7 +6,7 @@ local tiles = {
 
     {
         name = "ground",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
@@ -27,13 +27,13 @@ local tiles = {
     
     {
         name = "block",
-        collision = COLLISION.CUBE,
+        collision = VAR("collision").cube,
         breakable = true
     },
     
     {
         name = "coinBlock",
-        collision = COLLISION.CUBE,
+        collision = VAR("collision").cube,
         coinBlock = true,
         type = "coinAnimation",
         img = "img/coinBlock.png"
@@ -51,7 +51,7 @@ local tiles = {
     
     {
         name = "bowserbridge",
-        collision = COLLISION.CUBE,
+        collision = VAR("collision").cube,
         bowserbridge = true
     },
     
@@ -65,47 +65,47 @@ local tiles = {
     
     {
         name = "whitepipetopleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "whitepipetopright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "greenpipetopleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "greenpipetopright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "redpipetopleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "redpipetopright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "mushroomleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "mushroomcenter",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "mushroomright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     
@@ -144,7 +144,7 @@ local tiles = {
     
     {
         name = "castleground",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
@@ -173,37 +173,37 @@ local tiles = {
     
     {
         name = "whitepipebottomleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "whitepipebottomright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "greenpipebottomleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "greenpipebottomright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "redpipebottomleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "redpipebottomright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "cannontop",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
@@ -239,13 +239,13 @@ local tiles = {
     
     {
         name = "blockunderground",
-        collision = COLLISION.CUBE,
+        collision = VAR("collision").cube,
         breakable = true
     },
     
     {
         name = "groundunderground",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
@@ -278,37 +278,37 @@ local tiles = {
     
     {
         name = "greenpipelefttopleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "greenpipelefttopright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "greenpipemiddletop",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "underwaterpipetop",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "whitepipetopleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
 
     {
         name = "whitepipetopright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
 
     {
         name = "cannonbottom",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
@@ -345,17 +345,17 @@ local tiles = {
 
     {
         name = "treeplatformleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "treeplatformmiddle",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "treeplatformright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
 
     {
@@ -372,7 +372,7 @@ local tiles = {
 
     {
         name = "underwaterplant",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
 
     {
@@ -381,42 +381,42 @@ local tiles = {
 
     {
         name = "blockalt",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
 
     {
         name = "cloudplatform",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
 
     {
         name = "greenpipeleftbottomleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
 
     {
         name = "greenpipeleftbottomright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
 
     {
         name = "greenpipemiddlebottom",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
 
     {
         name = "underwaterpipebottom",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
 
     {
         name = "whitepipebottomleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
 
     {
         name = "whitepipebottomright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
 
     {
@@ -446,22 +446,22 @@ local tiles = {
     
     {
         name = "whitetreeplatformleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "whitetreeplatformmiddle",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "whitetreeplatformright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "whiteground",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
@@ -534,7 +534,7 @@ local tiles = {
     
     {
         name = "bridge",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
 
@@ -553,7 +553,7 @@ local tiles = {
 
     {
         name = "undergroundblockalt",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
@@ -562,7 +562,7 @@ local tiles = {
     
     {
         name = "coinblockempty",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
@@ -587,7 +587,7 @@ local tiles = {
     
     {
         name = "cannonlong",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
@@ -600,7 +600,7 @@ local tiles = {
     
     {
         name = "whiteblock",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
@@ -609,27 +609,27 @@ local tiles = {
     
     {
         name = "redpipebottomleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "redpipebottomright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "redpipetopleft",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "redpipetopright",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {
         name = "underwaterblock",
-        collision = COLLISION.CUBE
+        collision = VAR("collision").cube
     },
     
     {

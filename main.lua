@@ -3,21 +3,17 @@ function love.load()
     print("Mari3 POC by Maurice")
     print("Loading stuff...")
     
-    require "variables"
-    if love.filesystem.exists("environment.lua") then
-        require "environment"
-    end
+    require "util"
     
     love.graphics.setDefaultFilter("nearest", "nearest")
     
-    love.window.setMode(400*SCALE, 224*SCALE, {
+    love.window.setMode(400*VAR("scale"), 224*VAR("scale"), {
         vsync = false,
         resizable = true,
     })
     
-    love.resize(400*SCALE, 224*SCALE)
+    love.resize(400*VAR("scale"), 224*VAR("scale"))
     
-    require "util"
     sandbox = require "lib/sandbox"
     JSON = require "lib/JSON"
     class = require "lib/middleclass"
@@ -111,19 +107,19 @@ function love.load()
     fontQuad[" "] = fontQuad["Space"]
 
     print("Loading sound... (might take a while)")
-    if not MUSICDISABLED then
+    if not VAR("musicDisabled") then
         overworldMusic = love.audio.newSource("sound/music/overworld.ogg")
         overworldMusic:setLooping(true)
     end
 
     jumpSound = love.audio.newSource("sound/jump.ogg")
-    jumpSound:setVolume(VOLUME)
+    jumpSound:setVolume(VAR("volume"))
     blockSound = love.audio.newSource("sound/block.ogg")
-    blockSound:setVolume(VOLUME)
+    blockSound:setVolume(VAR("volume"))
     coinSound = love.audio.newSource("sound/coin.ogg")
-    coinSound:setVolume(VOLUME)
+    coinSound:setVolume(VAR("volume"))
     stompSound = love.audio.newSource("sound/stomp.ogg")
-    stompSound:setVolume(VOLUME)
+    stompSound:setVolume(VAR("volume"))
     
     mainFTAnalyser = FTAnalyser:new()
     mainPerformanceTracker = PerformanceTracker:new()
@@ -147,8 +143,8 @@ function love.update(dt)
         return
     end
 
-	if FFKEYS then
-		for _, v in ipairs(FFKEYS) do
+	if VAR("ffKeys") then
+		for _, v in ipairs(VAR("ffKeys")) do
 			if love.keyboard.isDown(v.key) then
 				dt = dt * v.val
 			end
@@ -161,8 +157,8 @@ function love.update(dt)
 end
 
 function love.draw()
-    if SCALE ~= 1 then
-        love.graphics.scale(SCALE, SCALE)
+    if VAR("scale") ~= 1 then
+        love.graphics.scale(VAR("scale"), VAR("scale"))
     end
 
     if gameState == "game" then
@@ -171,13 +167,13 @@ function love.draw()
     
     mainFTAnalyser:frameEnd(gdt)
 
-    if SCALE ~= 1 then
-        love.graphics.scale(1/SCALE, 1/SCALE)
+    if VAR("scale") ~= 1 then
+        love.graphics.scale(1/VAR("scale"), 1/VAR("scale"))
     end
 end
 
 function love.keypressed(key)
-    if key == CONTROLS.quit then
+    if key == VAR("controls").quit then
         love.event.quit()
     end
     
@@ -193,11 +189,11 @@ function love.mousepressed(x, y, button)
 end
 
 function love.resize(w, h)
-    SCREENWIDTH = w/SCALE
-    SCREENHEIGHT = h/SCALE
+    SCREENWIDTH = w/VAR("scale")
+    SCREENHEIGHT = h/VAR("scale")
 
-    WIDTH = math.ceil(SCREENWIDTH/TILESIZE)
-    HEIGHT = math.ceil((SCREENHEIGHT-UIHEIGHT)/TILESIZE)
+    WIDTH = math.ceil(SCREENWIDTH/VAR("tileSize"))
+    HEIGHT = math.ceil((SCREENHEIGHT-VAR("uiHeight"))/VAR("tileSize"))
 
     SCROLLINGSTART = math.max(5, WIDTH-13) --when the scrolling begins to set in
     SCROLLINGCOMPLETE = math.max(2, WIDTH-10) --when the scrolling will be as fast as mario can run
@@ -252,7 +248,7 @@ function marioPrint(s, x, y)
 end
 
 function keyDown(cmd)
-    return love.keyboard.isDown(CONTROLS[cmd])
+    return love.keyboard.isDown(VAR("controls")[cmd])
 end
 
 function skipUpdate()
@@ -302,18 +298,18 @@ function worldDraw(...)
 end
 
 function worldLine(x1, y1, x2, y2)
-    love.graphics.line(x1*TILESIZE, y1*TILESIZE, x2*TILESIZE, y2*TILESIZE)
+    love.graphics.line(x1*VAR("tileSize"), y1*VAR("tileSize"), x2*VAR("tileSize"), y2*VAR("tileSize"))
 end
 
 function worldRectangle(style, x, y, w, h)
-    love.graphics.rectangle(style, x*TILESIZE, y*TILESIZE, w*TILESIZE, h*TILESIZE)
+    love.graphics.rectangle(style, x*VAR("tileSize"), y*VAR("tileSize"), w*VAR("tileSize"), h*VAR("tileSize"))
 end
 
 function worldPolygon(style, ...)
     local points = {}
     
     for i, v in ipairs({...}) do
-       table.insert(points, v*TILESIZE)
+       table.insert(points, v*VAR("tileSize"))
     end
     
     love.graphics.polygon(style, unpack(points))

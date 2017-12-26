@@ -25,11 +25,11 @@ function World:update(dt)
 		v:update(dt)
 		
 		-- Add gravity
-        v.speedY = math.min((v.maxSpeedY or MAXYSPEED), v.speedY + (v.gravity or GRAVITY) * 0.5 * dt)
+        v.speedY = math.min((v.maxSpeedY or VAR("maxYSpeed")), v.speedY + (v.gravity or VAR("gravity")) * 0.5 * dt)
         
         local oldX, oldY = v.x, v.y
         
-		v.x = v.x + v.speedX * dt
+        v.x = v.x + (v.speedX + (v.speedXAdd or 0)) * (v.speedXFactor or 1) * dt
         v.y = v.y + v.speedY * dt
         
 		v:checkCollisions()
@@ -38,13 +38,13 @@ function World:update(dt)
 		for _, p in ipairs(self.portals) do
 			local iX, iY = linesIntersect(oldX+v.width/2, oldY+v.height/2, v.x+v.width/2, v.y+v.height/2, p.x1, p.y1, p.x2, p.y2)
 			if iX then
-				self:doPortal(v, p, v.x, v.y)
+				self:doPortal(v, p, v.x, v.y, oldX, oldY)
 				break
 			end
-		end
+        end
 		
 		-- Add gravity again
-		v.speedY = math.min((v.maxSpeedY or MAXYSPEED), v.speedY + (v.gravity or GRAVITY) * 0.5 * dt)
+		v.speedY = math.min((v.maxSpeedY or VAR("maxYSpeed")), v.speedY + (v.gravity or VAR("gravity")) * 0.5 * dt)
 	end
 end
 
@@ -54,7 +54,7 @@ function World:draw()
 		worldDraw(obj.img, obj.quad, obj.x+obj.width/2, obj.y+obj.height/2, obj.r or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
 	end
 
-	if PHYSICSDEBUG then
+	if VAR("physicsDebug") then
 		self:physicsDebug()
     end
 end
@@ -81,7 +81,7 @@ function World:physicsDebug()
                 local tile = self:getTile(x, y)
                 
                 if tile.collision then
-                    if tile.collision ~= COLLISION.CUBE then -- optimization for cubes
+                    if tile.collision ~= VAR("collision").cube then -- optimization for cubes
                         local points = {}
                         for i = 1, #tile.collision, 2 do
                             table.insert(points, tile.collision[i]/self.tileSize+x-1)
@@ -156,7 +156,7 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
         else
             local tile = self:getTile(mapX, mapY)
             if tile.collision then
-                if tile.collision == COLLISION.CUBE then
+                if tile.collision == VAR("collision").cube then
                     cubeCol = true
                 else
                 
@@ -259,29 +259,52 @@ function World:worldToMap(x, y)
     return math.floor(x/self.tileSize)+1, math.floor(y/self.tileSize)+1
 end
 
-function World:doPortal(obj, portal, oldX, oldY)
+function World:doPortal(obj, portal, x, y, oldX, oldY)
+    print(obj.speedX, obj.speedY)
+    -- Check whether to reverse portal direction (when portal face the same way)
+    local reversed = false
+    if  portal.r+math.pi < portal.connectsTo.r+math.pi+VAR("portalReverseRange") and
+        portal.r+math.pi > portal.connectsTo.r+math.pi-VAR("portalReverseRange") then
+        reversed = true
+    end
+    
 	-- Modify speed
     local speed = math.sqrt(obj.speedX^2 + obj.speedY^2)
     local inR = math.atan2(obj.speedY, obj.speedX)
-    local r = portal.connectsTo.r - portal.r - math.pi + inR
+    local r
+    
+    if not reversed then
+        r = portal.connectsTo.r - portal.r - math.pi + inR
+    else
+        r = portal.connectsTo.r - inR + portal.r
+    end
     
 	obj.speedX = math.cos(r)*speed
     obj.speedY = math.sin(r)*speed
     
 	-- Modify position
     -- Rotate around entry portal
-    local newX, newY = pointAroundPoint(oldX+obj.width/2, oldY+obj.height/2, portal.x2, portal.y2, -portal.r-math.pi)
+    local newX, newY
     
-	-- Translate by portal offset
-	newX = newX + (portal.connectsTo.x1 - portal.x2)
-	newY = newY + (portal.connectsTo.y1 - portal.y2)
+    if not reversed then
+        newX, newY = pointAroundPoint(x+obj.width/2, y+obj.height/2, portal.x2, portal.y2, -portal.r-math.pi)
+        
+        -- Translate by portal offset
+        newX = newX + (portal.connectsTo.x1 - portal.x2)
+        newY = newY + (portal.connectsTo.y1 - portal.y2)
+    else
+	    newX, newY = pointAroundPoint(oldX+obj.width/2, oldY+obj.height/2, portal.x1, portal.y1, -portal.r)
+    
+        -- Translate by portal offset
+        newX = newX + (portal.connectsTo.x1 - portal.x1)
+        newY = newY + (portal.connectsTo.y1 - portal.y1)
+    end
 
 	-- Rotate around exit portal
-	newX, newY = pointAroundPoint(newX, newY, portal.connectsTo.x1, portal.connectsTo.y1, portal.connectsTo.r)
+    newX, newY = pointAroundPoint(newX, newY, portal.connectsTo.x1, portal.connectsTo.y1, portal.connectsTo.r)
 
 	obj.x = newX-obj.width/2
     obj.y = newY-obj.height/2
-    
 end
 
 return World

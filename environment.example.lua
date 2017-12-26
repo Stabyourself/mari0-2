@@ -1,10 +1,10 @@
-PHYSICSDEBUG = false
-NOENEMIES = false
-MUSICDISABLED = false
-VOLUME = 1
-SCALE = 1
+VAR("physicsDebug") = false
+VAR("noEnemies") = false
+VAR("musicDisabled") = false
+VAR("volume") = 1
+VAR("scale") = 1
 
-FFKEYS = {
+VAR("ffKeys") = {
     {
         key="+",
         val=30

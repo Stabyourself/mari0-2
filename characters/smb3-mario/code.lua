@@ -6,6 +6,7 @@ local MAXSPEEDS = {90, 150, 210}
 
 local FRICTION = 140.625 --amount of speed that is substracted when not pushing buttons
 local FRICTIONICE = 42.1875 --duh
+local BUTTFRICTION = 277.77777777777777777777777777778
 
 local FRICTIONSKID = 450 --turnaround speed
 local FRICTIONSKIDICE = 182.8125 --turnaround speed on ice
@@ -15,10 +16,9 @@ local RUNANIMATIONTIME = 1.2
 local JUMPFORCE = 256
 local JUMPFORCEADD = 30.4 --how much jumpforce is added at top speed (linear from 0 to topspeed)
 
-PMETERTICKS = 7
-PMETERTIMEUP = 8/60
-PMETERTIMEDOWN = 24/60
-PMETERTIMEMARGIN = 16/60
+local PMETERTIMEUP = 8/60
+local PMETERTIMEDOWN = 24/60
+local PMETERTIMEMARGIN = 16/60
 
 local JUMPTABLE = {
     {speedX = 60, speedY = -206.25},
@@ -30,13 +30,17 @@ local JUMPTABLE = {
 character.runFrames = 2
 
 function character.movement(dt, self)
+    if self.onGround then
+        self.ducking = keyDown("down")
+    end
+    
     local maxSpeed = MAXSPEEDS[1]
     
     if keyDown("run") then
         maxSpeed = MAXSPEEDS[2]
     end
     
-    if self.pMeter == PMETERTICKS and keyDown("run") then
+    if self.pMeter == VAR("pMeterTicks") and keyDown("run") then
         maxSpeed = MAXSPEEDS[3]
     end
     
@@ -54,18 +58,49 @@ function character.movement(dt, self)
             self.speedX = math.min(maxSpeed, self.speedX + ACCELERATION*dt)
         end
     end
+    
+    -- Butt slide
+    if keyDown("right") or keyDown("left") or keyDown("jump") or (self.speedX == 0 and self.surfaceAngle == 0) then
+        self.buttSliding = false
+    end
+    
+    if keyDown("down") and not self.buttSliding and self.surfaceAngle ~= 0 and self.onGround then
+        self.buttSliding = true
+        
+        if self.surfaceAngle > 0 then
+            self.speedX = math.max(0, self.speedX)
+        else
+            self.speedX = math.min(0, self.speedX)
+        end
+    end
+    
+    if self.buttSliding then
+        local buttAcceleration = 225 * (self.surfaceAngle/(math.pi/8))
+        
+        self.buttSliding = true
+        self.speedX = self.speedX + buttAcceleration*dt
+        print(buttAcceleration)
+    end
 
     -- Apply friction?
-    if self.onGround then
+    if self.onGround and (self.surfaceAngle == 0 or not self.buttSliding) then
         if (not keyDown("right") and not keyDown("left")) or 
             self.ducking or
             self.disabled or
             math.abs(self.speedX) > maxSpeed then
                 
+            local friction = FRICTION
+            
+            if somethingIce then -- todo
+                friction = FRICTIONICE
+            elseif self.buttSliding then
+                friction = BUTTFRICTION
+            end
+                
             if self.speedX > 0 then
-                self.speedX = math.max(0, self.speedX - FRICTION*dt)
+                self.speedX = math.max(0, self.speedX - friction*dt)
             elseif self.speedX < 0 then
-                self.speedX = math.min(0, self.speedX + FRICTION*dt)
+                self.speedX = math.min(0, self.speedX + friction*dt)
             end
         end
     end
@@ -87,7 +122,7 @@ function character.movement(dt, self)
     end
     
     -- Maintain fullspeed when pMeter full
-    if self.pMeter == PMETERTICKS and
+    if self.pMeter == VAR("pMeterTicks") and
         (not self.onGround or 
         (math.abs(self.speedX) >= MAXSPEEDS[2] and
         keyDown("run") and 
@@ -100,7 +135,7 @@ function character.movement(dt, self)
         self.pMeterTimer = self.pMeterTimer - self.pMeterTime
         
         if self.onGround and math.abs(self.speedX) >= MAXSPEEDS[2] then
-            if self.pMeter < PMETERTICKS then
+            if self.pMeter < VAR("pMeterTicks") then
                 self.pMeterTime = PMETERTIMEUP
                 self.pMeter = self.pMeter + 1
             end
@@ -112,6 +147,25 @@ function character.movement(dt, self)
                 if self.pMeter == 0 then
                     self.pMeterTime = PMETERTIMEUP
                 end
+            end
+        end
+    end
+    
+    -- Adjust speedx if going downhill or uphill
+    self.speedXAdd = 0
+    self.speedXFactor = 1
+    if self.onGround then
+        if self.surfaceAngle > 0 then
+            if self.speedX > 0 then
+                self.speedXAdd = 7.5
+            else
+                self.speedXFactor = math.cos(self.surfaceAngle)
+            end
+        elseif self.surfaceAngle < 0 then
+            if self.speedX < 0 then
+                self.speedXAdd = -7.5
+            else
+                self.speedXFactor = math.cos(-self.surfaceAngle)
             end
         end
     end
@@ -156,6 +210,10 @@ function character.animation(dt, self)
         else
             self.animationState = "jumping"
         end
+    end
+    
+    if self.buttSliding then
+        self.animationState = "buttSliding"
     end
 
     if keyDown("left") then

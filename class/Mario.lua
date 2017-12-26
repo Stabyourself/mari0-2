@@ -1,5 +1,4 @@
 Mario = class("Mario", fissix.PhysObj)
-    
 
 function Mario:initialize(world, char, x, y)
     fissix.PhysObj.initialize(self, world, x, y, 12, 12)
@@ -34,7 +33,7 @@ function Mario:update(dt)
     if self.jumping then
         if not keyDown("jump") or self.speedY > 0 then
             self.jumping = false
-            self.gravity = GRAVITY
+            self.gravity = VAR("gravity")
         end
     end
 
@@ -51,7 +50,7 @@ end
 
 function Mario:updateCrosshair()
     local cx, cy = self.x+self.width/2, self.y+self.height/2+2
-    local mx, my = (love.mouse.getX())/SCALE+game.level.camera.x, love.mouse.getY()/SCALE+game.level.camera.y
+    local mx, my = (love.mouse.getX())/VAR("scale")+game.level.camera.x, love.mouse.getY()/VAR("scale")+game.level.camera.y
     self.portalGunAngle = math.atan2(my-cy, mx-cx)
 
     local x, y, absX, absY, side = game.level:rayCast(cx/game.level.tileSize, cy/game.level.tileSize, self.portalGunAngle)
@@ -70,7 +69,7 @@ function Mario:jump()
     self.onGround = false
     self.jumping = true
 
-    self.gravity = GRAVITYJUMPING
+    self.gravity = VAR("gravityjumping")
     
     self.char:jump(dt, self)
     
@@ -104,7 +103,7 @@ function Mario:ceilCollide(obj2)
     if obj2:isInstanceOf(Block) then
         -- See whether it was very close to the edge of a block next to air, in which case allow Mario to keep jumping
         -- Right side
-        if self.x > obj2.x+obj2.width - JUMPLEEWAY and not game.level:getTile(obj2.blockX+1, obj2.blockY).collision then
+        if self.x > obj2.x+obj2.width - VAR("jumpLeeway") and not game.level:getTile(obj2.blockX+1, obj2.blockY).collision then
             self.x = obj2.x+obj2.width
             self.speedX = math.max(self.speedX, 0)
 
@@ -112,7 +111,7 @@ function Mario:ceilCollide(obj2)
         end
         
         -- Left side
-        if self.x + self.width < obj2.x + JUMPLEEWAY and not game.level:getTile(obj2.blockX-1, obj2.blockY).collision then
+        if self.x + self.width < obj2.x + VAR("jumpLeeway") and not game.level:getTile(obj2.blockX-1, obj2.blockY).collision then
             self.x = obj2.x-self.width
             self.speedX = math.min(self.speedX, 0)
 
@@ -136,7 +135,7 @@ function Mario:ceilCollide(obj2)
             end
         end
         
-        self.speedY = BLOCKHITFORCE
+        self.speedY = VAR("blockHitForce")
         
         game.level:bumpBlock(x, y)
     end
@@ -145,7 +144,7 @@ end
 function Mario:floorCollide(obj2)
     if obj2.stompable then
         obj2:stomp()
-        self.speedY = -getRequiredSpeed(ENEMYBOUNCEHEIGHT)
+        self.speedY = -getRequiredSpeed(VAR("enemyBounceHeight"))
         playSound(stompSound)
         
         return true

@@ -9,6 +9,7 @@ function Tile:initialize(tileMap, img, x, y, props)
 	
 	self.invisible = self.props.invisible or false
 	self.type = self.props.type or "normal"
+	self.angle = self.props.angle or 0
 
 	self.collision = self.props.collision or false
 	if self.collision then
@@ -29,7 +30,7 @@ function Tile:checkCollision(x, y)
 		return false
 	end
 	
-	if type(self.collision) ~= COLLISION.CUBE then -- optimization for cubes
+	if type(self.collision) ~= VAR("collision").cube then -- optimization for cubes
 		-- Polygon collision code here!
 		for _, points in ipairs(self.collisionTriangulated) do
 			if pointInTriangle(x, y, points) then

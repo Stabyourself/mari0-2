@@ -4,7 +4,8 @@ function Character:initialize(path)
     local characterData = love.filesystem.read(path .. "/code.lua")
     self.data = sandbox.run(characterData, {env = {
         keyDown = keyDown,
-        print = print
+        print = print,
+        VAR = VAR
     }})
     
     self.img = love.graphics.newImage(path .. "/graphics.png")
@@ -17,6 +18,7 @@ function Character:initialize(path)
     self.quad.sliding = {}
     self.quad.jumping = {}
     self.quad.jumpingWithPassion = {}
+    self.quad.buttSliding = {}
     
     for y = 1, 5 do
         self.quad.idle[y] = love.graphics.newQuad(0, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
@@ -34,6 +36,7 @@ function Character:initialize(path)
         self.quad.sliding[y] = love.graphics.newQuad(100, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
         self.quad.jumping[y] = love.graphics.newQuad(120, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
         self.quad.jumpingWithPassion[y] = love.graphics.newQuad(140, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
+        self.quad.buttSliding[y] = love.graphics.newQuad(180, (y-1)*20, 20, 20, self.img:getWidth(), self.img:getHeight())
     end
 end
 

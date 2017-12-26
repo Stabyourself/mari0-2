@@ -1,56 +1,63 @@
-SCALE = 1
-VOLUME = 1
+PMETERTICKS = 10
 
-TILESIZE = 16
-UIHEIGHT = 38
 
-GRAVITY = 1125
-GRAVITYJUMPING = 480 --gravity while jumping (Only for mario)
-MAXYSPEED = 100000000--258.75 --258.75
+return {
+    scale = 1,
+    volume = 1,
 
-ENEMYBOUNCEHEIGHT = 14
+    tileSize = 16,
+    uiHeight = 38,
 
-SCROLLRATE = 80
-SUPERSCROLLRATE = 640
+    gravity = 1125,
+    gravityjumping = 480, --gravity while jumping (Only for mario)
+    maxYSpeed = 1000,--258.75 --258.75
 
-OBJOFFSCREENDRAW = 0.5 -- to compensate for graphics being wider than the PhysObj
+    enemyBounceHeight = 14,
 
-BLOCKBOUNCETIME = 0.2
-BLOCKBOUNCEHEIGHT = 0.4
+    scrollRate = 80,
 
-JUMPLEEWAY = 6/16
-BLOCKHITFORCE = 2
+    blockBounceTime = 0.2,
+    blockBounceHeight = 0.4,
 
-COINANIMATIONTIME = 0.14
+    jumpLeeway = 6/16,
+    blockHitForce = 2,
 
-ENEMIESPSAWNAHEAD = 0
+    coinAnimationTime = 0.14,
 
-PORTALSIZE = 32
+    enemiesSpawnAhead = 0,
 
-PMETERTICKS = 7
+    portalSize = 32,
+    portalReverseRange = math.pi/4,
 
-CONTROLS = {
-    quit = "escape",
-    frameDataDisplay = "f",
-    boost = "b",
-    
-    left = "a",
-    right = "d",
-    jump = "space",
-    run = "lshift"
-}
+    pMeterTicks = 7,
+    pMeterBlinkTime = 8/60,
 
-FFKEYS = {
-    {
-        key = "-",
-        val = 0.02
-    }
-}
+    controls = {
+        quit = "escape",
+        frameDataDisplay = "f",
+        boost = "b",
+        
+        left = "a",
+        right = "d",
+        down = "s",
+        up = "w",
+        jump = "space",
+        run = "lshift"
+    },
 
-COLLISION = {}
-COLLISION.CUBE = {
-     0,  0,
-    16,  0,
-    16, 16,
-     0, 16,
+    ffKeys = {
+        {
+            key = "-",
+            val = 0.02
+        }
+    },
+
+    collision = {
+        cube = {
+            0,  0,
+            16,  0,
+            16, 16,
+            0, 16,
+        }
+    },
 }

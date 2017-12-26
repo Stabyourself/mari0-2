@@ -1,6 +1,6 @@
 BlockBounce = class("BlockBounce")
 
-local halfblockbouncetime = BLOCKBOUNCETIME/2
+local halfblockbouncetime = VAR("blockBounceTime")/2
 
 function BlockBounce:initialize(x, y)
     self.x = x
@@ -14,10 +14,10 @@ function BlockBounce:update(dt)
     self.t = self.t + dt
     
     if self.t < halfblockbouncetime then
-        self.offset = (self.t/halfblockbouncetime)*BLOCKBOUNCEHEIGHT
+        self.offset = (self.t/halfblockbouncetime)*VAR("blockBounceHeight")
     else
-        self.offset = (1-(self.t-halfblockbouncetime)/halfblockbouncetime)*BLOCKBOUNCEHEIGHT
+        self.offset = (1-(self.t-halfblockbouncetime)/halfblockbouncetime)*VAR("blockBounceHeight")
     end
     
-    return self.t >= BLOCKBOUNCETIME
+    return self.t >= VAR("blockBounceTime")
 end

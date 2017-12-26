@@ -10,8 +10,7 @@ function PhysObj:initialize(world, x, y, width, height)
 	self.speedX = 0
 	self.speedY = 0
 	
-	self.friction = 0
-	
+    self.surfaceAngle = 0
 	self.onGround = false
 	
 	self.tracers = {}
@@ -152,10 +151,10 @@ function PhysObj:bottomColCheck()
 	local colX, colY
 	
 	for i, v in ipairs(self.tracers.down) do
-		local currentTraceX, currentTraceY = v:trace()
+		local currentTraceX, currentTraceY, currentTraceAngle = v:trace()
 		
 		if currentTraceX and (not colX or currentTraceY < colY) then
-			colX, colY = currentTraceX, currentTraceY
+			colX, colY, colAngle = currentTraceX, currentTraceY, currentTraceAngle
 		end
 	end
 	
@@ -172,7 +171,7 @@ function PhysObj:bottomColCheck()
 				end
 			end
 			
-			return {x = colX, y = colY}
+			return {x = colX, y = colY, angle = colAngle}
 		end
 	end
 	
@@ -197,6 +196,13 @@ function PhysObj:checkCollisions()
 	
 	if not collisions.bottom then
 		self.onGround = false
+	end
+	
+	if collisions.bottom then
+		local x, y = self.world:worldToMap(collisions.bottom.x, collisions.bottom.y)
+		
+		local tile = self.world:getTile(x, y)
+		self.surfaceAngle = tile.angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
 	end
 end
 

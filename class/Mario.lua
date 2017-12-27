@@ -1,28 +1,27 @@
 Mario = class("Mario", fissix.PhysObj)
 
-function Mario:initialize(world, char, x, y)
+function Mario:initialize(world, x, y)
     fissix.PhysObj.initialize(self, world, x, y, 12, 12)
-    
-    self.char = char
     
     self.jumping = false
     self.ducking = false
     self.portals = {}
 
     self.animationState = "idle"
-    self.quad = self.char.quad[self.animationState][3]
+    self.currentQuad = self.quad[self.animationState][3]
     
     self.runAnimationFrame = 1
     self.runAnimationTimer = 0
     self.animationDirection = 1
-    self.img = self.char.img
     self.centerX = 10
     self.centerY = 10
     self.pMeter = 0
     self.pMeterTimer = 0
     self.pMeterTime = 8/60
     
-    self.hasPortalGun = true
+    self.canFly = true
+    self.flyTimer = 0
+    self.hasPortalGun = false
     self.portalGunAngle = 0
     
     self.portalColor = {
@@ -40,15 +39,9 @@ function Mario:update(dt)
         end
     end
 
-    self.char:movement(dt, self)
-    self.char:animation(dt, self)
+    self:movement(dt, self)
+    self:animation(dt, self)
     self:updateCrosshair()
-
-    if (self.animationState == "running" or self.animationState == "sprinting") then
-        self.quad = self.char.quad[self.animationState][self:getAngleFrame(self.portalGunAngle)][self.runAnimationFrame]
-    else
-        self.quad = self.char.quad[self.animationState][self:getAngleFrame(self.portalGunAngle)]
-    end
 end
 
 function Mario:updateCrosshair()
@@ -69,14 +62,22 @@ function Mario:updateCrosshair()
 end
 
 function Mario:jump()
-    self.onGround = false
-    self.jumping = true
+    if self.onGround then
+        self.onGround = false
+        self.jumping = true
 
-    self.gravity = VAR("gravityjumping")
-    
-    self.char:jump(dt, self)
-    
-    playSound(jumpSound)
+        self.gravity = VAR("gravityjumping")
+        
+        playSound(jumpSound)
+        
+        return true
+    end
+end
+
+function Mario:duck()
+    if self.onGround then
+        return true
+    end
 end
 
 function Mario:getAngleFrame(angle)
@@ -145,7 +146,7 @@ function Mario:ceilCollision(obj2)
     end
 end
 
-function Mario:floorCollision(obj2)
+function Mario:bottomCollision(obj2)
     if obj2.stompable then
         obj2:stomp()
         self.speedY = -getRequiredSpeed(VAR("enemyBounceHeight"))
@@ -161,8 +162,4 @@ end
 
 function Mario:rightCollision(obj2)
     self.groundSpeedX = 0
-end
-
-function Mario:startFall()
-    self.animationState = "running"
 end

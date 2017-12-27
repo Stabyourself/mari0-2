@@ -22,7 +22,7 @@ function World:loadMap(map)
 end
 
 function World:update(dt)
-	for i, v in ipairs(self.objects) do
+    for i, v in ipairs(self.objects) do
 		v:update(dt)
 		
 		-- Add gravity
@@ -56,7 +56,7 @@ end
 function World:draw()
 	for _, obj in ipairs(self.objects) do
 		mainPerformanceTracker:track("worldobjects drawn")
-		worldDraw(obj.img, obj.quad, obj.x+obj.width/2, obj.y+obj.height/2, obj.r or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
+		worldDraw(obj.img, obj.currentQuad, obj.x+obj.width/2, obj.y+obj.height/2, obj.r or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
 	end
 
 	if VAR("physicsDebug") then

@@ -160,7 +160,7 @@ function PhysObj:bottomColCheck()
 	end
 	
 	if colY then --Ground collision
-		if not self:bottomCollision() then
+		if not self:bottomCollision({}) then
 			if self.onGround then
 				self.y = colY-self.height
 				self.speedY = math.min(self.speedY, 0)

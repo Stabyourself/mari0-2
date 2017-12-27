@@ -23,6 +23,7 @@ function love.load()
 
     require "lib/fissix"
 
+    require "class/CharacterState"
     require "class/Character"
     require "enemyLoader"
 
@@ -121,7 +122,6 @@ function love.load()
     stompSound = love.audio.newSource("sound/stomp.ogg")
     stompSound:setVolume(VAR("volume"))
     
-    mainFTAnalyser = FTAnalyser:new()
     mainPerformanceTracker = PerformanceTracker:new()
     
     defaultUI = UI:new("img/ui/default.png")
@@ -131,7 +131,6 @@ function love.load()
 end
 
 function love.update(dt)
-    mainFTAnalyser:frameStart()
     mainPerformanceTracker:reset()
     
     dt = math.min(1/10, dt)
@@ -139,7 +138,6 @@ function love.update(dt)
 
     if skipNext then
         skipNext = false
-        mainFTAnalyser:frameEnd(dt)
         return
     end
 
@@ -165,7 +163,32 @@ function love.draw()
         game.draw()
     end
     
-    mainFTAnalyser:frameEnd(gdt)
+    -- For the stream
+    if VAR("inputDebug") then
+        local function setColorBasedOn(key)
+            if keyDown(key) then
+                love.graphics.setColor(255, 255, 255)
+            else
+                love.graphics.setColor(50, 50, 50)
+            end
+        end
+        
+        setColorBasedOn("up")
+        love.graphics.rectangle("fill", 16, SCREENHEIGHT-32, 8, 8)
+        setColorBasedOn("left")
+        love.graphics.rectangle("fill", 8, SCREENHEIGHT-24, 8, 8)
+        setColorBasedOn("right")
+        love.graphics.rectangle("fill", 24, SCREENHEIGHT-24, 8, 8)
+        setColorBasedOn("down")
+        love.graphics.rectangle("fill", 16, SCREENHEIGHT-16, 8, 8)
+        
+        setColorBasedOn("run")
+        love.graphics.rectangle("fill", 60, SCREENHEIGHT-20, 8, 8)
+        setColorBasedOn("jump")
+        love.graphics.rectangle("fill", 72, SCREENHEIGHT-20, 8, 8)
+        
+        love.graphics.setColor(255, 255, 255)
+    end
 
     if VAR("scale") ~= 1 then
         love.graphics.scale(1/VAR("scale"), 1/VAR("scale"))

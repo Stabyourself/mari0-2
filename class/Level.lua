@@ -51,7 +51,7 @@ function Level:initialize(path, tileMap)
 
     local x, y = self:mapToWorld(self.spawnX, self.spawnY)
     
-    table.insert(self.marios, Mario:new(self, smb3_mario, x-6, y-12))
+    table.insert(self.marios, Smb3Mario:new(self, x-6, y-12))
 
     self.portals = {}
     
@@ -111,8 +111,12 @@ function Level:draw()
 end
 
 function Level:keypressed(key)
-    if key == VAR("controls").jump and self.marios[1].onGround then
+    if key == VAR("controls").jump then
         self.marios[1]:jump()
+    end
+    
+    if key == VAR("controls").down then
+        self.marios[1]:duck()
     end
     
     if key == VAR("controls").boost then

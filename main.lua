@@ -111,6 +111,7 @@ function love.load()
     if not VAR("musicDisabled") then
         overworldMusic = love.audio.newSource("sound/music/overworld.ogg")
         overworldMusic:setLooping(true)
+        overworldMusic:setVolume(VAR("volume"))
     end
 
     jumpSound = love.audio.newSource("sound/jump.ogg")

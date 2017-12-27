@@ -434,7 +434,7 @@ end
 
 function Character:duck()
     if Mario.duck(self) then
-        if self.state ~= state.buttSlide and self.surfaceAngle ~= 0 and self.onGround then
+        if self.state ~= state.buttSlide and self.surfaceAngle ~= 0 and self.onGround and not keyDown("left") and not keyDown("right") then
             self:switchState("buttSlide")
             
             if self.surfaceAngle > 0 then

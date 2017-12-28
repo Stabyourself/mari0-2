@@ -18,8 +18,6 @@ function love.load()
     JSON = require "lib/JSON"
     class = require "lib/middleclass"
     Camera = require "lib/Camera"
-    FTAnalyser = require "lib/FTAnalyser"
-    PerformanceTracker = require "lib/PerformanceTracker"
 
     require "lib/fissix"
 
@@ -123,8 +121,6 @@ function love.load()
     stompSound = love.audio.newSource("sound/stomp.ogg")
     stompSound:setVolume(VAR("volume"))
     
-    mainPerformanceTracker = PerformanceTracker:new()
-    
     defaultUI = UI:new("img/ui/default.png")
 
     print("Loading game")
@@ -132,8 +128,6 @@ function love.load()
 end
 
 function love.update(dt)
-    mainPerformanceTracker:reset()
-    
     dt = math.min(1/10, dt)
     gdt = dt
 
@@ -215,15 +209,19 @@ end
 function love.resize(w, h)
     SCREENWIDTH = w/VAR("scale")
     SCREENHEIGHT = h/VAR("scale")
+    
+    CAMERAWIDTH = SCREENWIDTH
+    CAMERAHEIGHT = SCREENHEIGHT-VAR("uiHeight")
 
     WIDTH = math.ceil(SCREENWIDTH/VAR("tileSize"))
     HEIGHT = math.ceil((SCREENHEIGHT-VAR("uiHeight"))/VAR("tileSize"))
-
-    SCROLLINGSTART = math.max(5, WIDTH-13) --when the scrolling begins to set in
-    SCROLLINGCOMPLETE = math.max(2, WIDTH-10) --when the scrolling will be as fast as mario can run
-
-    SCROLLINGLEFTSTART = 6 --See above, but for scrolling left
-    SCROLLINGLEFTCOMPLETE = 4
+    
+    RIGHTSCROLLBORDER = math.floor(math.max(CAMERAWIDTH/2, CAMERAWIDTH-VAR("cameraScrollRightBorder")))
+    LEFTSCROLLBORDER = math.ceil(math.min(CAMERAWIDTH/2, VAR("cameraScrollLeftBorder")))
+    
+    DOWNSCROLLBORDER = math.floor(math.max(CAMERAHEIGHT/2, CAMERAHEIGHT-VAR("cameraScrollDownBorder")))
+    print(DOWNSCROLLBORDER, CAMERAHEIGHT-VAR("cameraScrollDownBorder"))
+    UPSCROLLBORDER = math.ceil(math.min(CAMERAHEIGHT/2, VAR("cameraScrollUpBorder")))
 end
 
 function updateGroup(group, dt)

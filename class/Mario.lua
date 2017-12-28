@@ -1,26 +1,32 @@
 Mario = class("Mario", fissix.PhysObj)
 
-function Mario:initialize(world, x, y)
-    fissix.PhysObj.initialize(self, world, x, y, 12, 12)
+function Mario:initialize(world, x, y, powerUpState)
+    self.powerUpState = powerUpState or "small"
+    
+    local height = 12
+    if self.powerUpState ~= "small" then
+        height = 24
+    end
+    
+    fissix.PhysObj.initialize(self, world, x, y, 12, height)
     
     self.jumping = false
     self.ducking = false
     self.portals = {}
 
     self.animationState = "idle"
-    self.currentQuad = self.quad[self.animationState][3]
     
     self.runAnimationFrame = 1
     self.runAnimationTimer = 0
     self.animationDirection = 1
-    self.centerX = 10
-    self.centerY = 10
+    
     self.pMeter = 0
     self.pMeterTimer = 0
     self.pMeterTime = 8/60
     
     self.canFly = true
     self.flyTimer = 0
+    
     self.hasPortalGun = false
     self.portalGunAngle = 0
     

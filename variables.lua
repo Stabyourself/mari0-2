@@ -14,11 +14,8 @@ return {
 
     enemyBounceHeight = 14,
 
-    scrollRate = 80,
-
     blockBounceTime = 0.2,
     blockBounceHeight = 0.4,
-
     jumpLeeway = 6/16,
     blockHitForce = 2,
 
@@ -31,6 +28,13 @@ return {
 
     pMeterTicks = 7,
     pMeterBlinkTime = 8/60,
+    
+    cameraScrollLeftBorder = 115,
+    cameraScrollRightBorder = 115,
+    cameraScrollUpBorder = 47,
+    cameraScrollDownBorder = 75,
+    
+    cameraScrollRate = 300,
 
     controls = {
         quit = "escape",

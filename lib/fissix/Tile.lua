@@ -25,13 +25,13 @@ function Tile:initialize(tileMap, img, x, y, props)
 end
 
 function Tile:checkCollision(x, y)
-	mainPerformanceTracker:track("pixel collision checks")
 	if not self.collision then
 		return false
 	end
 	
-	if type(self.collision) ~= VAR("collision").cube then -- optimization for cubes
-		-- Polygon collision code here!
+	if self.collision == VAR("collision").cube then -- optimization for cubes
+		return true
+	else
 		for _, points in ipairs(self.collisionTriangulated) do
 			if pointInTriangle(x, y, points) then
 				return true
@@ -39,8 +39,6 @@ function Tile:checkCollision(x, y)
 		end
 		
 		return false
-	else
-		return true
 	end
 end
 

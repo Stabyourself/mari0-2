@@ -45,37 +45,134 @@ local JUMPTABLE = {
     {speedX = math.huge, speedY = -236.25},
 }
 
-
-Character.img = love.graphics.newImage("characters/smb3-mario/graphics.png")
-
-Character.runFrames = 2
-
-Character.quad = {}
-Character.quad.idle = {}
-Character.quad.running = {}
-Character.quad.sprinting = {}
-Character.quad.sliding = {}
-Character.quad.jumping = {}
-Character.quad.jumpingWithPassion = {}
-Character.quad.buttSliding = {}
-
-for y = 1, 5 do
-    Character.quad.idle[y] = love.graphics.newQuad(0, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
-
-    Character.quad.running[y] = {}
-    for i = 1, Character.runFrames do
-        Character.quad.running[y][i] = love.graphics.newQuad(i*20, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
-    end
-
-    Character.quad.sprinting[y] = {}
-    for i = 1, Character.runFrames do
-        Character.quad.sprinting[y][i] = love.graphics.newQuad((i+2)*20, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
-    end
+local powerUpStates = {
+    small = {
+        width = 20,
+        height = 20,
+        centerX = 10,
+        centerY = 11,
+        frames = {
+            "idle",
+            "run",
+            "run",
+            "sprint",
+            "sprint",
+            "skid",
+            "jump",
+            "jumpWithPassion",
+            "die",
+            "buttSlide",
+            "swim",
+            "swim",
+            "swim",
+            "swim",
+            "pipe",
+            "hold",
+            "holdIdle",
+            "holdRun",
+            "holdRun",
+            "climb",
+            "climb",
+        },
+    },
     
-    Character.quad.sliding[y] = love.graphics.newQuad(100, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
-    Character.quad.jumping[y] = love.graphics.newQuad(120, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
-    Character.quad.jumpingWithPassion[y] = love.graphics.newQuad(140, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
-    Character.quad.buttSliding[y] = love.graphics.newQuad(180, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
+    big = {
+        width = 40,
+        height = 40,
+        centerX = 23,
+        centerY = 24,
+        frames = {
+            "idle",
+            "run",
+            "run",
+            "run",
+            "sprint",
+            "sprint",
+            "sprint",
+            "skid",
+            "jump",
+            "jumpWithPassion",
+            "die",
+            "buttSlide",
+            "swim",
+            "swim",
+            "swim",
+            "swim",
+            "pipe",
+            "hold",
+            "holdIdle",
+            "holdRun",
+            "holdRun",
+            "holdRun",
+            "climb",
+            "climb",
+        },
+    },
+    
+    raccoon = {
+        width = 40,
+        height = 40,
+        centerX = 23,
+        centerY = 24,
+        frames = {
+            "idle",
+            "run",
+            "run",
+            "run",
+            "sprint",
+            "sprint",
+            "sprint",
+            "skid",
+            "jump",
+            "jumpWithPassion",
+            "die",
+            "buttSlide",
+            "swim",
+            "swim",
+            "swim",
+            "swim",
+            "pipe",
+            "hold",
+            "holdIdle",
+            "holdRun",
+            "holdRun",
+            "holdRun",
+            "climb",
+            "climb",
+        },
+    }
+}
+
+for i, v in pairs(powerUpStates) do
+    Character[i] = {}
+    local char = Character[i]
+    
+    char.centerX = v.centerX
+    char.centerY = v.centerY
+    
+    char.img = love.graphics.newImage("characters/smb3-mario/" .. i .. ".png")
+    char.quad = {}
+    
+    for y = 1, 5 do
+        char.quad[y] = {}
+        local x = 0
+        
+        for _, name in ipairs(v.frames) do
+            local quad = love.graphics.newQuad(x*v.width, (y-1)*v.height, v.width, v.height, Character[i].img:getWidth(), Character[i].img:getHeight())
+            
+            if char.quad[y][name] then
+                if type(char.quad[y][name]) ~= "table" then
+                    char.quad[y][name] = {char.quad[y][name]}
+                end
+                
+                table.insert(char.quad[y][name], quad)
+            else
+                char.quad[y][name] = quad
+            end
+                
+            x = x + 1
+        end
+    end
 end
 
 local state = {}
@@ -123,11 +220,11 @@ state.buttSlide = CharacterState:new("buttSlide", function(self)
 end)
 
 state.raccoonJump = CharacterState:new("raccoonJump", function(self)
-    
+    -- handled by bottomCollision and jump
 end)
 
 state.fly = CharacterState:new("fly", function(self)
-    if self.flyTimer >= FLYTIME then
+    if not self.flying then
         return "raccoonJump"
     end
     
@@ -148,8 +245,14 @@ function Character:initialize(...)
     
     self.flyingUpTimer = FLYINGUPTIME
     self.flyTimer = FLYTIME
+    self.flying = false
     
     self.floatTimer = FLOATTIME
+    self.img = Character[self.powerUpState].img
+    self.quad = Character[self.powerUpState].quad[3][self.animationState]
+    
+    self.centerX = Character[self.powerUpState].centerX
+    self.centerY = Character[self.powerUpState].centerY
     
     self.state = state.idle
 end
@@ -169,10 +272,12 @@ function Character:movement(dt)
         self.flyingUpTimer = self.flyingUpTimer + dt
     end
     
-    if self.flyTimer < FLYTIME then
+    if self.flying then
         self.flyTimer = self.flyTimer + dt
         
         if self.flyTimer >= FLYTIME then
+            self.flyTimer = FLYTIME
+            self.flying = false
             self.pMeter = 0
         end
     end
@@ -243,7 +348,7 @@ function Character:movement(dt)
             end
         end
         
-        if self.flyTimer < FLYTIME or self.state == state.float then
+        if self.flying or self.state == state.float then
             self:accelerate(dt, MAXSPEEDFLY)
         else
             local maxSpeed = math.min(MAXSPEEDS[2], self.maxSpeedJump)
@@ -280,7 +385,7 @@ function Character:movement(dt)
         self.pMeterTime = PMETERTIMEMARGIN
     end
     
-    if self.flyTimer < FLYTIME then -- stuck pMeter to full
+    if self.flying then -- stuck pMeter to full
         
     else
         while self.pMeterTimer >= self.pMeterTime do
@@ -377,37 +482,37 @@ function Character:animation(dt)
     end
 
     if self.onGround and ((keyDown("left") and self.speedX > 0) or (keyDown("right") and self.speedX < 0)) then
-        self.animationState = "sliding"
+        self.animationState = "skid"
     elseif self.onGround and self.speedX ~= 0 then
         if math.abs(self.speedX) >= MAXSPEEDS[3] then
-            self.animationState = "sprinting"
+            self.animationState = "sprint"
         else
-            self.animationState = "running"
+            self.animationState = "run"
         end
     end
 
-    if (self.animationState == "running" or self.animationState == "sprinting") and self.onGround then
+    if (self.animationState == "run" or self.animationState == "sprint") and self.onGround then
         self.runAnimationTimer = self.runAnimationTimer + (math.abs(self.speedX)+5)/6*dt
         while self.runAnimationTimer > RUNANIMATIONTIME do
             self.runAnimationTimer = self.runAnimationTimer - RUNANIMATIONTIME
             self.runAnimationFrame = self.runAnimationFrame + 1
 
-            if self.runAnimationFrame > self.runFrames then
-                self.runAnimationFrame = self.runAnimationFrame - self.runFrames
+            if self.runAnimationFrame > #Character[self.powerUpState].quad[1].run then
+                self.runAnimationFrame = self.runAnimationFrame - #Character[self.powerUpState].quad[1].run
             end
         end
     end
     
     if not self.onGround then
-        if self.maxSpeedJump == MAXSPEEDS[3] or self.flyTimer < FLYTIME then
-            self.animationState = "jumpingWithPassion"
+        if self.maxSpeedJump == MAXSPEEDS[3] or self.flying then
+            self.animationState = "jumpWithPassion"
         else
-            self.animationState = "jumping"
+            self.animationState = "jump"
         end
     end
     
     if self.state == state.buttSlide then
-        self.animationState = "buttSliding"
+        self.animationState = "buttSlide"
     end
 
     if self.hasPortalGun then -- look towards portalGunAngle
@@ -425,10 +530,10 @@ function Character:animation(dt)
         end
     end
     
-    if (self.animationState == "running" or self.animationState == "sprinting") then
-        self.currentQuad = self.quad[self.animationState][self:getAngleFrame(self.portalGunAngle)][self.runAnimationFrame]
+    if (self.animationState == "run" or self.animationState == "sprint") then
+        self.quad = Character[self.powerUpState].quad[self:getAngleFrame(self.portalGunAngle)][self.animationState][self.runAnimationFrame]
     else
-        self.currentQuad = self.quad[self.animationState][self:getAngleFrame(self.portalGunAngle)]
+        self.quad = Character[self.powerUpState].quad[self:getAngleFrame(self.portalGunAngle)][self.animationState]
     end
 end
 
@@ -447,7 +552,7 @@ function Character:duck()
 end
 
 function Character:jump()
-    if (self.state == state.raccoonJump or self.state == state.fly) and self.flyTimer < FLYTIME then
+    if (self.state == state.raccoonJump or self.state == state.fly) and self.flying then
         self.flyingUpTimer = 0
         self:switchState("fly")
     end
@@ -462,8 +567,9 @@ function Character:jump()
         if self.canFly then
             self:switchState("raccoonJump")
             
-            if self.pMeter == VAR("pMeterTicks") and self.flyTimer >= FLYTIME then
+            if self.pMeter == VAR("pMeterTicks") and not self.flying then
                 self.flyTimer = 0
+                self.flying = true
             end
         else
             self:switchState("jump")

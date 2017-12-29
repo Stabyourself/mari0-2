@@ -107,17 +107,36 @@ function Level:keypressed(key)
         self.marios[1]:jump()
     end
     
-    if key == VAR("controls").down then
-        self.marios[1]:duck()
-    end
-    
     if key == VAR("controls").boost then
         self.marios[1].speedX = 1000
+    end
+    
+    if key == VAR("controls").closePortals then
+        self.marios[1]:closePortals()
+    end
+    
+    if key == VAR("controls").run then
+        self.marios[1]:spin()
     end
 end
 
 function Level:mousepressed(x, y, button)
-    self:attemptPortal(1, button)
+    local mario = self.marios[1]
+    
+    local portal = self:attemptPortal(mario.crosshairTileX, mario.crosshairTileY, mario.crosshairSide, mario.crosshairX, mario.crosshairY, mario.portalColor[button])
+    
+    if portal then
+        if mario.portals[button] then
+            mario.portals[button].deleteMe = true
+        end
+        
+        mario.portals[button] = portal
+                
+        if mario.portals[1] and mario.portals[2] then
+            mario.portals[1]:connectTo(mario.portals[2])
+            mario.portals[2]:connectTo(mario.portals[1])
+        end
+    end
 end
 
 function Level:spawnEnemies(untilX)

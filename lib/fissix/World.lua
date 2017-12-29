@@ -24,6 +24,8 @@ function World:loadMap(map)
 end
 
 function World:update(dt)
+    updateGroup(self.portals)
+    
     for i, v in ipairs(self.objects) do
 		v:update(dt)
 		
@@ -37,7 +39,7 @@ function World:update(dt)
         v.x = v.x + v.speedX * dt
         v.y = v.y + v.speedY * dt
         
-		v:checkCollisions()
+        v:checkCollisions()
         
         -- Portal checks
 		for _, p in ipairs(self.portals) do
@@ -123,7 +125,7 @@ function World:checkMapCollision(x, y)
             local nx, ny = pointAroundPoint(x, y, v.x1, v.y1, -v.r)
             
             if  nx > v.x1+1 and nx < v.x1+v.size-1 and
-                ny >= v.y1-1 and ny < v.y1+10 then
+                ny >= v.y1-1 and ny < v.y1+20 then
                 return false
             end
         end
@@ -304,9 +306,8 @@ function World:worldToMap(x, y)
     return math.floor(x/self.tileSize)+1, math.floor(y/self.tileSize)+1
 end
 
-function World:attemptPortal(ply, portalI)
-    local mario = self.marios[ply]
-    local x1, y1, x2, y2 = self:checkPortalSurface(mario.crosshairTileX, mario.crosshairTileY, mario.crosshairSide, 0)
+function World:attemptPortal(tileX, tileY, side, x, y, color)
+    local x1, y1, x2, y2 = self:checkPortalSurface(tileX, tileY, side, 0)
     
     if x1 then
         -- make sure that the surface is big enough to hold a portal
@@ -314,7 +315,7 @@ function World:attemptPortal(ply, portalI)
         local length = math.sqrt((x1-x2)^2+(y1-y2)^2)
         
         if length >= VAR("portalSize") then
-            local middleProgress = math.sqrt((mario.crosshairX-x1)^2+(mario.crosshairY-y1)^2)/length
+            local middleProgress = math.sqrt((x-x1)^2+(y-y1)^2)/length
             
             local leftSpace = middleProgress*length
             local rightSpace = (1-middleProgress)*length
@@ -334,14 +335,10 @@ function World:attemptPortal(ply, portalI)
             local p2x = math.cos(angle)*VAR("portalSize")/2+mX
             local p2y = math.sin(angle)*VAR("portalSize")/2+mY
             
-            local portal = Portal:new(self, p1x, p1y, p2x, p2y, mario.portalColor[portalI])
-            mario.portals[portalI] = portal
+            local portal = Portal:new(self, p1x, p1y, p2x, p2y, color)
             table.insert(self.portals, portal)
             
-            if mario.portals[1] and mario.portals[2] then
-                mario.portals[1]:connectTo(mario.portals[2])
-                mario.portals[2]:connectTo(mario.portals[1])
-            end
+            return portal
         end
     end 
 end

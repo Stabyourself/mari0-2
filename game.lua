@@ -8,6 +8,7 @@ function game.load()
     game.timeLeft = 400
     
     smbTileMap = fissix.TileMap:new("tilemaps/smb3")
+    SmbMario = require("characters/smb-mario/code")
     Smb3Mario = require("characters/smb3-mario/code")
     
     game.level = Level:new("levels/smb3test.lua", smbTileMap)
@@ -52,7 +53,7 @@ function game.draw()
     love.graphics.setColor(255, 255, 255)
     smb3ui.time = math.floor(love.timer.getFPS())--math.ceil(game.timeLeft)
     smb3ui.pMeter = game.level.marios[1].pMeter
-    smb3ui.score = 1234567
+    smb3ui.score = 160291
     smb3ui.lives = 4
     smb3ui.coins = 23
     smb3ui.world = 1

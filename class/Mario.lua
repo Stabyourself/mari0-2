@@ -16,16 +16,11 @@ function Mario:initialize(world, x, y, powerUpState)
 
     self.animationState = "idle"
     
-    self.runAnimationFrame = 1
-    self.runAnimationTimer = 0
     self.animationDirection = 1
     
     self.pMeter = 0
     self.pMeterTimer = 0
     self.pMeterTime = 8/60
-    
-    self.canFly = true
-    self.flyTimer = 0
     
     self.hasPortalGun = false
     self.portalGunAngle = 0
@@ -37,14 +32,6 @@ function Mario:initialize(world, x, y, powerUpState)
 end
 
 function Mario:update(dt)
-    -- Jump physics
-    if self.jumping then
-        if not keyDown("jump") or self.speedY > 0 then
-            self.jumping = false
-            self.gravity = VAR("gravity")
-        end
-    end
-
     self:movement(dt, self)
     self:animation(dt, self)
     self:updateCrosshair()
@@ -67,6 +54,15 @@ function Mario:updateCrosshair()
     self.crosshairSide = side
 end
 
+function Mario:closePortals()
+    for i = 1, 2 do
+        if self.portals[i] then
+            self.portals[i].deleteMe = true
+            self.portals[i] = nil
+        end
+    end
+end
+
 function Mario:jump()
     if self.onGround then
         self.onGround = false
@@ -76,12 +72,6 @@ function Mario:jump()
         
         playSound(jumpSound)
         
-        return true
-    end
-end
-
-function Mario:duck()
-    if self.onGround then
         return true
     end
 end
@@ -169,3 +159,5 @@ end
 function Mario:rightCollision(obj2)
     self.groundSpeedX = 0
 end
+
+function Mario:spin() end

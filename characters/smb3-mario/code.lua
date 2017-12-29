@@ -38,6 +38,12 @@ local FLOATASCENSION = 60
 local FLYINGUPTIME = 16/60
 local FLOATTIME = 16/60
 
+local FLYANIMATIONTIME = 4/60
+local FLOATANIMATIONTIME = 4/60
+
+local SPINTIME = 19/60
+local SPINFRAMETIME = 4/60
+
 local JUMPTABLE = {
     {speedX = 60, speedY = -206.25},
     {speedX = 120, speedY = -213.75},
@@ -59,7 +65,7 @@ local powerUpStates = {
             "sprint",
             "skid",
             "jump",
-            "jumpWithPassion",
+            "fly",
             "die",
             "buttSlide",
             "swim",
@@ -81,6 +87,7 @@ local powerUpStates = {
         height = 40,
         centerX = 23,
         centerY = 24,
+        canDuck = true,
         frames = {
             "idle",
             "run",
@@ -91,7 +98,7 @@ local powerUpStates = {
             "sprint",
             "skid",
             "jump",
-            "jumpWithPassion",
+            "fly",
             "die",
             "buttSlide",
             "swim",
@@ -114,31 +121,75 @@ local powerUpStates = {
         height = 40,
         centerX = 23,
         centerY = 24,
+        canSpin = true,
+        canFly = true,
+        canFloat = true,
+        canDuck = true,
         frames = {
             "idle",
+            
             "run",
             "run",
             "run",
+            
             "sprint",
             "sprint",
             "sprint",
+            
             "skid",
+            
             "jump",
-            "jumpWithPassion",
+            
+            "fall",
+            
+            "fly",
+            "fly",
+            "fly",
+            
+            "float",
+            "float",
+            "float",
+            
             "die",
+            
+            "duck",
+            
             "buttSlide",
+            
             "swim",
             "swim",
             "swim",
             "swim",
-            "pipe",
-            "hold",
+            
+            "spin",
+            "spin",
+            "spin",
+            "spin",
+            
+            "spinAir",
+            "spinAir",
+            "spinAir",
+            "spinAir",
+            
             "holdIdle",
+            
             "holdRun",
             "holdRun",
             "holdRun",
+            
+            "kick",
+            
             "climb",
             "climb",
+            
+            "summerSault",
+            "summerSault",
+            "summerSault",
+            "summerSault",
+            "summerSault",
+            "summerSault",
+            "summerSault",
+            "summerSault",
         },
     }
 }
@@ -149,6 +200,11 @@ for i, v in pairs(powerUpStates) do
     
     char.centerX = v.centerX
     char.centerY = v.centerY
+    char.canFly = v.canFly
+    char.canFloat = v.canFloat
+    char.canSpin = v.canSpin
+    char.canDuck = v.canDuck
+    
     
     char.img = love.graphics.newImage("characters/smb3-mario/" .. i .. ".png")
     char.quad = {}
@@ -178,89 +234,125 @@ end
 local state = {}
 
 
-state.idle = CharacterState:new("idle", function(self)
+state.idle = function(mario)
     if keyDown("right") or keyDown("left") then
         return "run"
     end
-end)
-
-
-state.run = CharacterState:new("run", function(self)
-    if not keyDown("right") and not keyDown("left") then
-        return "idle"
-    end
     
-    if  self.groundSpeedX > 0 and keyDown("left") or
-        self.groundSpeedX < 0 and keyDown("right") then
-        return "skid"
+    if mario.groundSpeedX ~= 0 then
+        return "stop"
     end
-end)
+end
 
 
-state.skid = CharacterState:new("skid", function(self)
-    if  self.groundSpeedX == 0 or 
-        (self.groundSpeedX < 0 and keyDown("left") and not keyDown("right")) or
-        (self.groundSpeedX > 0 and keyDown("right") and not keyDown("right")) or
-        (self.groundSpeedX > 0 and not keyDown("left")) or
-        (self.groundSpeedX < 0 and not keyDown("right")) then
+state.stop = function(mario)
+    if keyDown("right") or keyDown("left") then
         return "run"
     end
-end)
-
-
-state.jump = CharacterState:new("jump", function(self)
-    -- handled by bottomCollision
-end)
-
-
-state.buttSlide = CharacterState:new("buttSlide", function(self)
-    if keyDown("right") or keyDown("left") or (self.groundSpeedX == 0 and self.surfaceAngle == 0) then
+    
+    if mario.groundSpeedX == 0 then
         return "idle"
     end
-end)
+end
 
-state.raccoonJump = CharacterState:new("raccoonJump", function(self)
-    -- handled by bottomCollision and jump
-end)
 
-state.fly = CharacterState:new("fly", function(self)
-    if not self.flying then
-        return "raccoonJump"
+state.run = function(mario)
+    if not keyDown("right") and not keyDown("left") then
+        return "stop"
     end
     
-    if self.flyingUpTimer >= FLYINGUPTIME then
-        return "raccoonJump"
+    if  mario.groundSpeedX > 0 and keyDown("left") or
+        mario.groundSpeedX < 0 and keyDown("right") then
+        return "skid"
     end
-end)
+end
 
-state.float = CharacterState:new("float", function(self)
-    if self.floatTimer >= FLOATTIME then
-        return "raccoonJump"
+
+state.skid = function(mario)
+    if mario.groundSpeedX == 0 then
+        return "idle"
     end
-end)
+    
+    if  (mario.groundSpeedX < 0 and keyDown("left") and not keyDown("right")) or
+        (mario.groundSpeedX > 0 and keyDown("right") and not keyDown("right")) or
+        (mario.groundSpeedX > 0 and not keyDown("left")) or
+        (mario.groundSpeedX < 0 and not keyDown("right")) then
+        return "run"
+    end
+end
+
+
+state.jump = function(mario)
+    if not keyDown("jump") or mario.speedY >= JUMPGRAVITYUNTIL then
+        return "fall"
+    end
+end
+
+state.fall = function(mario)
+    if keyDown("jump") and mario.speedY < JUMPGRAVITYUNTIL then
+        return "jump"
+    end
+    -- handled by bottomCollision
+end
+
+
+state.buttSlide = function(mario)
+    if keyDown("right") or keyDown("left") or (mario.groundSpeedX == 0 and mario.surfaceAngle == 0) then
+        return "idle"
+    end
+end
+
+
+state.fly = function(mario, characterState)
+    if not mario.flying then
+        return "fall"
+    end
+    
+    if characterState.timer >= FLYINGUPTIME then
+        return "fall"
+    end
+end
+
+
+state.float = function(mario, characterState)
+    if characterState.timer >= FLOATTIME then
+        return "fall"
+    end
+end
 
 
 function Character:initialize(...)
     Mario.initialize(self, ...)
     
-    self.flyingUpTimer = FLYINGUPTIME
     self.flyTimer = FLYTIME
     self.flying = false
     
-    self.floatTimer = FLOATTIME
     self.img = Character[self.powerUpState].img
     self.quad = Character[self.powerUpState].quad[3][self.animationState]
     
     self.centerX = Character[self.powerUpState].centerX
     self.centerY = Character[self.powerUpState].centerY
     
-    self.state = state.idle
+    self.state = CharacterState:new("idle", state.idle)
+    
+    self.runAnimationFrame = 1
+    self.runAnimationTimer = 0
+    
+    self.flyAnimationFrame = 1
+    self.flyAnimationTimer = 0
+    
+    self.floatAnimationFrame = 1
+    self.floatAnimationFrame = 0
+    
+    self.spinning = false
+    self.spinTimer = SPINTIME
 end
 
 function Character:switchState(stateName)
     if stateName then
         if stateName ~= true then
-            self.state = state[stateName]
+            assert(state[stateName], "Tried to switch to nonexistent CharacterState \"" .. stateName .. "\" and that's bad.")
+            self.state = CharacterState:new(stateName, state[stateName])
         end
         
         self:switchState(self.state:checkExit(self)) -- oh god recursion
@@ -268,10 +360,6 @@ function Character:switchState(stateName)
 end
 
 function Character:movement(dt)
-    if self.flyingUpTimer < FLYINGUPTIME then
-        self.flyingUpTimer = self.flyingUpTimer + dt
-    end
-    
     if self.flying then
         self.flyTimer = self.flyTimer + dt
         
@@ -282,17 +370,27 @@ function Character:movement(dt)
         end
     end
     
-    if self.floatTimer < FLOATTIME then
-        self.floatTimer = self.floatTimer + dt
+    if self.spinning then
+        self.spinTimer = self.spinTimer + dt
+        
+        if self.spinTimer >= SPINTIME then
+            self.spinTimer = SPINTIME
+            self.spinning = false
+        end
     end
     
+    self.state:update(dt)
     self:switchState(true)
     
-    if self.state == state.idle then
+    if self.state.name == "idle" then
+        
+    end
+    
+    if self.state.name == "stop" then
         self:friction(dt)
     end
     
-    if self.state == state.run then
+    if self.state.name == "run" then
         local maxSpeed = 0
         
         if keyDown("left") or keyDown("right") then
@@ -319,16 +417,16 @@ function Character:movement(dt)
         end
     end
     
-    if self.state == state.skid then
+    if self.state.name == "skid" then
         self:skid(dt)
     end
     
-    if self.state == state.jump then
-        self:accelerate(dt, self.maxSpeedJump)
+    if not self.flying and (self.state.name == "jump" or self.state.name == "fall") then
+        self:accelerate(dt, self.maxSpeedJump or MAXSPEEDS[1])
         self:skid(dt)
     end
     
-    if self.state == state.buttSlide then
+    if self.state.name == "buttSlide" then
         local buttAcceleration = BUTTACCELERATION * (self.surfaceAngle/(math.pi/8))
         
         self.groundSpeedX = self.groundSpeedX + buttAcceleration*dt
@@ -338,7 +436,7 @@ function Character:movement(dt)
         end
     end
     
-    if self.state == state.raccoonJump or self.state == state.fly or self.state == state.float then
+    if (self.flying and (self.state.name == "jump" or self.state.name == "fall")) or self.state.name == "fly" or self.state.name == "float" then
         if math.abs(self.groundSpeedX) > MAXSPEEDFLY then
             if  self.groundSpeedX > 0 and keyDown("right") or
                 self.groundSpeedX < 0 and keyDown("left") then
@@ -348,7 +446,7 @@ function Character:movement(dt)
             end
         end
         
-        if self.flying or self.state == state.float then
+        if self.flying or self.state.name == "float" then
             self:accelerate(dt, MAXSPEEDFLY)
         else
             local maxSpeed = math.min(MAXSPEEDS[2], self.maxSpeedJump)
@@ -359,11 +457,11 @@ function Character:movement(dt)
         self:skid(dt, FRICTIONSKIDFLY)
     end
     
-    if self.state == state.fly then
+    if self.state.name == "fly" then
         self.speedY = FLYINGASCENSION
     end
     
-    if self.state == state.float then
+    if self.state.name == "float" then
         self.speedY = FLOATASCENSION
     end 
     
@@ -409,6 +507,32 @@ function Character:movement(dt)
         end
     end
     
+    -- Ducking
+    if self.onGround then
+        if keyDown("down") and not keyDown("left") and not keyDown("right") and self.state.name ~= "buttSlide" then
+            if self.surfaceAngle ~= 0 then -- check if buttslide
+                self:switchState("buttSlide")
+                
+                if self.surfaceAngle > 0 then
+                    self.groundSpeedX = math.max(0, self.groundSpeedX)
+                else
+                    self.groundSpeedX = math.min(0, self.groundSpeedX)
+                end
+            elseif Character[self.powerUpState].canDuck then
+                self.ducking = true
+                
+                -- Stop spinning if was spinning
+                if Character[self.powerUpState].canSpin then
+                    self.spinning = false
+                    self.spinTimer = SPINTIME
+                end
+            end
+        else
+            self.ducking = false
+        end
+    end
+    
+    
     self.speedX = self.groundSpeedX
     
     -- Adjust speedx if going downhill or uphill
@@ -431,9 +555,9 @@ function Character:movement(dt)
     
     -- Update gravity
     self.gravity = NORMALGRAVITY
-    if self.state == state.fly or self.state == state.float then
+    if self.state.name == "fly"or self.state.name == "float" then
         self.gravity = 0
-    elseif self.jumping and self.speedY < JUMPGRAVITYUNTIL then
+    elseif self.state.name == "jump" then
         self.gravity = JUMPGRAVITY
     end
 end
@@ -477,44 +601,6 @@ function Character:accelerate(dt, maxSpeed)
 end
 
 function Character:animation(dt)
-    if self.onGround and self.speedX == 0 then
-        self.animationState = "idle"
-    end
-
-    if self.onGround and ((keyDown("left") and self.speedX > 0) or (keyDown("right") and self.speedX < 0)) then
-        self.animationState = "skid"
-    elseif self.onGround and self.speedX ~= 0 then
-        if math.abs(self.speedX) >= MAXSPEEDS[3] then
-            self.animationState = "sprint"
-        else
-            self.animationState = "run"
-        end
-    end
-
-    if (self.animationState == "run" or self.animationState == "sprint") and self.onGround then
-        self.runAnimationTimer = self.runAnimationTimer + (math.abs(self.speedX)+5)/6*dt
-        while self.runAnimationTimer > RUNANIMATIONTIME do
-            self.runAnimationTimer = self.runAnimationTimer - RUNANIMATIONTIME
-            self.runAnimationFrame = self.runAnimationFrame + 1
-
-            if self.runAnimationFrame > #Character[self.powerUpState].quad[1].run then
-                self.runAnimationFrame = self.runAnimationFrame - #Character[self.powerUpState].quad[1].run
-            end
-        end
-    end
-    
-    if not self.onGround then
-        if self.maxSpeedJump == MAXSPEEDS[3] or self.flying then
-            self.animationState = "jumpWithPassion"
-        else
-            self.animationState = "jump"
-        end
-    end
-    
-    if self.state == state.buttSlide then
-        self.animationState = "buttSlide"
-    end
-
     if self.hasPortalGun then -- look towards portalGunAngle
         if math.abs(self.portalGunAngle) <= math.pi*.5 then
             self.animationDirection = 1
@@ -530,51 +616,139 @@ function Character:animation(dt)
         end
     end
     
+    local frame = false
+    
+    if self.ducking then
+        self.animationState = "duck"
+        
+    elseif self.spinning then
+        if self.onGround then
+            self.animationState = "spin"
+        else
+            self.animationState = "spinAir"
+        end
+        
+        self.animationDirection = self.spinDirection
+        
+        -- calculate spin frame from spinTimer
+        local spinFrames = #Character[self.powerUpState].quad[1].spin
+        
+        local time = math.fmod(self.spinTimer, spinFrames*SPINFRAMETIME)
+        
+        frame = math.ceil(time/SPINFRAMETIME)
+        
+    elseif self.state.name == "idle" then
+        self.animationState = "idle"
+        
+    elseif self.state.name == "skid" then
+        self.animationState = "skid"
+        
+    elseif self.state.name == "stop" or self.state.name == "run" then
+        if math.abs(self.speedX) >= MAXSPEEDS[3] then
+            self.animationState = "sprint"
+        else
+            self.animationState = "run"
+        end
+        
+    elseif self.flying and (self.state.name == "jump" or self.state.name == "fly" or self.state.name == "fall") then
+        self.animationState = "fly"
+        
+    elseif self.state.name == "float" then
+        self.animationState = "float"
+        
+    elseif self.state.name == "jump" or self.state.name == "fall" then
+        if self.speedY < 0 then
+            if self.maxSpeedJump == MAXSPEEDS[3] or self.flying then
+                self.animationState = "fly"
+            else
+                self.animationState = "jump"
+            end
+        else   
+            self.animationState = "fall"
+        end
+        
+    elseif self.state.name == "buttSlide" then
+        self.animationState = "buttSlide"
+    end
+
+    
+    -- Running animation
     if (self.animationState == "run" or self.animationState == "sprint") then
-        self.quad = Character[self.powerUpState].quad[self:getAngleFrame(self.portalGunAngle)][self.animationState][self.runAnimationFrame]
+        self.runAnimationTimer = self.runAnimationTimer + (math.abs(self.speedX)+50)/8*dt
+        while self.runAnimationTimer > RUNANIMATIONTIME do
+            self.runAnimationTimer = self.runAnimationTimer - RUNANIMATIONTIME
+            self.runAnimationFrame = self.runAnimationFrame + 1
+            
+            local runFrames = #Character[self.powerUpState].quad[1].run
+
+            if self.runAnimationFrame > runFrames then
+                self.runAnimationFrame = self.runAnimationFrame - runFrames
+            end
+        end
+        
+        frame = self.runAnimationFrame
+    end
+    
+    -- Flying animation
+    if self.animationState == "fly" then
+        if self.state.name == "fall" then
+            self.flyAnimationFrame = 2
+        else
+            self.flyAnimationTimer = self.flyAnimationTimer + dt
+            while self.flyAnimationTimer > FLYANIMATIONTIME do
+                self.flyAnimationTimer = self.flyAnimationTimer - FLYANIMATIONTIME
+                self.flyAnimationFrame = self.flyAnimationFrame + 1
+
+                local flyFrames = #Character[self.powerUpState].quad[1].fly
+                if self.flyAnimationFrame > flyFrames then
+                    self.flyAnimationFrame = flyFrames -- don't reset to the start
+                end
+            end
+        end
+        
+        frame = self.flyAnimationFrame
+    end
+    
+    -- Float animation
+    if self.animationState == "float" then
+        self.floatAnimationTimer = self.floatAnimationTimer + dt
+        while self.floatAnimationTimer > FLYANIMATIONTIME do
+            self.floatAnimationTimer = self.floatAnimationTimer - FLYANIMATIONTIME
+            self.floatAnimationFrame = self.floatAnimationFrame + 1
+
+            local floatFrames = #Character[self.powerUpState].quad[1].float
+            if self.floatAnimationFrame > floatFrames then
+                self.floatAnimationFrame = floatFrames -- don't reset to the start
+            end
+        end
+        
+        frame = self.floatAnimationFrame
+    end
+    
+    -- Make sure to properly use the tables if it's an animationState with frames
+    if frame then
+        self.quad = Character[self.powerUpState].quad[self:getAngleFrame(self.portalGunAngle)][self.animationState][frame]
     else
         self.quad = Character[self.powerUpState].quad[self:getAngleFrame(self.portalGunAngle)][self.animationState]
     end
-end
-
-function Character:duck()
-    if Mario.duck(self) then
-        if self.state ~= state.buttSlide and self.surfaceAngle ~= 0 and self.onGround and not keyDown("left") and not keyDown("right") then
-            self:switchState("buttSlide")
-            
-            if self.surfaceAngle > 0 then
-                self.groundSpeedX = math.max(0, self.groundSpeedX)
-            else
-                self.groundSpeedX = math.min(0, self.groundSpeedX)
-            end
-        end
-    end
+    
+    assert(type(self.quad) == "userdata", "The state \"" .. self.animationState .. "\" seems to not be have a quad set up correctly.")
 end
 
 function Character:jump()
-    if (self.state == state.raccoonJump or self.state == state.fly) and self.flying then
-        self.flyingUpTimer = 0
+    if Character[self.powerUpState].canFly and self.flying and (self.state.name == "jump" or self.state.name == "fly" or self.state.name == "fall") then
         self:switchState("fly")
+        self.flyAnimationTimer = 0
+        self.flyAnimationFrame = 1
     end
     
-    if self.state == state.raccoonJump or self.state == state.float then
-        self.floatTimer = 0
+    if Character[self.powerUpState].canFloat and self.speedY > 0 and (self.state.name == "jump" or self.state.name == "float" or self.state.name == "fall") then
         self:switchState("float")
+        self.floatAnimationTimer = 0
+        self.floatAnimationFrame = 1
     end
     
     if Mario.jump(self) then
-        -- See if Mario should switch to flying mode
-        if self.canFly then
-            self:switchState("raccoonJump")
-            
-            if self.pMeter == VAR("pMeterTicks") and not self.flying then
-                self.flyTimer = 0
-                self.flying = true
-            end
-        else
-            self:switchState("jump")
-        end
-        
         -- Adjust jumpforce according to speed
         local speedY = 0
         for i = 1, #JUMPTABLE do
@@ -585,7 +759,7 @@ function Character:jump()
         end
         
         -- Store how fast Mario is allowed to accelerate during the jump
-        local maxSpeedJump
+        local maxSpeedJumps
         
         for i = 1, #MAXSPEEDS do
             if math.abs(self.groundSpeedX) <= MAXSPEEDS[i] then
@@ -601,14 +775,39 @@ function Character:jump()
         self.maxSpeedJump = maxSpeedJump
         
         self.speedY = speedY
+        
+        -- See if Mario should switch to flying mode
+        if Character[self.powerUpState].canFly then
+            self:switchState("jump")
+            
+            if self.pMeter == VAR("pMeterTicks") and not self.flying then
+                self.flyTimer = 0
+                self.flying = true
+            end
+        else
+            self:switchState("jump")
+        end
+        
     end
 end
 
 function Character:bottomCollision(obj2)
     Mario.bottomCollision(self, obj2)
     
-    if self.state == state.jump or self.state == state.raccoonJump then
+    if self.state.name == "jump" or self.state.name == "fall" or self.state.name == "float" then
         self:switchState("idle")
+    end
+end
+
+function Character:startFall()
+    self:switchState("fall")
+end
+
+function Character:spin() -- that's a good trick
+    if Character[self.powerUpState].canSpin and not self.spinning and not self.ducking then
+        self.spinning = true
+        self.spinTimer = 0
+        self.spinDirection = self.animationDirection
     end
 end
 

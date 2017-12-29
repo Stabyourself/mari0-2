@@ -160,19 +160,21 @@ function PhysObj:bottomColCheck()
 	end
 	
 	if colY then --Ground collision
-		if not self:bottomCollision({}) then
-			if self.onGround then
-				self.y = colY-self.height
-				self.speedY = math.min(self.speedY, 0)
-			else
-				if colY <= self.y + self.height then
+		if self.onGround or colY <= self.y + self.height then
+			if not self:bottomCollision({}) then
+				if self.onGround then
+					self.y = colY-self.height
+					self.speedY = math.min(self.speedY, 0)
+					
+					return {x = colX, y = colY, angle = colAngle}
+				else
 					self.y = colY-self.height
 					self.speedY = math.min(self.speedY, 0)
 					self.onGround = true
+					
+					return {x = colX, y = colY, angle = colAngle}
 				end
 			end
-			
-			return {x = colX, y = colY, angle = colAngle}
 		end
 	end
 	
@@ -196,7 +198,10 @@ function PhysObj:checkCollisions()
 	end
 	
 	if not collisions.bottom then
-		self.onGround = false
+		if self.onGround then
+			self:startFall()
+			self.onGround = false
+		end
 	end
 	
 	if collisions.bottom then
@@ -246,5 +251,6 @@ function PhysObj:leftCollision() end
 function PhysObj:rightCollision() end
 function PhysObj:bottomCollision() end
 function PhysObj:topCollision() end
+function PhysObj:startFall() end
 
 return PhysObj

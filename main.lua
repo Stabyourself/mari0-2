@@ -58,9 +58,8 @@ function love.load()
         &Time;
         &Times;
         &Space;
+        .;:;!?_-<>=+*/\
     ]]
-    
-    fontIgnore = {32}
     
     local i = 1
     local glyphNum = 1
@@ -84,7 +83,7 @@ function love.load()
         local byte = string.byte(glyph)
         
         if byte ~= string.byte("\n") and byte ~= string.byte(" ") then
-            if byte == string.byte(";") then
+            if byte == string.byte(";") and inLongName then
                 if inLongName then
                     assignGlyph(currentGlyph)
                     currentGlyph = ""
@@ -137,7 +136,7 @@ function love.update(dt)
     end
 
 	if VAR("ffKeys") then
-		for _, v in ipairs(VAR("ffKeys")) do
+        for _, v in ipairs(VAR("ffKeys")) do
 			if love.keyboard.isDown(v.key) then
 				dt = dt * v.val
 			end
@@ -157,6 +156,10 @@ function love.draw()
     if gameState == "game" then
         game.draw()
     end
+    
+    marioPrint("state:    " .. game.level.marios[1].state.name, 16, 16)
+    marioPrint("ducking:  " .. tostring(game.level.marios[1].ducking), 16, 26)
+    marioPrint("spinning: " .. tostring(game.level.marios[1].spinning), 16, 36)
     
     -- For the stream
     if VAR("inputDebug") then
@@ -181,6 +184,7 @@ function love.draw()
         love.graphics.rectangle("fill", 60, SCREENHEIGHT-20, 8, 8)
         setColorBasedOn("jump")
         love.graphics.rectangle("fill", 72, SCREENHEIGHT-20, 8, 8)
+        
         
         love.graphics.setColor(255, 255, 255)
     end
@@ -211,10 +215,10 @@ function love.resize(w, h)
     SCREENHEIGHT = h/VAR("scale")
     
     CAMERAWIDTH = SCREENWIDTH
-    CAMERAHEIGHT = SCREENHEIGHT-VAR("uiHeight")
+    CAMERAHEIGHT = SCREENHEIGHT-VAR("uiHeight")-VAR("uiLineHeight")
 
-    WIDTH = math.ceil(SCREENWIDTH/VAR("tileSize"))
-    HEIGHT = math.ceil((SCREENHEIGHT-VAR("uiHeight"))/VAR("tileSize"))
+    WIDTH = math.ceil(CAMERAWIDTH/VAR("tileSize"))
+    HEIGHT = math.ceil(CAMERAHEIGHT/VAR("tileSize"))
     
     RIGHTSCROLLBORDER = math.floor(math.max(CAMERAWIDTH/2, CAMERAWIDTH-VAR("cameraScrollRightBorder")))
     LEFTSCROLLBORDER = math.ceil(math.min(CAMERAWIDTH/2, VAR("cameraScrollLeftBorder")))
@@ -258,7 +262,7 @@ function marioPrint(s, x, y)
             if longGlyph then
                 longGlyph = longGlyph .. glyph
             else
-                toPrint = glyph
+                toPrint = string.lower(glyph)
             end
         end
         

@@ -7,6 +7,7 @@ return {
 
     tileSize = 16,
     uiHeight = 38,
+    uiLineHeight = 1,
 
     gravity = 1125,
     gravityjumping = 480, --gravity while jumping (Only for mario)
@@ -46,14 +47,8 @@ return {
         down = "s",
         up = "w",
         jump = "space",
-        run = "lshift"
-    },
-
-    ffKeys = {
-        {
-            key = "-",
-            val = 0.02
-        }
+        run = "lshift",
+        closePortals = "r",
     },
 
     collision = {

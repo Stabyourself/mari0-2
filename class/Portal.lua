@@ -14,6 +14,10 @@ function Portal:initialize(world, x1, y1, x2, y2, color)
     self.open = false
 end
 
+function Portal:update(dt)
+    
+end
+
 function Portal:draw()
     love.graphics.setColor(self.color)
     love.graphics.line(self.x1, self.y1, self.x2, self.y2)

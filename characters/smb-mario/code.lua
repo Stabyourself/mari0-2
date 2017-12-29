@@ -1,4 +1,4 @@
-local character = {}
+local Character = class("SMBMario", Mario)
 
 local WALKACCELERATION = 128 --acceleration of walking on ground
 local RUNACCELERATION = 256 --acceleration of running on ground
@@ -17,13 +17,47 @@ local RUNANIMATIONTIME = 1.6 --
 local JUMPFORCE = 256
 local JUMPFORCEADD = 30.4 --how much jumpforce is added at top speed (linear from 0 to topspeed)
 
-function character.movement(dt, mario)
+Character.img = love.graphics.newImage("characters/smb-mario/graphics.png")
+
+Character.quads = {}
+Character.quads.idle = {}
+Character.quads.running = {}
+Character.quads.sprinting = {}
+Character.quads.sliding = {}
+Character.quads.jumping = {}
+Character.quads.jumpingWithPassion = {}
+Character.quads.buttSliding = {}
+
+for y = 1, 5 do
+    Character.quads.idle[y] = love.graphics.newQuad(0, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
+
+    Character.quads.running[y] = {}
+    for i = 1, 3 do
+        Character.quads.running[y][i] = love.graphics.newQuad(i*20, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
+    end
+
+    
+    Character.quads.sliding[y] = love.graphics.newQuad(80, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
+    Character.quads.jumping[y] = love.graphics.newQuad(100, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
+end
+
+function Character:initialize(...)
+    Mario.initialize(self, ...)
+    
+    self.centerX = 10
+    self.centerY = 10
+    self.runAnimationTimer = 0
+    self.runAnimationFrame = 1
+    self.quad = Character.quads.idle[3]
+end
+
+function Character:movement(dt)
     --Todo: Don't accelerate past maxwalkspeed in air!
     --Todo: Some stuff about automatically getting maxrunspeed if on maxwalkspeed when landing
     local acceleration = 0
 
     -- Normal left/right acceleration
-    if (not keyDown("run") and math.abs(mario.speedX) <= MAXWALKSPEED) or (keyDown("run") and math.abs(mario.speedX) <= MAXRUNSPEED) then
+    if (not keyDown("run") and math.abs(self.speedX) <= MAXWALKSPEED) or (keyDown("run") and math.abs(self.speedX) <= MAXRUNSPEED) then
         local accelerationVal = WALKACCELERATION
         if keyDown("run") then
             accelerationVal = RUNACCELERATION
@@ -32,7 +66,7 @@ function character.movement(dt, mario)
         if keyDown("left") then
             acceleration = acceleration - accelerationVal
 
-            if not mario.onGround and mario.speedX > 0 then
+            if not self.onGround and self.speedX > 0 then
                 acceleration = acceleration * AIRSLIDEFACTOR
             end
         end
@@ -40,7 +74,7 @@ function character.movement(dt, mario)
         if keyDown("right") then
             acceleration = acceleration + accelerationVal
 
-            if not mario.onGround and mario.speedX < 0 then
+            if not self.onGround and self.speedX < 0 then
                 acceleration = acceleration * AIRSLIDEFACTOR
             end
         end
@@ -48,23 +82,23 @@ function character.movement(dt, mario)
 
     -- Apply friction?
     if  (not keyDown("right") and not keyDown("left")) or 
-        (mario.ducking and mario.onGround) or
-        mario.disabled or
-        (not keyDown("run") and math.abs(mario.speedX) > MAXWALKSPEED) or
-        math.abs(mario.speedX) > MAXRUNSPEED or
-        ((acceleration < 0 and mario.speedX > 0) or (acceleration > 0 and mario.speedX < 0)) then
+        (self.ducking and self.onGround) or
+        self.disabled or
+        (not keyDown("run") and math.abs(self.speedX) > MAXWALKSPEED) or
+        math.abs(self.speedX) > MAXRUNSPEED or
+        ((acceleration < 0 and self.speedX > 0) or (acceleration > 0 and self.speedX < 0)) then
 
         -- Friction multiplier
         local friction = FRICTION
-        if not mario.onGround then
+        if not self.onGround then
             friction = FRICTIONAIR
-        elseif math.abs(mario.speedX) > MAXRUNSPEED then
+        elseif math.abs(self.speedX) > MAXRUNSPEED then
             friction = SUPERFRICTION
         end
 
-        if mario.speedX > 0 then
+        if self.speedX > 0 then
             acceleration = acceleration - FRICTION
-        elseif mario.speedX < 0 then
+        elseif self.speedX < 0 then
             acceleration = acceleration + FRICTION
         end
     end
@@ -72,66 +106,73 @@ function character.movement(dt, mario)
     -- Clamp max speeds for walk and run
     local maxSpeed
 
-    if (not keyDown("run") and math.abs(mario.speedX) < MAXWALKSPEED) then
+    if (not keyDown("run") and math.abs(self.speedX) < MAXWALKSPEED) then
         maxSpeed = MAXWALKSPEED
-    elseif (keyDown("run") and math.abs(mario.speedX) < MAXRUNSPEED) then
+    elseif (keyDown("run") and math.abs(self.speedX) < MAXRUNSPEED) then
         maxSpeed = MAXRUNSPEED
     end
 
-    mario.speedX = mario.speedX + acceleration*dt
+    self.speedX = self.speedX + acceleration*dt
 
     if maxSpeed then
         if acceleration > 0 then
-            mario.speedX = math.min(mario.speedX, maxSpeed)
+            self.speedX = math.min(self.speedX, maxSpeed)
         else
-            mario.speedX = math.max(mario.speedX, -maxSpeed)
+            self.speedX = math.max(self.speedX, -maxSpeed)
         end
     end
 
     -- Kill movement below a threshold
-    if math.abs(mario.speedX) < MINSPEED and (not keyDown("right") and not keyDown("left")) then
-        mario.speedX = 0
+    if math.abs(self.speedX) < MINSPEED and (not keyDown("right") and not keyDown("left")) then
+        self.speedX = 0
     end
 end
 
-function character.animation(dt, mario)
-    if mario.onGround and mario.speedX == 0 then
-        mario.animationState = "idle"
+function Character:animation(dt)
+    if self.onGround and self.speedX == 0 then
+        self.animationState = "idle"
     end
 
-    if mario.onGround and ((keyDown("left") and mario.speedX > 0) or (keyDown("right") and mario.speedX < 0)) then
-        mario.animationState = "sliding"
-    elseif mario.onGround and mario.speedX ~= 0 then
-        mario.animationState = "running"
+    if self.onGround and ((keyDown("left") and self.speedX > 0) or (keyDown("right") and self.speedX < 0)) then
+        self.animationState = "sliding"
+    elseif self.onGround and self.speedX ~= 0 then
+        self.animationState = "running"
     end
 
-    if mario.animationState == "running" and mario.onGround then
-        mario.runAnimationTimer = mario.runAnimationTimer + (math.abs(mario.speedX)+4)/5*dt --wtf is this
-        while mario.runAnimationTimer > RUNANIMATIONTIME do
-            mario.runAnimationTimer = mario.runAnimationTimer - RUNANIMATIONTIME
-            mario.runAnimationFrame = mario.runAnimationFrame + 1
+    if self.animationState == "running" and self.onGround then
+        self.runAnimationTimer = self.runAnimationTimer + (math.abs(self.speedX)+4)/5*dt --wtf is this
+        while self.runAnimationTimer > RUNANIMATIONTIME do
+            self.runAnimationTimer = self.runAnimationTimer - RUNANIMATIONTIME
+            self.runAnimationFrame = self.runAnimationFrame + 1
 
-            if mario.runAnimationFrame > 3 then
-                mario.runAnimationFrame = mario.runAnimationFrame - 3
+            if self.runAnimationFrame > 3 then
+                self.runAnimationFrame = self.runAnimationFrame - 3
             end
         end
     end
 
-    if keyDown("left") and mario.onGround then
-        mario.animationDirection = -1
-    elseif keyDown("right") and mario.onGround then
-        mario.animationDirection = 1
+    if keyDown("left") and self.onGround then
+        self.animationDirection = -1
+    elseif keyDown("right") and self.onGround then
+        self.animationDirection = 1
+    end
+
+    if (self.animationState == "running" or self.animationState == "sprinting") then
+        self.quad = self.quads[self.animationState][3][self.runAnimationFrame]
+    else
+        self.quad = self.quads[self.animationState][3]
     end
 end
 
-function character.jump(dt, mario)
+function Character:jump()
     -- Adjust jumpforce according to speed
     local jumpforce = JUMPFORCE
 
-    jumpforce = jumpforce + math.max(0, math.min(1, math.abs(mario.speedX)/MAXRUNSPEED)) * JUMPFORCEADD
+    jumpforce = jumpforce + math.max(0, math.min(1, math.abs(self.speedX)/MAXRUNSPEED)) * JUMPFORCEADD
 
-    mario.speedY = -jumpforce
-    mario.animationState = "jumping"
+    self.speedY = -jumpforce
+    self.animationState = "jumping"
+    self.onGround = false
 end
 
-return character
+return Character

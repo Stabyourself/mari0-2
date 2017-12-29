@@ -5,6 +5,7 @@ function Smb3Ui:initialize()
     
     self.pMeterBlinkTimer = 0
     
+    self.skyColor = {156, 252, 240}
     self.time = 0
     self.world = 1
     self.score = 0
@@ -29,6 +30,9 @@ function Smb3Ui:draw()
     
     love.graphics.setColor(0, 0, 0)
     love.graphics.rectangle("fill", 0, 0, SCREENWIDTH, VAR("uiHeight"))
+    
+    love.graphics.setColor(self.skyColor)
+    love.graphics.rectangle("fill", 0, -VAR("uiLineHeight"), SCREENWIDTH, VAR("uiLineHeight"))
     
     love.graphics.translate((SCREENWIDTH-256)/2, 0)
     

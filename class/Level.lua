@@ -51,7 +51,7 @@ function Level:initialize(path, tileMap)
 
     local x, y = self:mapToWorld(self.spawnX, self.spawnY)
     
-    table.insert(self.marios, Smb3Mario:new(self, x-6, y-12, "raccoon"))
+    table.insert(self.marios, Smb3Mario:new(self, x-6, y-12, "big"))
     
     -- Camera stuff
     self.camera = Camera:new()
@@ -117,6 +117,10 @@ function Level:keypressed(key)
     
     if key == VAR("controls").run then
         self.marios[1]:spin()
+    end
+    
+    if key == VAR("controls").star then
+        self.marios[1]:star()
     end
 end
 

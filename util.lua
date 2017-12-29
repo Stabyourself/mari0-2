@@ -139,3 +139,21 @@ function pointInTriangle(x, y, t) -- Credits to https://stackoverflow.com/questi
 
     return s >= 0 and t >= 0 and (s + t) < 2 * A * sign
 end
+
+function paletteSwap(imgData, swaps)
+    for y = 0, imgData:getHeight()-1 do
+        for x = 0, imgData:getWidth()-1 do
+            for _, v in ipairs(swaps) do
+                local r, g, b, a = imgData:getPixel(x, y)
+                
+                if r == v[1][1] and g == v[1][2] and b == v[1][3] then
+                    imgData:setPixel(x, y, v[2][1], v[2][2], v[2][3], a)
+                    
+                    break
+                end
+            end
+        end
+    end
+    
+    return imgData
+end

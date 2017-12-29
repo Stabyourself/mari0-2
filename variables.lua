@@ -41,6 +41,7 @@ return {
         quit = "escape",
         frameDataDisplay = "f",
         boost = "b",
+        star = "p", -- p is for power up
         
         left = "a",
         right = "d",

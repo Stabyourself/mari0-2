@@ -44,6 +44,30 @@ local FLOATANIMATIONTIME = 4/60
 local SPINTIME = 19/60
 local SPINFRAMETIME = 4/60
 
+local STARTIME = 7.5
+local STARFRAMETIME = 4/60
+local SOMERSAULTTIME = 2/60
+
+local STARPALETTES = {
+    {
+        {252, 252, 252},
+        {0, 0, 0},
+        {216, 40, 0},
+    },
+    
+    {
+        {252, 252, 252},
+        {0, 0, 0},
+        {76, 220, 72},
+    },
+    
+    {
+        {252, 188, 176},
+        {0, 0, 0},
+        {252, 152, 56},
+    }
+}
+
 local JUMPTABLE = {
     {speedX = 60, speedY = -206.25},
     {speedX = 120, speedY = -213.75},
@@ -53,26 +77,43 @@ local JUMPTABLE = {
 
 local powerUpStates = {
     small = {
+        colors = {
+            {252, 188, 176},
+            {216, 40, 0},
+            {0, 0, 0},
+        },
         width = 20,
         height = 20,
         centerX = 10,
         centerY = 11,
         frames = {
             "idle",
+            
             "run",
             "run",
+            
             "sprint",
             "sprint",
+            
             "skid",
+            
             "jump",
+            
+            "fall",
+            
             "fly",
+            
             "die",
+            
             "buttSlide",
+            
             "swim",
             "swim",
             "swim",
             "swim",
+            
             "pipe",
+            
             "hold",
             "holdIdle",
             "holdRun",
@@ -83,6 +124,11 @@ local powerUpStates = {
     },
     
     big = {
+        colors = {
+            {252, 188, 176},
+            {216, 40, 0},
+            {0, 0, 0},
+        },
         width = 40,
         height = 40,
         centerX = 23,
@@ -90,33 +136,135 @@ local powerUpStates = {
         canDuck = true,
         frames = {
             "idle",
+            
             "run",
             "run",
             "run",
+            
             "sprint",
             "sprint",
             "sprint",
+            
             "skid",
+            
             "jump",
+            
+            "fall",
+            
             "fly",
+            
             "die",
+            
+            "duck",
+            
             "buttSlide",
+            
             "swim",
             "swim",
             "swim",
             "swim",
+            
             "pipe",
-            "hold",
+            "useless",
+            
             "holdIdle",
+            
             "holdRun",
             "holdRun",
-            "holdRun",
+            
+            "kick",
+            
             "climb",
             "climb",
+            
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            
+            "shoot",
+            "shoot",
+        },
+    },
+    
+    hammer = {
+        colors = {
+            {252, 152, 56},
+            {252, 252, 252},
+            {0, 0, 0},
+        },
+        width = 40,
+        height = 40,
+        centerX = 23,
+        centerY = 24,
+        canDuck = true,
+        frames = {
+            "idle",
+            
+            "run",
+            "run",
+            "run",
+            
+            "sprint",
+            "sprint",
+            "sprint",
+            
+            "skid",
+            
+            "jump",
+            
+            "fall",
+            
+            "fly",
+            
+            "die",
+            
+            "duck",
+            
+            "buttSlide",
+            
+            "swim",
+            "swim",
+            "swim",
+            "swim",
+            
+            "pipe",
+            "useless",
+            
+            "holdIdle",
+            
+            "holdRun",
+            "holdRun",
+            
+            "kick",
+            
+            "climb",
+            "climb",
+            
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            
+            "shoot",
+            "shoot",
         },
     },
     
     raccoon = {
+        colors = {
+            {252, 188, 176},
+            {216, 40, 0},
+            {0, 0, 0},
+        },
         width = 40,
         height = 40,
         centerX = 23,
@@ -182,18 +330,103 @@ local powerUpStates = {
             "climb",
             "climb",
             
-            "summerSault",
-            "summerSault",
-            "summerSault",
-            "summerSault",
-            "summerSault",
-            "summerSault",
-            "summerSault",
-            "summerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+        },
+    },
+    
+    tanooki = {
+        colors = {
+            {252, 188, 176},
+            {200, 76, 12},
+            {0, 0, 0},
+        },
+        width = 40,
+        height = 40,
+        centerX = 23,
+        centerY = 24,
+        canSpin = true,
+        canFly = true,
+        canFloat = true,
+        canDuck = true,
+        frames = {
+            "idle",
+            
+            "run",
+            "run",
+            "run",
+            
+            "sprint",
+            "sprint",
+            "sprint",
+            
+            "skid",
+            
+            "jump",
+            
+            "fall",
+            
+            "fly",
+            "fly",
+            "fly",
+            
+            "float",
+            "float",
+            "float",
+            
+            "die",
+            
+            "duck",
+            
+            "buttSlide",
+            
+            "swim",
+            "swim",
+            "swim",
+            "swim",
+            
+            "spin",
+            "spin",
+            "spin",
+            "spin",
+            
+            "spinAir",
+            "spinAir",
+            "spinAir",
+            "spinAir",
+            
+            "holdIdle",
+            
+            "holdRun",
+            "holdRun",
+            "holdRun",
+            
+            "kick",
+            
+            "climb",
+            "climb",
+            
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            "somerSault",
+            
+            "statue",
         },
     }
 }
 
+print("Setting up palettes for character")
 for i, v in pairs(powerUpStates) do
     Character[i] = {}
     local char = Character[i]
@@ -205,9 +438,35 @@ for i, v in pairs(powerUpStates) do
     char.canSpin = v.canSpin
     char.canDuck = v.canDuck
     
+    char.imgData = love.image.newImageData("characters/smb3-mario/" .. i .. ".png")
+    -- swap here
+    if LUIGI or true then
+        char.imgData = paletteSwap(char.imgData, {{{216, 40, 0}, {0, 255, 255}}})
+    end
     
-    char.img = love.graphics.newImage("characters/smb3-mario/" .. i .. ".png")
+    char.img = love.graphics.newImage(char.imgData)
+    
+    -- star palette swaps
+    if v.colors then
+        char.starImg = {}
+        for _, starpalette in ipairs(STARPALETTES) do
+            local imgData = love.image.newImageData("characters/smb3-mario/" .. i .. ".png")
+            
+            local swaps = {}
+            for j, w in ipairs(v.colors) do
+                table.insert(swaps, {
+                    w,
+                    starpalette[j]
+                })
+            end
+            imgData = paletteSwap(imgData, swaps)
+            
+            table.insert(char.starImg, love.graphics.newImage(imgData))
+        end
+    end
+    
     char.quad = {}
+    char.frames = {}
     
     for y = 1, 5 do
         char.quad[y] = {}
@@ -222,14 +481,17 @@ for i, v in pairs(powerUpStates) do
                 end
                 
                 table.insert(char.quad[y][name], quad)
+                char.frames[name] = char.frames[name] + 1
             else
                 char.quad[y][name] = quad
+                char.frames[name] = 1
             end
                 
             x = x + 1
         end
     end
 end
+print("Done.")
 
 local state = {}
 
@@ -344,6 +606,9 @@ function Character:initialize(...)
     self.floatAnimationFrame = 1
     self.floatAnimationFrame = 0
     
+    self.somerSaultFrame = 2
+    self.somerSaultFrameTimer = 0
+    
     self.spinning = false
     self.spinTimer = SPINTIME
 end
@@ -360,11 +625,30 @@ function Character:switchState(stateName)
 end
 
 function Character:movement(dt)
+    if self.starMan then
+        self.starTimer = self.starTimer + dt
+        
+        if self.starTimer >= STARTIME then
+            self.starMan = false
+            self.img = Character[self.powerUpState].img
+        end
+        
+        self.somerSaultFrameTimer = self.somerSaultFrameTimer + dt
+        
+        while self.somerSaultFrameTimer > SOMERSAULTTIME do
+            self.somerSaultFrameTimer = self.somerSaultFrameTimer - SOMERSAULTTIME
+            
+            self.somerSaultFrame = self.somerSaultFrame + 1
+            if self.somerSaultFrame > Character[self.powerUpState].frames.somerSault then
+                self.somerSaultFrame = 1
+            end
+        end
+    end
+        
     if self.flying then
         self.flyTimer = self.flyTimer + dt
         
         if self.flyTimer >= FLYTIME then
-            self.flyTimer = FLYTIME
             self.flying = false
             self.pMeter = 0
         end
@@ -374,7 +658,6 @@ function Character:movement(dt)
         self.spinTimer = self.spinTimer + dt
         
         if self.spinTimer >= SPINTIME then
-            self.spinTimer = SPINTIME
             self.spinning = false
         end
     end
@@ -601,6 +884,18 @@ function Character:accelerate(dt, maxSpeed)
 end
 
 function Character:animation(dt)
+    -- Image updating for star
+    if self.starMan then
+        -- get frame
+        local frame = math.ceil(math.fmod(self.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
+        
+        if frame == 1 then
+            self.img = Character[self.powerUpState].img
+        else
+            self.img = Character[self.powerUpState].starImg[frame-1]
+        end 
+    end
+    
     if self.hasPortalGun then -- look towards portalGunAngle
         if math.abs(self.portalGunAngle) <= math.pi*.5 then
             self.animationDirection = 1
@@ -618,7 +913,7 @@ function Character:animation(dt)
     
     local frame = false
     
-    if self.spinning then
+    if self.spinning and not self.starMan then
         if self.onGround then
             self.animationState = "spin"
         else
@@ -628,9 +923,7 @@ function Character:animation(dt)
         self.animationDirection = self.spinDirection
         
         -- calculate spin frame from spinTimer
-        local spinFrames = #Character[self.powerUpState].quad[1].spin
-        
-        local time = math.fmod(self.spinTimer, spinFrames*SPINFRAMETIME)
+        local time = math.fmod(self.spinTimer, Character[self.powerUpState].frames.spin*SPINFRAMETIME)
         
         frame = math.ceil(time/SPINFRAMETIME)
         
@@ -652,23 +945,32 @@ function Character:animation(dt)
         
     elseif self.flying and (self.state.name == "jump" or self.state.name == "fly" or self.state.name == "fall") then
         self.animationState = "fly"
+    
+    elseif self.state.name == "buttSlide" then
+        self.animationState = "buttSlide"
+        
+    elseif self.starMan then
+        self.animationState = "somerSault"
+        frame = self.somerSaultFrame
         
     elseif self.state.name == "float" then
         self.animationState = "float"
         
     elseif self.state.name == "jump" or self.state.name == "fall" then
-        if self.speedY < 0 then
-            if self.maxSpeedJump == MAXSPEEDS[3] or self.flying then
-                self.animationState = "fly"
+        if not Character[self.powerUpState].canFly and self.pMeter == VAR("pMeterTicks") then
+            self.animationState = "fly"
+        else
+            if self.speedY < 0 then
+                if self.maxSpeedJump == MAXSPEEDS[3] or self.flying then
+                    self.animationState = "fly"
+                else
+                    self.animationState = "jump"
+                end
             else
-                self.animationState = "jump"
+                self.animationState = "fall"
             end
-        else   
-            self.animationState = "fall"
         end
         
-    elseif self.state.name == "buttSlide" then
-        self.animationState = "buttSlide"
     end
 
     
@@ -679,7 +981,7 @@ function Character:animation(dt)
             self.runAnimationTimer = self.runAnimationTimer - RUNANIMATIONTIME
             self.runAnimationFrame = self.runAnimationFrame + 1
             
-            local runFrames = #Character[self.powerUpState].quad[1].run
+            local runFrames = Character[self.powerUpState].frames.run
 
             if self.runAnimationFrame > runFrames then
                 self.runAnimationFrame = self.runAnimationFrame - runFrames
@@ -691,22 +993,25 @@ function Character:animation(dt)
     
     -- Flying animation
     if self.animationState == "fly" then
-        if self.state.name == "fall" then
-            self.flyAnimationFrame = 2
-        else
-            self.flyAnimationTimer = self.flyAnimationTimer + dt
-            while self.flyAnimationTimer > FLYANIMATIONTIME do
-                self.flyAnimationTimer = self.flyAnimationTimer - FLYANIMATIONTIME
-                self.flyAnimationFrame = self.flyAnimationFrame + 1
+        local flyFrames = Character[self.powerUpState].frames.fly
+        
+        if flyFrames > 1 then
+            if self.state.name == "fall" then
+                self.flyAnimationFrame = 2
+            else
+                self.flyAnimationTimer = self.flyAnimationTimer + dt
+                while self.flyAnimationTimer > FLYANIMATIONTIME do
+                    self.flyAnimationTimer = self.flyAnimationTimer - FLYANIMATIONTIME
+                    self.flyAnimationFrame = self.flyAnimationFrame + 1
 
-                local flyFrames = #Character[self.powerUpState].quad[1].fly
-                if self.flyAnimationFrame > flyFrames then
-                    self.flyAnimationFrame = flyFrames -- don't reset to the start
+                    if self.flyAnimationFrame > flyFrames then
+                        self.flyAnimationFrame = flyFrames -- don't reset to the start
+                    end
                 end
             end
+            
+            frame = self.flyAnimationFrame
         end
-        
-        frame = self.flyAnimationFrame
     end
     
     -- Float animation
@@ -716,7 +1021,7 @@ function Character:animation(dt)
             self.floatAnimationTimer = self.floatAnimationTimer - FLYANIMATIONTIME
             self.floatAnimationFrame = self.floatAnimationFrame + 1
 
-            local floatFrames = #Character[self.powerUpState].quad[1].float
+            local floatFrames = Character[self.powerUpState].frames.float
             if self.floatAnimationFrame > floatFrames then
                 self.floatAnimationFrame = floatFrames -- don't reset to the start
             end
@@ -778,16 +1083,19 @@ function Character:jump()
         
         -- See if Mario should switch to flying mode
         if Character[self.powerUpState].canFly then
-            self:switchState("jump")
-            
             if self.pMeter == VAR("pMeterTicks") and not self.flying then
                 self.flyTimer = 0
                 self.flying = true
             end
-        else
-            self:switchState("jump")
         end
         
+        -- Reset starJump animation
+        if self.starMan then
+            self.somerSaultFrame = 2
+            self.somerSaultFrameTimer = 0
+        end
+        
+        self:switchState("jump")
     end
 end
 
@@ -809,6 +1117,11 @@ function Character:spin() -- that's a good trick
         self.spinTimer = 0
         self.spinDirection = self.animationDirection
     end
+end
+
+function Character:star()
+    self.starMan = true
+    self.starTimer = 0
 end
 
 return Character

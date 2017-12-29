@@ -618,10 +618,7 @@ function Character:animation(dt)
     
     local frame = false
     
-    if self.ducking then
-        self.animationState = "duck"
-        
-    elseif self.spinning then
+    if self.spinning then
         if self.onGround then
             self.animationState = "spin"
         else
@@ -636,6 +633,9 @@ function Character:animation(dt)
         local time = math.fmod(self.spinTimer, spinFrames*SPINFRAMETIME)
         
         frame = math.ceil(time/SPINFRAMETIME)
+        
+    elseif self.ducking then
+        self.animationState = "duck"
         
     elseif self.state.name == "idle" then
         self.animationState = "idle"
@@ -804,7 +804,7 @@ function Character:startFall()
 end
 
 function Character:spin() -- that's a good trick
-    if Character[self.powerUpState].canSpin and not self.spinning and not self.ducking then
+    if Character[self.powerUpState].canSpin and not self.spinning and not keyDown("down") then
         self.spinning = true
         self.spinTimer = 0
         self.spinDirection = self.animationDirection

@@ -157,7 +157,9 @@ function love.draw()
         game.draw()
     end
     
-    marioPrint(game.level.marios[1].state.name, SCREENWIDTH-80, SCREENHEIGHT-24)
+    marioPrint(game.level.marios[1].state.name, 8, 8)
+    marioPrint("Spinning:    " .. tostring(game.level.marios[1].spinning), 8, 18)
+    marioPrint("Shooting:    " .. tostring(game.level.marios[1].shooting), 8, 28)
     
     -- For the stream
     if VAR("inputDebug") then

@@ -117,6 +117,7 @@ function Level:keypressed(key)
     
     if key == VAR("controls").run then
         self.marios[1]:spin()
+        self.marios[1]:shoot()
     end
     
     if key == VAR("controls").star then

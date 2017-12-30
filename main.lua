@@ -319,7 +319,7 @@ function worldDraw(...)
     if type(arg[2]) == "number" then
         love.graphics.draw(arg[1], math.round(arg[2]), math.round(arg[3]), arg[4], arg[5], arg[6], arg[7], arg[8])
     else
-        love.graphics.draw(arg[1], arg[2], math.round(arg[3]), math.round(arg[4]), arg[5], arg[6], arg[7], arg[8], arg[9])
+        love.graphics.draw(arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8], arg[9])
     end
 end
 

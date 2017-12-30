@@ -22,7 +22,7 @@ function Mario:initialize(world, x, y, powerUpState)
     self.pMeterTimer = 0
     self.pMeterTime = 8/60
     
-    self.hasPortalGun = false
+    self.hasPortalGun = true
     self.portalGunAngle = 0
     
     self.portalColor = {

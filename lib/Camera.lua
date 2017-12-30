@@ -8,7 +8,7 @@ end
 
 function Camera:attach()
 	love.graphics.push()
-	love.graphics.translate(math.round(-self.x), math.round(-self.y))
+	love.graphics.translate(-self.x, -self.y)
 end
 
 function Camera:detach()

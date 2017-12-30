@@ -51,7 +51,7 @@ function Level:initialize(path, tileMap)
 
     local x, y = self:mapToWorld(self.spawnX, self.spawnY)
     
-    table.insert(self.marios, Smb3Mario:new(self, x-6, y-12, "big"))
+    table.insert(self.marios, Smb3Mario:new(self, x-6, y-12, "raccoon"))
     
     -- Camera stuff
     self.camera = Camera:new()
@@ -71,6 +71,8 @@ function Level:update(dt)
     if newSpawnLine > self.spawnLine then
         self:spawnEnemies(newSpawnLine)
     end
+    
+    --print(self.marios[1].x-self.camera.x)
 end
 
 function Level:draw()
@@ -166,24 +168,25 @@ function Level:updateCamera(dt)
     
     -- Horizontal
     if pXr+mario.width > RIGHTSCROLLBORDER then
-        self.camera.x = math.max(pX-mario.width-RIGHTSCROLLBORDER, self.camera.x + VAR("cameraScrollRate")*dt)
+        self.camera.x = math.min(pX+mario.width-RIGHTSCROLLBORDER, self.camera.x + VAR("cameraScrollRate")*dt)
+        
     elseif pXr < LEFTSCROLLBORDER then
-        self.camera.x = math.min(pX-LEFTSCROLLBORDER, self.camera.x - VAR("cameraScrollRate")*dt)
+        self.camera.x = math.max(pX-LEFTSCROLLBORDER, self.camera.x - VAR("cameraScrollRate")*dt)
     end
     
     -- Vertical
     local pY = mario.y
     local pYr = pY - self.camera.y
+    
+    if pYr+mario.height > DOWNSCROLLBORDER then
+        self.camera.y = math.min(pY+mario.height-DOWNSCROLLBORDER, self.camera.y + VAR("cameraScrollRate")*dt)
+    end
         
     -- Only scroll up in flight mode
     if mario.flying or self.camera.y < game.level.height*self.tileSize-CAMERAHEIGHT then
         if pYr < UPSCROLLBORDER then
-            self.camera.y = math.min(pY-UPSCROLLBORDER, self.camera.y - VAR("cameraScrollRate")*dt)
+            self.camera.y = math.max(pY-UPSCROLLBORDER, self.camera.y - VAR("cameraScrollRate")*dt)
         end
-    end
-    
-    if pYr+mario.height > DOWNSCROLLBORDER then
-        self.camera.y = math.max(pY-mario.height-DOWNSCROLLBORDER, self.camera.y + VAR("cameraScrollRate")*dt)
     end
     
     -- And clamp it to map boundaries

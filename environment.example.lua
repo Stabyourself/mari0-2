@@ -1,17 +1,26 @@
-VAR("physicsDebug") = false
-VAR("noEnemies") = false
-VAR("musicDisabled") = false
-VAR("volume") = 1
-VAR("scale") = 1
+return {
+    physicsDebug = false,
+    quadDebug = false,
+    stencilDebug = true,
+    physicsDebug = false,
+    inputDebug = true,
 
-VAR("ffKeys") = {
-    {
-        key="+",
-        val=30
+    noEnemies = false,
+    musicDisabled = false,
+    volume = 0,
+    scale = 3,
+
+    vsync = true,
+
+    ffKeys = {
+        {
+            key="+",
+            val=30
+        },
+
+        {
+            key="-",
+            val=0.1
+        }
     },
-
-    {
-        key="-",
-        val=0.1
-    }
 }

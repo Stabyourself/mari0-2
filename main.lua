@@ -1,14 +1,13 @@
 --Mari3 - MIT License.
 function love.load()
     print("Mari3 POC by Maurice")
-    print("Loading stuff...")
     
     require "util"
     
     love.graphics.setDefaultFilter("nearest", "nearest")
     
     love.window.setMode(400*VAR("scale"), 224*VAR("scale"), {
-        vsync = false,
+        vsync = VAR("vsync"),
         resizable = true,
     })
     
@@ -124,6 +123,8 @@ function love.load()
     coinSound:setVolume(VAR("volume"))
     stompSound = love.audio.newSource("sound/stomp.ogg")
     stompSound:setVolume(VAR("volume"))
+
+    debugCandyImg = love.graphics.newImage("img/debug-candy.png")
     
     defaultUI = UI:new("img/ui/default.png")
 
@@ -227,8 +228,9 @@ function love.resize(w, h)
     LEFTSCROLLBORDER = math.ceil(math.min(CAMERAWIDTH/2, VAR("cameraScrollLeftBorder")))
     
     DOWNSCROLLBORDER = math.floor(math.max(CAMERAHEIGHT/2, CAMERAHEIGHT-VAR("cameraScrollDownBorder")))
-    print(DOWNSCROLLBORDER, CAMERAHEIGHT-VAR("cameraScrollDownBorder"))
     UPSCROLLBORDER = math.ceil(math.min(CAMERAHEIGHT/2, VAR("cameraScrollUpBorder")))
+
+    debugCandyQuad = love.graphics.newQuad(0, 0, SCREENWIDTH, SCREENHEIGHT, 8, 8)
 end
 
 function updateGroup(group, dt)

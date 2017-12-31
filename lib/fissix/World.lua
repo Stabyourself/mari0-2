@@ -61,8 +61,8 @@ function World:checkPortaling(obj, oldX, oldY)
             
             if iX then
                 local x, y, speedX, speedY = obj.x+obj.width/2, obj.y+obj.height/2, obj.groundSpeedX, obj.speedY
-                local angle = math.atan2(obj.speedY, obj.groundSpeedX)
-                local speed = math.sqrt(obj.groundSpeedX^2+obj.speedY^2)
+                local angle = math.atan2(speedY, speedX)
+                local speed = math.sqrt(speedX^2+speedY^2)
                 
                 local outX, outY, outAngle, angleDiff, reversed = self:doPortal(p, x, y, angle)
                 
@@ -116,28 +116,7 @@ function World:draw()
         local quadY = obj.y+obj.height/2-obj.centerY
         local quadWidth = obj.sizeX
         local quadHeight = obj.sizeY
-        
-        love.graphics.stencil(function()
-            for _, p in ipairs(self.portals) do
-                if p.open then
-                    if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
-                        objectWithinPortalRange(p, x, y) then
-                        p:stencilRectangle("in")
-                    end
-                end
-            end
-        end)
-        
-        love.graphics.setStencilTest("equal", 0)
-        
-        worldDraw(obj.img, obj.quad, x, y, obj.r or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
-        
-        love.graphics.setStencilTest()
-        
-        if VAR("quadDebug") then
-            love.graphics.rectangle("line", quadX, quadY, quadWidth, quadHeight)
-        end
-        
+
         -- Portal duplication
         for _, p in ipairs(self.portals) do
             if p.open then
@@ -151,18 +130,51 @@ function World:draw()
                         xScale = -1
                     end
                     
-                    if VAR("stencilDebug") then
-                        p.connectsTo:stencilRectangle("out", "line")
-                    end
-                    
                     love.graphics.stencil(function() p.connectsTo:stencilRectangle("out") end, "replace")
                     love.graphics.setStencilTest("greater", 0)
-                    
+
+                    if VAR("stencilDebug") then
+                        love.graphics.setColor(0, 255, 0, 200)
+                        love.graphics.rectangle("fill", 0, 0, SCREENWIDTH, SCREENHEIGHT)
+                        love.graphics.setColor(255, 255, 255)
+                    end
+
                     worldDraw(obj.img, obj.quad, cX, cY, (obj.r or 0) + angleDiff, (obj.animationDirection or 1)*xScale, 1, obj.centerX, obj.centerY)
+                    
                     
                     love.graphics.setStencilTest()
                 end
             end
+        end
+
+        -- Actual position
+        love.graphics.stencil(function()
+            for _, p in ipairs(self.portals) do
+                if p.open then
+                    if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
+                        objectWithinPortalRange(p, x, y) then
+                        p:stencilRectangle("in")
+                    end
+                end
+            end
+        end)
+
+        if VAR("stencilDebug") then
+            love.graphics.setStencilTest("greater", 0)
+            love.graphics.setColor(255, 0, 0, 200)
+            love.graphics.draw(debugCandyImg, debugCandyQuad, 0, 0)
+            --love.graphics.rectangle("fill", 0, 0, SCREENWIDTH, SCREENHEIGHT)
+            love.graphics.setColor(255, 255, 255)
+        end
+        
+        love.graphics.setStencilTest("equal", 0)
+        
+        worldDraw(obj.img, obj.quad, x, y, obj.r or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
+        
+        love.graphics.setStencilTest()
+        
+        if VAR("quadDebug") then
+            love.graphics.rectangle("line", quadX, quadY, quadWidth, quadHeight)
         end
 	end
     

@@ -49,9 +49,9 @@ function Level:initialize(path, tileMap)
 
     self.marios = {}
 
-    local x, y = self:mapToWorld(self.spawnX, self.spawnY)
+    local x, y = self:mapToWorld(self.spawnX-.5, self.spawnY)
     
-    table.insert(self.marios, Smb3Mario:new(self, x-6, y-12, "raccoon"))
+    table.insert(self.marios, Smb3Mario:new(self, x, y, "raccoon"))
     
     -- Camera stuff
     self.camera = Camera:new()

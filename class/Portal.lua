@@ -5,9 +5,11 @@ Portal.glowImg = love.graphics.newImage("img/portal-glow.png")
 
 Portal.thingImg = love.graphics.newImage("img/portal-thing.png")
 Portal.thingSmallImg = love.graphics.newImage("img/portal-thing-small.png")
+Portal.thingMediumImg = love.graphics.newImage("img/portal-thing-medium.png")
 
 local PORTALANIMATIONTIME = 1.5
-local PORTALDOTLAG = 0.15
+local PORTALSMALLLAG = 0.15
+local PORTALMEDIUMLAG = 0.06
 local PORTALTHINGS = 3
 local PORTALTHINGDIFF = math.pi*2/PORTALTHINGS
 local PORTALPARTICLETIME = 0.1
@@ -77,11 +79,15 @@ function Portal:update(dt)
     self.thingList = {background = {}, foreground = {}}
     
     for i = 1, PORTALTHINGS do
-        for j = 1, 2 do
+        for j = 1, 3 do
             local a = a + (i-1)*PORTALTHINGDIFF
             
             if j == 2 then
-                a = a - math.pi*PORTALDOTLAG
+                a = a - math.pi*PORTALMEDIUMLAG
+            end
+            
+            if j == 3 then
+                a = a - math.pi*PORTALSMALLLAG
             end
             
             a = math.fmod(a, math.pi*2)
@@ -92,11 +98,21 @@ function Portal:update(dt)
             if diff < 0.5 then
                 insertInto = self.thingList.foreground
             end
+
+            local img = self.thingImg
+
+            if j == 2 then
+                img = self.thingMediumImg
+            end
+
+            if j == 3 then
+                img = self.thingSmallImg
+            end
             
             table.insert(insertInto, {
                 a = a,
                 diff = diff,
-                small = (j == 2)
+                img = img
             })
         end
     end
@@ -120,7 +136,7 @@ function Portal:draw(side)
         end
         
         for _, v in ipairs(self.thingList.background) do
-            self:drawThing(v.a, v.small)
+            self:drawThing(v.a, v.img)
         end
         
     else
@@ -132,14 +148,14 @@ function Portal:draw(side)
         love.graphics.draw(self.baseImg, 0, 0, 0, self.size*self.openProgress, 1, .5, 1)
     
         for _, v in ipairs(self.thingList.foreground) do
-            self:drawThing(v.a, v.small)
+            self:drawThing(v.a, v.img)
         end
     end
     
     love.graphics.pop()
 end
 
-function Portal:drawThing(a, small)
+function Portal:drawThing(a, img)
     --darken based on distance to "front"
     local closeness = math.abs(a-math.pi)/math.pi
     
@@ -167,11 +183,7 @@ function Portal:drawThing(a, small)
         sx = -sx
     end
     
-    if not small then
-        love.graphics.draw(self.thingImg, x, 0, 0, sx, 1, 5, 3)
-    else
-        love.graphics.draw(self.thingSmallImg, x, 0, 0, sx, 1, 1, 2)
-    end
+        love.graphics.draw(img, x, 0, 0, sx, 1, img:getWidth()/2, img:getHeight()+1)
 end
 
 function Portal:connectTo(portal)
@@ -179,14 +191,18 @@ function Portal:connectTo(portal)
     self.open = true
 end
 
-function Portal:stencilRectangle(way, method)
+function Portal:stencilRectangle(way)
     love.graphics.push()
     love.graphics.translate(self.x1, self.y1)
     love.graphics.rotate(self.r)
-    if way == "in" then
-        love.graphics.rectangle(method or "fill", -32, 0, self.size+64, 32)
-    else
-        love.graphics.rectangle(method or "fill", -32, -32, self.size+64, 32)
+
+    local x, y, w, h = -32, 0, self.size+64, 32 -- in (DON'T draw those pixels
+
+    if way == "out" then
+        x, y, w, h = -32, -32, self.size+64, 32 -- out (DO draw those pixels)
     end
+
+    love.graphics.rectangle("fill", x, y, w, h)
+
     love.graphics.pop()
 end

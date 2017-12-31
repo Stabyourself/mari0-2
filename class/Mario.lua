@@ -3,12 +3,13 @@ Mario = class("Mario", fissix.PhysObj)
 function Mario:initialize(world, x, y, powerUpState)
     self.powerUpState = powerUpState or "small"
     
+    local width = 12
     local height = 12
     if self.powerUpState ~= "small" then
         height = 24
     end
     
-    fissix.PhysObj.initialize(self, world, x, y, 12, height)
+    fissix.PhysObj.initialize(self, world, x-width/2, y-height, width, height)
     
     self.jumping = false
     self.ducking = false

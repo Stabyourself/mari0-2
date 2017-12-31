@@ -570,31 +570,27 @@ for i, v in pairs(powerUpStates) do
     char.height = v.height
     
     char.imgData = love.image.newImageData("characters/smb3-mario/" .. i .. ".png")
-    -- swap here
-    if LUIGI then
-        char.imgData = paletteSwap(char.imgData, {{{216, 40, 0}, {0, 255, 255}}})
-    end
-    
     char.img = love.graphics.newImage(char.imgData)
     
     -- star palette swaps
-    if v.colors then
-        char.starImg = {}
-        for _, starpalette in ipairs(STARPALETTES) do
-            local imgData = love.image.newImageData("characters/smb3-mario/" .. i .. ".png")
+    
+    -- if v.colors then
+    --     char.starImg = {}
+    --     for _, starpalette in ipairs(STARPALETTES) do
+    --         local imgData = love.image.newImageData("characters/smb3-mario/" .. i .. ".png")
             
-            local swaps = {}
-            for j, w in ipairs(v.colors) do
-                table.insert(swaps, {
-                    w,
-                    starpalette[j]
-                })
-            end
-            imgData = paletteSwap(imgData, swaps)
+    --         local swaps = {}
+    --         for j, w in ipairs(v.colors) do
+    --             table.insert(swaps, {
+    --                 w,
+    --                 starpalette[j]
+    --             })
+    --         end
+    --         imgData = paletteSwap(imgData, swaps)
             
-            table.insert(char.starImg, love.graphics.newImage(imgData))
-        end
-    end
+    --         table.insert(char.starImg, love.graphics.newImage(imgData))
+    --     end
+    -- end
     
     char.quad = {}
     char.frames = {}

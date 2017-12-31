@@ -84,10 +84,10 @@ local powerUpStates = {
             {216, 40, 0},
             {0, 0, 0},
         },
-        width = 20,
-        height = 20,
-        centerX = 10,
-        centerY = 11,
+        width = 24,
+        height = 24,
+        centerX = 12,
+        centerY = 15,
         frames = {
             "idle",
             
@@ -116,10 +116,13 @@ local powerUpStates = {
             
             "pipe",
             
-            "hold",
             "holdIdle",
+            
             "holdRun",
             "holdRun",
+            
+            "kick",
+            
             "climb",
             "climb",
         },
@@ -127,7 +130,7 @@ local powerUpStates = {
     
     big = {
         colors = {
-            {252, 188, 176},
+            {252, 188, 176},    
             {216, 40, 0},
             {0, 0, 0},
         },
@@ -177,6 +180,8 @@ local powerUpStates = {
             
             "holdIdle",
             
+            "holdRun",
+            "holdRun",
             "holdRun",
             "holdRun",
             
@@ -259,6 +264,8 @@ local powerUpStates = {
             
             "holdRun",
             "holdRun",
+            "holdRun",
+            "holdRun",
             
             "kick",
             
@@ -337,6 +344,8 @@ local powerUpStates = {
             
             "holdIdle",
             
+            "holdRun",
+            "holdRun",
             "holdRun",
             "holdRun",
             
@@ -435,6 +444,7 @@ local powerUpStates = {
             "holdRun",
             "holdRun",
             "holdRun",
+            "holdRun",
             
             "kick",
             
@@ -523,6 +533,7 @@ local powerUpStates = {
             "holdRun",
             "holdRun",
             "holdRun",
+            "holdRun",
             
             "kick",
             
@@ -555,6 +566,8 @@ for i, v in pairs(powerUpStates) do
     char.canSpin = v.canSpin
     char.canDuck = v.canDuck
     char.canShoot = v.canShoot
+    char.width = v.width
+    char.height = v.height
     
     char.imgData = love.image.newImageData("characters/smb3-mario/" .. i .. ".png")
     -- swap here
@@ -710,6 +723,9 @@ function Character:initialize(...)
     self.img = Character[self.powerUpState].img
     self.quad = Character[self.powerUpState].quad[3][self.animationState]
     
+    self.sizeX = Character[self.powerUpState].width
+    self.sizeY = Character[self.powerUpState].height
+    
     self.centerX = Character[self.powerUpState].centerX
     self.centerY = Character[self.powerUpState].centerY
     
@@ -754,14 +770,16 @@ function Character:movement(dt)
             self.img = Character[self.powerUpState].img
         end
         
-        self.somerSaultFrameTimer = self.somerSaultFrameTimer + dt
-        
-        while self.somerSaultFrameTimer > SOMERSAULTTIME do
-            self.somerSaultFrameTimer = self.somerSaultFrameTimer - SOMERSAULTTIME
+        if Character[self.powerUpState].frames.somerSault then
+            self.somerSaultFrameTimer = self.somerSaultFrameTimer + dt
             
-            self.somerSaultFrame = self.somerSaultFrame + 1
-            if self.somerSaultFrame > Character[self.powerUpState].frames.somerSault then
-                self.somerSaultFrame = 1
+            while self.somerSaultFrameTimer > SOMERSAULTTIME do
+                self.somerSaultFrameTimer = self.somerSaultFrameTimer - SOMERSAULTTIME
+                
+                self.somerSaultFrame = self.somerSaultFrame + 1
+                if self.somerSaultFrame > Character[self.powerUpState].frames.somerSault then
+                    self.somerSaultFrame = 1
+                end
             end
         end
     end
@@ -1017,17 +1035,17 @@ function Character:animation(dt)
     -- Image updating for star
     if self.starMan then
         -- get frame
-        local frame = math.ceil(math.fmod(self.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
+        local pallette = math.ceil(math.fmod(self.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
         
-        if frame == 1 then
+        if pallette == 1 then
             self.img = Character[self.powerUpState].img
         else
-            self.img = Character[self.powerUpState].starImg[frame-1]
+            self.img = Character[self.powerUpState].starImg[pallette-1]
         end 
     end
     
     if self.hasPortalGun then -- look towards portalGunAngle
-        if math.abs(self.portalGunAngle) <= math.pi*.5 then
+        if math.abs(self.portalGunAngle-self.r) <= math.pi*.5 then
             self.animationDirection = 1
         else
             self.animationDirection = -1
@@ -1086,7 +1104,7 @@ function Character:animation(dt)
     elseif self.state.name == "buttSlide" then
         self.animationState = "buttSlide"
         
-    elseif self.starMan then
+    elseif self.starMan and Character[self.powerUpState].frames.somerSault then
         self.animationState = "somerSault"
         frame = self.somerSaultFrame
         
@@ -1167,9 +1185,9 @@ function Character:animation(dt)
     
     -- Make sure to properly use the tables if it's an animationState with frames
     if frame then
-        self.quad = Character[self.powerUpState].quad[self:getAngleFrame(self.portalGunAngle)][self.animationState][frame]
+        self.quad = Character[self.powerUpState].quad[self:getAngleFrame(self.portalGunAngle-self.r)][self.animationState][frame]
     else
-        self.quad = Character[self.powerUpState].quad[self:getAngleFrame(self.portalGunAngle)][self.animationState]
+        self.quad = Character[self.powerUpState].quad[self:getAngleFrame(self.portalGunAngle-self.r)][self.animationState]
     end
     
     assert(type(self.quad) == "userdata", "The state \"" .. self.animationState .. "\" seems to not be have a quad set up correctly.")

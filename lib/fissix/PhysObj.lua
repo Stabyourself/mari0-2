@@ -11,6 +11,8 @@ function PhysObj:initialize(world, x, y, width, height)
 	self.groundSpeedX = 0
 	self.speedY = 0
 	
+	self.r = 0
+	
     self.surfaceAngle = 0
 	self.onGround = false
 	
@@ -78,6 +80,16 @@ function PhysObj:initialize(world, x, y, width, height)
 	--from right side
 	for xOff = self.width-1-fissix.TRACER_SIDE_DIST_TOP, math.floor(self.width/2), -step do
 		table.insert(self.tracers.up, fissix.Tracer:new(self, xOff, yOff, 0, -1, distance))
+	end
+end
+
+function PhysObj:unRotate(dt)
+	self.r = normalizeAngle(self.r)
+	
+	if self.r > 0 then
+		self.r = math.max(0, self.r - VAR("rotationSpeed")*dt)
+	else
+		self.r = math.min(0, self.r + VAR("rotationSpeed")*dt)
 	end
 end
 

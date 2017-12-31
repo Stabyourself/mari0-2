@@ -12,6 +12,10 @@ function VAR(i, default)
     return VARIABLES[i] or default
 end
 
+function CHEAT(i)
+    return CHEATENABLED[i]
+end
+
 function print_r (t, name, indent) -- http://www.hpelbers.org/lua/print_r
     local tableList = {}
     function table_r (t, name, indent, full)
@@ -96,15 +100,23 @@ function rectangleOnLine(x, y, w, h, p1x, p1y, p2x, p2y) -- Todo: optimize this
 
     if above and below then
         -- B
-        local angle = math.atan2(p2y-p1y, p2x-p1x)
-        local newX = pointAroundPoint(x, y, p1x, p1y, -angle) - p1x
-        
-        if newX > -0.1 and newX < 1.9 then -- These values may need to be reworked properly
+        if  (p1x > x+w and p2x > x+w) or
+            (p1x < x and p2x < x) or
+            (p1y > y+h and p2y > y+h) or
+            (p1y < y and p2y < y) then
+                return false
+        else
             return true
         end
     end
 
     return false
+end
+
+function objectWithinPortalRange(p, x, y)
+    local nX, nY = pointAroundPoint(x, y, p.x1, p.y1, -p.r)
+    
+    return nX-p.x1 > 0 and nX-p.x1 < p.size and nY < p.y1
 end
 
 function linesIntersect(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) -- Credits to https://stackoverflow.com/a/1968345
@@ -156,4 +168,11 @@ function paletteSwap(imgData, swaps)
     end
     
     return imgData
+end
+
+function normalizeAngle(a)
+	a = math.fmod(a+math.pi, math.pi*2)-math.pi
+    a = math.fmod(a-math.pi, math.pi*2)+math.pi
+    
+    return a
 end

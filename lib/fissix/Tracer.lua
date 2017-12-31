@@ -16,7 +16,7 @@ function Tracer:trace()
 		x = self.physObj:getX() + self.xOff + i*self.xDir
 		y = self.physObj:getY() + self.yOff + i*self.yDir
 		
-		col = self.physObj.World:checkMapCollision(x, y)
+		col = self.physObj.World:checkMapCollision(self.physObj, x, y)
 		if col then
 			return x, y
 		end

@@ -22,7 +22,7 @@ function Mario:initialize(world, x, y, powerUpState)
     self.pMeterTimer = 0
     self.pMeterTime = 8/60
     
-    self.hasPortalGun = true
+    self.hasPortalGun = true--true
     self.portalGunAngle = 0
     
     self.portalColor = {
@@ -32,9 +32,17 @@ function Mario:initialize(world, x, y, powerUpState)
 end
 
 function Mario:update(dt)
-    self:movement(dt, self)
-    self:animation(dt, self)
+    self:movement(dt)
+    self:animation(dt)
+    
     self:updateCrosshair()
+    
+    if CHEAT("spinnyMario") then
+        self.r = self.r + self.groundSpeedX*dt*0.1
+        self:unRotate(0)
+    else
+        self:unRotate(dt)
+    end
 end
 
 function Mario:updateCrosshair()

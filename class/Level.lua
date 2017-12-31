@@ -71,26 +71,25 @@ function Level:update(dt)
     if newSpawnLine > self.spawnLine then
         self:spawnEnemies(newSpawnLine)
     end
-    
-    --print(self.marios[1].x-self.camera.x)
 end
 
 function Level:draw()
     self.camera:attach()
     
     local xStart = math.floor(self.camera.x/self.tileSize)+1
-    local xEnd = math.min(self.width, xStart+WIDTH)
-    xEnd = math.min(self.width, xEnd)
+    local xEnd = xStart+WIDTH
 
     local yStart = math.floor(self.camera.y/self.tileSize)+1
-    local yEnd = self.height
+    local yEnd = yStart+HEIGHT
     
     for x = xStart, xEnd do
         for y = yStart, yEnd do
-            local Tile = self:getTile(x, y)
-            
-            if Tile and not Tile.invisible then
-                Tile:draw((x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
+            if self:inMap(x, y) then
+                local Tile = self:getTile(x, y)
+                
+                if Tile and not Tile.invisible then
+                    Tile:draw((x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
+                end
             end
         end
     end
@@ -142,6 +141,8 @@ function Level:mousepressed(x, y, button)
         if mario.portals[1] and mario.portals[2] then
             mario.portals[1]:connectTo(mario.portals[2])
             mario.portals[2]:connectTo(mario.portals[1])
+            
+            mario.portals[1].timer = mario.portals[2].timer
         end
     end
 end

@@ -24,48 +24,152 @@ function World:loadMap(map)
 end
 
 function World:update(dt)
-    updateGroup(self.portals)
+    updateGroup(self.portals, dt)
     
-    for i, v in ipairs(self.objects) do
-		v:update(dt)
+    for i, obj in ipairs(self.objects) do
+		obj:update(dt)
 		
 		-- Add gravity
-        v.speedY = v.speedY + (v.gravity or VAR("gravity")) * 0.5 * dt
+        obj.speedY = obj.speedY + (obj.gravity or VAR("gravity")) * 0.5 * dt
         -- Cap speedY
-        v.speedY = math.min((v.maxSpeedY or VAR("maxYSpeed")), v.speedY)
+        obj.speedY = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speedY)
         
-        local oldX, oldY = v.x, v.y
+        local oldX, oldY = obj.x, obj.y
         
-        v.x = v.x + v.speedX * dt
-        v.y = v.y + v.speedY * dt
+        obj.x = obj.x + obj.speedX * dt
+        obj.y = obj.y + obj.speedY * dt
         
-        v:checkCollisions()
+        self:checkPortaling(obj, oldX, oldY)
         
-        -- Portal checks
-		for _, p in ipairs(self.portals) do
-			local iX, iY = linesIntersect(oldX+v.width/2, oldY+v.height/2, v.x+v.width/2, v.y+v.height/2, p.x1, p.y1, p.x2, p.y2)
-			if iX then
-				self:doPortal(v, p, v.x, v.y, v.groundSpeedX, v.speedY, oldX, oldY)
-				break
-			end
-        end
+        local oldX, oldY = obj.x, obj.y
+        
+        obj:checkCollisions()
+        
+        self:checkPortaling(obj, oldX, oldY)
 		
 		-- Add gravity again
-        v.speedY = v.speedY + (v.gravity or VAR("gravity")) * 0.5 * dt
+        obj.speedY = obj.speedY + (obj.gravity or VAR("gravity")) * 0.5 * dt
         -- Cap speedY
-        v.speedY = math.min((v.maxSpeedY or VAR("maxYSpeed")), v.speedY)
+        obj.speedY = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speedY)
 	end
 end
 
+function World:checkPortaling(obj, oldX, oldY)
+    for _, p in ipairs(self.portals) do
+        if p.open then
+            local iX, iY = linesIntersect(oldX+obj.width/2, oldY+obj.height/2, obj.x+obj.width/2, obj.y+obj.height/2, p.x1, p.y1, p.x2, p.y2)
+            
+            if iX then
+                local x, y, speedX, speedY = obj.x+obj.width/2, obj.y+obj.height/2, obj.groundSpeedX, obj.speedY
+                local angle = math.atan2(obj.speedY, obj.groundSpeedX)
+                local speed = math.sqrt(obj.groundSpeedX^2+obj.speedY^2)
+                
+                local outX, outY, outAngle, angleDiff, reversed = self:doPortal(p, x, y, angle)
+                
+                obj.x = outX
+                obj.y = outY
+                
+                obj.groundSpeedX = math.cos(outAngle)*speed
+                obj.speedY = math.sin(outAngle)*speed
+                
+                obj.r = obj.r + angleDiff
+                
+                if reversed then
+                    obj.animationDirection = -obj.animationDirection
+                end
+                
+                self.portalVectorDebugs = {}
+                table.insert(self.portalVectorDebugs, {
+                    inX = x,
+                    inY = y,
+                    inVX = speedX,
+                    inVY = speedY,
+                    
+                    outX = obj.x,
+                    outY = obj.y,
+                    outVX = obj.groundSpeedX,
+                    outVY = obj.speedY,
+                    
+                    reversed = reversed
+                })
+                
+                obj.x = obj.x-obj.width/2
+                obj.y = obj.y-obj.height/2
+                
+                break
+            end
+        end
+    end 
+end
+
 function World:draw()
-	for _, obj in ipairs(self.objects) do
-		worldDraw(obj.img, obj.quad, obj.x+obj.width/2, obj.y+obj.height/2, obj.r or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
+    for _, v in ipairs(self.portals) do
+        v:draw("background")
+    end
+    
+    love.graphics.setColor(255, 255, 255)
+    
+    for _, obj in ipairs(self.objects) do
+        local x, y = obj.x+obj.width/2, obj.y+obj.height/2
+        
+        local quadX = obj.x+obj.width/2-obj.centerX
+        local quadY = obj.y+obj.height/2-obj.centerY
+        local quadWidth = obj.sizeX
+        local quadHeight = obj.sizeY
+        
+        love.graphics.stencil(function()
+            for _, p in ipairs(self.portals) do
+                if p.open then
+                    if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
+                        objectWithinPortalRange(p, x, y) then
+                        p:stencilRectangle("in")
+                    end
+                end
+            end
+        end)
+        
+        love.graphics.setStencilTest("equal", 0)
+        
+        worldDraw(obj.img, obj.quad, x, y, obj.r or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
+        
+        love.graphics.setStencilTest()
+        
+        if VAR("quadDebug") then
+            love.graphics.rectangle("line", quadX, quadY, quadWidth, quadHeight)
+        end
+        
+        -- Portal duplication
+        for _, p in ipairs(self.portals) do
+            if p.open then
+                if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
+                    objectWithinPortalRange(p, x, y) then
+                    local angle = math.atan2(obj.speedY, obj.groundSpeedX)
+                    local cX, cY, cAngle, angleDiff, reversed = self:doPortal(p, obj.x+obj.width/2, obj.y+obj.height/2, angle)
+                    
+                    local xScale = 1
+                    if reversed then
+                        xScale = -1
+                    end
+                    
+                    if VAR("stencilDebug") then
+                        p.connectsTo:stencilRectangle("out", "line")
+                    end
+                    
+                    love.graphics.stencil(function() p.connectsTo:stencilRectangle("out") end, "replace")
+                    love.graphics.setStencilTest("greater", 0)
+                    
+                    worldDraw(obj.img, obj.quad, cX, cY, (obj.r or 0) + angleDiff, (obj.animationDirection or 1)*xScale, 1, obj.centerX, obj.centerY)
+                    
+                    love.graphics.setStencilTest()
+                end
+            end
+        end
 	end
     
     for _, v in ipairs(self.portals) do
-        v:draw()
+        v:draw("foreground")
     end
-
+    
 	if VAR("physicsDebug") then
 		self:physicsDebug()
     end
@@ -116,17 +220,22 @@ function World:portalVectorDebug()
     end
 end
 
-function World:checkMapCollision(x, y)
+function World:checkMapCollision(obj, x, y)
     -- Portal hijacking
-    for _, v in ipairs(self.portals) do
-        if v.open then
+    for _, p in ipairs(self.portals) do
+        if p.open and objectWithinPortalRange(p, obj.x+obj.width/2, obj.y+obj.height/2) then
             -- check if pixel is inside portal wallspace
             -- rotate x, y around portal origin
-            local nx, ny = pointAroundPoint(x, y, v.x1, v.y1, -v.r)
+            local nx, ny = pointAroundPoint(x, y, p.x1, p.y1, -p.r)
+
+            if ny >= p.y1-1 and ny < p.y1+64 then
+                if nx > p.x1 and nx < p.x1+p.size then
+                    return false
+                end
             
-            if  nx > v.x1+1 and nx < v.x1+v.size-1 and
-                ny >= v.y1-1 and ny < v.y1+20 then
-                return false
+                if nx < p.x1 or nx > p.x1+p.size then
+                    return true
+                end
             end
         end
     end
@@ -343,7 +452,7 @@ function World:attemptPortal(tileX, tileY, side, x, y, color)
     end 
 end
 
-function World:doPortal(obj, portal, x, y, speedX, speedY, oldX, oldY)
+function World:doPortal(portal, x, y, angle)
     -- Check whether to reverse portal direction (when portal face the same way)
     local reversed = false
     
@@ -352,34 +461,32 @@ function World:doPortal(obj, portal, x, y, speedX, speedY, oldX, oldY)
         reversed = true
     end
     
-    local oldSpeedX, oldSpeedY = speedX, speedY
-    
 	-- Modify speed
-    local speed = math.sqrt(speedX^2 + speedY^2)
-    local inR = math.atan2(speedY, speedX)
     local r
+    local rDiff
     
     if not reversed then
-        r = portal.connectsTo.r - portal.r - math.pi + inR
+        rDiff = portal.connectsTo.r - portal.r - math.pi
+        r = rDiff + angle
     else
-        r = portal.connectsTo.r - inR + portal.r
+        rDiff = portal.connectsTo.r + portal.r + math.pi
+        r = portal.connectsTo.r + portal.r - angle
     end
-    
-	obj.groundSpeedX = math.cos(r)*speed
-    obj.speedY = math.sin(r)*speed
     
 	-- Modify position
     -- Rotate around entry portal
     local newX, newY
     
     if not reversed then
-        newX, newY = pointAroundPoint(x+obj.width/2, y+obj.height/2, portal.x2, portal.y2, -portal.r-math.pi)
+        newX, newY = pointAroundPoint(x, y, portal.x2, portal.y2, -portal.r-math.pi)
         
         -- Translate by portal offset
         newX = newX + (portal.connectsTo.x1 - portal.x2)
         newY = newY + (portal.connectsTo.y1 - portal.y2)
     else
-	    newX, newY = pointAroundPoint(oldX+obj.width/2, oldY+obj.height/2, portal.x1, portal.y1, -portal.r)
+	    newX, newY = pointAroundPoint(x, y, portal.x1, portal.y1, portal.r)
+        local pR = math.atan2(y-portal.y1, x-portal.x1)
+	    newX, newY = pointAroundPoint(newX, newY, portal.x1, portal.y1, -pR*2)
     
         -- Translate by portal offset
         newX = newX + (portal.connectsTo.x1 - portal.x1)
@@ -389,23 +496,7 @@ function World:doPortal(obj, portal, x, y, speedX, speedY, oldX, oldY)
 	-- Rotate around exit portal
     newX, newY = pointAroundPoint(newX, newY, portal.connectsTo.x1, portal.connectsTo.y1, portal.connectsTo.r)
 
-	obj.x = newX-obj.width/2
-    obj.y = newY-obj.height/2
-    
-    self.portalVectorDebugs = {}
-    table.insert(self.portalVectorDebugs, {
-        inX = x+obj.width/2,
-        inY = y+obj.height/2,
-        inVX = speedX,
-        inVY = speedY,
-        
-        outX = obj.x+obj.width/2,
-        outY = obj.y+obj.height/2,
-        outVX = obj.groundSpeedX,
-        outVY = obj.speedY,
-        
-        reversed = reversed
-    })
+    return newX, newY, r, rDiff, reversed
 end
 
 function World:checkPortalSurface(tileX, tileY, side, progress)

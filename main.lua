@@ -18,6 +18,8 @@ function love.load()
     JSON = require "lib/JSON"
     class = require "lib/middleclass"
     Camera = require "lib/Camera"
+    Color = require "lib/Color"
+    Easing = require "lib/Easing"
 
     require "lib/fissix"
 
@@ -30,8 +32,11 @@ function love.load()
     require "class/BlockBounce"
     require "class/Enemy"
     require "class/Portal" -- the juicy bits
+    require "class/PortalParticle" -- the juicy bits
     require "class/UI"
     require "class/Smb3Ui"
+    
+    require "cheats"
 
     require "game"
     
@@ -158,8 +163,6 @@ function love.draw()
     end
     
     marioPrint(game.level.marios[1].state.name, 8, 8)
-    marioPrint("Spinning:    " .. tostring(game.level.marios[1].spinning), 8, 18)
-    marioPrint("Shooting:    " .. tostring(game.level.marios[1].shooting), 8, 28)
     
     -- For the stream
     if VAR("inputDebug") then

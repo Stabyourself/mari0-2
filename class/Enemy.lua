@@ -26,11 +26,22 @@ function Enemy:initialize(world, x, y, json, img, quad)
     if self.movementType == "truffleshuffle" then
         self.shuffleDir = -1
     end
+    
+    self.sizeX = 16
+    self.sizeY = 16
 end
 
 function Enemy:update(dt)
     self:animation(dt)
     self:movement(dt)
+    
+    if CHEAT("spinnyMario") then
+        self.r = self.r + self.speedX*dt*0.1
+        self:unRotate(0)
+    else
+        self.r = self.r + self.speedX*dt*0.1
+        self:unRotate(dt)
+    end
 
     if self.autoRemove and (self.x+self.width < game.level.camera.x-1 or self.y > HEIGHT+1) then
         return true

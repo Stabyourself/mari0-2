@@ -8,6 +8,16 @@ tiles[1192] = {collision = VAR("collision").cube}
 tiles[1193] = {collision = VAR("collision").cube}
 tiles[1194] = {collision = VAR("collision").cube}
 
+tiles[1337] = {
+    collision = {
+        0 ,0,
+        8, 8,
+        16, 0,
+        16, 16,
+        0, 16,
+    }
+}
+
 tiles[1265] = {
     angle = -math.pi/8,
     collision = {
@@ -64,6 +74,25 @@ tiles[1340] = {
          0, 16,
     }
 }
+
+tiles[1400] = {
+    angle = 0,
+    collision = {
+         0,  0,
+        16,  0,
+        16, 16,
+    }
+}
+
+tiles[1401] = {
+    angle = 0,
+    collision = {
+         0,  0,
+        16, 0,
+         0, 16,
+    }
+}
+
 
 local props = {
     tileSize = 16,

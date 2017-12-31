@@ -157,10 +157,9 @@ end
 
 function Portal:drawThing(a, img)
     --darken based on distance to "front"
-    local closeness = math.abs(a-math.pi)/math.pi
     
     local r, g, b = unpack(self.color)
-    local darken = (closeness)*0.6
+    local darken = math.abs(a-math.pi)/math.pi*0.6
     love.graphics.setColor(Color.darken(r, g, b, darken))
     
     local dist = (self.size/2*self.openProgress - 2)
@@ -174,16 +173,17 @@ function Portal:drawThing(a, img)
         x = -(1-(1+x)^1.5)
     end
     
-    x = x*dist
+    x = x
     
-    local sx = (1-(math.abs(x)/dist))*0.7+0.3
+    local sx = (1-(math.abs(x)))*0.7+0.3
     
-    --turn around on the way to left
-    if a > math.pi*0.5 and a < math.pi*1.5 then
-        sx = -sx
-    end
+    -- turn around on the way to left
+    -- Actually no because the portalthings are symmetrical
+    -- if a > math.pi*0.5 and a < math.pi*1.5 then
+    --     sx = -sx
+    -- end
     
-        love.graphics.draw(img, x, 0, 0, sx, 1, img:getWidth()/2, img:getHeight()+1)
+    love.graphics.draw(img, x*dist, 0, 0, sx, 1, img:getWidth()/2, img:getHeight()+1)
 end
 
 function Portal:connectTo(portal)

@@ -141,8 +141,8 @@ function Level:mousepressed(x, y, button)
         if mario.portals[1] and mario.portals[2] then
             mario.portals[1]:connectTo(mario.portals[2])
             mario.portals[2]:connectTo(mario.portals[1])
-            
-            mario.portals[1].timer = mario.portals[2].timer
+
+            mario.portals[button].timer = mario.portals[button].connectsTo.timer
         end
     end
 end

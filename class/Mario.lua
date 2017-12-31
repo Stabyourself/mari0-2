@@ -37,7 +37,7 @@ function Mario:update(dt)
     
     self:updateCrosshair()
     
-    if CHEAT("spinnyMario") then
+    if CHEAT("tumble") then
         self.r = self.r + self.groundSpeedX*dt*0.1
         self:unRotate(0)
     else

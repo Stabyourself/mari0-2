@@ -35,7 +35,7 @@ function Enemy:update(dt)
     self:animation(dt)
     self:movement(dt)
     
-    if CHEAT("spinnyMario") then
+    if CHEAT("tumble") then
         self.r = self.r + self.speedX*dt*0.1
         self:unRotate(0)
     else

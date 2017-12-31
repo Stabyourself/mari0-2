@@ -1,3 +1,3 @@
 CHEATENABLED = {}
 
-CHEATENABLED.spinnyMario = false
+CHEATENABLED.tumble = false

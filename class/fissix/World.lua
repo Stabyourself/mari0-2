@@ -160,7 +160,7 @@ function World:draw()
                         love.graphics.setColor(255, 255, 255)
                     end
 
-                    worldDraw(obj.img, obj.quad, cX, cY, (obj.r or 0) + angleDiff, (obj.animationDirection or 1)*xScale, 1, obj.centerX, obj.centerY)
+                    drawObject(obj, cX, cY, (obj.r or 0) + angleDiff, (obj.animationDirection or 1)*xScale, 1, obj.centerX, obj.centerY)
                     
                     love.graphics.setStencilTest()
                     
@@ -192,7 +192,7 @@ function World:draw()
         
         love.graphics.setStencilTest("equal", 0)
         
-        worldDraw(obj.img, obj.quad, x, y, obj.r or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
+        drawObject(obj, x, y, obj.r or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
         
         love.graphics.setStencilTest()
         
@@ -213,6 +213,24 @@ function World:draw()
     
     if VAR("portalVectorDebug") then
         self:portalVectorDebug()
+    end
+end
+
+function drawObject(obj, x, y, r, sx, sy, cx, cy)
+    if type(obj.img) == "table" then
+        for i, v in ipairs(obj.img) do
+            if obj.palette[i] then
+                love.graphics.setColor(obj.palette[i])
+            end
+            worldDraw(v, obj.quad, x, y, r, sx, sy, cx, cy)
+            love.graphics.setColor(255, 255, 255)
+        end
+        
+        if obj.img["static"] then
+            worldDraw(obj.img["static"], obj.quad, x, y, r, sx, sy, cx, cy)
+        end
+    else
+        worldDraw(obj.img, obj.quad, x, y, r, sx, sy, cx, cy)
     end
 end
 

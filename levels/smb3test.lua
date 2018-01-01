@@ -2,7 +2,7 @@ return {
     entities = {
         {type = "spawn", x = 7.5, y = 14},
         
-        {type = "goomba", x = 23, y = 14},
+        --{type = "goomba", x = 23, y = 14},
     },
     
     map = {

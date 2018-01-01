@@ -53,20 +53,20 @@ local SHOOTTIME = 12/60
 local STARPALETTES = {
     {
         {252, 252, 252},
-        {0, 0, 0},
-        {216, 40, 0},
+        {  0,   0,   0},
+        {216,  40,   0},
     },
     
     {
         {252, 252, 252},
-        {0, 0, 0},
-        {76, 220, 72},
+        {  0,   0,   0},
+        { 76, 220,  72},
     },
     
     {
         {252, 188, 176},
-        {0, 0, 0},
-        {252, 152, 56},
+        {  0,   0,   0},
+        {252, 152,  56},
     }
 }
 
@@ -81,8 +81,8 @@ local powerUpStates = {
     small = {
         colors = {
             {252, 188, 176},
-            {216, 40, 0},
-            {0, 0, 0},
+            {216,  40,   0},
+            {  0,   0,   0},
         },
         width = 24,
         height = 24,
@@ -130,9 +130,9 @@ local powerUpStates = {
     
     big = {
         colors = {
-            {252, 188, 176},    
-            {216, 40, 0},
-            {0, 0, 0},
+            {252, 188, 176},
+            {216,  40,   0},
+            {  0,   0,   0},
         },
         width = 40,
         height = 40,
@@ -212,8 +212,8 @@ local powerUpStates = {
     fire = {
         colors = {
             {252, 188, 176},
-            {216, 40, 0},
-            {0, 0, 0},
+            {252, 152,  56},
+            {216,  40,   0},
         },
         width = 40,
         height = 40,
@@ -293,9 +293,9 @@ local powerUpStates = {
     
     hammer = {
         colors = {
-            {252, 152, 56},
-            {252, 252, 252},
-            {0, 0, 0},
+            {252, 188, 176},
+            {216,  40,   0},
+            {  0,   0,   0},
         },
         width = 40,
         height = 40,
@@ -376,8 +376,8 @@ local powerUpStates = {
     raccoon = {
         colors = {
             {252, 188, 176},
-            {216, 40, 0},
-            {0, 0, 0},
+            {216,  40,   0},
+            {  0,   0,   0},
         },
         width = 40,
         height = 40,
@@ -465,8 +465,8 @@ local powerUpStates = {
     tanooki = {
         colors = {
             {252, 188, 176},
-            {200, 76, 12},
-            {0, 0, 0},
+            {200,  76,  12},
+            {  0,   0,   0},
         },
         width = 40,
         height = 40,
@@ -554,43 +554,39 @@ local powerUpStates = {
     }
 }
 
-print("Setting up palettes for character")
 for i, v in pairs(powerUpStates) do
     Character[i] = {}
     local char = Character[i]
     
-    char.centerX = v.centerX
-    char.centerY = v.centerY
-    char.canFly = v.canFly
-    char.canFloat = v.canFloat
-    char.canSpin = v.canSpin
-    char.canDuck = v.canDuck
-    char.canShoot = v.canShoot
-    char.width = v.width
-    char.height = v.height
+    for j, w in pairs(v) do
+        char[j] = w
+    end
     
-    char.imgData = love.image.newImageData("characters/smb3-mario/" .. i .. ".png")
-    char.img = love.graphics.newImage(char.imgData)
+    char.img = {}
+    local imgWidth, imgHeight
     
-    -- star palette swaps
+    local function getPath(j)
+        return "characters/smb3-mario/graphics/" .. i .. "-" .. j .. ".png"
+    end
     
-    -- if v.colors then
-    --     char.starImg = {}
-    --     for _, starpalette in ipairs(STARPALETTES) do
-    --         local imgData = love.image.newImageData("characters/smb3-mario/" .. i .. ".png")
-            
-    --         local swaps = {}
-    --         for j, w in ipairs(v.colors) do
-    --             table.insert(swaps, {
-    --                 w,
-    --                 starpalette[j]
-    --             })
-    --         end
-    --         imgData = paletteSwap(imgData, swaps)
-            
-    --         table.insert(char.starImg, love.graphics.newImage(imgData))
-    --     end
-    -- end
+    local j = 1
+    while love.filesystem.isFile(getPath(j)) do
+        char.img[j] = love.graphics.newImage(getPath(j))
+        
+        imgWidth = char.img[j]:getWidth()
+        imgHeight = char.img[j]:getHeight()
+        
+        j = j + 1
+    end
+    
+    if love.filesystem.isFile(getPath("static")) then
+        char.img["static"] = love.graphics.newImage(getPath("static"))
+        
+        imgWidth = char.img["static"]:getWidth()
+        imgHeight = char.img["static"]:getHeight()
+    end
+    
+    assert(imgWidth, "I couldn't load a single image for powerUpState \"" .. i .. "\", this is illegal and you're going to jail")
     
     char.quad = {}
     char.frames = {}
@@ -600,7 +596,7 @@ for i, v in pairs(powerUpStates) do
         local x = 0
         
         for _, name in ipairs(v.frames) do
-            local quad = love.graphics.newQuad(x*v.width, (y-1)*v.height, v.width, v.height, Character[i].img:getWidth(), Character[i].img:getHeight())
+            local quad = love.graphics.newQuad(x*v.width, (y-1)*v.height, v.width, v.height, imgWidth, imgHeight)
             
             if char.quad[y][name] then
                 if type(char.quad[y][name]) ~= "table" then
@@ -618,7 +614,6 @@ for i, v in pairs(powerUpStates) do
         end
     end
 end
-print("Done.")
 
 local state = {}
 
@@ -716,14 +711,16 @@ function Character:initialize(...)
     self.flyTimer = FLYTIME
     self.flying = false
     
-    self.img = Character[self.powerUpState].img
-    self.quad = Character[self.powerUpState].quad[3][self.animationState]
+    self.char = Character[self.powerUpState]
     
-    self.sizeX = Character[self.powerUpState].width
-    self.sizeY = Character[self.powerUpState].height
+    self.img = self.char.img
+    self.quad = self.char.quad[3].idle
     
-    self.centerX = Character[self.powerUpState].centerX
-    self.centerY = Character[self.powerUpState].centerY
+    self.sizeX = self.char.width
+    self.sizeY = self.char.height
+    
+    self.centerX = self.char.centerX
+    self.centerY = self.char.centerY
     
     self.state = CharacterState:new("idle", state.idle)
     
@@ -744,6 +741,8 @@ function Character:initialize(...)
     
     self.shooting = false
     self.shootTimer = 0
+    
+    self.palette = self.char.colors
 end
 
 function Character:switchState(stateName)
@@ -763,17 +762,18 @@ function Character:movement(dt)
         
         if self.starTimer >= STARTIME then
             self.starMan = false
-            self.img = Character[self.powerUpState].img
+            self.img = self.char.img
+            self.palette = self.standardPalette
         end
         
-        if Character[self.powerUpState].frames.somerSault then
+        if self.char.frames.somerSault then
             self.somerSaultFrameTimer = self.somerSaultFrameTimer + dt
             
             while self.somerSaultFrameTimer > SOMERSAULTTIME do
                 self.somerSaultFrameTimer = self.somerSaultFrameTimer - SOMERSAULTTIME
                 
                 self.somerSaultFrame = self.somerSaultFrame + 1
-                if self.somerSaultFrame > Character[self.powerUpState].frames.somerSault then
+                if self.somerSaultFrame > self.char.frames.somerSault then
                     self.somerSaultFrame = 1
                 end
             end
@@ -945,11 +945,11 @@ function Character:movement(dt)
                 else
                     self.groundSpeedX = math.min(0, self.groundSpeedX)
                 end
-            elseif Character[self.powerUpState].canDuck then
+            elseif self.char.canDuck then
                 self.ducking = true
                 
                 -- Stop spinning if was spinning
-                if Character[self.powerUpState].canSpin then
+                if self.char.canSpin then
                     self.spinning = false
                     self.spinTimer = SPINTIME
                 end
@@ -1031,13 +1031,13 @@ function Character:animation(dt)
     -- Image updating for star
     if self.starMan then
         -- get frame
-        local pallette = math.ceil(math.fmod(self.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
+        local palette = math.ceil(math.fmod(self.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
         
-        if pallette == 1 then
-            self.img = Character[self.powerUpState].img
+        if palette == 4 then
+            self.palette = self.standardPalette
         else
-            self.img = Character[self.powerUpState].starImg[pallette-1]
-        end 
+            self.palette = STARPALETTES[palette]
+        end
     end
     
     if self.hasPortalGun then -- look towards portalGunAngle
@@ -1067,7 +1067,7 @@ function Character:animation(dt)
         self.animationDirection = self.spinDirection
         
         -- calculate spin frame from spinTimer
-        frame = math.ceil(math.fmod(self.spinTimer, Character[self.powerUpState].frames.spin*SPINFRAMETIME)/SPINFRAMETIME)
+        frame = math.ceil(math.fmod(self.spinTimer, self.char.frames.spin*SPINFRAMETIME)/SPINFRAMETIME)
 
     elseif self.shooting and (not self.starMan or (self.state.name ~= "jump" and self.state.name ~= "fall")) then
         if self.onGround then
@@ -1076,7 +1076,7 @@ function Character:animation(dt)
             self.animationState = "shootAir"
         end
         
-        frame = math.ceil(self.shootTimer/SHOOTTIME*Character[self.powerUpState].frames.shoot)
+        frame = math.ceil(self.shootTimer/SHOOTTIME*self.char.frames.shoot)
 
     elseif self.ducking then
         self.animationState = "duck"
@@ -1100,7 +1100,7 @@ function Character:animation(dt)
     elseif self.state.name == "buttSlide" then
         self.animationState = "buttSlide"
         
-    elseif self.starMan and Character[self.powerUpState].frames.somerSault then
+    elseif self.starMan and self.char.frames.somerSault then
         self.animationState = "somerSault"
         frame = self.somerSaultFrame
         
@@ -1108,9 +1108,9 @@ function Character:animation(dt)
         self.animationState = "float"
         
     elseif self.state.name == "jump" or self.state.name == "fall" then
-        if not Character[self.powerUpState].canFly and self.pMeter == VAR("pMeterTicks") then
+        if not self.char.canFly and self.pMeter == VAR("pMeterTicks") then
             self.animationState = "fly"
-        elseif (not Character[self.powerUpState].canFly and self.maxSpeedJump == MAXSPEEDS[3]) or self.flying then
+        elseif (not self.char.canFly and self.maxSpeedJump == MAXSPEEDS[3]) or self.flying then
             self.animationState = "fly"
         else
             if self.speedY < 0 then
@@ -1130,7 +1130,7 @@ function Character:animation(dt)
             self.runAnimationTimer = self.runAnimationTimer - RUNANIMATIONTIME
             self.runAnimationFrame = self.runAnimationFrame + 1
             
-            local runFrames = Character[self.powerUpState].frames.run
+            local runFrames = self.char.frames.run
 
             if self.runAnimationFrame > runFrames then
                 self.runAnimationFrame = self.runAnimationFrame - runFrames
@@ -1142,7 +1142,7 @@ function Character:animation(dt)
     
     -- Flying animation
     if self.animationState == "fly" then
-        local flyFrames = Character[self.powerUpState].frames.fly
+        local flyFrames = self.char.frames.fly
         
         if flyFrames > 1 then
             if self.state.name == "fall" then
@@ -1170,7 +1170,7 @@ function Character:animation(dt)
             self.floatAnimationTimer = self.floatAnimationTimer - FLYANIMATIONTIME
             self.floatAnimationFrame = self.floatAnimationFrame + 1
 
-            local floatFrames = Character[self.powerUpState].frames.float
+            local floatFrames = self.char.frames.float
             if self.floatAnimationFrame > floatFrames then
                 self.floatAnimationFrame = floatFrames -- don't reset to the start
             end
@@ -1181,22 +1181,22 @@ function Character:animation(dt)
     
     -- Make sure to properly use the tables if it's an animationState with frames
     if frame then
-        self.quad = Character[self.powerUpState].quad[self:getAngleFrame(self.portalGunAngle-self.r)][self.animationState][frame]
+        self.quad = self.char.quad[self:getAngleFrame(self.portalGunAngle-self.r)][self.animationState][frame]
     else
-        self.quad = Character[self.powerUpState].quad[self:getAngleFrame(self.portalGunAngle-self.r)][self.animationState]
+        self.quad = self.char.quad[self:getAngleFrame(self.portalGunAngle-self.r)][self.animationState]
     end
     
     assert(type(self.quad) == "userdata", "The state \"" .. self.animationState .. "\" seems to not be have a quad set up correctly.")
 end
 
 function Character:jump()
-    if Character[self.powerUpState].canFly and self.flying and (self.state.name == "jump" or self.state.name == "fly" or self.state.name == "fall") then
+    if self.char.canFly and self.flying and (self.state.name == "jump" or self.state.name == "fly" or self.state.name == "fall") then
         self:switchState("fly")
         self.flyAnimationTimer = 0
         self.flyAnimationFrame = 1
     end
     
-    if Character[self.powerUpState].canFloat and self.speedY > 0 and (self.state.name == "jump" or self.state.name == "float" or self.state.name == "fall") then
+    if self.char.canFloat and self.speedY > 0 and (self.state.name == "jump" or self.state.name == "float" or self.state.name == "fall") then
         self:switchState("float")
         self.floatAnimationTimer = 0
         self.floatAnimationFrame = 1
@@ -1231,7 +1231,7 @@ function Character:jump()
         self.speedY = speedY
         
         -- See if Mario should switch to flying mode
-        if Character[self.powerUpState].canFly then
+        if self.char.canFly then
             if self.pMeter == VAR("pMeterTicks") and not self.flying then
                 self.flyTimer = 0
                 self.flying = true
@@ -1261,7 +1261,7 @@ function Character:startFall()
 end
 
 function Character:spin() -- that's a good trick
-    if Character[self.powerUpState].canSpin and not self.spinning then
+    if self.char.canSpin and not self.spinning then
         if not keyDown("down") then -- Make sure it's not colliding with any of the other states
             self.spinning = true
             self.spinTimer = 0
@@ -1276,7 +1276,7 @@ function Character:star()
 end
 
 function Character:shoot()
-    if Character[self.powerUpState].canShoot and not self.shooting then
+    if self.char.canShoot and not self.shooting then
         if not self.ducking then -- Make sure it's not colliding with any of the other states
             -- This is where I'd spawn some fireballs.
             

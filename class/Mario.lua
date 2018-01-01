@@ -30,6 +30,12 @@ function Mario:initialize(world, x, y, powerUpState)
         {60, 188, 252},
 		{232, 130, 30}
     }
+    
+    self.standardPalette = {
+        {252, 188, 176},
+        {216,  40,   0},
+        {  0,   0,   0},
+    }
 end
 
 function Mario:update(dt)

@@ -76,11 +76,13 @@ end
 function Level:draw()
     self.camera:attach()
     
-    fissix.World.draw(self)
+    love.graphics.setColor(255, 255, 255)
     
     for _, v in ipairs(self.marios) do
         love.graphics.line(v.x+v.width/2, v.y+v.height/2+2, v.crosshairX, v.crosshairY)
     end
+    
+    fissix.World.draw(self)
     
     self.camera:detach()
 end

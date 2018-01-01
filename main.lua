@@ -324,8 +324,18 @@ function worldDraw(...)
     local arg = {...}
 
     if type(arg[2]) == "number" then
-        love.graphics.draw(arg[1], math.round(arg[2]), math.round(arg[3]), arg[4], arg[5], arg[6], arg[7], arg[8])
+        if VAR("noSubpixelMovement") then
+            arg[2] = math.round(arg[2])
+            arg[3] = math.round(arg[3])
+        end
+        
+        love.graphics.draw(arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8])
     else
+        if VAR("noSubpixelMovement") then
+            arg[3] = math.round(arg[3])
+            arg[4] = math.round(arg[4])
+        end
+        
         love.graphics.draw(arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8], arg[9])
     end
 end

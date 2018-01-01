@@ -8,7 +8,11 @@ end
 
 function Camera:attach()
 	love.graphics.push()
-	love.graphics.translate(-self.x, -self.y)
+	if VAR("noSubpixelMovement") then
+		love.graphics.translate(math.round(-self.x), math.round(-self.y))
+	else
+		love.graphics.translate(-self.x, -self.y)
+	end
 end
 
 function Camera:detach()

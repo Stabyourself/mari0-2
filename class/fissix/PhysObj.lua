@@ -11,6 +11,8 @@ function PhysObj:initialize(world, x, y, width, height)
 	self.groundSpeedX = 0
 	self.speedY = 0
 	
+	self.gravityDirection = math.pi*.5
+	
 	self.r = 0
 	
     self.surfaceAngle = 0

@@ -235,6 +235,25 @@ function World:portalVectorDebug()
 end
 
 function World:checkMapCollision(obj, x, y)
+    -- Portal hijacking
+    for _, p in ipairs(self.portals) do
+        if p.open and objectWithinPortalRange(p, obj.x+obj.width/2, obj.y+obj.height/2) then
+            -- check if pixel is inside portal wallspace
+            -- rotate x, y around portal origin
+            local nx, ny = pointAroundPoint(x, y, p.x1, p.y1, -p.r)
+
+            if ny >= p.y1-1 and ny < p.y1+64 then
+                if nx > p.x1 and nx < p.x1+p.size then
+                    return false
+                end
+            
+                if nx < p.x1 or nx > p.x1+p.size then
+                    return true
+                end
+            end
+        end
+    end
+    
     local tileX, tileY = self:worldToMap(x, y)
 	
 	if not self:inMap(tileX, tileY) then
@@ -469,18 +488,21 @@ function World:doPortal(portal, x, y, angle)
     end
     
 	-- Modify position
-    -- Rotate around entry portal
     local newX, newY
     
     if not reversed then
+        -- Rotate around entry portal (+ half a turn)
         newX, newY = pointAroundPoint(x, y, portal.x2, portal.y2, -portal.r-math.pi)
         
-        -- Translate by portal offset
+        -- Translate by portal offset (from opposite sites)
         newX = newX + (portal.connectsTo.x1 - portal.x2)
         newY = newY + (portal.connectsTo.y1 - portal.y2)
     else
-        local pR = math.atan2(y-portal.y1, x-portal.x1)
-	    newX, newY = pointAroundPoint(x, y, portal.x1, portal.y1, portal.r-pR*2)
+        -- Rotate around entry portal
+	    newX, newY = pointAroundPoint(x, y, portal.x1, portal.y1, -portal.r)
+
+        -- mirror along entry portal
+        newY = newY + (portal.y1-newY)*2
     
         -- Translate by portal offset
         newX = newX + (portal.connectsTo.x1 - portal.x1)

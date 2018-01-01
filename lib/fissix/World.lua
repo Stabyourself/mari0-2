@@ -242,12 +242,10 @@ function World:checkMapCollision(obj, x, y)
             -- rotate x, y around portal origin
             local nx, ny = pointAroundPoint(x, y, p.x1, p.y1, -p.r)
 
-            if ny >= p.y1-1 and ny < p.y1+64 then
-                if nx > p.x1 and nx < p.x1+p.size then
+            if ny >= p.y1 and ny < p.y1+64 then -- vertically inside the portal
+                if nx > p.x1 and nx < p.x1+p.size then -- horizontally INside the portal
                     return false
-                end
-            
-                if nx < p.x1 or nx > p.x1+p.size then
+                else -- horizontally OUTside the portal
                     return true
                 end
             end
@@ -282,6 +280,7 @@ end
 
 function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/raycasting.html , thanks man
     -- Todo: limit how far offscreen this goes?
+    -- Todo: allow offscreen as long as it'll return to inscreen
     local rayPosX = x+1
     local rayPosY = y+1
     local rayDirX = math.cos(dir)
@@ -463,7 +462,7 @@ function World:attemptPortal(tileX, tileY, side, x, y, color)
             
             return portal
         end
-    end 
+    end
 end
 
 function World:doPortal(portal, x, y, angle)
@@ -494,7 +493,7 @@ function World:doPortal(portal, x, y, angle)
         -- Rotate around entry portal (+ half a turn)
         newX, newY = pointAroundPoint(x, y, portal.x2, portal.y2, -portal.r-math.pi)
         
-        -- Translate by portal offset (from opposite sites)
+        -- Translate by portal offset (from opposite sides)
         newX = newX + (portal.connectsTo.x1 - portal.x2)
         newY = newY + (portal.connectsTo.y1 - portal.y2)
     else
@@ -516,17 +515,6 @@ function World:doPortal(portal, x, y, angle)
 end
 
 function World:checkPortalSurface(tileX, tileY, side, progress)
-    local windMill = {
-        -1, -1,
-         0, -1,
-         1, -1,
-         1,  0,
-         1,  1,
-         0,  1,
-        -1,  1,
-        -1, 0
-    }
-    
     local function walkSide(tile, tileX, tileY, side, dir)
         local nextX, nextY, angle, nextAngle, nextTileX, nextTileY, nextSide, x, y
         local first = true
@@ -638,6 +626,17 @@ function World:checkPortalSurface(tileX, tileY, side, progress)
                     
                     -- Dirty check, maybe change
                     -- Find where on the "windmill" we are
+                    local windMill = {
+                        -1, -1,
+                        0, -1,
+                        1, -1,
+                        1,  0,
+                        1,  1,
+                        0,  1,
+                        -1,  1,
+                        -1, 0
+                    }
+
                     local pos
                     for i = 1, #windMill, 2 do
                         if windMill[i] == moveX and windMill[i+1] == moveY then

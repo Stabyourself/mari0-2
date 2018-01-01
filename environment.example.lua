@@ -1,13 +1,14 @@
 return {
     physicsDebug = false,
     quadDebug = false,
-    stencilDebug = true,
+    stencilDebug = false,
     physicsDebug = false,
     inputDebug = true,
+    portalVectorDebug = false,
 
     noEnemies = false,
     musicDisabled = false,
-    volume = 0,
+    volume = 1,
     scale = 3,
 
     vsync = true,

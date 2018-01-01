@@ -2,7 +2,6 @@ return {
     physicsDebug = false,
     quadDebug = false,
     stencilDebug = false,
-    physicsDebug = false,
     inputDebug = true,
     portalVectorDebug = false,
 

@@ -135,14 +135,17 @@ function World:draw()
 
                     if VAR("stencilDebug") then
                         love.graphics.setColor(0, 255, 0, 200)
-                        love.graphics.rectangle("fill", 0, 0, SCREENWIDTH, SCREENHEIGHT)
+                        love.graphics.rectangle("fill", self.camera.x, self.camera.y, SCREENWIDTH, SCREENHEIGHT)
                         love.graphics.setColor(255, 255, 255)
                     end
 
                     worldDraw(obj.img, obj.quad, cX, cY, (obj.r or 0) + angleDiff, (obj.animationDirection or 1)*xScale, 1, obj.centerX, obj.centerY)
                     
-                    
                     love.graphics.setStencilTest()
+                    
+                    if VAR("doPortalDebug") then
+                        love.graphics.rectangle("fill", cX-.5, cY-.5, 1, 1)
+                    end
                 end
             end
         end
@@ -162,8 +165,7 @@ function World:draw()
         if VAR("stencilDebug") then
             love.graphics.setStencilTest("greater", 0)
             love.graphics.setColor(255, 0, 0, 200)
-            love.graphics.draw(debugCandyImg, debugCandyQuad, 0, 0)
-            --love.graphics.rectangle("fill", 0, 0, SCREENWIDTH, SCREENHEIGHT)
+            love.graphics.rectangle("fill", self.camera.x, self.camera.y, SCREENWIDTH, SCREENHEIGHT)
             love.graphics.setColor(255, 255, 255)
         end
         
@@ -207,7 +209,7 @@ function World:physicsDebug()
                         
                         worldPolygon("line", unpack(points))
                     else
-                        worldRectangle("line", x-1, y-1, 1, 1)
+                        worldRectangle("line", x, y-1, 1, 1)
                     end
                 end
             end
@@ -233,25 +235,6 @@ function World:portalVectorDebug()
 end
 
 function World:checkMapCollision(obj, x, y)
-    -- Portal hijacking
-    for _, p in ipairs(self.portals) do
-        if p.open and objectWithinPortalRange(p, obj.x+obj.width/2, obj.y+obj.height/2) then
-            -- check if pixel is inside portal wallspace
-            -- rotate x, y around portal origin
-            local nx, ny = pointAroundPoint(x, y, p.x1, p.y1, -p.r)
-
-            if ny >= p.y1-1 and ny < p.y1+64 then
-                if nx > p.x1 and nx < p.x1+p.size then
-                    return false
-                end
-            
-                if nx < p.x1 or nx > p.x1+p.size then
-                    return true
-                end
-            end
-        end
-    end
-    
     local tileX, tileY = self:worldToMap(x, y)
 	
 	if not self:inMap(tileX, tileY) then
@@ -496,9 +479,8 @@ function World:doPortal(portal, x, y, angle)
         newX = newX + (portal.connectsTo.x1 - portal.x2)
         newY = newY + (portal.connectsTo.y1 - portal.y2)
     else
-	    newX, newY = pointAroundPoint(x, y, portal.x1, portal.y1, portal.r)
         local pR = math.atan2(y-portal.y1, x-portal.x1)
-	    newX, newY = pointAroundPoint(newX, newY, portal.x1, portal.y1, -pR*2)
+	    newX, newY = pointAroundPoint(x, y, portal.x1, portal.y1, portal.r-pR*2)
     
         -- Translate by portal offset
         newX = newX + (portal.connectsTo.x1 - portal.x1)

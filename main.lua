@@ -3,6 +3,8 @@ function love.load()
     print("Mari3 POC by Maurice")
     
     require "util"
+
+    print(VAR("vsync"))
     
     love.graphics.setDefaultFilter("nearest", "nearest")
     

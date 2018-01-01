@@ -2,6 +2,7 @@ PMETERTICKS = 10
 
 
 return {
+    vsync = 2,
     scale = 1,
     volume = 1,
 

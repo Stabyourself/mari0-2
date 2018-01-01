@@ -4,12 +4,13 @@ if love.filesystem.exists("environment.lua") then
     local envTemp = require "environment"
     
     for i, v in pairs(envTemp) do
+        print(i, v)
         VARIABLES[i] = v
     end
 end
 
 function VAR(i, default)
-    return VARIABLES[i] or default
+    return VARIABLES[i] == nil and default or VARIABLES[i]
 end
 
 function CHEAT(i)
@@ -51,7 +52,7 @@ end
 function inTable(t, needle)
 	for i, v in pairs(t) do
 		if v == needle then
-			return true
+			return i
 		end
 	end
 	return false
@@ -79,13 +80,16 @@ function sideOfLine(ox, oy, p1x, p1y, p2x, p2y) -- Credits to https://stackoverf
     return (p2y-p1y)*ox + (p1x-p2x)*oy + (p2x*p1y-p1x*p2y)
 end
 
-function rectangleOnLine(x, y, w, h, p1x, p1y, p2x, p2y) -- Todo: optimize this
+function rectangleOnLine(x, y, w, h, p1x, p1y, p2x, p2y) -- See above
     -- A
+    local xr = x+w -- right side
+    local yb = y+h -- bottom side
+
     local pointPositions = {
         sideOfLine(x, y, p1x, p1y, p2x, p2y),
-        sideOfLine(x+w, y, p1x, p1y, p2x, p2y),
-        sideOfLine(x, y+h, p1x, p1y, p2x, p2y),
-        sideOfLine(x+w, y+h, p1x, p1y, p2x, p2y)
+        sideOfLine(xr, y, p1x, p1y, p2x, p2y),
+        sideOfLine(x, yb, p1x, p1y, p2x, p2y),
+        sideOfLine(xr, yb, p1x, p1y, p2x, p2y),
     }
 
     local above, below = false, false
@@ -100,9 +104,9 @@ function rectangleOnLine(x, y, w, h, p1x, p1y, p2x, p2y) -- Todo: optimize this
 
     if above and below then
         -- B
-        if  (p1x > x+w and p2x > x+w) or
+        if  (p1x > xr and p2x > xr) or
             (p1x < x and p2x < x) or
-            (p1y > y+h and p2y > y+h) or
+            (p1y > yb and p2y > yb) or
             (p1y < y and p2y < y) then
                 return false
         else
@@ -131,16 +135,16 @@ function linesIntersect(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) -- Credits to ht
 
     if (s >= 0 and s <= 1 and t >= 0 and t <= 1) then
         return p1x + (t * s0x), p1y + (t * s0y)
+    else
+        return false
     end
-
-    return false
 end
 
 function pointAroundPoint(x1, y1, x2, y2, r) -- Credits to https://stackoverflow.com/a/15109215
-    local newX = math.cos(r) * (x1-x2) - math.sin(r) * (y1-y2) + x2
-    local newY = math.sin(r) * (x1-x2) + math.cos(r) * (y1-y2) + y2
+    local cos = math.cos(r)
+    local sin = math.sin(r)
 
-    return newX, newY
+    return cos * (x1-x2) - sin * (y1-y2) + x2, sin * (x1-x2) + cos * (y1-y2) + y2
 end
 
 function pointInTriangle(x, y, t) -- Credits to https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle#comment22628102_2049712

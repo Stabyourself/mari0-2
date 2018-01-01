@@ -33,37 +33,37 @@ function PhysObj:initialize(world, x, y, width, height)
 	xOff = math.floor(self.width/2)-1
 	distance = math.floor(self.width/2)
 	
-	for yOff = self.height - fissix.TRACER_BOTTOM_DIST - 1, fissix.TRACER_TOP_SPACE+1, -step do
+	for yOff = self.height - fissix.TRACER_BOTTOM_DIST - 1, fissix.TRACER_SIDE_TOP_DIST+1, -step do
 		table.insert(self.tracers.left, fissix.Tracer:new(self, xOff, yOff, -1, 0, distance))
 	end
 	
 	-- Also include almost top
-	table.insert(self.tracers.left, fissix.Tracer:new(self, xOff, fissix.TRACER_TOP_SPACE, -1, 0, distance))
+	table.insert(self.tracers.left, fissix.Tracer:new(self, xOff, fissix.TRACER_SIDE_TOP_DIST, -1, 0, distance))
 	
 	
 	-- Create right tracers
 	xOff = math.floor(self.width/2)
 	distance = math.floor(self.width/2)
 	
-	for yOff = self.height - fissix.TRACER_BOTTOM_DIST - 1, fissix.TRACER_TOP_SPACE+1, -step do
+	for yOff = self.height - fissix.TRACER_BOTTOM_DIST - 1, fissix.TRACER_SIDE_TOP_DIST+1, -step do
 		table.insert(self.tracers.right, fissix.Tracer:new(self, xOff, yOff, 1, 0, distance))
 	end
 	
 	-- Also include almost top
-	table.insert(self.tracers.right, fissix.Tracer:new(self, xOff, fissix.TRACER_TOP_SPACE, 1, 0, distance))
+	table.insert(self.tracers.right, fissix.Tracer:new(self, xOff, fissix.TRACER_SIDE_TOP_DIST, 1, 0, distance))
 	
 	
 	-- Create bottom tracers
 	yOff = self.height/2
-	distance = self.height/2+fissix.TRACER_DOWN_EXTEND
+	distance = self.height/2+fissix.TRACER_BOTTOM_EXTEND
 	
 	--from left side
-	for xOff = 0+fissix.TRACER_SIDE_DIST, math.floor(self.width/2)-1, fissix.TRACER_DOWN_SPACE do
+	for xOff = 0+fissix.TRACER_BOTTOM_SIDE_SPACING, math.floor(self.width/2)-1, fissix.TRACER_BOTTOM_SPACING do
 		table.insert(self.tracers.down, fissix.Tracer:new(self, xOff, yOff, 0, 1, distance))
 	end
 	
 	--from right side
-	for xOff = self.width-1-fissix.TRACER_SIDE_DIST, math.floor(self.width/2), -fissix.TRACER_DOWN_SPACE do
+	for xOff = self.width-1-fissix.TRACER_BOTTOM_SIDE_SPACING, math.floor(self.width/2), -fissix.TRACER_BOTTOM_SPACING do
 		table.insert(self.tracers.down, fissix.Tracer:new(self, xOff, yOff, 0, 1, distance))
 	end
 	
@@ -73,12 +73,12 @@ function PhysObj:initialize(world, x, y, width, height)
 	distance = self.height/2
 	
 	--from left side
-	for xOff = 0+fissix.TRACER_SIDE_DIST_TOP, math.floor(self.width/2)-1, step do
+	for xOff = 0+fissix.TRACER_TOP_SPACING, math.floor(self.width/2)-1, step do
 		table.insert(self.tracers.up, fissix.Tracer:new(self, xOff, yOff, 0, -1, distance))
 	end
 	
 	--from right side
-	for xOff = self.width-1-fissix.TRACER_SIDE_DIST_TOP, math.floor(self.width/2), -step do
+	for xOff = self.width-1-fissix.TRACER_TOP_SPACING, math.floor(self.width/2), -step do
 		table.insert(self.tracers.up, fissix.Tracer:new(self, xOff, yOff, 0, -1, distance))
 	end
 end

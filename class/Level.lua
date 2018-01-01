@@ -76,29 +76,11 @@ end
 function Level:draw()
     self.camera:attach()
     
-    local xStart = math.floor(self.camera.x/self.tileSize)+1
-    local xEnd = xStart+WIDTH
-
-    local yStart = math.floor(self.camera.y/self.tileSize)+1
-    local yEnd = yStart+HEIGHT
-    
-    for x = xStart, xEnd do
-        for y = yStart, yEnd do
-            if self:inMap(x, y) then
-                local Tile = self:getTile(x, y)
-                
-                if Tile and not Tile.invisible then
-                    Tile:draw((x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
-                end
-            end
-        end
-    end
+    fissix.World.draw(self)
     
     for _, v in ipairs(self.marios) do
         love.graphics.line(v.x+v.width/2, v.y+v.height/2+2, v.crosshairX, v.crosshairY)
     end
-    
-    fissix.World.draw(self)
     
     self.camera:detach()
 end

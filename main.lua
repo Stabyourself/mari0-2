@@ -22,7 +22,7 @@ function love.load()
     Color = require "lib/Color"
     Easing = require "lib/Easing"
 
-    require "lib/fissix"
+    require "class/fissix"
 
     require "class/CharacterState"
     require "class/Character"

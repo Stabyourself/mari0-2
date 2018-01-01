@@ -4,7 +4,6 @@ if love.filesystem.exists("environment.lua") then
     local envTemp = require "environment"
     
     for i, v in pairs(envTemp) do
-        print(i, v)
         VARIABLES[i] = v
     end
 end

@@ -103,10 +103,31 @@ function World:checkPortaling(obj, oldX, oldY)
 end
 
 function World:draw()
+    -- Map
+    local xStart = math.floor(self.camera.x/self.tileSize)+1
+    local xEnd = xStart+WIDTH
+
+    local yStart = math.floor(self.camera.y/self.tileSize)+1
+    local yEnd = yStart+HEIGHT
+
+    for x = xStart, xEnd do
+        for y = yStart, yEnd do
+            if self:inMap(x, y) then
+                local Tile = self:getTile(x, y)
+                
+                if Tile and not Tile.invisible then
+                    Tile:draw((x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
+                end
+            end
+        end
+    end
+
+    -- Portals (background)
     for _, v in ipairs(self.portals) do
         v:draw("background")
     end
     
+    -- Objects
     love.graphics.setColor(255, 255, 255)
     
     for _, obj in ipairs(self.objects) do
@@ -180,10 +201,12 @@ function World:draw()
         end
 	end
     
+    -- Portals (Foreground)
     for _, v in ipairs(self.portals) do
         v:draw("foreground")
     end
     
+    -- Debug
 	if VAR("physicsDebug") then
 		self:physicsDebug()
     end
@@ -194,6 +217,8 @@ function World:draw()
 end
 
 function World:physicsDebug()
+    love.graphics.setColor(255, 255, 255)
+
 	for x = 1, #self.map do
         for y = 1, #self.map[x] do
             if self:objVisible((x-1)*self.tileSize, (y-1)*self.tileSize, 16, 16) then
@@ -209,7 +234,7 @@ function World:physicsDebug()
                         
                         worldPolygon("line", unpack(points))
                     else
-                        worldRectangle("line", x, y-1, 1, 1)
+                        worldRectangle("line", x-1, y-1, 1, 1)
                     end
                 end
             end

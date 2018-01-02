@@ -20,7 +20,7 @@ function game.load()
     if not VAR("musicDisabled") then
         playMusic(overworldMusic)
     end
-
+    
     skipUpdate()
 end
 
@@ -58,25 +58,10 @@ function game.draw()
     smb3ui.coins = 23
     smb3ui.world = 1
     smb3ui:draw()
-    
-    -- UI
-    -- score
-    
-    --[[
-    love.graphics.print("mario", 24, 16, "left")
-    love.graphics.print("012345", 24, 24, "left")
-    
-    -- coins (abused as FPS for now)
-    love.graphics.print("fps*" .. love.timer.getFPS(), math.round((SCREENWIDTH-80)/3)+40, 24, "center")
-    
-    -- level
-    love.graphics.print("world", math.round((SCREENWIDTH-80)/3*2)+40, 16, "center")
-    love.graphics.print(" 1-1 ", math.round((SCREENWIDTH-80)/3*2)+40, 24, "center")
-    
-    -- time
-    love.graphics.print("time", SCREENWIDTH-24, 16, "right")
-    love.graphics.print(padZeroes(math.ceil(game.timeLeft), 3), SCREENWIDTH-24, 24, "right")
-    --]]
+end
+
+function game.resize(w, h)
+    smb3ui:resize(w, h)
 end
 
 function game.keypressed(key)

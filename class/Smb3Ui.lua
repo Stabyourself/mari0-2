@@ -11,6 +11,47 @@ function Smb3Ui:initialize()
     self.score = 0
     self.coins = 0
     self.lives = 0
+    
+    self.canvas = GUI.Canvas:new(defaultUI, 0, SCREENHEIGHT-VAR("uiHeight"), SCREENWIDTH, VAR("uiHeight"))
+    self.canvas.backgroundColor = {0, 0, 0}
+    
+    self.uiBox = GUI.Box:new(16, 6, 146, 20)
+    self.uiBox.backgroundColor = self.skyColor
+    self.canvas:addChild(self.uiBox)
+    
+    self.cardBox = {}
+    for i = 1, 3 do
+        self.cardBox[i] = GUI.Box:new(152+i*24, 6, 18, 20)
+        self.cardBox[i].backgroundColor = self.skyColor
+        self.canvas:addChild(self.cardBox[i])
+    end
+    
+    self.element = {}
+    self.element.world = GUI.Text:new("", 1, 2)
+    self.element.pMeter = GUI.Text:new("", 49, 2)
+    self.element.coins = GUI.Text:new("", 121, 2)
+    self.element.lives = GUI.Text:new("", 1, 10)
+    self.element.score = GUI.Text:new("", 49, 10)
+    self.element.time = GUI.Text:new("", 113, 10)
+    
+    self.uiBox:addChild(self.element.world)
+    self.uiBox:addChild(self.element.pMeter)
+    self.uiBox:addChild(self.element.coins)
+    self.uiBox:addChild(self.element.lives)
+    self.uiBox:addChild(self.element.score)
+    self.uiBox:addChild(self.element.time)
+    
+    self:resize()
+end
+
+function Smb3Ui:resize()
+    self.canvas.w = SCREENWIDTH
+    self.canvas.y = SCREENHEIGHT-VAR("uiHeight")
+    
+    self.uiBox.x = (SCREENWIDTH-256)/2+16
+    for i, v in ipairs(self.cardBox) do
+        v.x = (SCREENWIDTH-256)/2+152+i*24
+    end
 end
 
 function Smb3Ui:update(dt)
@@ -21,44 +62,24 @@ function Smb3Ui:update(dt)
             self.pMeterBlinkTimer = self.pMeterBlinkTimer - VAR("pMeterBlinkTime")*2
         end
     end
+    
+    self.element.world.s = self:getWorldText()
+    self.element.pMeter.s = self:getPMeterText()
+    self.element.coins.s = self:getCoinsText()
+    self.element.lives.s = self:getLivesText()
+    self.element.score.s = self:getScoreText()
+    self.element.time.s = self:getTimeText()
 end
 
 function Smb3Ui:draw()
-    love.graphics.push()
-    
-    love.graphics.translate(0, SCREENHEIGHT-VAR("uiHeight"))
-    
-    love.graphics.setColor(0, 0, 0)
-    love.graphics.rectangle("fill", 0, 0, SCREENWIDTH, VAR("uiHeight"))
-    
-    love.graphics.setColor(self.skyColor)
-    love.graphics.rectangle("fill", 0, -VAR("uiLineHeight"), SCREENWIDTH, VAR("uiLineHeight"))
-    
-    love.graphics.translate((SCREENWIDTH-256)/2, 0)
-    
-    love.graphics.setColor(255, 255, 255)
-    -- Bawxes
-    defaultUI:box(16, 6, 146, 20)
-    defaultUI:box(176, 6, 18, 20)
-    defaultUI:box(200, 6, 18, 20)
-    defaultUI:box(224, 6, 18, 20)
-    
-    --P Meter
-    self:drawWorld(17, 8)
-    self:drawPMeter(65, 8)
-    self:drawCoins(137, 8)
-    self:drawLives(17, 16)
-    self:drawScore(65, 16)
-    self:drawTime(129, 16)
-    
-    love.graphics.pop()
+    self.canvas:draw()
 end
 
-function Smb3Ui:drawWorld(x, y)
-    marioPrint("&World1;&World2;&World3;&World4;" ..  self.world, x, y)
+function Smb3Ui:getWorldText()
+    return "&World1;&World2;&World3;&World4;" .. self.world
 end
 
-function Smb3Ui:drawPMeter(x, y)
+function Smb3Ui:getPMeterText()
     local s = ""
     
     for i = 1, math.min(VAR("pMeterTicks")-1, self.pMeter) do
@@ -75,10 +96,10 @@ function Smb3Ui:drawPMeter(x, y)
         s = s .. "&pMeter1;&pMeter2;"
     end
     
-    marioPrint(s, x, y)
+    return s
 end
 
-function Smb3Ui:drawCoins(x, y)
+function Smb3Ui:getCoinsText()
     local s = ""
     
     s = s .. "&Dollarinos;"
@@ -89,10 +110,10 @@ function Smb3Ui:drawCoins(x, y)
         s = s .. self.coins
     end
     
-    marioPrint(s, x, y)
+    return s
 end
 
-function Smb3Ui:drawLives(x, y)
+function Smb3Ui:getLivesText()
     local s = ""
     s = "&Mario1;&Mario2;&Times;"
     
@@ -102,13 +123,13 @@ function Smb3Ui:drawLives(x, y)
         s = s .. self.lives
     end
     
-    marioPrint(s, x, y)
+    return s
 end
 
-function Smb3Ui:drawScore(x, y)
-    marioPrint(padZeroes(self.score, 7), x, y)
+function Smb3Ui:getScoreText()
+    return padZeroes(self.score, 7), x, y
 end
 
-function Smb3Ui:drawTime(x, y)
-    marioPrint("&Time;" .. padZeroes(self.time, 3), x, y)
+function Smb3Ui:getTimeText()
+    return "&Time;" .. padZeroes(self.time, 3)
 end

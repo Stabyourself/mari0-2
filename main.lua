@@ -13,8 +13,6 @@ function love.load()
         resizable = true,
     })
     
-    love.resize(400*VAR("scale"), 224*VAR("scale"))
-    
     sandbox = require "lib/sandbox"
     JSON = require "lib/JSON"
     class = require "lib/middleclass"
@@ -34,12 +32,15 @@ function love.load()
     require "class/Enemy"
     require "class/Portal" -- the juicy bits
     require "class/PortalParticle" -- the juicy bits
-    require "class/UI"
+    require "class/gui"
     require "class/Smb3Ui"
     
     require "cheats"
 
+    require "gameStateManager"
+    
     require "game"
+    require "editor"
     
 	fontImg = love.graphics.newImage("img/font.png")
     fontGlyphs = [[
@@ -128,10 +129,13 @@ function love.load()
 
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")
     
-    defaultUI = UI:new("img/ui/default.png")
+    defaultUI = GUI:new("img/gui/default")
+    
+    love.resize(400*VAR("scale"), 224*VAR("scale"))
 
     print("Loading game")
-    game.load()
+    gameStateManager.loadState(game)
+    gameStateManager.addState(editor)
 end
 
 function love.update(dt)
@@ -149,23 +153,21 @@ function love.update(dt)
 				dt = dt * v.val
 			end
 		end
-	end
-    
-    if gameState == "game" then
-        game.update(dt)
     end
+    
+    gameStateManager.event("update", dt)
 end
 
 function love.draw()
     if VAR("scale") ~= 1 then
         love.graphics.scale(VAR("scale"), VAR("scale"))
     end
-
-    if gameState == "game" then
-        game.draw()
-    end
     
-    marioPrint(game.level.marios[1].state.name, 8, 8)
+    gameStateManager.event("draw")
+    
+    if VAR("characterStateDebug") then
+        marioPrint(game.level.marios[1].state.name, 8, 8)
+    end
     
     -- For the stream
     if VAR("inputDebug") then
@@ -205,15 +207,23 @@ function love.keypressed(key)
         love.event.quit()
     end
     
-    if gameState == "game" then
-        game.keypressed(key)
-    end
+    gameStateManager.event("keypressed", key)
+end
+
+function getWorldMouse()
+    return love.mouse.getX()/VAR("scale"), love.mouse.getY()/VAR("scale")
 end
 
 function love.mousepressed(x, y, button)
-    if gameState == "game" then
-        game.mousepressed(x, y, button)
-    end
+    x, y = getWorldMouse()
+    
+    gameStateManager.event("mousepressed", x, y, button)
+end
+
+function love.mousereleased(x, y, button)
+    x, y = getWorldMouse()
+    
+    gameStateManager.event("mousereleased", x, y, button)
 end
 
 function love.resize(w, h)
@@ -233,6 +243,8 @@ function love.resize(w, h)
     UPSCROLLBORDER = math.ceil(math.min(CAMERAHEIGHT/2, VAR("cameraScrollUpBorder")))
 
     debugCandyQuad = love.graphics.newQuad(0, 0, SCREENWIDTH, SCREENHEIGHT, 8, 8)
+    
+    gameStateManager.event("resize", SCREENWIDTH, SCREENHEIGHT)
 end
 
 function updateGroup(group, dt)
@@ -255,6 +267,10 @@ end
 function marioPrint(s, x, y)
     local longGlyph = false
     local char = 0
+    
+    local charX = 0
+    local charY = 0
+    
     for i = 1, #s do
         local toPrint = false
         local glyph = string.sub(s, i, i)
@@ -265,6 +281,9 @@ function marioPrint(s, x, y)
         elseif byte == string.byte(";") and longGlyph then
             toPrint = longGlyph
             longGlyph = false
+        elseif byte == string.byte("\n") then
+            charY = charY + 1
+            charX = 0
         else
             if longGlyph then
                 longGlyph = longGlyph .. glyph
@@ -274,8 +293,8 @@ function marioPrint(s, x, y)
         end
         
         if toPrint then
-            love.graphics.draw(fontImg, fontQuad[toPrint], char*8+x, y)
-            char = char + 1
+            love.graphics.draw(fontImg, fontQuad[toPrint], charX*8+x, charY*8+y)
+            charX = charX + 1
         end
     end
 end

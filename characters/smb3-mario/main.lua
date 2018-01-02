@@ -12,10 +12,6 @@ function love.load()
         end
     end
     
-    for i, v in ipairs(files) do
-        print(i, v)
-    end
-    
     currentFile = 1
     
     loadImg()

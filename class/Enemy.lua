@@ -39,7 +39,6 @@ function Enemy:update(dt)
         self.r = self.r + self.speedX*dt*0.1
         self:unRotate(0)
     else
-        self.r = self.r + self.speedX*dt*0.1
         self:unRotate(dt)
     end
 

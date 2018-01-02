@@ -24,6 +24,8 @@ function Box:initialize(x, y, w, h)
 end
 
 function Box:update(dt)
+    GUI.Canvas.update(self, dt)
+    
     local titleHeight = 0
     
     if self.title then
@@ -153,7 +155,7 @@ function Box:collision(x, y)
 end
 
 function Box:mousepressed(x, y, button)
-    x, y = x-self.x, y-self.y
+    x, y = self:getMouse()
     
     if GUI.Canvas.mousepressed(self, x, y, button) then
         return true
@@ -184,7 +186,7 @@ function Box:mousepressed(x, y, button)
 end
 
 function Box:mousereleased(x, y, button)
-    x, y = x-self.x, y-self.y
+    x, y = self:getMouse()
     GUI.Canvas.mousereleased(self, x, y, button)
     
     self.dragging = false

@@ -167,11 +167,11 @@ function Mario:bottomCollision(obj2)
 end
 
 function Mario:leftCollision(obj2)
-    self.groundSpeedX = 0
+    
 end
 
 function Mario:rightCollision(obj2)
-    self.groundSpeedX = 0
+    
 end
 
 function Mario:spin() end

@@ -49,7 +49,7 @@ function Canvas:draw()
 end
 
 function Canvas:mousepressed(x, y, button)
-    x, y = x-self.x, y-self.y
+    x, y = self:getMouse()
     
     for i = #self.children, 1, -1 do
         local v = self.children[i]
@@ -59,14 +59,14 @@ function Canvas:mousepressed(x, y, button)
                 -- push that element to the end
                 table.insert(self.children, table.remove(self.children, i))
                 
-                return
+                return true
             end
         end
     end
 end
 
 function Canvas:mousereleased(x, y, button)
-    x, y = x-self.x, y-self.y
+    x, y = self:getMouse()
     
     for _, v in ipairs(self.children) do
         if v.mousereleased then

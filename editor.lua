@@ -28,6 +28,16 @@ function editor.newWindow(type)
         editor.windows.testWindow.backgroundColor = game.level.backgroundColor
         
         editor.canvas:addChild(editor.windows.testWindow)
+        
+        
+        local bla = GUI.Box:new(64, 16, 40, 40)
+        bla.draggable = true
+        bla.resizeable = true
+        bla.closeable = true
+        bla.title = "virus.exe"
+        bla.backgroundColor = game.level.backgroundColor
+        
+        editor.windows.testWindow:addChild(bla)
     end
 end
 

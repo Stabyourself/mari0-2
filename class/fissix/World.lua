@@ -155,8 +155,8 @@ function World:draw()
                     love.graphics.setStencilTest("greater", 0)
 
                     if VAR("stencilDebug") then
-                        love.graphics.setColor(0, 255, 0, 200)
-                        love.graphics.rectangle("fill", self.camera.x, self.camera.y, SCREENWIDTH, SCREENHEIGHT)
+                        love.graphics.setColor(0, 255, 0)
+                        love.graphics.draw(debugCandyImg, debugCandyQuad, self.camera.x, self.camera.y)
                         love.graphics.setColor(255, 255, 255)
                     end
 
@@ -185,8 +185,8 @@ function World:draw()
 
         if VAR("stencilDebug") then
             love.graphics.setStencilTest("greater", 0)
-            love.graphics.setColor(255, 0, 0, 200)
-            love.graphics.rectangle("fill", self.camera.x, self.camera.y, SCREENWIDTH, SCREENHEIGHT)
+            love.graphics.setColor(255, 0, 0)
+            love.graphics.draw(debugCandyImg, debugCandyQuad, self.camera.x, self.camera.y)
             love.graphics.setColor(255, 255, 255)
         end
         

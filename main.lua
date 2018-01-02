@@ -128,6 +128,7 @@ function love.load()
     stompSound:setVolume(VAR("volume"))
 
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")
+    debugCandyImg:setWrap("repeat")
     
     defaultUI = GUI:new("img/gui/default")
     

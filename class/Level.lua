@@ -12,20 +12,6 @@ function Level:initialize(path, tileMap)
 
     self.enemyList = loadEnemies()
     
-    self.blocks = {}
-    self.liveReplacements = {}
-    for x = 1, self.width do
-        for y = 1, self.height do
-            local tile = self:getTile(x, y)
-            if tile and tile.type == "coinAnimation" then
-                table.insert(self.liveReplacements, {
-                    x = x,
-                    y = y
-                })
-            end
-        end
-    end
-    
     self.blockBounces = {}
     
     self.spawnList = {}

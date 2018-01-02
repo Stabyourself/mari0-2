@@ -147,7 +147,6 @@ function Mario:ceilCollision(obj2)
         if toCheck ~= 0 then
             if game.level:getTile(x+toCheck, y).collision then
                 x = x + toCheck
-                obj2 = game.level.blocks[x][y]
             end
         end
         

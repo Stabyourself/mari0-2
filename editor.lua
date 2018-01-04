@@ -18,26 +18,26 @@ function editor.draw()
     editor.canvas:draw()
 end
 
-function editor.newWindow(type)
+function editor.newWindow(type, elem)
     if type == "test" then
-        editor.windows.testWindow = GUI.Box:new(64, 16, 92, 109)
-        editor.windows.testWindow.draggable = true
-        editor.windows.testWindow.resizeable = true
-        editor.windows.testWindow.closeable = true
-        editor.windows.testWindow.title = "virus.exe"
-        editor.windows.testWindow.backgroundColor = game.level.backgroundColor
+        local testWindow = GUI.Box:new(10, 30, 150, 100)
+        testWindow.draggable = true
+        testWindow.resizeable = true
+        testWindow.closeable = true
+        testWindow.scrollable = {true, true}
+        testWindow.title = "Is this the best element?"
+        testWindow.backgroundColor = game.level.backgroundColor
         
-        editor.canvas:addChild(editor.windows.testWindow)
+        editor.canvas:addChild(testWindow)
         
-        
-        local bla = GUI.Box:new(64, 16, 40, 40)
-        bla.draggable = true
-        bla.resizeable = true
-        bla.closeable = true
-        bla.title = "virus.exe"
-        bla.backgroundColor = game.level.backgroundColor
-        
-        editor.windows.testWindow:addChild(bla)
+        for y = 5, 70, 20 do
+            local text = GUI.Text:new("Important", 5, y)
+            testWindow:addChild(text)
+            
+            local slider = GUI.Slider:new(0, 100, 5, y+9, 190, true)
+            
+            testWindow:addChild(slider)
+        end
     end
 end
 

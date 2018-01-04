@@ -1,4 +1,4 @@
-local Box = class("GUI.Box", GUI.Canvas)
+local Box = class("GUI.Box", GUI.Element)
 
 local boxQuad = {
     love.graphics.newQuad(0, 0, 16, 16, 33, 33),
@@ -12,19 +12,24 @@ local boxQuad = {
     love.graphics.newQuad(17, 17, 16, 16, 33, 33),
 }
 
+local scrollBarQuad = {
+    love.graphics.newQuad(0, 0, 8, 8, 17, 8),
+    love.graphics.newQuad(8, 0, 1, 8, 17, 8),
+    love.graphics.newQuad(9, 0, 8, 8, 17, 8),
+}
+
 function Box:initialize(x, y, w, h)
-    self.x = x
-    self.y = y
-    self.w = w
-    self.h = h
+    GUI.Element.initialize(self, x, y, w, h)
     
+    self.scrollable = {false, false}
+    self.scroll = {0, 0}
     self.backgroundColor = {0, 0, 0, 0}
     
     self.children = {}
 end
 
 function Box:update(dt)
-    GUI.Canvas.update(self, dt)
+    GUI.Element.update(self, dt)
     
     local titleHeight = 0
     
@@ -42,13 +47,8 @@ function Box:update(dt)
     if self.resizing then
         local x, y = self.parent:getMouse()
         
-        if x+self.resizeX <= self.parent.w then
-            self.w = x-self.x+self.resizeX
-        end
-        
-        if y+self.resizeY <= self.parent.h then
-            self.h = y-self.y+self.resizeY
-        end
+        self.w = math.min(self.parent.w-self.x, x-self.x+self.resizeX)
+        self.h = math.min(self.parent.h-self.y, y-self.y+self.resizeY)
     end
     
     --limit w and y
@@ -64,18 +64,33 @@ function Box:update(dt)
     
     self.y = math.max(titleHeight, self.y)
     self.y = math.min(self.parent.h-self.h, self.y)
+    
+    local innerW, innerH = self:getInnerSize()
+    
+    if self.scrollingX then
+        local x, y = self:getMouse()
+        
+        local factor = ((x-self.scrollingXdragX)/(self.w-25))
+        
+        factor = math.clamp(factor, 0, 1)
+        self.scroll[1] = factor*(innerW-self.w)
+    end
+    
+    self.scroll[1] = math.min(innerW-self.w, self.scroll[1])
+    self.scroll[1] = math.max(0, self.scroll[1])
+    
+    print(self.scroll[1])
 end
 
-function Box:draw()
-    love.graphics.push()
-    love.graphics.translate(self.x, self.y)
+function Box:draw(level)
+    GUI.Element.translate(self)
     
     love.graphics.setColor(self.backgroundColor)
     love.graphics.rectangle("fill", 0, 0, self.w, self.h)
     
     love.graphics.setColor(255, 255, 255)
     
-    -- topleft
+    -- Border
     local img = self.gui.img.box
     if self.title then
         img = self.gui.img.boxTitled
@@ -91,38 +106,18 @@ function Box:draw()
     love.graphics.draw(img, boxQuad[8], 0, self.h, 0, self.w, 1)
     love.graphics.draw(img, boxQuad[9], self.w, self.h)
     
-    
-    for _, v in ipairs(self.children) do
-        love.graphics.stencil(function()
-            love.graphics.rectangle("fill", 0, 0, self.w, self.h)
-        end)
-        love.graphics.setStencilTest("greater", 0)
-        
-        v:draw()
-        
-        love.graphics.setStencilTest()
-    end
-    
-    
     if self.title then
         love.graphics.stencil(function()
             love.graphics.rectangle("fill", 0, -10, self.w, 10)
-        end)
-        love.graphics.setStencilTest("greater", 0)
+        end, "increment", 1, true)
+        love.graphics.setStencilTest("equal", level)
         
         marioPrint(self.title, 0, -10)
         
-        love.graphics.setStencilTest()
-    end
-    
-    if self.resizeable then
-        if self.resizing then
-            love.graphics.draw(self.gui.img.boxResizeActive, self.w-11, self.h-11)
-        elseif self:resizeCornerCollision(self:getMouse()) then
-            love.graphics.draw(self.gui.img.boxResizeHover, self.w-11, self.h-11)
-        else
-            love.graphics.draw(self.gui.img.boxResize, self.w-11, self.h-11)
-        end
+        love.graphics.stencil(function()
+            love.graphics.rectangle("fill", 0, -10, self.w, 10)
+        end, "decrement", 1, true)
+        love.graphics.setStencilTest("equal", level-1)
     end
     
     if self.closeable then
@@ -135,7 +130,53 @@ function Box:draw()
         end
     end
     
-    love.graphics.pop()
+    GUI.Element.stencil(self, level)
+    
+    love.graphics.translate(-self.scroll[1], -self.scroll[2])
+    
+    GUI.Element.draw(self, level)
+    
+    love.graphics.translate(self.scroll[1], self.scroll[2])
+    
+    GUI.Element.unStencil(self, level)
+    
+    local innerW, innerH = self:getInnerSize()
+    
+    if self.scrollable[1] then
+        if innerW > self.w then
+            love.graphics.draw(self.gui.img.scrollBarBack, 0, self.h-8, 0, self.w, 1)
+            
+            local scrollbarX = self:getScrollBarX()
+            
+            local img = self.gui.img.scrollBar
+            
+            if self:scrollXCollision(self:getMouse()) or self.scrollingX then
+                img = self.gui.img.scrollBarHover
+            end
+            
+            love.graphics.draw(img, scrollBarQuad[1], scrollbarX, self.h-8)
+            love.graphics.draw(img, scrollBarQuad[2], scrollbarX+8, self.h-8)
+            love.graphics.draw(img, scrollBarQuad[3], scrollbarX+9, self.h-8)
+        end
+    end
+    
+    if self.resizeable then
+        if self.resizing then
+            love.graphics.draw(self.gui.img.boxResizeActive, self.w-11, self.h-11)
+        elseif self:resizeCornerCollision(self:getMouse()) then
+            love.graphics.draw(self.gui.img.boxResizeHover, self.w-11, self.h-11)
+        else
+            love.graphics.draw(self.gui.img.boxResize, self.w-11, self.h-11)
+        end
+    end
+    
+    GUI.Element.unTranslate(self)
+end
+
+function Box:getScrollBarX()
+    local innerW, innerH = self:getInnerSize()
+    
+    return (self.scroll[1]/(innerW-self.w))*(self.w-25)
 end
 
 function Box:titleBarCollision(x, y)
@@ -154,10 +195,23 @@ function Box:collision(x, y)
     return x >= -2 and x < self.w+2 and y >= -2 and y < self.h+3
 end
 
-function Box:mousepressed(x, y, button)
-    x, y = self:getMouse()
+function Box:scrollXCollision(x, y)
+    local scrollbarX = self:getScrollBarX()
     
-    if GUI.Canvas.mousepressed(self, x, y, button) then
+    return x >= scrollbarX and x < scrollbarX + 17 and y >= self.h-8 and y < self.h
+end
+
+function Box:mousepressed(x, y, button)
+    -- Check resize before the rest because reasons
+    if self.resizeable and self:resizeCornerCollision(x, y) then
+        self.resizing = true
+        self.resizeX = self.w-x
+        self.resizeY = self.h-y
+        
+        return true
+    end
+    
+    if GUI.Element.mousepressed(self, x, y, button) then
         return true
     end
     
@@ -172,11 +226,10 @@ function Box:mousepressed(x, y, button)
         self.dragY = y
         
         return true
-        
-    elseif self.resizeable and self:resizeCornerCollision(x, y) then
-        self.resizing = true
-        self.resizeX = self.w-x
-        self.resizeY = self.h-y
+    
+    elseif self.scrollable[1] and self:scrollXCollision(x, y) then
+        self.scrollingX = true
+        self.scrollingXdragX = x-self:getScrollBarX()
         
         return true
         
@@ -186,11 +239,11 @@ function Box:mousepressed(x, y, button)
 end
 
 function Box:mousereleased(x, y, button)
-    x, y = self:getMouse()
-    GUI.Canvas.mousereleased(self, x, y, button)
+    GUI.Element.mousereleased(self, x, y, button)
     
     self.dragging = false
     self.resizing = false
+    self.scrollingX = false
     
     if self.closing then
         if self:closeCollision(x, y) then
@@ -199,12 +252,6 @@ function Box:mousereleased(x, y, button)
             self.closing = false
         end
     end 
-end
-
-function Box:getMouse()
-    local x, y = self.parent:getMouse()
-    
-    return x-self.x, y-self.y
 end
 
 return Box

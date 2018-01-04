@@ -60,7 +60,7 @@ end
 function math.round(i, decimals)
     local factor = math.pow(10, decimals or 0)
     
-    if i > 0 then
+    if i >= 0 then
         return math.floor(i*factor+.5)/factor
     else
         return math.ceil(i*factor-.5)/factor

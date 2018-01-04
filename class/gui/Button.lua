@@ -1,4 +1,4 @@
-Button = class("GUI.Button")
+Button = class("GUI.Button", GUI.Element)
 
 local buttonQuad = {
     love.graphics.newQuad(0, 0, 8, 8, 17, 17),
@@ -13,17 +13,18 @@ local buttonQuad = {
 }
 
 function Button:initialize(x, y, s, func)
-    self.x = x
-    self.y = y
     self.s = s
+    local w, h
     
     if self.s then
-        self.w = #self.s*8+2
-        self.h = 10
+        w = #self.s*8+2
+        h = 10
     else
-        self.w = 8
-        self.h = 8
+        w = 8
+        h = 8
     end
+    
+    GUI.Element.initialize(self, x, y, w, h)
     
     self.func = func --boogie nights
 end
@@ -32,9 +33,8 @@ function Button:getCollision(x, y)
     return x >= -2 and x < self.w+2 and y >= -2 and y < self.h+2
 end 
 
-function Button:draw()
-    love.graphics.push()
-    love.graphics.translate(self.x, self.y)
+function Button:draw(level)
+    GUI.Element.translate(self)
     
     love.graphics.setColor(255, 255, 255)
     
@@ -54,22 +54,19 @@ function Button:draw()
     love.graphics.draw(img, buttonQuad[8], 0, self.h, 0, self.w, 1)
     love.graphics.draw(img, buttonQuad[9], self.w, self.h)
     
+    GUI.Element.stencil(self, level)
+    
+    GUI.Element.draw(self, level)
+    
     if self.s then
         marioPrint(self.s, 1, 1)
     end
     
-    love.graphics.pop()
-end
-
-function Button:getMouse()
-    local x, y = self.parent:getMouse()
-    
-    return x-self.x, y-self.y
+    GUI.Element.unStencil(self, level)
+    GUI.Element.unTranslate(self)
 end
 
 function Button:mousepressed(x, y, button)
-    x, y = x-self.x, y-self.y
-    
     if self:getCollision(x, y) then
         self.func()
     end

@@ -63,12 +63,12 @@ function Smb3Ui:update(dt)
         end
     end
     
-    self.element.world.s = self:getWorldText()
-    self.element.pMeter.s = self:getPMeterText()
-    self.element.coins.s = self:getCoinsText()
-    self.element.lives.s = self:getLivesText()
-    self.element.score.s = self:getScoreText()
-    self.element.time.s = self:getTimeText()
+    self.element.world:setString(self:getWorldText())
+    self.element.pMeter:setString(self:getPMeterText())
+    self.element.coins:setString(self:getCoinsText())
+    self.element.lives:setString(self:getLivesText())
+    self.element.score:setString(self:getScoreText())
+    self.element.time:setString(self:getTimeText())
 end
 
 function Smb3Ui:draw()

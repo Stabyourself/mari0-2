@@ -41,7 +41,8 @@ function Level:initialize(path, tileMap)
     
     -- Camera stuff
     self.camera = Camera:new()
-    self.camera.y = (self.height - HEIGHT)*self.tileSize
+    self.camera.y = self.height*self.tileSize - CAMERAHEIGHT
+    print(self.camera.y)
     self.spawnLine = 0
     self.spawnI = 1
 

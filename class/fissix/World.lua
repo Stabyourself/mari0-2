@@ -128,7 +128,7 @@ function World:draw()
     end
     
     -- Objects
-    love.graphics.setColor(255, 255, 255)
+    love.graphics.setColor(1, 1, 1)
     
     for _, obj in ipairs(self.objects) do
         local x, y = obj.x+obj.width/2, obj.y+obj.height/2
@@ -155,9 +155,9 @@ function World:draw()
                     love.graphics.setStencilTest("greater", 0)
 
                     if VAR("stencilDebug") then
-                        love.graphics.setColor(0, 255, 0)
+                        love.graphics.setColor(0, 1, 0)
                         love.graphics.draw(debugCandyImg, debugCandyQuad, self.camera.x, self.camera.y)
-                        love.graphics.setColor(255, 255, 255)
+                        love.graphics.setColor(1, 1, 1)
                     end
 
                     drawObject(obj, cX, cY, (obj.r or 0) + angleDiff, (obj.animationDirection or 1)*xScale, 1, obj.centerX, obj.centerY)
@@ -185,9 +185,9 @@ function World:draw()
 
         if VAR("stencilDebug") then
             love.graphics.setStencilTest("greater", 0)
-            love.graphics.setColor(255, 0, 0)
+            love.graphics.setColor(1, 0, 0)
             love.graphics.draw(debugCandyImg, debugCandyQuad, self.camera.x, self.camera.y)
-            love.graphics.setColor(255, 255, 255)
+            love.graphics.setColor(1, 1, 1)
         end
         
         love.graphics.setStencilTest("equal", 0)
@@ -223,7 +223,7 @@ function drawObject(obj, x, y, r, sx, sy, cx, cy)
                 love.graphics.setColor(obj.palette[i])
             end
             worldDraw(v, obj.quad, x, y, r, sx, sy, cx, cy)
-            love.graphics.setColor(255, 255, 255)
+            love.graphics.setColor(1, 1, 1)
         end
         
         if obj.img["static"] then
@@ -235,7 +235,7 @@ function drawObject(obj, x, y, r, sx, sy, cx, cy)
 end
 
 function World:physicsDebug()
-    love.graphics.setColor(255, 255, 255)
+    love.graphics.setColor(1, 1, 1)
 
 	for x = 1, #self.map do
         for y = 1, #self.map[x] do
@@ -267,9 +267,9 @@ end
 function World:portalVectorDebug()
     for _, v in ipairs(self.portalVectorDebugs) do
         if not v.reversed then
-            love.graphics.setColor(255, 255, 0)
+            love.graphics.setColor(1, 1, 0)
         else
-            love.graphics.setColor(255, 0, 0)
+            love.graphics.setColor(1, 0, 0)
         end
         
         worldArrow(v.inX, v.inY, v.inVX, v.inVY)

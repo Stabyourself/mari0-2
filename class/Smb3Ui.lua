@@ -5,7 +5,7 @@ function Smb3Ui:initialize()
     
     self.pMeterBlinkTimer = 0
     
-    self.skyColor = {156, 252, 240}
+    self.skyColor = game.level.backgroundColor
     self.time = 0
     self.world = 1
     self.score = 0

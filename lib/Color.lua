@@ -1,132 +1,92 @@
---[[
+-- Color library thing for Mari0 2 - MIT License.
 
-#########################################################################
-#                                                                       #
-# color.lua                                                             #
-#                                                                       #
-# Love2D color functions                                                #
-#                                                                       #
-# Copyright 2011 Josh Bothun                                            #
-# joshbothun@gmail.com                                                  #
-# http://minornine.com                                                  #
-#                                                                       #
-# This program is free software: you can redistribute it and/or modify  #
-# it under the terms of the GNU General Public License as published by  #
-# the Free Software Foundation, either version 3 of the License, or     #
-# (at your option) any later version.                                   #
-#                                                                       #
-# This program is distributed in the hope that it will be useful,       #
-# but WITHOUT ANY WARRANTY; without even the implied warranty of        #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
-# GNU General Public License <http://www.gnu.org/licenses/> for         #
-# more details.                                                         #
-#                                                                       #
-#########################################################################
+local Color = class("Color")
 
---]]
-
--- Color functions
-local color = {}
-
-function color.toRgb(h, s, l, a)
-    if s<=0 then return l,l,l,a end
-    h, s, l = h/256*6, s/255, l/255
-    local c = (1-math.abs(2*l-1))*s
-    local x = (1-math.abs(h%2-1))*c
-    local m,r,g,b = (l-.5*c), 0,0,0
-    if h < 1     then r,g,b = c,x,0
-    elseif h < 2 then r,g,b = x,c,0
-    elseif h < 3 then r,g,b = 0,c,x
-    elseif h < 4 then r,g,b = 0,x,c
-    elseif h < 5 then r,g,b = x,0,c
-    else              r,g,b = c,0,x
-    end return (r+m)*255,(g+m)*255,(b+m)*255,a
+function Color.fromRGB(r, g, b, a)
+    return Color:new(r, g, b, a or 1)
 end
 
-function color.toHsl(r, g, b, a)
-    local r, g, b = r/255, g/255, b/255
-    local min, max = math.min(r, g, b), math.max(r, g, b)
-    local h, s, l = 0, 0, (max + min) / 2
-    if max ~= min then
-        local d = max - min
-        s = l > 0.5 and d / (2 - max - min) or d / (max + min)
+function Color.fromHSV(h, s, v, a)
+    return Color:new(Color.HSVtoRGB(h, s, v, a or 1))
+end
+
+function Color:initialize(r, g, b, a)
+    self.r = r
+    self.g = g
+    self.b = b
+    self.a = a
+end
+
+function Color:rgb()
+    return self.r, self.g, self.b, self.a
+end
+
+function Color:darken(i)
+    local h, s, v, a = Color.RGBtoHSV(self.r, self.g, self.b)
+    
+    v = (1-i)*v
+    
+    return Color.fromHSV(h, s, v, a)
+end
+
+function Color:lighten(i)
+    local h, s, v, a = Color.RGBtoHSV(self.r, self.g, self.b)
+    
+    s = (1-i)*s
+    
+    return Color.fromHSV(h, s, v, a)
+end
+
+function Color.HSVtoRGB(h, s, v, a)
+    local i = math.floor(h * 6);
+    local f = h * 6 - i;
+    local p = v * (1 - s);
+    local q = v * (1 - f * s);
+    local t = v * (1 - (1 - f) * s);
+    
+    local mod = i % 6
+    
+    local r, g, b
+    
+    if mod == 0 then
+        r, g, b = v, t, p
+    elseif mod == 1 then
+        r, g, b = q, v, p
+    elseif mod == 2 then
+        r, g, b = p, v, t
+    elseif mod == 3 then
+        r, g, b = p, q, v
+    elseif mod == 4 then
+        r, g, b = t, p, v
+    elseif mod == 5 then
+        r, g, b = v, p, q
+    end
+    
+    return r, g, b, a
+end
+
+function Color.RGBtoHSV(r, g, b, a)
+    local max = math.max(r, g, b)
+    local min = math.min(r, g, b)
+    local h, s, v = max, max, max
+
+    local d = max - min
+    local s = (max == 0) and 0 or d / max
+
+    if max == min then
+        h = 0
+    else
         if max == r then
-            local mod = 6
-            if g > b then mod = 0 end
-            h = (g - b) / d + mod
+            h = (g - b) / d + (g < b and 6 or 0)
         elseif max == g then
             h = (b - r) / d + 2
-        else
+        elseif max == b then
             h = (r - g) / d + 4
         end
-    end
-    h = h / 6
-    return h*255, s*255, l*255, a
-end
-
-function color.shift(r, g, b, a, delta)
-    if not delta then a, delta = delta, a end
-    local h, s, l = color.toHsl(r, g, b)
-    return color.toRgb((h + delta) % 255, s, l, a)
-end
-
-function color.lighten(r, g, b, a, delta)
-    if not delta then a, delta = delta, a end
-
-    if delta < 0 then
-        return color.darken(r, g, b, a, -delta)
+        h = h/6
     end
 
-    local h, s, l = color.toHsl(r, g, b)
-    return color.toRgb(h, s, l+(255-l)*delta, a)
+    return h, s, v, a
 end
 
-function color.saturate(r, g, b, a, delta)
-    if not delta then a, delta = delta, a end
-    local h, s, l = color.toHsl(r, g, b)
-
-    if delta < 0 then
-        return color.desaturate(r, g, b, a, -delta)
-    end
-
-    return color.toRgb(h, s+(255-s)*delta, l, a)
-end
-
-function color.darken(r, g, b, a, delta)
-    if not delta then a, delta = delta, a end
-
-    if delta < 0 then
-        return color.lighten(r, g, b, a, -delta)
-    end
-
-    local h, s, l = color.toHsl(r, g, b)
-    return color.toRgb(h, s, l-l*delta, a)
-end
-
-function color.desaturate(r, g, b, a, delta)
-    if not delta then a, delta = delta, a end
-
-    if delta < 0 then
-        return color.saturate(r, g, b, a, -delta)
-    end
-
-    local h, s, l = color.toHsl(r, g, b)
-    return color.toRgb(h, s-s*delta, l, a)
-end
-
-function constrain(i, min, max)
-	return math.min(math.max(i, min), max)
-end
-
-
--- Wrap all color methods to accept either a table or flat args
-for k, v in pairs(color) do
-    color[k] = function(a, b, c, d, ...)
-        if type(a) == 'table' then
-            return v(a[1], a[2], a[3], a[4], b, c, d, ...)
-        end
-        return v(a, b, c, d, ...)
-    end
-end
-
-return color
+return Color

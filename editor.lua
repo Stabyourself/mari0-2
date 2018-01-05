@@ -27,35 +27,32 @@ function editor.newWindow(type, elem)
         testWindow.resizeable = true
         testWindow.closeable = true
         testWindow.scrollable = {true, true}
-        testWindow.title = "Is this the best element?"
         testWindow.backgroundColor = game.level.backgroundColor
         
         editor.canvas:addChild(testWindow)
         
-        -- local testWindow2 = GUI.Box:new(10, 30, 150, 100)
-        -- testWindow2.resizeable = true
-        -- testWindow2.draggable = true
-        -- testWindow2.closeable = true
-        -- testWindow2.scrollable = {true, false}
-        -- testWindow:addChild(testWindow2)
+        local testWindow2 = GUI.Box:new(10, 30, 150, 100)
+        testWindow2.resizeable = true
+        testWindow2.draggable = true
+        testWindow2.closeable = true
+        testWindow2.scrollable = {true, false}
+        testWindow:addChild(testWindow2)
 
-        -- local testWindow3 = GUI.Box:new(10, 30, 150, 100)
-        -- testWindow3.resizeable = true
-        -- testWindow3.draggable = true
-        -- testWindow3.closeable = true
-        -- testWindow3.scrollable = {true, false}
-        -- testWindow2:addChild(testWindow3)
-
-        --testWindow2:addChild(testWindow2)
+        local testWindow3 = GUI.Box:new(10, 30, 150, 100)
+        testWindow3.resizeable = true
+        testWindow3.draggable = true
+        testWindow3.closeable = true
+        testWindow3.scrollable = {true, false}
+        testWindow2:addChild(testWindow3)
         
-        for y = 0, 80, 20 do
-            local text = GUI.Text:new("Important", 0, y)
-            testWindow:addChild(text)
+        -- for y = 0, 80, 20 do
+        --     local text = GUI.Text:new("Important", 0, y)
+        --     testWindow:addChild(text)
             
-            local slider = GUI.Slider:new(0, 100, 0, y+9, 100, true)
+        --     local slider = GUI.Slider:new(0, 100, 0, y+9, 100, true)
             
-            testWindow:addChild(slider)
-        end
+        --     testWindow:addChild(slider)
+        -- end
     end
 end
 

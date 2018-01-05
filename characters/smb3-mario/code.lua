@@ -52,21 +52,21 @@ local SHOOTTIME = 12/60
 
 local STARPALETTES = {
     {
-        {252, 252, 252},
-        {  0,   0,   0},
-        {216,  40,   0},
+        {252/255, 252/255, 252/255},
+        {  0/255,   0/255,   0/255},
+        {216/255,  40/255,   0/255},
     },
     
     {
-        {252, 252, 252},
-        {  0,   0,   0},
-        { 76, 220,  72},
+        {252/255, 252/255, 252/255},
+        {  0/255,   0/255,   0/255},
+        { 76/255, 220/255,  72/255},
     },
     
     {
-        {252, 188, 176},
-        {  0,   0,   0},
-        {252, 152,  56},
+        {252/255/255, 188/255, 176/255},
+        {  0/255/255,   0/255,   0/255},
+        {252/255/255, 152/255,  56/255},
     }
 }
 
@@ -80,9 +80,9 @@ local JUMPTABLE = {
 local powerUpStates = {
     small = {
         colors = {
-            {252, 188, 176},
-            {216,  40,   0},
-            {  0,   0,   0},
+            {252/255, 188/255, 176/255},
+            {216/255,  40/255,   0/255},
+            {  0/255,   0/255,   0/255},
         },
         width = 24,
         height = 24,
@@ -130,9 +130,9 @@ local powerUpStates = {
     
     big = {
         colors = {
-            {252, 188, 176},
-            {216,  40,   0},
-            {  0,   0,   0},
+            {252/255, 188/255, 176/255},
+            {216/255,  40/255,   0/255},
+            {  0/255,   0/255,   0/255},
         },
         width = 40,
         height = 40,
@@ -211,9 +211,9 @@ local powerUpStates = {
     
     fire = {
         colors = {
-            {252, 188, 176},
-            {252, 152,  56},
-            {216,  40,   0},
+            {252/255, 188/255, 176/255},
+            {252/255, 152/255,  56/255},
+            {216/255,  40/255,   0/255},
         },
         width = 40,
         height = 40,
@@ -293,9 +293,9 @@ local powerUpStates = {
     
     hammer = {
         colors = {
-            {252, 188, 176},
-            {216,  40,   0},
-            {  0,   0,   0},
+            {252/255, 188/255, 176/255},
+            {216/255,  40/255,   0/255},
+            {  0/255,   0/255,   0/255},
         },
         width = 40,
         height = 40,
@@ -375,9 +375,9 @@ local powerUpStates = {
     
     raccoon = {
         colors = {
-            {252, 188, 176},
-            {216,  40,   0},
-            {  0,   0,   0},
+            {252/255, 188/255, 176/255},
+            {216/255,  40/255,   0/255},
+            {  0/255,   0/255,   0/255},
         },
         width = 40,
         height = 40,
@@ -464,9 +464,9 @@ local powerUpStates = {
     
     tanooki = {
         colors = {
-            {252, 188, 176},
-            {200,  76,  12},
-            {  0,   0,   0},
+            {252/255, 188/255, 176},
+            {200/255,  76/255,  12},
+            {  0/255,   0/255,   0},
         },
         width = 40,
         height = 40,
@@ -570,16 +570,20 @@ for i, v in pairs(powerUpStates) do
     end
     
     local j = 1
-    while love.filesystem.isFile(getPath(j)) do
+    local fileInfo = love.filesystem.getInfo(getPath(j))
+    
+    while fileInfo and fileInfo.type == "file" do
         char.img[j] = love.graphics.newImage(getPath(j))
         
         imgWidth = char.img[j]:getWidth()
         imgHeight = char.img[j]:getHeight()
         
         j = j + 1
+        fileInfo = love.filesystem.getInfo(getPath(j))
     end
     
-    if love.filesystem.isFile(getPath("static")) then
+    local fileInfo = love.filesystem.getInfo(getPath("static"))
+    if fileInfo and fileInfo.type == "file" then
         char.img["static"] = love.graphics.newImage(getPath("static"))
         
         imgWidth = char.img["static"]:getWidth()
@@ -742,7 +746,8 @@ function Character:initialize(...)
     self.shooting = false
     self.shootTimer = 0
     
-    self.palette = self.char.colors
+    self.standardPalette = self.char.colors
+    self.palette = self.standardPalette
 end
 
 function Character:switchState(stateName)

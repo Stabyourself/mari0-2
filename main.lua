@@ -3,8 +3,6 @@ function love.load()
     print("Mari3 POC by Maurice")
     
     require "util"
-
-    print(VAR("vsync"))
     
     love.graphics.setDefaultFilter("nearest", "nearest")
     
@@ -113,18 +111,18 @@ function love.load()
 
     print("Loading sound... (might take a while)")
     if not VAR("musicDisabled") then
-        overworldMusic = love.audio.newSource("sound/music/overworld.ogg")
+        overworldMusic = love.audio.newSource("sound/music/overworld.ogg", "stream")
         overworldMusic:setLooping(true)
         overworldMusic:setVolume(VAR("volume"))
     end
 
-    jumpSound = love.audio.newSource("sound/jump.ogg")
+    jumpSound = love.audio.newSource("sound/jump.ogg", "static")
     jumpSound:setVolume(VAR("volume"))
-    blockSound = love.audio.newSource("sound/block.ogg")
+    blockSound = love.audio.newSource("sound/block.ogg", "static")
     blockSound:setVolume(VAR("volume"))
-    coinSound = love.audio.newSource("sound/coin.ogg")
+    coinSound = love.audio.newSource("sound/coin.ogg", "static")
     coinSound:setVolume(VAR("volume"))
-    stompSound = love.audio.newSource("sound/stomp.ogg")
+    stompSound = love.audio.newSource("sound/stomp.ogg", "static")
     stompSound:setVolume(VAR("volume"))
 
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")
@@ -174,9 +172,9 @@ function love.draw()
     if VAR("inputDebug") then
         local function setColorBasedOn(key)
             if keyDown(key) then
-                love.graphics.setColor(255, 255, 255)
+                love.graphics.setColor(1, 1, 1)
             else
-                love.graphics.setColor(50, 50, 50)
+                love.graphics.setColor(0.2, 0.2, 0.2)
             end
         end
         
@@ -195,7 +193,7 @@ function love.draw()
         love.graphics.rectangle("fill", 72, SCREENHEIGHT-20, 8, 8)
         
         
-        love.graphics.setColor(255, 255, 255)
+        love.graphics.setColor(1, 1, 1)
     end
 
     if VAR("scale") ~= 1 then

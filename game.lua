@@ -50,7 +50,7 @@ end
 function game.draw()
     game.level:draw()
 
-    love.graphics.setColor(255, 255, 255)
+    love.graphics.setColor(1, 1, 1)
     smb3ui.time = math.floor(love.timer.getFPS())--math.ceil(game.timeLeft)
     smb3ui.pMeter = game.level.marios[1].pMeter
     smb3ui.score = 160291

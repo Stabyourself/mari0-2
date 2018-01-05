@@ -21,12 +21,12 @@ function Box:initialize(x, y, w, h)
     self.children = {}
 end
 
-function Box:update(dt)
+function Box:update(dt, x, y)
     if self.draggable then
         self.posMin[2] = 10
     end
 
-    GUI.Element.update(self, dt)
+    GUI.Element.update(self, dt, x, y)
 end
 
 function Box:draw(level)
@@ -35,7 +35,7 @@ function Box:draw(level)
     love.graphics.setColor(self.backgroundColor)
     love.graphics.rectangle("fill", 0, 0, self.w, self.h)
     
-    love.graphics.setColor(255, 255, 255)
+    love.graphics.setColor(1, 1, 1)
     
     -- Border
     local img = self.gui.img.box
@@ -70,7 +70,7 @@ function Box:draw(level)
     if self.closeable then
         if self.closing then
             love.graphics.draw(self.gui.img.boxCloseActive, self.w-11, -13)
-        elseif self:closeCollision(self:getMouse()) then
+        elseif self:closeCollision(self.mouse[1], self.mouse[2]) then
             love.graphics.draw(self.gui.img.boxCloseHover, self.w-11, -13)
         else
             love.graphics.draw(self.gui.img.boxClose, self.w-11, -13)
@@ -86,7 +86,7 @@ function Box:draw(level)
     if self.resizeable then
         if self.resizing then
             love.graphics.draw(self.gui.img.boxResizeActive, self.w-11, self.h-11)
-        elseif self:resizeCornerCollision(self:getMouse()) then
+        elseif self:resizeCornerCollision(self.mouse[1], self.mouse[2]) then
             love.graphics.draw(self.gui.img.boxResizeHover, self.w-11, self.h-11)
         else
             love.graphics.draw(self.gui.img.boxResize, self.w-11, self.h-11)

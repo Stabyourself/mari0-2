@@ -235,30 +235,30 @@ function PhysObj:getY()
 end
 
 function PhysObj:debugDraw(xOff, yOff)
-	love.graphics.setColor(255, 0, 0)
+	love.graphics.setColor(1, 0, 0)
 	love.graphics.rectangle("line", self:getX()+.5, self:getY()+.5, self.width-1, self.height-1)
 	
-	love.graphics.setColor(0, 255, 0, 127)
+	love.graphics.setColor(0, 1, 0, 127)
 	for j, w in ipairs(self.tracers.right) do
 		w:debugDraw()
 	end
 	
-	love.graphics.setColor(0, 0, 255, 127)
+	love.graphics.setColor(0, 0, 1, 127)
 	for j, w in ipairs(self.tracers.left) do
 		w:debugDraw()
 	end
 	
-	love.graphics.setColor(255, 0, 255, 127)
+	love.graphics.setColor(1, 0, 1, 127)
 	for j, w in ipairs(self.tracers.down) do
 		w:debugDraw()
 	end
 	
-	love.graphics.setColor(255, 255, 0, 127)
+	love.graphics.setColor(1, 1, 0, 127)
 	for j, w in ipairs(self.tracers.up) do
 		w:debugDraw()
 	end
 	
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 end
 
 function PhysObj:leftCollision() end

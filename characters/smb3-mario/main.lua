@@ -24,7 +24,7 @@ function loadImg()
 end
 
 function love.draw()
-    love.graphics.setColor(255, 255, 255)
+    love.graphics.setColor(1, 1, 1)
     love.graphics.print(files[currentFile] .. " - Arrows to change image, mouse to select colors, R to reset, enter to process current image")
     
     love.graphics.rectangle("fill", 0, 20, #colors*20, 20)
@@ -33,7 +33,7 @@ function love.draw()
         love.graphics.rectangle("fill", (i-1)*20+1, 21, 18, 18)
     end
     
-    love.graphics.setColor(255, 255, 255)
+    love.graphics.setColor(1, 1, 1)
     
     love.graphics.draw(img, 0, 40, 0, scale, scale)
     
@@ -109,7 +109,9 @@ function love.mousepressed(x, y, button)
 end
 
 function processImage(name, imgData, colors)
-    if not love.filesystem.isDirectory("graphics") then
+    local fileInfo = love.filesystem.getInfo("graphics")
+    
+    if fileInfo and fileInfo.type == "directory" then
         love.filesystem.createDirectory("graphics")
     end
     
@@ -130,7 +132,7 @@ function separateColor(imgData, color)
             local r, g, b, a = imgData:getPixel(x, y)
             
             if r == color[1] and g == color[2] and b == color[3] then
-                out:setPixel(x, y, 255, 255, 255, a)
+                out:setPixel(x, y, 1, 1, 1, a)
             end
         end
     end

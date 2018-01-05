@@ -31,8 +31,7 @@ end
 
 function Slider:update(dt)
     if self.dragging then
-        local x, y = self:getMouse()
-        local pos = (x-self.dragX-self.barOffset)/(self.barWidth)
+        local pos = (self.mouse[1]-self.dragX-self.barOffset)/(self.barWidth)
         
         pos = math.clamp(pos, 0, 1)
         
@@ -72,7 +71,7 @@ function Slider:draw(level)
 
     if self.dragging then
         img = self.gui.img.sliderActive
-    elseif self:getCollision(self:getMouse()) then
+    elseif self:getCollision(self.mouse[1], self.mouse[2]) then
         img = self.gui.img.sliderHover
     end
     

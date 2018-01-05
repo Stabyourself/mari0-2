@@ -1,6 +1,8 @@
 local VARIABLES = require "variables"
 
-if love.filesystem.exists("environment.lua") then
+local fileInfo = love.filesystem.getInfo("environment.lua")
+
+if fileInfo and fileInfo.type == "file" then
     local envTemp = require "environment"
     
     for i, v in pairs(envTemp) do

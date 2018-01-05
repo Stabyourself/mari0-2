@@ -24,6 +24,8 @@ function Element:initialize(x, y, w, h)
     self.posMin = {0, 0}
     self.sizeMin = {0, 0}
     
+    self.mouse = {0, 0}
+    
     self.children = {}
 end
 
@@ -42,10 +44,17 @@ function Element:removeChild(element)
     end
 end
 
-function Element:update(dt)
+function Element:update(dt, x, y)
+    if not x then
+        x, y = love.mouse.getPosition()
+        x, y = x/VAR("scale"), y/VAR("scale")
+    end
+    
+    self.mouse = {x, y}
+    
     for _, v in ipairs(self.children) do
         if v.update then
-            v:update(dt)
+            v:update(dt, x-v.x+self.scroll[1], y-v.y+self.scroll[2])
         end
     end
 
@@ -71,19 +80,15 @@ function Element:update(dt)
  
     if self.draggable then
         if self.dragging then
-            local x, y = self.parent:getMouse()
-            
-            self.x = x-self.dragPos[1]+self.parent.scroll[1]
-            self.y = y-self.dragPos[2]+self.parent.scroll[2]
+            self.x = self.parent.mouse[1]-self.dragPos[1]+self.parent.scroll[1]
+            self.y = self.parent.mouse[2]-self.dragPos[2]+self.parent.scroll[2]
         end
     end
 
     if self.resizeable then
         if self.resizing then
-            local x, y = self.parent:getMouse()
-            
-            self.w = x-self.x+self.resizeX+self.parent.scroll[1]
-            self.h = y-self.y+self.resizeY+self.parent.scroll[2]
+            self.w = self.parent.mouse[1]-self.x+self.resizeX+self.parent.scroll[1]
+            self.h = self.parent.mouse[2]-self.y+self.resizeY+self.parent.scroll[2]
 
             if not self.parent.scrollable[1] then
                 self.w = math.min(self.parent:getInnerWidth()-self.x, self.w)
@@ -119,9 +124,7 @@ function Element:update(dt)
     local childrenW, childrenH = self:getChildrenSize()
     
     if self.scrolling[1] then
-        local x, y = self:getMouse()
-        
-        local factor = ((x-self.scrollingDragOffset[1])/(self.w-self.scrollbarSize[1]-self.scrollbarSpace))
+        local factor = ((self.mouse[1]-self.scrollingDragOffset[1])/(self.w-self.scrollbarSize[1]-self.scrollbarSpace))
         
         factor = math.clamp(factor, 0, 1)
         self.scroll[1] = factor*(childrenW-self:getInnerWidth())
@@ -131,9 +134,7 @@ function Element:update(dt)
     self.scroll[1] = math.max(0, self.scroll[1])
     
     if self.scrolling[2] then
-        local x, y = self:getMouse()
-        
-        local factor = ((y-self.scrollingDragOffset[2])/(self.h-self.scrollbarSize[2]-self.scrollbarSpace))
+        local factor = ((self.mouse[2]-self.scrollingDragOffset[2])/(self.h-self.scrollbarSize[2]-self.scrollbarSpace))
         
         factor = math.clamp(factor, 0, 1)
         self.scroll[2] = factor*(childrenH-self:getInnerHeight())
@@ -195,7 +196,7 @@ function Element:draw(level)
             
             if self.scrolling[i] then
                 img = self.gui.img.scrollbarActive
-            elseif self:scrollCollision(i, self:getMouse()) then
+            elseif self:scrollCollision(i, self.mouse[1], self.mouse[2]) then
                 img = self.gui.img.scrollbarHover
             end
 
@@ -295,21 +296,6 @@ function Element:mousereleased(x, y, button)
             v:mousereleased(x-v.x+self.scroll[1], y-v.y+self.scroll[2], button)
         end
     end
-end
-
-function Element:getMouse(inner)
-    local x, y
-    if self.parent then
-        x, y = self.parent:getMouse(true)
-    else
-        x, y = getWorldMouse()
-    end
-    
-    if inner then
-        x, y = x+self.scroll[1], y+self.scroll[2]
-    end
-
-    return x-self.x, y-self.y
 end
 
 function Element:getChildrenSize()

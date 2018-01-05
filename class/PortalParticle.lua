@@ -4,20 +4,18 @@ local PORTALPARTICLETIME = 1
 local SPEEDCHANGE = 300
 local RCHANGE = 40
 
-function PortalParticle:initialize(x, y, r, color, t)
+function PortalParticle:initialize(x, y, r, color)
     self.x = x
     self.y = y
     self.r = r
     self.color = color
-    
-    self.tOffset = t
     
     self.timer = 0
     self.speed = 8
 end
 
 function PortalParticle:update(dt)
-    self.timer = self.timer + dt + self.tOffset
+    self.timer = self.timer + dt
     self.tOffset = 0
     
     self.r = self.r + (love.math.random()*2-1)*dt*RCHANGE
@@ -30,6 +28,9 @@ function PortalParticle:update(dt)
 end
 
 function PortalParticle:draw()
-    love.graphics.setColor(self.color[1], self.color[2], self.color[3], (1-self.timer/PORTALPARTICLETIME)*255)
+    local r, g, b = self.color:rgb()
+    local glowA = 1-self.timer/PORTALPARTICLETIME
+    
+    love.graphics.setColor(r, g, b, glowA)
     love.graphics.rectangle("fill", self.x-.5, self.y-.5, 1, 1)
 end

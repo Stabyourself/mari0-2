@@ -36,11 +36,11 @@ end
 function Button:draw(level)
     GUI.Element.translate(self)
     
-    love.graphics.setColor(255, 255, 255)
+    love.graphics.setColor(1, 1, 1)
     
     local img = self.gui.img.button
     
-    if self:getCollision(self:getMouse()) then
+    if self:getCollision(self.mouse[1], self.mouse[2]) then
         img = self.gui.img.buttonHover
     end
     

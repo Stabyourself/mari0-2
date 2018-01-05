@@ -27,15 +27,11 @@ function Mario:initialize(world, x, y, powerUpState)
     self.portalGunAngle = 0
     
     self.portalColor = {
-        {60, 188, 252},
-		{232, 130, 30}
+        Color.fromHSV(200/360, 0.76, 0.99),
+        Color.fromHSV(30/360, 0.87, 0.91),
     }
     
-    self.standardPalette = {
-        {252, 188, 176},
-        {216,  40,   0},
-        {  0,   0,   0},
-    }
+    self.crosshair = false
 end
 
 function Mario:update(dt)
@@ -57,16 +53,17 @@ function Mario:updateCrosshair()
     local mx, my = (love.mouse.getX())/VAR("scale")+game.level.camera.x, love.mouse.getY()/VAR("scale")+game.level.camera.y
     self.portalGunAngle = math.atan2(my-cy, mx-cx)
 
-    local x, y, absX, absY, side = game.level:rayCast(cx/game.level.tileSize, cy/game.level.tileSize, self.portalGunAngle)
+    local tileX, tileY, worldX, worldY, blockSide = game.level:rayCast(cx/game.level.tileSize, cy/game.level.tileSize, self.portalGunAngle)
 
-    absX, absY = game.level:mapToWorld(absX, absY)
+    worldX, worldY = game.level:mapToWorld(worldX, worldY)
     
-    -- CHANGE THIS
-    self.crosshairX = absX
-    self.crosshairY = absY
-    self.crosshairTileX = x
-    self.crosshairTileY = y
-    self.crosshairSide = side
+    self.crosshair = {
+        tileX = tileX,
+        tileY = tileY,
+        worldX = worldX,
+        worldY = worldY,
+        blockSide = blockSide,
+    }
 end
 
 function Mario:closePortals()

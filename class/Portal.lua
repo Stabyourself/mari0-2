@@ -61,14 +61,13 @@ function Portal:update(dt)
         self.particleTimer = self.particleTimer + dt
         
         while self.particleTimer >= PORTALPARTICLETIME do
-            local diff = self.particleTimer - PORTALPARTICLETIME
-            self.particleTimer = diff
+            self.particleTimer = self.particleTimer - PORTALPARTICLETIME
             
             local dist = (love.math.random()-.5)*(self.size-3)*self.openProgress
             
             local r = -math.pi/2
             
-            table.insert(self.particles, PortalParticle:new(dist, 0, r, self.color, diff))
+            table.insert(self.particles, PortalParticle:new(dist, 0, r, self.color))
         end
     end
     
@@ -130,9 +129,8 @@ function Portal:draw(side)
         local glowA = math.sin(glowI)*0.2+0.8
         
         if self.open then
-            local r, g, b = Color.lighten(self.color, 0.7)
-            love.graphics.setColor(r, g, b, 255*glowA)
-            love.graphics.draw(self.glowImg, 0, 0, 0, math.max(0, self.size*self.openProgress-2), 1, .5, 8)
+            love.graphics.setColor(1, 1, 1, 0.7)
+            love.graphics.draw(self.glowImg, 0, 0, 0, math.max(0, self.size*self.openProgress-2), 1, .5, 16)
         end
         
         for _, v in ipairs(self.thingList.background) do
@@ -144,7 +142,7 @@ function Portal:draw(side)
             v:draw()
         end
         
-        love.graphics.setColor(self.color)
+        love.graphics.setColor(self.color:rgb())
         love.graphics.draw(self.baseImg, 0, 0, 0, self.size*self.openProgress, 1, .5, 1)
     
         for _, v in ipairs(self.thingList.foreground) do
@@ -158,9 +156,8 @@ end
 function Portal:drawThing(a, img)
     --darken based on distance to "front"
     
-    local r, g, b = unpack(self.color)
     local darken = math.abs(a-math.pi)/math.pi*0.6
-    love.graphics.setColor(Color.darken(r, g, b, darken))
+    love.graphics.setColor(self.color:darken(darken):rgb())
     
     local dist = (self.size/2*self.openProgress - 2)
     

@@ -9,6 +9,15 @@ function Level:initialize(path, tileMap)
     self:loadMap(self.data.map)
     
     self.backgroundColor = self.data.backgroundColor or {156, 252, 240}
+    self.backgroundColor[1] = self.backgroundColor[1]/255
+    self.backgroundColor[2] = self.backgroundColor[2]/255
+    self.backgroundColor[3] = self.backgroundColor[3]/255
+    
+    -- Camera stuff
+    self.camera = Camera:new()
+    self.camera.y = self.height*self.tileSize - CAMERAHEIGHT
+    self.spawnLine = 0
+    self.spawnI = 1
 
     self.enemyList = loadEnemies()
     
@@ -38,13 +47,6 @@ function Level:initialize(path, tileMap)
     local x, y = self:mapToWorld(self.spawnX-.5, self.spawnY)
     
     table.insert(self.marios, Smb3Mario:new(self, x, y, "small"))
-    
-    -- Camera stuff
-    self.camera = Camera:new()
-    self.camera.y = self.height*self.tileSize - CAMERAHEIGHT
-    print(self.camera.y)
-    self.spawnLine = 0
-    self.spawnI = 1
 
     self:spawnEnemies(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end
@@ -63,10 +65,12 @@ end
 function Level:draw()
     self.camera:attach()
     
-    love.graphics.setColor(255, 255, 255)
+    love.graphics.setColor(1, 1, 1)
     
     for _, v in ipairs(self.marios) do
-        love.graphics.line(v.x+v.width/2, v.y+v.height/2+2, v.crosshairX, v.crosshairY)
+        if v.crosshair then
+            love.graphics.line(v.x+v.width/2, v.y+v.height/2+2, v.crosshair.worldX, v.crosshair.worldY)
+        end
     end
     
     fissix.World.draw(self)
@@ -100,7 +104,7 @@ end
 function Level:mousepressed(x, y, button)
     local mario = self.marios[1]
     
-    local portal = self:attemptPortal(mario.crosshairTileX, mario.crosshairTileY, mario.crosshairSide, mario.crosshairX, mario.crosshairY, mario.portalColor[button])
+    local portal = self:attemptPortal(mario.crosshair.tileX, mario.crosshair.tileY, mario.crosshair.blockSide, mario.crosshair.worldX, mario.crosshair.worldY, mario.portalColor[button])
     
     if portal then
         if mario.portals[button] then

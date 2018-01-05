@@ -29,7 +29,9 @@ function Slider:initialize(min, max, x, y, w, showValue)
     self:addChild(self.text)
 end
 
-function Slider:update(dt)
+function Slider:update(dt, x, y)
+    GUI.Element.update(self, dt, x, y)
+    
     if self.dragging then
         local pos = (self.mouse[1]-self.dragX-self.barOffset)/(self.barWidth)
         

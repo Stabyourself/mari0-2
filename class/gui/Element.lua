@@ -207,7 +207,7 @@ function Element:draw(level)
                 love.graphics.draw(img, scrollbarQuad[2], pos + 1, self.h-4, 0, self.scrollbarSize[i]-2, 1, 0, 4)
                 love.graphics.draw(img, scrollbarQuad[3], pos - 1 + self.scrollbarSize[i], self.h-4, 0, 1, 1, 0, 4)
             else
-                love.graphics.draw(self.gui.img.scrollbarBack, self.w-4, 0, math.pi/2, self.w, 1, 0, 4)
+                love.graphics.draw(self.gui.img.scrollbarBack, self.w-4, 0, math.pi/2, self.h, 1, 0, 4)
         
                 love.graphics.draw(img, scrollbarQuad[1], self.w-4, pos, math.pi/2, 1, 1, 0, 4)
                 love.graphics.draw(img, scrollbarQuad[2], self.w-4, pos + 1, math.pi/2, self.scrollbarSize[i]-2, 1, 0, 4)
@@ -241,7 +241,7 @@ function Element:getInnerHeight()
     local h = self.h
 
     if self.hasScrollbar[1] then
-        h = h - 10
+        h = h - 8
     end
 
     return h
@@ -251,7 +251,7 @@ function Element:getInnerWidth()
     local w = self.w
 
     if self.hasScrollbar[2] then
-        w = w - 10
+        w = w - 8
     end
 
     return w

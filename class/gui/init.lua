@@ -16,6 +16,7 @@ function GUI:initialize(folder)
     
     self.img.scrollbar = love.graphics.newImage(folder .. "/scrollbar.png")
     self.img.scrollbarHover = love.graphics.newImage(folder .. "/scrollbar-hover.png")
+    self.img.scrollbarActive = love.graphics.newImage(folder .. "/scrollbar-active.png")
     self.img.scrollbarBack = love.graphics.newImage(folder .. "/scrollbar-back.png")
     
     self.img.boxResize = love.graphics.newImage(folder .. "/box-resize.png")
@@ -29,7 +30,8 @@ function GUI:initialize(folder)
     self.img.button = love.graphics.newImage(folder .. "/button.png")
     self.img.buttonHover = love.graphics.newImage(folder .. "/button-hover.png")
     
-    self.img.sliderBar = love.graphics.newImage(folder .. "/slider-bar.png")
     self.img.slider = love.graphics.newImage(folder .. "/slider.png")
     self.img.sliderHover = love.graphics.newImage(folder .. "/slider-hover.png")
+    self.img.sliderActive = love.graphics.newImage(folder .. "/slider-active.png")
+    self.img.sliderBar = love.graphics.newImage(folder .. "/slider-bar.png")
 end

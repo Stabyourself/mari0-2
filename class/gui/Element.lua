@@ -6,7 +6,7 @@ local scrollbarQuad = {
     love.graphics.newQuad(2, 0, 1, 8, 3, 8),
 }
 
-Element.scrollbarSpace = 0
+Element.scrollbarSpace = 8
 
 function Element:initialize(x, y, w, h)
     self.x = x
@@ -193,7 +193,9 @@ function Element:draw(level)
             
             local img = self.gui.img.scrollbar
             
-            if self:scrollCollision(i, self:getMouse()) or self.scrolling[i] then
+            if self.scrolling[i] then
+                img = self.gui.img.scrollbarActive
+            elseif self:scrollCollision(i, self:getMouse()) then
                 img = self.gui.img.scrollbarHover
             end
 

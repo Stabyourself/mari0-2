@@ -69,7 +69,10 @@ function Slider:draw(level)
     love.graphics.draw(self.gui.img.sliderBar, sliderQuad[3], self.barWidth+self.barOffset*2-8, 0)
     
     local img = self.gui.img.slider
-    if self:getCollision(self:getMouse()) or self.dragging then
+
+    if self.dragging then
+        img = self.gui.img.sliderActive
+    elseif self:getCollision(self:getMouse()) then
         img = self.gui.img.sliderHover
     end
     

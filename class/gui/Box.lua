@@ -12,13 +12,10 @@ local boxQuad = {
     love.graphics.newQuad(17, 17, 16, 16, 33, 33),
 }
 
-Box.sizeMin = {12, 12}
-
-Box.scrollbarSpace = 8
-
 function Box:initialize(x, y, w, h)
     GUI.Element.initialize(self, x, y, w, h)
 
+    self.sizeMin = {12, 12}
     self.backgroundColor = {0, 0, 0, 0}
     
     self.children = {}

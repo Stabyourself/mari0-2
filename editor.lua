@@ -3,6 +3,7 @@ editor = {}
 function editor.load()
     editor.canvas = GUI.Canvas:new(defaultUI, 0, 0, SCREENWIDTH, SCREENHEIGHT)
     editor.canvas.scrollable[1] = true
+    editor.canvas.scrollable[2] = true
     editor.windows = {}
     
     editor.buttons = {}

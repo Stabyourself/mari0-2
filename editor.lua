@@ -22,7 +22,7 @@ end
 
 function editor.newWindow(type, elem)
     if type == "test" then
-        local testWindow = GUI.Box:new(10, 30, 150, 100)
+        local testWindow = GUI.Box:new(10, 30, 100, 97)
         testWindow.draggable = true
         testWindow.resizeable = true
         testWindow.closeable = true
@@ -48,11 +48,11 @@ function editor.newWindow(type, elem)
 
         --testWindow2:addChild(testWindow2)
         
-        for y = 5, 70, 20 do
-            local text = GUI.Text:new("Important", 5, y)
+        for y = 0, 80, 20 do
+            local text = GUI.Text:new("Important", 0, y)
             testWindow:addChild(text)
             
-            local slider = GUI.Slider:new(0, 100, 5, y+9, 190, true)
+            local slider = GUI.Slider:new(0, 100, 0, y+9, 100, true)
             
             testWindow:addChild(slider)
         end

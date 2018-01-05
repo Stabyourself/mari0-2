@@ -12,74 +12,24 @@ local boxQuad = {
     love.graphics.newQuad(17, 17, 16, 16, 33, 33),
 }
 
-local scrollBarQuad = {
-    love.graphics.newQuad(0, 0, 8, 8, 17, 8),
-    love.graphics.newQuad(8, 0, 1, 8, 17, 8),
-    love.graphics.newQuad(9, 0, 8, 8, 17, 8),
-}
+Box.sizeMin = {12, 12}
+
+Box.scrollbarSpace = 8
 
 function Box:initialize(x, y, w, h)
     GUI.Element.initialize(self, x, y, w, h)
-    
-    self.scrollable = {false, false}
-    self.scroll = {0, 0}
+
     self.backgroundColor = {0, 0, 0, 0}
     
     self.children = {}
 end
 
 function Box:update(dt)
+    if self.draggable then
+        self.posMin[2] = 10
+    end
+
     GUI.Element.update(self, dt)
-    
-    local titleHeight = 0
-    
-    if self.title then
-        titleHeight = 10
-    end
-    
-    if self.dragging then
-        local x, y = self.parent:getMouse()
-        
-        self.x = x-self.dragX
-        self.y = y-self.dragY
-    end
-    
-    if self.resizing then
-        local x, y = self.parent:getMouse()
-        
-        self.w = math.min(self.parent.w-self.x, x-self.x+self.resizeX)
-        self.h = math.min(self.parent.h-self.y, y-self.y+self.resizeY)
-    end
-    
-    --limit w and y
-    self.w = math.max(8, self.w)
-    self.w = math.min(self.parent.w, self.w)
-    
-    self.h = math.max(8, self.h)
-    self.h = math.min(self.parent.h-titleHeight, self.h)
-        
-    --limit x and y
-    self.x = math.max(0, self.x)
-    self.x = math.min(self.parent.w-self.w, self.x)
-    
-    self.y = math.max(titleHeight, self.y)
-    self.y = math.min(self.parent.h-self.h, self.y)
-    
-    local innerW, innerH = self:getInnerSize()
-    
-    if self.scrollingX then
-        local x, y = self:getMouse()
-        
-        local factor = ((x-self.scrollingXdragX)/(self.w-25))
-        
-        factor = math.clamp(factor, 0, 1)
-        self.scroll[1] = factor*(innerW-self.w)
-    end
-    
-    self.scroll[1] = math.min(innerW-self.w, self.scroll[1])
-    self.scroll[1] = math.max(0, self.scroll[1])
-    
-    print(self.scroll[1])
 end
 
 function Box:draw(level)
@@ -92,7 +42,7 @@ function Box:draw(level)
     
     -- Border
     local img = self.gui.img.box
-    if self.title then
+    if self.draggable then
         img = self.gui.img.boxTitled
     end
     
@@ -101,7 +51,7 @@ function Box:draw(level)
     love.graphics.draw(img, boxQuad[3], self.w, -16)
     love.graphics.draw(img, boxQuad[4], -16, 0, 0, 1, self.h)
     
-    love.graphics.draw(img, boxQuad[6], self.w, y, 0, 1, self.h)
+    love.graphics.draw(img, boxQuad[6], self.w, 0, 0, 1, self.h)
     love.graphics.draw(img, boxQuad[7], -16, self.h)
     love.graphics.draw(img, boxQuad[8], 0, self.h, 0, self.w, 1)
     love.graphics.draw(img, boxQuad[9], self.w, self.h)
@@ -132,33 +82,9 @@ function Box:draw(level)
     
     GUI.Element.stencil(self, level)
     
-    love.graphics.translate(-self.scroll[1], -self.scroll[2])
-    
     GUI.Element.draw(self, level)
     
-    love.graphics.translate(self.scroll[1], self.scroll[2])
-    
     GUI.Element.unStencil(self, level)
-    
-    local innerW, innerH = self:getInnerSize()
-    
-    if self.scrollable[1] then
-        if innerW > self.w then
-            love.graphics.draw(self.gui.img.scrollBarBack, 0, self.h-8, 0, self.w, 1)
-            
-            local scrollbarX = self:getScrollBarX()
-            
-            local img = self.gui.img.scrollBar
-            
-            if self:scrollXCollision(self:getMouse()) or self.scrollingX then
-                img = self.gui.img.scrollBarHover
-            end
-            
-            love.graphics.draw(img, scrollBarQuad[1], scrollbarX, self.h-8)
-            love.graphics.draw(img, scrollBarQuad[2], scrollbarX+8, self.h-8)
-            love.graphics.draw(img, scrollBarQuad[3], scrollbarX+9, self.h-8)
-        end
-    end
     
     if self.resizeable then
         if self.resizing then
@@ -171,12 +97,6 @@ function Box:draw(level)
     end
     
     GUI.Element.unTranslate(self)
-end
-
-function Box:getScrollBarX()
-    local innerW, innerH = self:getInnerSize()
-    
-    return (self.scroll[1]/(innerW-self.w))*(self.w-25)
 end
 
 function Box:titleBarCollision(x, y)
@@ -193,12 +113,6 @@ end
 
 function Box:collision(x, y)
     return x >= -2 and x < self.w+2 and y >= -2 and y < self.h+3
-end
-
-function Box:scrollXCollision(x, y)
-    local scrollbarX = self:getScrollBarX()
-    
-    return x >= scrollbarX and x < scrollbarX + 17 and y >= self.h-8 and y < self.h
 end
 
 function Box:mousepressed(x, y, button)
@@ -222,14 +136,7 @@ function Box:mousepressed(x, y, button)
         
     elseif self.draggable and self:titleBarCollision(x, y) then
         self.dragging = true
-        self.dragX = x
-        self.dragY = y
-        
-        return true
-    
-    elseif self.scrollable[1] and self:scrollXCollision(x, y) then
-        self.scrollingX = true
-        self.scrollingXdragX = x-self:getScrollBarX()
+        self.dragPos = {x, y}
         
         return true
         
@@ -243,7 +150,6 @@ function Box:mousereleased(x, y, button)
     
     self.dragging = false
     self.resizing = false
-    self.scrollingX = false
     
     if self.closing then
         if self:closeCollision(x, y) then

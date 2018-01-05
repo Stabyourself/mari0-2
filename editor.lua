@@ -2,6 +2,7 @@ editor = {}
 
 function editor.load()
     editor.canvas = GUI.Canvas:new(defaultUI, 0, 0, SCREENWIDTH, SCREENHEIGHT)
+    editor.canvas.scrollable[1] = true
     editor.windows = {}
     
     editor.buttons = {}
@@ -29,6 +30,22 @@ function editor.newWindow(type, elem)
         testWindow.backgroundColor = game.level.backgroundColor
         
         editor.canvas:addChild(testWindow)
+        
+        -- local testWindow2 = GUI.Box:new(10, 30, 150, 100)
+        -- testWindow2.resizeable = true
+        -- testWindow2.draggable = true
+        -- testWindow2.closeable = true
+        -- testWindow2.scrollable = {true, false}
+        -- testWindow:addChild(testWindow2)
+
+        -- local testWindow3 = GUI.Box:new(10, 30, 150, 100)
+        -- testWindow3.resizeable = true
+        -- testWindow3.draggable = true
+        -- testWindow3.closeable = true
+        -- testWindow3.scrollable = {true, false}
+        -- testWindow2:addChild(testWindow3)
+
+        --testWindow2:addChild(testWindow2)
         
         for y = 5, 70, 20 do
             local text = GUI.Text:new("Important", 5, y)

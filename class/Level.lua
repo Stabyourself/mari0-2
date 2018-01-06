@@ -65,13 +65,19 @@ end
 function Level:draw()
     self.camera:attach()
     
-    love.graphics.setColor(1, 1, 1)
-    
     for _, v in ipairs(self.marios) do
         if v.crosshair then
+            if v.crosshair.valid then
+                love.graphics.setColor(0, 1, 0)
+            else
+                love.graphics.setColor(1, 0, 0)
+            end
+            
             love.graphics.line(v.x+v.width/2, v.y+v.height/2+2, v.crosshair.worldX, v.crosshair.worldY)
         end
     end
+    
+    love.graphics.setColor(1, 1, 1)
     
     fissix.World.draw(self)
     
@@ -104,7 +110,7 @@ end
 function Level:mousepressed(x, y, button)
     local mario = self.marios[1]
     
-    local portal = self:attemptPortal(mario.crosshair.tileX, mario.crosshair.tileY, mario.crosshair.blockSide, mario.crosshair.worldX, mario.crosshair.worldY, mario.portalColor[button])
+    local portal = self:attemptPortal(mario.crosshair.tileX, mario.crosshair.tileY, mario.crosshair.blockSide, mario.crosshair.worldX, mario.crosshair.worldY, mario.portalColor[button], mario.portals[button])
     
     if portal then
         if mario.portals[button] then

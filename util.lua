@@ -1,3 +1,5 @@
+-- I'd like to dedicate this file to stackoverflow.
+
 local VARIABLES = require "variables"
 
 local fileInfo = love.filesystem.getInfo("environment.lua")
@@ -117,6 +119,30 @@ function rectangleOnLine(x, y, w, h, p1x, p1y, p2x, p2y) -- See above
 
     return false
 end
+
+function pointOnLine(lx1, ly1, lx2, ly2, px, py) -- Credits to https://stackoverflow.com/a/17693146
+    local dist1P = math.sqrt((lx1-px)^2+(ly1-py)^2)
+    local dist2P = math.sqrt((lx2-px)^2+(ly2-py)^2)
+    local dist12 = math.sqrt((lx1-lx2)^2+(ly1-ly2)^2)
+    
+    if math.abs(math.abs(dist2P - dist1P) - dist12) < 0.0000001 or
+        math.abs(math.abs(dist2P + dist1P) - dist12) < 0.0000001 then
+        return dist1P - dist2P
+    end
+    return 
+end
+
+-- function pointOnLine(l1x, l1y, l2x, l2y, px, py)
+--     if l1x == px then 
+--         return l2x == px 
+--     end
+    
+--     if l1y == py then
+--         return l2y == py 
+--     end
+    
+--     return math.abs((l1x - px)*(l1y - py) - (px - l2x)*(py - l2y)) < 0.000001
+-- end
 
 function objectWithinPortalRange(p, x, y)
     local nX, nY = pointAroundPoint(x, y, p.x1, p.y1, -p.r)

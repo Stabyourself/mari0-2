@@ -285,7 +285,7 @@ function World:checkMapCollision(obj, x, y)
             -- rotate x, y around portal origin
             local nx, ny = pointAroundPoint(x, y, p.x1, p.y1, -p.r)
 
-            if ny >= p.y1 and ny < p.y1+64 then -- vertically inside the portal
+            if ny >= p.y1-1 and ny < p.y1+64 then -- vertically inside the portal
                 if nx > p.x1 and nx < p.x1+p.size then -- horizontally INside the portal
                     return false
                 else -- horizontally OUTside the portal
@@ -471,15 +471,15 @@ function World:worldToMap(x, y)
     return math.floor(x/self.tileSize)+1, math.floor(y/self.tileSize)+1
 end
 
-function World:attemptPortal(tileX, tileY, side, x, y, color)
-    local x1, y1, x2, y2 = self:checkPortalSurface(tileX, tileY, side, 0)
+function World:attemptPortal(tileX, tileY, side, x, y, color, ignoreP)
+    local x1, y1, x2, y2 = self:checkPortalSurface(tileX, tileY, side, x, y, ignoreP)
     
     if x1 then
         -- make sure that the surface is big enough to hold a portal
-        local angle = math.atan2(y2-y1, x2-x1)
         local length = math.sqrt((x1-x2)^2+(y1-y2)^2)
         
         if length >= VAR("portalSize") then
+            local angle = math.atan2(y2-y1, x2-x1)
             local middleProgress = math.sqrt((x-x1)^2+(y-y1)^2)/length
             
             local leftSpace = middleProgress*length
@@ -557,7 +557,7 @@ function World:doPortal(portal, x, y, angle)
     return newX, newY, r, rDiff, reversed
 end
 
-function World:checkPortalSurface(tileX, tileY, side, progress)
+function World:checkPortalSurface(tileX, tileY, side, worldX, worldY, ignoreP)
     local function walkSide(tile, tileX, tileY, side, dir)
         local nextX, nextY, angle, nextAngle, nextTileX, nextTileY, nextSide, x, y
         local first = true
@@ -763,6 +763,34 @@ function World:checkPortalSurface(tileX, tileY, side, progress)
     
     startX, startY = self:mapToWorld(startX, startY)
     endX, endY = self:mapToWorld(endX, endY)
+    
+        
+    -- Do some magic to determine whether there's portals blocking off sections of our portal surface
+    local angle = math.atan2(endY-startY, endX-startX)
+        
+    for _, p in ipairs(self.portals) do
+        if p ~= ignoreP then
+            if math.abs(p.r - angle) < 0.0001 then -- angle is the same!
+                local onLine = pointOnLine(p.x1, p.y1, p.x2, p.y2, worldX, worldY)
+                if onLine then -- surface is the same! (or at least on the same line which is good enough)
+                    if onLine >= 0 then -- Check on which side of the same surface portal we are
+                        if math.abs(startX-worldX) > math.abs(p.x2-worldX) or
+                            math.abs(startY-worldY) > math.abs(p.y2-worldY) then -- finally check that we are not accidentally lengthening the portal surface
+                            startX = p.x2
+                            startY = p.y2
+                        end
+                        
+                    else
+                        if math.abs(endX-worldX) > math.abs(p.x1-worldX) or
+                            math.abs(endY-worldY) > math.abs(p.y1-worldY) then
+                            endX = p.x1
+                            endY = p.y1
+                        end
+                    end
+                end
+            end
+        end
+    end
 
     return startX, startY, endX, endY
 end

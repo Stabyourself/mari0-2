@@ -29,6 +29,7 @@ function Mario:initialize(world, x, y, powerUpState)
     self.portalColor = {
         Color.fromHSV(200/360, 0.76, 0.99),
         Color.fromHSV(30/360, 0.87, 0.91),
+        Color.fromHSV(30/360, 0.87, 0.91),
     }
     
     self.crosshair = false
@@ -55,7 +56,7 @@ function Mario:updateCrosshair()
 
     local tileX, tileY, worldX, worldY, blockSide = game.level:rayCast(cx/game.level.tileSize, cy/game.level.tileSize, self.portalGunAngle)
 
-    worldX, worldY = game.level:mapToWorld(worldX, worldY)
+    worldX, worldY = self.world:mapToWorld(worldX, worldY)
     
     self.crosshair = {
         tileX = tileX,
@@ -63,7 +64,15 @@ function Mario:updateCrosshair()
         worldX = worldX,
         worldY = worldY,
         blockSide = blockSide,
+        valid = false,
     }
+    
+    local x1, y1, x2, y2 = self.world:checkPortalSurface(self.crosshair.tileX, self.crosshair.tileY, self.crosshair.blockSide, self.crosshair.worldX, self.crosshair.worldY)
+    
+    local length = math.sqrt((x1-x2)^2+(y1-y2)^2)
+    if length >= VAR("portalSize") then
+        self.crosshair.valid = true
+    end
 end
 
 function Mario:closePortals()

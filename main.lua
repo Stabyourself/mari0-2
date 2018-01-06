@@ -359,18 +359,24 @@ function worldDraw(...)
 end
 
 function worldLine(x1, y1, x2, y2)
-    love.graphics.line(x1*VAR("tileSize"), y1*VAR("tileSize"), x2*VAR("tileSize"), y2*VAR("tileSize"))
+    love.graphics.line(x1, y1, x2, y2)
 end
 
 function worldRectangle(style, x, y, w, h)
-    love.graphics.rectangle(style, x*VAR("tileSize"), y*VAR("tileSize"), w*VAR("tileSize"), h*VAR("tileSize"))
+    if VAR("noSubpixelMovement") then
+        x = math.round(x)
+        y = math.round(y)
+        w = math.round(w)
+        h = math.round(h)
+    end
+    love.graphics.rectangle(style, x, y, w, h)
 end
 
 function worldPolygon(style, ...)
     local points = {}
     
     for i, v in ipairs({...}) do
-       table.insert(points, v*VAR("tileSize"))
+       table.insert(points, v)
     end
     
     love.graphics.polygon(style, unpack(points))

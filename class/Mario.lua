@@ -69,9 +69,11 @@ function Mario:updateCrosshair()
     
     local x1, y1, x2, y2 = self.world:checkPortalSurface(self.crosshair.tileX, self.crosshair.tileY, self.crosshair.blockSide, self.crosshair.worldX, self.crosshair.worldY)
     
-    local length = math.sqrt((x1-x2)^2+(y1-y2)^2)
-    if length >= VAR("portalSize") then
-        self.crosshair.valid = true
+    if x1 then
+        local length = math.sqrt((x1-x2)^2+(y1-y2)^2)
+        if length >= VAR("portalSize") then
+            self.crosshair.valid = true
+        end
     end
 end
 

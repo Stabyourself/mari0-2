@@ -238,22 +238,22 @@ function PhysObj:debugDraw(xOff, yOff)
 	love.graphics.setColor(1, 0, 0)
 	love.graphics.rectangle("line", self:getX()+.5, self:getY()+.5, self.width-1, self.height-1)
 	
-	love.graphics.setColor(0, 1, 0, 127)
+	love.graphics.setColor(0, 1, 0, 0.5)
 	for j, w in ipairs(self.tracers.right) do
 		w:debugDraw()
 	end
 	
-	love.graphics.setColor(0, 0, 1, 127)
+	love.graphics.setColor(0, 0, 1, 0.5)
 	for j, w in ipairs(self.tracers.left) do
 		w:debugDraw()
 	end
 	
-	love.graphics.setColor(1, 0, 1, 127)
+	love.graphics.setColor(1, 0, 1, 0.5)
 	for j, w in ipairs(self.tracers.down) do
 		w:debugDraw()
 	end
 	
-	love.graphics.setColor(1, 1, 0, 127)
+	love.graphics.setColor(1, 1, 0, 0.5)
 	for j, w in ipairs(self.tracers.up) do
 		w:debugDraw()
 	end

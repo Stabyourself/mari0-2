@@ -75,7 +75,7 @@ tiles[1340] = {
     }
 }
 
-tiles[1400] = {
+tiles[1535] = {
     angle = 0,
     collision = {
          0,  0,
@@ -84,7 +84,7 @@ tiles[1400] = {
     }
 }
 
-tiles[1401] = {
+tiles[1534] = {
     angle = 0,
     collision = {
          0,  0,

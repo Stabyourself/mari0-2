@@ -46,7 +46,7 @@ function World:update(dt)
         obj:checkCollisions()
         
         self:checkPortaling(obj, oldX, oldY)
-		
+        
 		-- Add gravity again
         obj.speedY = obj.speedY + (obj.gravity or VAR("gravity")) * 0.5 * dt
         -- Cap speedY
@@ -96,10 +96,12 @@ function World:checkPortaling(obj, oldX, oldY)
                 obj.x = obj.x-obj.width/2
                 obj.y = obj.y-obj.height/2
                 
-                break
+                return true
             end
         end
-    end 
+    end
+    
+    return false
 end
 
 function World:draw()
@@ -246,13 +248,13 @@ function World:physicsDebug()
                     if tile.collision ~= VAR("collision").cube then -- optimization for cubes
                         local points = {}
                         for i = 1, #tile.collision, 2 do
-                            table.insert(points, tile.collision[i]/self.tileSize+x-1)
-                            table.insert(points, tile.collision[i+1]/self.tileSize+y-1)
+                            table.insert(points, tile.collision[i]+(x-1)*self.tileSize)
+                            table.insert(points, tile.collision[i+1]+(y-1)*self.tileSize)
                         end
                         
                         worldPolygon("line", unpack(points))
                     else
-                        worldRectangle("line", x-1, y-1, 1, 1)
+                        worldRectangle("line", (x-1)*self.tileSize, (y-1)*self.tileSize, 1*self.tileSize, 1*self.tileSize)
                     end
                 end
             end
@@ -418,12 +420,12 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
 
             if side == "ver" then
                 local dist = (mapX - rayPosX + (1 - stepX) / 2) / rayDirX;
-                hitDist = math.fmod(rayPosY + dist * rayDirY, 1)
+                hitDist = rayPosY + dist * rayDirY - math.floor(mapY)
 
                 absY = absY + hitDist
             else
                 local dist = (mapY - rayPosY + (1 - stepY) / 2) / rayDirY;
-                hitDist = math.fmod(rayPosX + dist * rayDirX, 1)
+                hitDist = rayPosX + dist * rayDirX - math.floor(mapX)
 
                 absX = absX + hitDist
             end

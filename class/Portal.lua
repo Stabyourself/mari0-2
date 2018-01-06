@@ -130,7 +130,7 @@ function Portal:draw(side)
         
         if self.open then
             love.graphics.setColor(1, 1, 1, 0.7)
-            love.graphics.draw(self.glowImg, 0, 0, 0, math.max(0, self.size*self.openProgress-2), 1, .5, 16)
+            worldDraw(self.glowImg, 0, 0, 0, math.max(0, self.size*self.openProgress-2), 1, .5, 16)
         end
         
         for _, v in ipairs(self.thingList.background) do
@@ -143,7 +143,7 @@ function Portal:draw(side)
         end
         
         love.graphics.setColor(self.color:rgb())
-        love.graphics.draw(self.baseImg, 0, 0, 0, self.size*self.openProgress, 1, .5, 1)
+        worldDraw(self.baseImg, 0, 0, 0, self.size*self.openProgress, 1, .5, 1)
     
         for _, v in ipairs(self.thingList.foreground) do
             self:drawThing(v.a, v.img)
@@ -180,7 +180,7 @@ function Portal:drawThing(a, img)
     --     sx = -sx
     -- end
     
-    love.graphics.draw(img, x*dist, 0, 0, sx, 1, img:getWidth()/2, img:getHeight()+1)
+    worldDraw(img, x*dist, 0, 0, sx, 1, img:getWidth()/2, img:getHeight()+1)
 end
 
 function Portal:connectTo(portal)

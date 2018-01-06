@@ -32,5 +32,5 @@ function PortalParticle:draw()
     local glowA = 1-self.timer/PORTALPARTICLETIME
     
     love.graphics.setColor(r, g, b, glowA)
-    love.graphics.rectangle("fill", self.x-.5, self.y-.5, 1, 1)
+    worldRectangle("fill", self.x-.5, self.y-.5, 1, 1)
 end

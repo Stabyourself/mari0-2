@@ -71,10 +71,10 @@ local STARPALETTES = {
 }
 
 local JUMPTABLE = {
-    {speedX = 60, speedY = -206.25},
-    {speedX = 120, speedY = -213.75},
-    {speedX = 180, speedY = -221.25},
-    {speedX = math.huge, speedY = -236.25},
+    {vel = 60, jumpForce = -206.25},
+    {vel = 120, jumpForce = -213.75},
+    {vel = 180, jumpForce = -221.25},
+    {vel = math.huge, jumpForce = -236.25},
 }
 
 local powerUpStates = {
@@ -671,13 +671,13 @@ end
 
 
 state.jump = function(mario)
-    if not keyDown("jump") or mario.speedY >= JUMPGRAVITYUNTIL then
+    if not keyDown("jump") or mario.speed.y >= JUMPGRAVITYUNTIL then
         return "fall"
     end
 end
 
 state.fall = function(mario)
-    if keyDown("jump") and mario.speedY < JUMPGRAVITYUNTIL then
+    if keyDown("jump") and mario.speed.y < JUMPGRAVITYUNTIL then
         return "jump"
     end
     -- handled by bottomCollision
@@ -890,11 +890,11 @@ function Character:movement(dt)
     end
     
     if self.state.name == "fly" then
-        self.speedY = FLYINGASCENSION
+        self.speed.y = FLYINGASCENSION
     end
     
     if self.state.name == "float" then
-        self.speedY = FLOATASCENSION
+        self.speed.y = FLOATASCENSION
     end 
     
     -- P meter
@@ -921,7 +921,7 @@ function Character:movement(dt)
         while self.pMeterTimer >= self.pMeterTime do
             self.pMeterTimer = self.pMeterTimer - self.pMeterTime
             
-            if self.onGround and math.abs(self.speedX) >= MAXSPEEDS[2] then
+            if self.onGround and math.abs(self.speed.x) >= MAXSPEEDS[2] then
                 if self.pMeter < VAR("pMeterTicks") then
                     self.pMeterTime = PMETERTIMEUP
                     self.pMeter = self.pMeter + 1
@@ -965,21 +965,21 @@ function Character:movement(dt)
     end
     
     
-    self.speedX = self.groundSpeedX
+    self.speed.x = self.groundSpeedX
     
-    -- Adjust speedx if going downhill or uphill
+    -- Adjust speed.x if going downhill or uphill
     if self.onGround then
         if self.surfaceAngle > 0 then
             if self.groundSpeedX > 0 then
-                self.speedX = self.speedX + DOWNHILLWALKBONUS
+                self.speed.x = self.speed.x + DOWNHILLWALKBONUS
             else
-                self.speedX = self.speedX * math.cos(self.surfaceAngle)
+                self.speed.x = self.speed.x * math.cos(self.surfaceAngle)
             end
         elseif self.surfaceAngle < 0 then
             if self.groundSpeedX < 0 then
-                self.speedX = self.speedX - DOWNHILLWALKBONUS
+                self.speed.x = self.speed.x - DOWNHILLWALKBONUS
             else
-                self.speedX = self.speedX * math.cos(-self.surfaceAngle)
+                self.speed.x = self.speed.x * math.cos(-self.surfaceAngle)
             end
         end
     end
@@ -1046,7 +1046,7 @@ function Character:animation(dt)
     end
     
     if self.hasPortalGun then -- look towards portalGunAngle
-        if math.abs(self.portalGunAngle-self.r) <= math.pi*.5 then
+        if math.abs(self.portalGunAngle-self.angle) <= math.pi*.5 then
             self.animationDirection = 1
         else
             self.animationDirection = -1
@@ -1093,7 +1093,7 @@ function Character:animation(dt)
         self.animationState = "skid"
         
     elseif self.state.name == "stop" or self.state.name == "run" then
-        if math.abs(self.speedX) >= MAXSPEEDS[3] then
+        if math.abs(self.speed.x) >= MAXSPEEDS[3] then
             self.animationState = "sprint"
         else
             self.animationState = "run"
@@ -1118,7 +1118,7 @@ function Character:animation(dt)
         elseif (not self.char.canFly and self.maxSpeedJump == MAXSPEEDS[3]) or self.flying then
             self.animationState = "fly"
         else
-            if self.speedY < 0 then
+            if self.speed.y < 0 then
                 self.animationState = "jump"
             else
                 self.animationState = "fall"
@@ -1130,7 +1130,7 @@ function Character:animation(dt)
     
     -- Running animation
     if (self.animationState == "run" or self.animationState == "sprint") then
-        self.runAnimationTimer = self.runAnimationTimer + (math.abs(self.speedX)+50)/8*dt
+        self.runAnimationTimer = self.runAnimationTimer + (math.abs(self.speed.x)+50)/8*dt
         while self.runAnimationTimer > RUNANIMATIONTIME do
             self.runAnimationTimer = self.runAnimationTimer - RUNANIMATIONTIME
             self.runAnimationFrame = self.runAnimationFrame + 1
@@ -1186,9 +1186,9 @@ function Character:animation(dt)
     
     -- Make sure to properly use the tables if it's an animationState with frames
     if frame then
-        self.quad = self.char.quad[self:getAngleFrame(self.portalGunAngle-self.r)][self.animationState][frame]
+        self.quad = self.char.quad[self:getAngleFrame(self.portalGunAngle-self.angle)][self.animationState][frame]
     else
-        self.quad = self.char.quad[self:getAngleFrame(self.portalGunAngle-self.r)][self.animationState]
+        self.quad = self.char.quad[self:getAngleFrame(self.portalGunAngle-self.angle)][self.animationState]
     end
     
     assert(type(self.quad) == "userdata", "The state \"" .. self.animationState .. "\" seems to not be have a quad set up correctly.")
@@ -1201,7 +1201,7 @@ function Character:jump()
         self.flyAnimationFrame = 1
     end
     
-    if self.char.canFloat and self.speedY > 0 and (self.state.name == "jump" or self.state.name == "float" or self.state.name == "fall") then
+    if self.char.canFloat and self.speed.y > 0 and (self.state.name == "jump" or self.state.name == "float" or self.state.name == "fall") then
         self:switchState("float")
         self.floatAnimationTimer = 0
         self.floatAnimationFrame = 1
@@ -1211,8 +1211,8 @@ function Character:jump()
         -- Adjust jumpforce according to speed
         local speedY = 0
         for i = 1, #JUMPTABLE do
-            if math.abs(self.groundSpeedX) <= JUMPTABLE[i].speedX then
-                speedY = JUMPTABLE[i].speedY
+            if math.abs(self.groundSpeedX) <= JUMPTABLE[i].vel then
+                speedY = JUMPTABLE[i].jumpForce
                 break
             end
         end
@@ -1233,7 +1233,7 @@ function Character:jump()
         
         self.maxSpeedJump = maxSpeedJump
         
-        self.speedY = speedY
+        self.speed.y = speedY
         
         -- See if Mario should switch to flying mode
         if self.char.canFly then

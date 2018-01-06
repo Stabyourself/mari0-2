@@ -30,14 +30,14 @@ function World:update(dt)
 		obj:update(dt)
 		
 		-- Add gravity
-        obj.speedY = obj.speedY + (obj.gravity or VAR("gravity")) * 0.5 * dt
-        -- Cap speedY
-        obj.speedY = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speedY)
+        obj.speed.y = obj.speed.y + (obj.gravity or VAR("gravity")) * 0.5 * dt
+        -- Cap speed.y
+        obj.speed.y = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed.y)
         
         local oldX, oldY = obj.x, obj.y
         
-        obj.x = obj.x + obj.speedX * dt
-        obj.y = obj.y + obj.speedY * dt
+        obj.x = obj.x + obj.speed.x * dt
+        obj.y = obj.y + obj.speed.y * dt
         
         self:checkPortaling(obj, oldX, oldY)
         
@@ -48,9 +48,13 @@ function World:update(dt)
         self:checkPortaling(obj, oldX, oldY)
         
 		-- Add gravity again
-        obj.speedY = obj.speedY + (obj.gravity or VAR("gravity")) * 0.5 * dt
-        -- Cap speedY
-        obj.speedY = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speedY)
+        obj.speed.y = obj.speed.y + (obj.gravity or VAR("gravity")) * 0.5 * dt
+        -- Cap speed.y
+        obj.speed.y = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed.y)
+        
+        if obj.postMovementUpdate then
+            obj:postMovementUpdate(dt)
+        end
 	end
 end
 
@@ -60,9 +64,9 @@ function World:checkPortaling(obj, oldX, oldY)
             local iX, iY = linesIntersect(oldX+obj.width/2, oldY+obj.height/2, obj.x+obj.width/2, obj.y+obj.height/2, p.x1, p.y1, p.x2, p.y2)
             
             if iX then
-                local x, y, speedX, speedY = obj.x+obj.width/2, obj.y+obj.height/2, obj.groundSpeedX, obj.speedY
-                local angle = math.atan2(speedY, speedX)
-                local speed = math.sqrt(speedX^2+speedY^2)
+                local x, y, velocity = obj.x+obj.width/2, obj.y+obj.height/2, Vector(obj.groundSpeedX, obj.speed.y)
+                local angle = math.atan2(velocity.y, velocity.x)
+                local speed = math.sqrt(velocity.x^2+velocity.y^2)
                 
                 local outX, outY, outAngle, angleDiff, reversed = self:doPortal(p, x, y, angle)
                 
@@ -70,9 +74,9 @@ function World:checkPortaling(obj, oldX, oldY)
                 obj.y = outY
                 
                 obj.groundSpeedX = math.cos(outAngle)*speed
-                obj.speedY = math.sin(outAngle)*speed
+                obj.speed.y = math.sin(outAngle)*speed
                 
-                obj.r = obj.r + angleDiff
+                obj.angle = obj.angle + angleDiff
                 
                 if reversed then
                     obj.animationDirection = -obj.animationDirection
@@ -82,13 +86,13 @@ function World:checkPortaling(obj, oldX, oldY)
                 table.insert(self.portalVectorDebugs, {
                     inX = x,
                     inY = y,
-                    inVX = speedX,
-                    inVY = speedY,
+                    inVX = velocity.x,
+                    inVY = velocity.y,
                     
                     outX = obj.x,
                     outY = obj.y,
                     outVX = obj.groundSpeedX,
-                    outVY = obj.speedY,
+                    outVY = obj.speed.y,
                     
                     reversed = reversed
                 })
@@ -145,7 +149,7 @@ function World:draw()
             if p.open then
                 if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
                     objectWithinPortalRange(p, x, y) then
-                    local angle = math.atan2(obj.speedY, obj.groundSpeedX)
+                    local angle = math.atan2(obj.speed.y, obj.groundSpeedX)
                     local cX, cY, cAngle, angleDiff, reversed = self:doPortal(p, obj.x+obj.width/2, obj.y+obj.height/2, angle)
                     
                     local xScale = 1
@@ -162,7 +166,7 @@ function World:draw()
                         love.graphics.setColor(1, 1, 1)
                     end
 
-                    drawObject(obj, cX, cY, (obj.r or 0) + angleDiff, (obj.animationDirection or 1)*xScale, 1, obj.centerX, obj.centerY)
+                    drawObject(obj, cX, cY, (obj.angle or 0) + angleDiff, (obj.animationDirection or 1)*xScale, 1, obj.centerX, obj.centerY)
                     
                     love.graphics.setStencilTest()
                     
@@ -194,7 +198,7 @@ function World:draw()
         
         love.graphics.setStencilTest("equal", 0)
         
-        drawObject(obj, x, y, obj.r or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
+        drawObject(obj, x, y, obj.angle or 0, obj.animationDirection or 1, 1, obj.centerX, obj.centerY)
         
         love.graphics.setStencilTest()
         
@@ -285,7 +289,7 @@ function World:checkMapCollision(obj, x, y)
         if p.open and objectWithinPortalRange(p, obj.x+obj.width/2, obj.y+obj.height/2) then
             -- check if pixel is inside portal wallspace
             -- rotate x, y around portal origin
-            local nx, ny = pointAroundPoint(x, y, p.x1, p.y1, -p.r)
+            local nx, ny = pointAroundPoint(x, y, p.x1, p.y1, -p.angle)
 
             if ny >= p.y1-1 and ny < p.y1+64 then -- vertically inside the portal
                 if nx > p.x1 and nx < p.x1+p.size then -- horizontally INside the portal
@@ -379,7 +383,7 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
                         
                     -- Trace line
                     local t1x, t1y = x, y
-                    local t2x, t2y = x+math.cos(dir)*100000, y+math.sin(dir)*100000
+                    local t2x, t2y = x+math.cos(dir)*100000, y+math.sin(dir)*100000 --todo find a better way for this
                     
                     for i = 1, #tile.collision, 2 do
                         local nextI = i + 2
@@ -461,7 +465,6 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
             mapY = mapY + stepY
             side = "hor"
         end
-
     end
 end
 
@@ -514,8 +517,8 @@ function World:doPortal(portal, x, y, angle)
     -- Check whether to reverse portal direction (when portal face the same way)
     local reversed = false
     
-    if  portal.r+math.pi < portal.connectsTo.r+math.pi+VAR("portalReverseRange") and
-        portal.r+math.pi > portal.connectsTo.r+math.pi-VAR("portalReverseRange") then
+    if  portal.angle+math.pi < portal.connectsTo.angle+math.pi+VAR("portalReverseRange") and
+        portal.angle+math.pi > portal.connectsTo.angle+math.pi-VAR("portalReverseRange") then
         reversed = true
     end
     
@@ -524,11 +527,11 @@ function World:doPortal(portal, x, y, angle)
     local rDiff
     
     if not reversed then
-        rDiff = portal.connectsTo.r - portal.r - math.pi
+        rDiff = portal.connectsTo.angle - portal.angle - math.pi
         r = rDiff + angle
     else
-        rDiff = portal.connectsTo.r + portal.r + math.pi
-        r = portal.connectsTo.r + portal.r - angle
+        rDiff = portal.connectsTo.angle + portal.angle + math.pi
+        r = portal.connectsTo.angle + portal.angle - angle
     end
     
 	-- Modify position
@@ -536,14 +539,14 @@ function World:doPortal(portal, x, y, angle)
     
     if not reversed then
         -- Rotate around entry portal (+ half a turn)
-        newX, newY = pointAroundPoint(x, y, portal.x2, portal.y2, -portal.r-math.pi)
+        newX, newY = pointAroundPoint(x, y, portal.x2, portal.y2, -portal.angle-math.pi)
         
         -- Translate by portal offset (from opposite sides)
         newX = newX + (portal.connectsTo.x1 - portal.x2)
         newY = newY + (portal.connectsTo.y1 - portal.y2)
     else
         -- Rotate around entry portal
-	    newX, newY = pointAroundPoint(x, y, portal.x1, portal.y1, -portal.r)
+	    newX, newY = pointAroundPoint(x, y, portal.x1, portal.y1, -portal.angle)
 
         -- mirror along entry portal
         newY = newY + (portal.y1-newY)*2
@@ -554,7 +557,7 @@ function World:doPortal(portal, x, y, angle)
     end
 
 	-- Rotate around exit portal
-    newX, newY = pointAroundPoint(newX, newY, portal.connectsTo.x1, portal.connectsTo.y1, portal.connectsTo.r)
+    newX, newY = pointAroundPoint(newX, newY, portal.connectsTo.x1, portal.connectsTo.y1, portal.connectsTo.angle)
 
     return newX, newY, r, rDiff, reversed
 end
@@ -772,7 +775,7 @@ function World:checkPortalSurface(tileX, tileY, side, worldX, worldY, ignoreP)
         
     for _, p in ipairs(self.portals) do
         if p ~= ignoreP then
-            if math.abs(p.r - angle) < 0.0001 then -- angle is the same!
+            if math.abs(p.angle - angle) < 0.0001 then -- angle is the same!
                 local onLine = pointOnLine(p.x1, p.y1, p.x2, p.y2, worldX, worldY)
                 if onLine then -- surface is the same! (or at least on the same line which is good enough)
                     if onLine >= 0 then -- Check on which side of the same surface portal we are
@@ -794,7 +797,7 @@ function World:checkPortalSurface(tileX, tileY, side, worldX, worldY, ignoreP)
         end
     end
 
-    return startX, startY, endX, endY
+    return startX, startY, endX, endY, angle
 end
 
 return World

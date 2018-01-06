@@ -10,6 +10,7 @@ function TileMap:initialize(path)
 	self.tileMargin = self.data.tileMargin or 1
 
 	self.img = love.graphics.newImage(self.path .. self.data.tileMap)
+	self.quad = {}
 	
 	self.tiles = {}
 	
@@ -21,7 +22,10 @@ function TileMap:initialize(path)
 	local i = 1
 	for y = 1, self.img:getHeight()/(self.tileSize+self.tileMargin) do
 		for x = 1, self.img:getWidth()/(self.tileSize+self.tileMargin) do
-			table.insert(self.tiles, fissix.Tile:new(self, self.img, x, y, self.data.tiles[i]))
+			local quad = love.graphics.newQuad((x-1)*(self.tileSize+self.tileMargin), (y-1)*(self.tileSize+self.tileMargin), self.tileSize, self.tileSize, self.img:getWidth(), self.img:getHeight())
+			
+			table.insert(self.tiles, fissix.Tile:new(self, self.img, quad, x, y, self.data.tiles[i]))
+			table.insert(self.quad, quad)
 			i = i + 1
 		end
 	end

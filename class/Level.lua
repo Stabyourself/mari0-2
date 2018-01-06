@@ -65,21 +65,11 @@ end
 function Level:draw()
     self.camera:attach()
     
-    for _, v in ipairs(self.marios) do
-        if v.crosshair then
-            if v.crosshair.valid then
-                love.graphics.setColor(0, 1, 0)
-            else
-                love.graphics.setColor(1, 0, 0)
-            end
-            
-            love.graphics.line(v.x+v.width/2, v.y+v.height/2+2, v.crosshair.worldX, v.crosshair.worldY)
-        end
-    end
-    
-    love.graphics.setColor(1, 1, 1)
-    
     fissix.World.draw(self)
+    
+    for _, v in ipairs(self.marios) do
+        v.crosshair:draw()
+    end
     
     self.camera:detach()
 end
@@ -90,7 +80,7 @@ function Level:keypressed(key)
     end
     
     if key == VAR("controls").boost then
-        self.marios[1].speedX = 1000
+        self.marios[1].speed.x = 1000
     end
     
     if key == VAR("controls").closePortals then
@@ -110,7 +100,7 @@ end
 function Level:mousepressed(x, y, button)
     local mario = self.marios[1]
     
-    local portal = self:attemptPortal(mario.crosshair.tileX, mario.crosshair.tileY, mario.crosshair.blockSide, mario.crosshair.worldX, mario.crosshair.worldY, mario.portalColor[button], mario.portals[button])
+    local portal = self:attemptPortal(mario.crosshair.target.tileX, mario.crosshair.target.tileY, mario.crosshair.target.blockSide, mario.crosshair.target.worldX, mario.crosshair.target.worldY, mario.portalColor[button], mario.portals[button])
     
     if portal then
         if mario.portals[button] then

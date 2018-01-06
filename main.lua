@@ -17,6 +17,7 @@ function love.load()
     Camera = require "lib/Camera"
     Color = require "lib/Color"
     Easing = require "lib/Easing"
+    Vector = require "lib/Vector"
 
     require "class/fissix"
 
@@ -32,6 +33,7 @@ function love.load()
     require "class/PortalParticle" -- the juicy bits
     require "class/gui"
     require "class/Smb3Ui"
+    require "class/Crosshair"
     
     require "cheats"
 
@@ -345,6 +347,9 @@ function worldDraw(...)
         if VAR("noSubpixelMovement") then
             arg[2] = math.round(arg[2])
             arg[3] = math.round(arg[3])
+            if arg[4] then
+                arg[4] = math.round((arg[4]/(math.pi*2))*16)/16*(math.pi*2)
+            end
         end
         
         love.graphics.draw(arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8])
@@ -352,6 +357,9 @@ function worldDraw(...)
         if VAR("noSubpixelMovement") then
             arg[3] = math.round(arg[3])
             arg[4] = math.round(arg[4])
+            if arg[5] then
+                arg[5] = math.round((arg[5]/(math.pi*2))*16)/16*(math.pi*2)
+            end
         end
         
         love.graphics.draw(arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8], arg[9])

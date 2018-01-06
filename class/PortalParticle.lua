@@ -7,7 +7,7 @@ local RCHANGE = 40
 function PortalParticle:initialize(x, y, r, color)
     self.x = x
     self.y = y
-    self.r = r
+    self.angle = r
     self.color = color
     
     self.timer = 0
@@ -18,11 +18,11 @@ function PortalParticle:update(dt)
     self.timer = self.timer + dt
     self.tOffset = 0
     
-    self.r = self.r + (love.math.random()*2-1)*dt*RCHANGE
+    self.angle = self.angle + (love.math.random()*2-1)*dt*RCHANGE
     self.speed = self.speed + (love.math.random()*2-1)*dt*SPEEDCHANGE
     
-    self.x = self.x + math.cos(self.r)*self.speed*dt
-    self.y = self.y + math.sin(self.r)*self.speed*dt
+    self.x = self.x + math.cos(self.angle)*self.speed*dt
+    self.y = self.y + math.sin(self.angle)*self.speed*dt
     
     return self.timer > PORTALPARTICLETIME
 end

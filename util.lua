@@ -145,7 +145,7 @@ end
 -- end
 
 function objectWithinPortalRange(p, x, y)
-    local nX, nY = pointAroundPoint(x, y, p.x1, p.y1, -p.r)
+    local nX, nY = pointAroundPoint(x, y, p.x1, p.y1, -p.angle)
     
     return nX-p.x1 > 0 and nX-p.x1 < p.size and nY < p.y1
 end
@@ -180,7 +180,7 @@ function pointInTriangle(x, y, t) -- Credits to https://stackoverflow.com/questi
     local s = (t[2] * t[5] - t[1] * t[6] + (t[6] - t[2]) * x + (t[1] - t[5]) * y) * sign
     local t = (t[1] * t[4] - t[2] * t[3] + (t[2] - t[4]) * x + (t[3] - t[1]) * y) * sign
 
-    return s >= 0 and t >= 0 and (s + t) < 2 * A * sign
+    return s > 0 and t > 0 and (s + t) < 2 * A * sign
 end
 
 function paletteSwap(imgData, swaps)

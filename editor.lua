@@ -2,14 +2,14 @@ editor = {}
 
 function editor.load()
     editor.canvas = GUI.Canvas:new(defaultUI, 0, 0, SCREENWIDTH, SCREENHEIGHT)
-    editor.canvas.scrollable[1] = true
-    editor.canvas.scrollable[2] = true
     editor.windows = {}
     
     editor.buttons = {}
     
-    editor.buttons.newTestWindow = GUI.Button:new(10, 10, "edgar anti virus", function() editor.newWindow("test") end)
+    editor.buttons.newTestWindow = GUI.Button:new(10, 30, "Don't press", function() editor.newWindow("test") end)
+    editor.buttons.newTileListWindow = GUI.Button:new(10, 10, "open tilelist", function() editor.newWindow("tileList") end)
     editor.canvas:addChild(editor.buttons.newTestWindow)
+    editor.canvas:addChild(editor.buttons.newTileListWindow)
 end
 
 function editor.update(dt)
@@ -26,24 +26,11 @@ function editor.newWindow(type, elem)
         testWindow.draggable = true
         testWindow.resizeable = true
         testWindow.closeable = true
-        testWindow.scrollable = {true, true}
+        testWindow.scrollable = {x=true, y=true}
+        testWindow.title = "Why did you press"
         testWindow.backgroundColor = game.level.backgroundColor
         
         editor.canvas:addChild(testWindow)
-        
-        -- local testWindow2 = GUI.Box:new(10, 30, 150, 100)
-        -- testWindow2.resizeable = true
-        -- testWindow2.draggable = true
-        -- testWindow2.closeable = true
-        -- testWindow2.scrollable = {true, false}
-        -- testWindow:addChild(testWindow2)
-
-        -- local testWindow3 = GUI.Box:new(10, 30, 150, 100)
-        -- testWindow3.resizeable = true
-        -- testWindow3.draggable = true
-        -- testWindow3.closeable = true
-        -- testWindow3.scrollable = {true, false}
-        -- testWindow2:addChild(testWindow3)
         
         for y = 0, 80, 20 do
             local text = GUI.Text:new("Important", 0, y)
@@ -53,6 +40,26 @@ function editor.newWindow(type, elem)
             
             testWindow:addChild(slider)
         end
+        
+    elseif type == "tileList" then
+        local tileListWindow = GUI.Box:new(10, 20, 200, 200)
+        tileListWindow.draggable = true
+        tileListWindow.resizeable = true
+        tileListWindow.closeable = true
+        tileListWindow.scrollable = {x=true, y=true}
+        tileListWindow.title = "tilelist"
+        tileListWindow.backgroundColor = game.level.backgroundColor
+        editor.canvas:addChild(tileListWindow)
+        
+        local text = GUI.Text:new("Awesomeness", 5, 5)
+        tileListWindow:addChild(text)
+        
+        local slider = GUI.Slider:new(0, 11, 5, 14, 100, true)
+        tileListWindow:addChild(slider)
+        
+        
+        local tileListButtonGrid = GUI.ButtonGrid:new(5, 30, game.level.tileMap.img, game.level.tileMap.quad, function(i) print("Holy shit you clicked tile number " .. i) end)
+        tileListWindow:addChild(tileListButtonGrid)
     end
 end
 

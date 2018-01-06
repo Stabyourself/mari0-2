@@ -40,7 +40,7 @@ function Button:draw(level)
     
     local img = self.gui.img.button
     
-    if self:getCollision(self.mouse[1], self.mouse[2]) then
+    if self:getCollision(self.mouse.x, self.mouse.y) then
         img = self.gui.img.buttonHover
     end
     

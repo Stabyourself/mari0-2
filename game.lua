@@ -7,11 +7,11 @@ function game.load()
     game.coinAnimationTimer = 0
     game.timeLeft = 400
     
-    smbTileMap = fissix.TileMap:new("tilemaps/smb3")
+    smb3TileMap = fissix.TileMap:new("tilemaps/smb3")
     SmbMario = require("characters/smb-mario/code")
     Smb3Mario = require("characters/smb3-mario/code")
     
-    game.level = Level:new("levels/smb3test.lua", smbTileMap)
+    game.level = Level:new("levels/smb3test.lua", smb3TileMap)
     
     smb3ui = Smb3Ui:new()
     

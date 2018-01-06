@@ -1,6 +1,6 @@
 local Tile = class("fissix.Tile")
 
-function Tile:initialize(tileMap, img, x, y, props)
+function Tile:initialize(tileMap, img, quad, x, y, props)
 	self.tileMap = tileMap
 	self.img = img
 	self.x = x
@@ -17,7 +17,7 @@ function Tile:initialize(tileMap, img, x, y, props)
 	end
 	
 	if self.type == "normal" then
-		self.quad = love.graphics.newQuad((self.x-1)*(self.tileMap.tileSize+self.tileMap.tileMargin), (self.y-1)*(self.tileMap.tileSize+self.tileMap.tileMargin), self.tileMap.tileSize, self.tileMap.tileSize, self.img:getWidth(), self.img:getHeight())
+		self.quad = quad
 	elseif self.type == "coinAnimation" then
 		self.quad = self.tileMap.coinQuad
 		self.img = love.graphics.newImage(self.props.img)

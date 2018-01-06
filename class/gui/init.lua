@@ -8,6 +8,7 @@ GUI.Box = require(current_folder .. "/Box")
 GUI.Text = require(current_folder .. "/Text")
 GUI.Button = require(current_folder .. "/Button")
 GUI.Slider = require(current_folder .. "/Slider")
+GUI.ButtonGrid = require(current_folder .. "/ButtonGrid")
 
 function GUI:initialize(folder)
     self.folder = folder

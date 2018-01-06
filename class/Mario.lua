@@ -32,49 +32,36 @@ function Mario:initialize(world, x, y, powerUpState)
         Color.fromHSV(30/360, 0.87, 0.91),
     }
     
-    self.crosshair = false
+    self.crosshair = DottedCrosshair:new(self)
 end
 
 function Mario:update(dt)
     self:movement(dt)
-    self:animation(dt)
-    
-    self:updateCrosshair()
     
     if CHEAT("tumble") then
-        self.r = self.r + self.groundSpeedX*dt*0.1
+        self.angle = self.angle + self.groundSpeedX*dt*0.1
         self:unRotate(0)
     else
         self:unRotate(dt)
     end
 end
 
-function Mario:updateCrosshair()
-    local cx, cy = self.x+self.width/2, self.y+self.height/2+2
-    local mx, my = (love.mouse.getX())/VAR("scale")+game.level.camera.x, love.mouse.getY()/VAR("scale")+game.level.camera.y
-    self.portalGunAngle = math.atan2(my-cy, mx-cx)
-
-    local tileX, tileY, worldX, worldY, blockSide = game.level:rayCast(cx/game.level.tileSize, cy/game.level.tileSize, self.portalGunAngle)
-
-    worldX, worldY = self.world:mapToWorld(worldX, worldY)
+function Mario:postMovementUpdate(dt)
+    self:animation(dt)
     
-    self.crosshair = {
-        tileX = tileX,
-        tileY = tileY,
-        worldX = worldX,
-        worldY = worldY,
-        blockSide = blockSide,
-        valid = false,
+    
+    local x, y = self.x+self.width/2, self.y+self.height/2+2
+    self.crosshair.origin = {
+        x = x,
+        y = y,
     }
     
-    local x1, y1, x2, y2 = self.world:checkPortalSurface(self.crosshair.tileX, self.crosshair.tileY, self.crosshair.blockSide, self.crosshair.worldX, self.crosshair.worldY)
+    local mx, my = (love.mouse.getX())/VAR("scale")+game.level.camera.x, love.mouse.getY()/VAR("scale")+game.level.camera.y
+    self.crosshair.angle = math.atan2(my-y, mx-x)
     
-    if x1 then
-        local length = math.sqrt((x1-x2)^2+(y1-y2)^2)
-        if length >= VAR("portalSize") then
-            self.crosshair.valid = true
-        end
-    end
+    self.portalGunAngle = self.crosshair.angle
+    
+    self.crosshair:update(dt)
 end
 
 function Mario:closePortals()
@@ -129,7 +116,7 @@ function Mario:ceilCollision(obj2)
         -- Right side
         if self.x > obj2.x+obj2.width - VAR("jumpLeeway") and not game.level:getTile(obj2.blockX+1, obj2.blockY).collision then
             self.x = obj2.x+obj2.width
-            self.speedX = math.max(self.speedX, 0)
+            self.speed.x = math.max(self.speed.x, 0)
 
             return true
         end
@@ -137,7 +124,7 @@ function Mario:ceilCollision(obj2)
         -- Left side
         if self.x + self.width < obj2.x + VAR("jumpLeeway") and not game.level:getTile(obj2.blockX-1, obj2.blockY).collision then
             self.x = obj2.x-self.width
-            self.speedX = math.min(self.speedX, 0)
+            self.speed.x = math.min(self.speed.x, 0)
 
             return true
         end
@@ -158,7 +145,7 @@ function Mario:ceilCollision(obj2)
             end
         end
         
-        self.speedY = VAR("blockHitForce")
+        self.speed.y = VAR("blockHitForce")
         
         game.level:bumpBlock(x, y)
     end
@@ -167,7 +154,7 @@ end
 function Mario:bottomCollision(obj2)
     if obj2.stompable then
         obj2:stomp()
-        self.speedY = -getRequiredSpeed(VAR("enemyBounceHeight"))
+        self.speed.y = -getRequiredSpeed(VAR("enemyBounceHeight"))
         playSound(stompSound)
         
         return true

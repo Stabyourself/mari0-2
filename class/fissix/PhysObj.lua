@@ -7,13 +7,12 @@ function PhysObj:initialize(world, x, y, width, height)
 	self.height = height
 	self.world = world
 	
-	self.speedX = 0
+	self.speed = Vector(0, 0)
 	self.groundSpeedX = 0
-	self.speedY = 0
 	
 	self.gravityDirection = math.pi*.5
 	
-	self.r = 0
+	self.angle = 0
 	
     self.surfaceAngle = 0
 	self.onGround = false
@@ -86,12 +85,12 @@ function PhysObj:initialize(world, x, y, width, height)
 end
 
 function PhysObj:unRotate(dt)
-	self.r = normalizeAngle(self.r)
+	self.angle = normalizeAngle(self.angle)
 	
-	if self.r > 0 then
-		self.r = math.max(0, self.r - VAR("rotationSpeed")*dt)
+	if self.angle > 0 then
+		self.angle = math.max(0, self.angle - VAR("rotationSpeed")*dt)
 	else
-		self.r = math.min(0, self.r + VAR("rotationSpeed")*dt)
+		self.angle = math.min(0, self.angle + VAR("rotationSpeed")*dt)
 	end
 end
 
@@ -153,7 +152,7 @@ function PhysObj:topColCheck()
 	if colY then --Top collision
 		if not self:topCollision() then
 			self.y = colY+1
-			self.speedY = math.max(self.speedY, 0)
+			self.speed.y = math.max(self.speed.y, 0)
 			
 			return {x = colX, y = colY}
 		end
@@ -178,12 +177,12 @@ function PhysObj:bottomColCheck()
 			if not self:bottomCollision({}) then
 				if self.onGround then
 					self.y = colY-self.height
-					self.speedY = math.min(self.speedY, 0)
+					self.speed.y = math.min(self.speed.y, 0)
 					
 					return {x = colX, y = colY, angle = colAngle}
 				else
 					self.y = colY-self.height
-					self.speedY = math.min(self.speedY, 0)
+					self.speed.y = math.min(self.speed.y, 0)
 					self.onGround = true
 					
 					return {x = colX, y = colY, angle = colAngle}
@@ -203,7 +202,7 @@ function PhysObj:checkCollisions()
 		collisions.right = self:rightColCheck()
 	end
 	
-	if self.speedY > 0 then
+	if self.speed.y > 0 then
 		collisions.bottom = self:bottomColCheck()
 	end
 	

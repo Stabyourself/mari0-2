@@ -15,7 +15,9 @@ local boxQuad = {
 function Box:initialize(x, y, w, h)
     GUI.Element.initialize(self, x, y, w, h)
 
-    self.sizeMin = {12, 12}
+    self.sizeMin.x = 13
+    self.sizeMin.y = 13
+    
     self.backgroundColor = {0, 0, 0, 0}
     
     self.children = {}
@@ -23,7 +25,7 @@ end
 
 function Box:update(dt, x, y)
     if self.draggable then
-        self.posMin[2] = 10
+        self.posMin.y = 10
     end
 
     GUI.Element.update(self, dt, x, y)
@@ -70,7 +72,7 @@ function Box:draw(level)
     if self.closeable then
         if self.closing then
             love.graphics.draw(self.gui.img.boxCloseActive, self.w-11, -13)
-        elseif self:closeCollision(self.mouse[1], self.mouse[2]) then
+        elseif self:closeCollision(self.mouse.x, self.mouse.y) then
             love.graphics.draw(self.gui.img.boxCloseHover, self.w-11, -13)
         else
             love.graphics.draw(self.gui.img.boxClose, self.w-11, -13)
@@ -86,7 +88,7 @@ function Box:draw(level)
     if self.resizeable then
         if self.resizing then
             love.graphics.draw(self.gui.img.boxResizeActive, self.w-11, self.h-11)
-        elseif self:resizeCornerCollision(self.mouse[1], self.mouse[2]) then
+        elseif self:resizeCornerCollision(self.mouse.x, self.mouse.y) then
             love.graphics.draw(self.gui.img.boxResizeHover, self.w-11, self.h-11)
         else
             love.graphics.draw(self.gui.img.boxResize, self.w-11, self.h-11)
@@ -116,8 +118,8 @@ function Box:mousepressed(x, y, button)
     -- Check resize before the rest because reasons
     if self.resizeable and self:resizeCornerCollision(x, y) then
         self.resizing = true
-        self.resizeX = self.w-x
-        self.resizeY = self.h-y
+        self.resizePos.x = self.w-x
+        self.resizePos.y = self.h-y
         
         return true
     end
@@ -133,7 +135,8 @@ function Box:mousepressed(x, y, button)
         
     elseif self.draggable and self:titleBarCollision(x, y) then
         self.dragging = true
-        self.dragPos = {x, y}
+        self.dragPos.x = x
+        self.dragPos.y = y
         
         return true
         

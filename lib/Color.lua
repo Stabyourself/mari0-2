@@ -11,18 +11,18 @@ function Color.fromHSV(h, s, v, a)
 end
 
 function Color:initialize(r, g, b, a)
-    self.r = r
+    self.angle = r
     self.g = g
     self.b = b
     self.a = a
 end
 
 function Color:rgb()
-    return self.r, self.g, self.b, self.a
+    return self.angle, self.g, self.b, self.a
 end
 
 function Color:darken(i)
-    local h, s, v, a = Color.RGBtoHSV(self.r, self.g, self.b)
+    local h, s, v, a = Color.RGBtoHSV(self.angle, self.g, self.b)
     
     v = (1-i)*v
     
@@ -30,7 +30,7 @@ function Color:darken(i)
 end
 
 function Color:lighten(i)
-    local h, s, v, a = Color.RGBtoHSV(self.r, self.g, self.b)
+    local h, s, v, a = Color.RGBtoHSV(self.angle, self.g, self.b)
     
     s = (1-i)*s
     

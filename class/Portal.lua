@@ -33,7 +33,7 @@ function Portal:initialize(world, x1, y1, x2, y2, color)
 end
 
 function Portal:updatePosition()
-    self.r = math.atan2(self.y2-self.y1, self.x2-self.x1)
+    self.angle = math.atan2(self.y2-self.y1, self.x2-self.x1)
     self.size = math.sqrt((self.x1-self.x2)^2 + (self.y1-self.y2)^2)
 end
 
@@ -41,11 +41,11 @@ function Portal:backwardsUpdatePosition()
     local cX = (self.x2+self.x1)/2
     local cY = (self.y2+self.y1)/2
     
-    self.x1 = -math.cos(self.r)*self.size/2+cX
-    self.x2 = -math.cos(self.r+math.pi)*self.size/2+cX
+    self.x1 = -math.cos(self.angle)*self.size/2+cX
+    self.x2 = -math.cos(self.angle+math.pi)*self.size/2+cX
     
-    self.y1 = -math.sin(self.r)*self.size/2+cY
-    self.y2 = -math.sin(self.r+math.pi)*self.size/2+cY
+    self.y1 = -math.sin(self.angle)*self.size/2+cY
+    self.y2 = -math.sin(self.angle+math.pi)*self.size/2+cY
 end
 
 function Portal:update(dt)
@@ -121,7 +121,7 @@ function Portal:draw(side)
     love.graphics.push()
     
     love.graphics.translate(self.x1, self.y1)
-    love.graphics.rotate(self.r)
+    love.graphics.rotate(self.angle)
     love.graphics.translate(self.size/2, 0)
     
     if side == "background" then
@@ -191,7 +191,7 @@ end
 function Portal:stencilRectangle(way)
     love.graphics.push()
     love.graphics.translate(self.x1, self.y1)
-    love.graphics.rotate(self.r)
+    love.graphics.rotate(self.angle)
 
     local x, y, w, h = -32, 0, self.size+64, 32 -- in (DON'T draw those pixels
 

@@ -7,7 +7,7 @@ function TileMap:initialize(path)
 		VAR = VAR
 	}})
 	self.tileSize = self.data.tileSize
-	self.tileMargin = self.data.tileMargin or 1
+	self.tileMargin = self.data.tileMargin or 0
 
 	self.img = love.graphics.newImage(self.path .. self.data.tileMap)
 	self.quad = {}

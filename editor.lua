@@ -58,7 +58,7 @@ end
 function editor.newWindow(type, elem)
     if type == "test" then
         local testWindow = GUI.Box:new(10, 30, 100, 100)
-        testWindow.draggable = true
+        testWindow.draggable = false
         testWindow.resizeable = true
         testWindow.closeable = true
         testWindow.scrollable = {x=true, y=true}

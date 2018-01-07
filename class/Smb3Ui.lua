@@ -15,7 +15,7 @@ function Smb3Ui:initialize()
     self.canvas = GUI.Canvas:new(defaultUI, 0, SCREENHEIGHT-VAR("uiHeight"), SCREENWIDTH, VAR("uiHeight"))
     self.canvas.background = {0, 0, 0}
     
-    self.uiBox = GUI.Box:new(14, 3, 150, 26)
+    self.uiBox = GUI.Box:new(16, 3, 150, 26)
     self.uiBox.background = self.skyColor
     self.canvas:addChild(self.uiBox)
     
@@ -27,12 +27,12 @@ function Smb3Ui:initialize()
     end
     
     self.element = {}
-    self.element.world = GUI.Text:new("", 3, 5)
-    self.element.pMeter = GUI.Text:new("", 51, 5)
-    self.element.coins = GUI.Text:new("", 123, 5)
-    self.element.lives = GUI.Text:new("", 3, 13)
-    self.element.score = GUI.Text:new("", 51, 13)
-    self.element.time = GUI.Text:new("", 115, 13)
+    self.element.world = GUI.Text:new("", 1, 2)
+    self.element.pMeter = GUI.Text:new("", 49, 2)
+    self.element.coins = GUI.Text:new("", 121, 2)
+    self.element.lives = GUI.Text:new("", 1, 10)
+    self.element.score = GUI.Text:new("", 49, 10)
+    self.element.time = GUI.Text:new("", 113, 10)
     
     self.uiBox:addChild(self.element.world)
     self.uiBox:addChild(self.element.pMeter)
@@ -45,12 +45,12 @@ function Smb3Ui:initialize()
 end
 
 function Smb3Ui:resize()
-    self.canvas.w = SCREENWIDTH
+    self.canvas:resize(SCREENWIDTH, self.canvas.h)
     self.canvas.y = SCREENHEIGHT-VAR("uiHeight")
     
-    self.uiBox.x = (SCREENWIDTH-256)/2+16
+    self.uiBox.x = (SCREENWIDTH-256)/2+13
     for i, v in ipairs(self.cardBox) do
-        v.x = (SCREENWIDTH-256)/2+152+i*24
+        v.x = (SCREENWIDTH-256)/2+i*24+149
     end
 end
 

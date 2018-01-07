@@ -1,23 +1,32 @@
 local Box = class("GUI.Box", GUI.Element)
 
 local boxQuad = {
-    love.graphics.newQuad(0, 0, 16, 16, 33, 33),
-    love.graphics.newQuad(16, 0, 1, 16, 33, 33),
-    love.graphics.newQuad(17, 0, 16, 16, 33, 33),
-    love.graphics.newQuad(0, 16, 16, 1, 33, 33),
-    nil,
-    love.graphics.newQuad(17, 16, 16, 1, 33, 33),
-    love.graphics.newQuad(0, 17, 16, 16, 33, 33),
-    love.graphics.newQuad(16, 17, 1, 16, 33, 33),
-    love.graphics.newQuad(17, 17, 16, 16, 33, 33),
+    love.graphics.newQuad(0, 0, 2, 3, 5, 7),
+    love.graphics.newQuad(2, 0, 1, 3, 5, 7),
+    love.graphics.newQuad(3, 0, 2, 3, 5, 7),
+    love.graphics.newQuad(0, 3, 2, 1, 5, 7),
+    love.graphics.newQuad(2, 3, 1, 1, 5, 7),
+    love.graphics.newQuad(3, 3, 2, 1, 5, 7),
+    love.graphics.newQuad(0, 4, 2, 3, 5, 7),
+    love.graphics.newQuad(2, 4, 1, 3, 5, 7),
+    love.graphics.newQuad(3, 4, 2, 3, 5, 7),
+}
+
+local titledBoxQuad = {
+    love.graphics.newQuad(0, 0, 3, 12, 7, 17),
+    love.graphics.newQuad(3, 0, 1, 12, 7, 17),
+    love.graphics.newQuad(4, 0, 3, 12, 7, 17),
+    love.graphics.newQuad(0, 12, 3, 1, 7, 17),
+    love.graphics.newQuad(3, 12, 1, 1, 7, 17),
+    love.graphics.newQuad(4, 12, 3, 1, 7, 17),
+    love.graphics.newQuad(0, 13, 3, 4, 7, 17),
+    love.graphics.newQuad(3, 13, 1, 4, 7, 17),
+    love.graphics.newQuad(4, 13, 3, 4, 7, 17),
 }
 
 function Box:initialize(x, y, w, h)
     GUI.Element.initialize(self, x, y, w, h)
 
-    self.sizeMin.x = 33
-    self.sizeMin.y = 33
-    
     self.background = {0, 0, 0, 0}
     self.backgroundQuad = love.graphics.newQuad(0, 0, 4, 4, 4, 4)
     
@@ -32,8 +41,12 @@ end
 
 function Box:update(dt, x, y)
     if self.draggable then
+        self.sizeMin.x = 19
+        self.sizeMin.y = 29
         self.childBox = {3, 12, self.w-6, self.h-16}
     else
+        self.sizeMin.x = 17
+        self.sizeMin.y = 19
         self.childBox = {2, 3, self.w-4, self.h-6}
     end
     
@@ -47,7 +60,7 @@ function Box:draw(level)
         love.graphics.setColor(self.background)
         love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
     elseif type(self.background) == "userdata" then
-        self.backgroundQuad:setViewport(0, 0, self.childBox[3], self.childBox[4])
+        self.backgroundQuad:setViewport(self.scroll.x%4, self.scroll.y%4, self.childBox[3], self.childBox[4])
         self.background:setWrap("repeat", "repeat")
             
         love.graphics.draw(self.background, self.backgroundQuad, self.childBox[1], self.childBox[2])
@@ -58,19 +71,13 @@ function Box:draw(level)
     
     -- Border
     local img = self.gui.img.box
+    local quad = boxQuad
     if self.draggable then
         img = self.gui.img.boxTitled
+        quad = titledBoxQuad
     end
     
-    love.graphics.draw(img, boxQuad[1], 0, 0)
-    love.graphics.draw(img, boxQuad[2], 16, 0, 0, self.w-32, 1)
-    love.graphics.draw(img, boxQuad[3], self.w-16, 0)
-    love.graphics.draw(img, boxQuad[4], 0, 16, 0, 1, self.h-32)
-    
-    love.graphics.draw(img, boxQuad[6], self.w-16, 16, 0, 1, self.h-32)
-    love.graphics.draw(img, boxQuad[7], 0, self.h-16)
-    love.graphics.draw(img, boxQuad[8], 16, self.h-16, 0, self.w-32, 1)
-    love.graphics.draw(img, boxQuad[9], self.w-16, self.h-16)
+    GUI.drawBox(img, quad, 0, 0, self.w, self.h)
     
     if self.title then
         love.graphics.stencil(function()
@@ -107,7 +114,13 @@ function Box:draw(level)
             img = self.gui.img.boxResizeHover
         end
         
-        love.graphics.draw(img, self.w-12, self.h-13)
+        local x, y = self.w-11, self.h-12
+        if not self.draggable then
+            x = x + 1
+            y = y + 1
+        end
+        
+        love.graphics.draw(img, x, y)
     end
     
     GUI.Element.unTranslate(self)
@@ -118,7 +131,7 @@ function Box:titleBarCollision(x, y)
 end
 
 function Box:resizeCornerCollision(x, y)
-    return x >= self.w-12 and x < self.w-3 and y >= self.h-13 and y < self.h-4
+    return x >= self.w-11 and x < self.w-3 and y >= self.h-12 and y < self.h-4
 end
 
 function Box:closeCollision(x, y)

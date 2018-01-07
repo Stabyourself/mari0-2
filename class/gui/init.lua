@@ -53,3 +53,23 @@ function GUI:initialize(folder)
         off = love.graphics.newImage(folder .. "/checkbox-off-active.png"),
     }
 end
+
+function GUI.drawBox(img, quad, x, y, w, h)
+    local _, _, w1 = quad[1]:getViewport()
+    local _, _, w2 = quad[2]:getViewport()
+    local _, _, w3 = quad[3]:getViewport()
+    
+    local _, _, _, h1 = quad[1]:getViewport()
+    local _, _, _, h2 = quad[4]:getViewport()
+    local _, _, _, h3 = quad[7]:getViewport()
+    
+    love.graphics.draw(img, quad[1], 0, 0)
+    love.graphics.draw(img, quad[2], w1, 0, 0, w-w1-w3, 1)
+    love.graphics.draw(img, quad[3], w-w3, 0)
+    love.graphics.draw(img, quad[4], 0, h1, 0, 1, h-h1-h3)
+    love.graphics.draw(img, quad[5], w1, h1, 0, w-w1-w3, h-h1-h3)
+    love.graphics.draw(img, quad[6], w-w3, h1, 0, 1, h-h1-h3)
+    love.graphics.draw(img, quad[7], 0, h-h3)
+    love.graphics.draw(img, quad[8], w1, h-h3, 0, w-w1-w3, 1)
+    love.graphics.draw(img, quad[9], w-w3, h-h3)
+end

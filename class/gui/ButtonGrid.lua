@@ -49,14 +49,12 @@ function ButtonGrid:draw(level)
     
     local mouseTile = self:getCollision(self.mouse.x, self.mouse.y)
     
-    local num = 0
-    
     for i = 1, #self.buttons do
         local tileX = (i-1)%self.perRow+1
         local tileY = math.ceil(i/self.perRow)-1
         
         local topY = math.floor((self.parent.scroll.y-self.y)/(self.size.y+self.gutter.y))
-        local bottomY = topY + math.ceil((self.parent:getInnerHeight())/(self.size.y+self.gutter.y))
+        local bottomY = math.floor((self.parent.scroll.y-self.y)/(self.size.y+self.gutter.y) + (self.parent:getInnerHeight())/(self.size.y+self.gutter.y))
         
         if tileY >= topY and tileY <= bottomY then
             local x = (tileX-1)*(self.size.x + self.gutter.x)
@@ -70,11 +68,8 @@ function ButtonGrid:draw(level)
                 love.graphics.setColor(1, 1, 1, 1)
             end
             
-            num = num + 1
         end
     end
-    
-    print(num)
     
     GUI.Element.draw(self, level)
     

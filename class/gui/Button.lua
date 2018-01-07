@@ -12,25 +12,31 @@ local buttonQuad = {
     love.graphics.newQuad(9, 9, 8, 8, 17, 17),
 }
 
+Button.padding = 1
+
 function Button:initialize(x, y, s, func)
     self.s = s
-    local w, h
+    local w = self.padding*2+4
+    local h = self.padding*2+4
     
     if self.s then
-        w = #self.s*8+2
-        h = 10
-    else
-        w = 8
-        h = 8
+        w = w+#self.s*8
+        h = h + 8
     end
     
     GUI.Element.initialize(self, x, y, w, h)
     
-    self.func = func --boogie nights
+    if self.s then
+        self:addChild(GUI.Text:new(self.s, 2+self.padding, 2+self.padding))
+    end
+    
+    self.func = func
+    
+    self.pressing = false
 end
 
 function Button:getCollision(x, y)
-    return x >= -2 and x < self.w+2 and y >= -2 and y < self.h+2
+    return x >= 0 and x < self.w and y >= 0 and y < self.h
 end 
 
 function Button:draw(level)
@@ -40,36 +46,43 @@ function Button:draw(level)
     
     local img = self.gui.img.button
     
-    if self:getCollision(self.mouse.x, self.mouse.y) then
+    if self.pressing then
+        img = self.gui.img.buttonActive
+    elseif self:getCollision(self.mouse.x, self.mouse.y) then
         img = self.gui.img.buttonHover
     end
     
-    love.graphics.draw(img, buttonQuad[1], -8, -8)
-    love.graphics.draw(img, buttonQuad[2], 0, -8, 0, self.w, 1)
-    love.graphics.draw(img, buttonQuad[3], self.w, -8)
-    love.graphics.draw(img, buttonQuad[4], -8, 0, 0, 1, self.h)
-    love.graphics.draw(img, buttonQuad[5], 0, 0, 0, self.w, self.h)
-    love.graphics.draw(img, buttonQuad[6], self.w, 0, 0, 1, self.h)
-    love.graphics.draw(img, buttonQuad[7], -8, self.h)
-    love.graphics.draw(img, buttonQuad[8], 0, self.h, 0, self.w, 1)
-    love.graphics.draw(img, buttonQuad[9], self.w, self.h)
-    
-    GUI.Element.stencil(self, level)
+    love.graphics.draw(img, buttonQuad[1], -6, -6)
+    love.graphics.draw(img, buttonQuad[2], 2, -6, 0, self.w-4, 1)
+    love.graphics.draw(img, buttonQuad[3], self.w-2, -6)
+    love.graphics.draw(img, buttonQuad[4], -6, 2, 0, 1, self.h-4)
+    love.graphics.draw(img, buttonQuad[5], 2, 2, 0, self.w-4, self.h-4)
+    love.graphics.draw(img, buttonQuad[6], self.w-2, 2, 0, 1, self.h-4)
+    love.graphics.draw(img, buttonQuad[7], -6, self.h-2)
+    love.graphics.draw(img, buttonQuad[8], 2, self.h-2, 0, self.w-4, 1)
+    love.graphics.draw(img, buttonQuad[9], self.w-2, self.h-2)
     
     GUI.Element.draw(self, level)
     
-    if self.s then
-        marioPrint(self.s, 1, 1)
-    end
-    
-    GUI.Element.unStencil(self, level)
     GUI.Element.unTranslate(self)
 end
 
 function Button:mousepressed(x, y, button)
     if self:getCollision(x, y) then
-        self.func()
+        self.pressing = true
+        
+        return true
     end
+end
+
+function Button:mousereleased(x, y, button)
+    if self.pressing and self:getCollision(x, y) then
+        if self.func then
+            self.func(self)
+        end
+    end
+    
+    self.pressing = false
 end
 
 return Button

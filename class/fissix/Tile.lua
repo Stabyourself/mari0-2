@@ -42,7 +42,11 @@ function Tile:checkCollision(x, y)
 	end
 end
 
-function Tile:draw(x, y)
+function Tile:draw(x, y, ghost)
+	if ghost then
+		love.graphics.setColor(1, 1, 1, 0.5)
+	end
+	
 	if not self.invisible then
 		if self.type == "normal" then
 			worldDraw(self.img, self.quad, x, y)

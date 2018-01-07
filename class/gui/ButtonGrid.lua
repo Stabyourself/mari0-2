@@ -5,7 +5,6 @@ ButtonGrid.size = Vector(16, 16)
 ButtonGrid.gutter = Vector(1, 1)
 
 function ButtonGrid:initialize(x, y, img, buttons, func)
-    
     self.img = img
     self.buttons = buttons
     
@@ -48,29 +47,37 @@ function ButtonGrid:draw(level)
     
     love.graphics.setColor(1, 1, 1)
     
-    GUI.Element.stencil(self, level)
-    
     local mouseTile = self:getCollision(self.mouse.x, self.mouse.y)
+    
+    local num = 0
     
     for i = 1, #self.buttons do
         local tileX = (i-1)%self.perRow+1
         local tileY = math.ceil(i/self.perRow)-1
         
-        local x = (tileX-1)*(self.size.x + self.gutter.x)
-        local y = tileY*(self.size.y + self.gutter.y)
+        local topY = math.floor((self.parent.scroll.y-self.y)/(self.size.y+self.gutter.y))
+        local bottomY = topY + math.ceil((self.parent:getInnerHeight())/(self.size.y+self.gutter.y))
         
-        love.graphics.draw(self.img, self.buttons[i], x, y)
-        
-        if i == mouseTile then
-            love.graphics.setColor(1, 1, 1, 0.7)
-            love.graphics.rectangle("fill", x, y, self.size.x, self.size.y)
-            love.graphics.setColor(1, 1, 1, 1)
+        if tileY >= topY and tileY <= bottomY then
+            local x = (tileX-1)*(self.size.x + self.gutter.x)
+            local y = tileY*(self.size.y + self.gutter.y)
+            
+            love.graphics.draw(self.img, self.buttons[i], x, y)
+            
+            if i == mouseTile then
+                love.graphics.setColor(1, 1, 1, 0.7)
+                love.graphics.rectangle("fill", x, y, self.size.x, self.size.y)
+                love.graphics.setColor(1, 1, 1, 1)
+            end
+            
+            num = num + 1
         end
     end
     
+    print(num)
+    
     GUI.Element.draw(self, level)
     
-    GUI.Element.unStencil(self, level)
     GUI.Element.unTranslate(self)
 end
 

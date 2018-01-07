@@ -13,13 +13,11 @@ end
 
 function Text:draw(level)
     GUI.Element.translate(self)
-    GUI.Element.stencil(self, level)
     
     GUI.Element.draw(self, level)
     
     marioPrint(self.s, 0, 0)
 
-    GUI.Element.unStencil(self, level)
     GUI.Element.unTranslate(self)
 end
 

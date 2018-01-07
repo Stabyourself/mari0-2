@@ -46,7 +46,7 @@ function Level:initialize(path, tileMap)
 
     local x, y = self:mapToWorld(self.spawnX-.5, self.spawnY)
     
-    table.insert(self.marios, Smb3Mario:new(self, x, y, "small"))
+    table.insert(self.marios, Smb3Mario:new(self, x, y, "raccoon"))
 
     self:spawnEnemies(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end
@@ -98,22 +98,24 @@ function Level:keypressed(key)
 end
 
 function Level:mousepressed(x, y, button)
-    local mario = self.marios[1]
-    
-    local portal = self:attemptPortal(mario.crosshair.target.tileX, mario.crosshair.target.tileY, mario.crosshair.target.blockSide, mario.crosshair.target.worldX, mario.crosshair.target.worldY, mario.portalColor[button], mario.portals[button])
-    
-    if portal then
-        if mario.portals[button] then
-            mario.portals[button].deleteMe = true
-        end
+    if button == 1 or button == 2 then
+        local mario = self.marios[1]
         
-        mario.portals[button] = portal
-                
-        if mario.portals[1] and mario.portals[2] then
-            mario.portals[1]:connectTo(mario.portals[2])
-            mario.portals[2]:connectTo(mario.portals[1])
+        local portal = self:attemptPortal(mario.crosshair.target.tileX, mario.crosshair.target.tileY, mario.crosshair.target.blockSide, mario.crosshair.target.worldX, mario.crosshair.target.worldY, mario.portalColor[button], mario.portals[button])
+        
+        if portal then
+            if mario.portals[button] then
+                mario.portals[button].deleteMe = true
+            end
+            
+            mario.portals[button] = portal
+                    
+            if mario.portals[1] and mario.portals[2] then
+                mario.portals[1]:connectTo(mario.portals[2])
+                mario.portals[2]:connectTo(mario.portals[1])
 
-            mario.portals[button].timer = mario.portals[button].connectsTo.timer
+                mario.portals[button].timer = mario.portals[button].connectsTo.timer
+            end
         end
     end
 end

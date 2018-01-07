@@ -316,7 +316,7 @@ function World:checkMapCollision(obj, x, y)
 end
 
 function World:setMap(x, y, i)
-    self.map[1][x][y] = i
+    self.map[x][y] = i
 end
 
 function World:getTile(x, y)
@@ -472,8 +472,16 @@ function World:mapToWorld(x, y)
     return x*self.tileSize, y*self.tileSize
 end
 
+function World:mapToScreen(x, y)
+    return x*self.tileSize-self.camera.x, y*self.tileSize-self.camera.y
+end
+
 function World:worldToMap(x, y)
     return math.floor(x/self.tileSize)+1, math.floor(y/self.tileSize)+1
+end
+
+function World:screenToMap(x, y)
+    return math.floor((x+self.camera.x)/self.tileSize)+1, math.floor((y+self.camera.y)/self.tileSize)+1
 end
 
 function World:attemptPortal(tileX, tileY, side, x, y, color, ignoreP)

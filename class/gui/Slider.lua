@@ -61,7 +61,6 @@ end
 
 function Slider:draw(level)
     GUI.Element.translate(self)
-    GUI.Element.stencil(self, level)
     
     GUI.Element.draw(self, level)
     
@@ -79,7 +78,6 @@ function Slider:draw(level)
     
     love.graphics.draw(img, self:getPosX(), 0, 0, 1, 1, 4)
 
-    GUI.Element.unStencil(self, level)
     GUI.Element.unTranslate(self)
 end
 

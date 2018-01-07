@@ -248,6 +248,10 @@ function love.resize(w, h)
     gameStateManager.event("resize", SCREENWIDTH, SCREENHEIGHT)
 end
 
+function love.wheelmoved(x, y)
+    gameStateManager.event("wheelmoved", x, y)
+end
+
 function updateGroup(group, dt)
 	local delete = {}
 	
@@ -301,7 +305,19 @@ function marioPrint(s, x, y)
 end
 
 function keyDown(cmd)
-    return love.keyboard.isDown(VAR("controls")[cmd])
+    local split = cmd:split(".")
+    
+    local function recursiveShit(var, t)
+        local ct = table.remove(t, 1)
+        
+        if #t == 0 then
+            return var[ct]
+        else
+            return recursiveShit(var[ct], t)
+        end
+    end
+    
+    return love.keyboard.isDown(recursiveShit(VAR("controls"), split))
 end
 
 function skipUpdate()

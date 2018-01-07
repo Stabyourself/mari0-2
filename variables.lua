@@ -53,6 +53,10 @@ return {
         jump = "space",
         run = "lshift",
         closePortals = "r",
+        
+        editor = {
+            pipette = "lshift"
+        }
     },
 
     collision = {

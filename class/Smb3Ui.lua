@@ -13,26 +13,26 @@ function Smb3Ui:initialize()
     self.lives = 0
     
     self.canvas = GUI.Canvas:new(defaultUI, 0, SCREENHEIGHT-VAR("uiHeight"), SCREENWIDTH, VAR("uiHeight"))
-    self.canvas.backgroundColor = {0, 0, 0}
+    self.canvas.background = {0, 0, 0}
     
-    self.uiBox = GUI.Box:new(16, 6, 146, 20)
-    self.uiBox.backgroundColor = self.skyColor
+    self.uiBox = GUI.Box:new(14, 3, 150, 26)
+    self.uiBox.background = self.skyColor
     self.canvas:addChild(self.uiBox)
     
     self.cardBox = {}
     for i = 1, 3 do
-        self.cardBox[i] = GUI.Box:new(152+i*24, 6, 18, 20)
-        self.cardBox[i].backgroundColor = self.skyColor
+        self.cardBox[i] = GUI.Box:new(150+i*28, 3, 22, 26)
+        self.cardBox[i].background = self.skyColor
         self.canvas:addChild(self.cardBox[i])
     end
     
     self.element = {}
-    self.element.world = GUI.Text:new("", 1, 2)
-    self.element.pMeter = GUI.Text:new("", 49, 2)
-    self.element.coins = GUI.Text:new("", 121, 2)
-    self.element.lives = GUI.Text:new("", 1, 10)
-    self.element.score = GUI.Text:new("", 49, 10)
-    self.element.time = GUI.Text:new("", 113, 10)
+    self.element.world = GUI.Text:new("", 3, 5)
+    self.element.pMeter = GUI.Text:new("", 51, 5)
+    self.element.coins = GUI.Text:new("", 123, 5)
+    self.element.lives = GUI.Text:new("", 3, 13)
+    self.element.score = GUI.Text:new("", 51, 13)
+    self.element.time = GUI.Text:new("", 115, 13)
     
     self.uiBox:addChild(self.element.world)
     self.uiBox:addChild(self.element.pMeter)
@@ -69,6 +69,8 @@ function Smb3Ui:update(dt)
     self.element.lives:setString(self:getLivesText())
     self.element.score:setString(self:getScoreText())
     self.element.time:setString(self:getTimeText())
+    
+    self.canvas:update(dt)
 end
 
 function Smb3Ui:draw()

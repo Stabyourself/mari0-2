@@ -20,7 +20,7 @@ function CHEAT(i)
     return CHEATENABLED[i]
 end
 
-function print_r (t, name, indent) -- http://www.hpelbers.org/lua/print_r
+function print_r (t, name, indent) -- Credits to http://www.hpelbers.org/lua/print_r
     local tableList = {}
     function table_r (t, name, indent, full)
       local id = not full and name
@@ -46,7 +46,20 @@ function print_r (t, name, indent) -- http://www.hpelbers.org/lua/print_r
       return table.concat(out, '\n')
     end
     print(table_r(t,name or 'Value',indent or ''))
-  end
+end
+
+function string:split(delimiter) -- Credits to https://stackoverflow.com/a/5032014
+	local result = {}
+	local from = 1
+	local delim_from, delim_to = string.find(self, delimiter, from, true)
+	while delim_from do
+		table.insert(result, string.sub(self, from, delim_from-1))
+		from = delim_to + 1
+		delim_from, delim_to = string.find(self, delimiter, from, true)
+	end
+	table.insert(result, string.sub(self, from))
+	return result
+end
 
 function padZeroes(s, num)
     return string.format("%0" .. num .. "d", s)

@@ -4,12 +4,14 @@ function love.load()
     
     require "util"
     
-    love.graphics.setDefaultFilter("nearest", "nearest")
-    
     love.window.setMode(400*VAR("scale"), 224*VAR("scale"), {
         vsync = VAR("vsync"),
         resizable = true,
     })
+
+    love.window.setTitle("Definitely not Mari0 2")
+    
+    love.graphics.setDefaultFilter("nearest", "nearest")
     
     sandbox = require "lib/sandbox"
     JSON = require "lib/JSON"

@@ -23,7 +23,7 @@ function Checkbox:initialize(x, y, s, func)
 end
 
 function Checkbox:getCollision(x, y)
-    return x >= 0 and x < self.w and y >= 0 and y < self.h
+    return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < self.h
 end 
 
 function Checkbox:draw(level)
@@ -55,8 +55,6 @@ end
 function Checkbox:mousepressed(x, y, Checkbox)
     if self:getCollision(x, y) then
         self.pressing = true
-        
-        return true
     end
 end
 

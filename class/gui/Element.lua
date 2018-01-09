@@ -57,18 +57,38 @@ function Element:removeChild(element)
     end
 end
 
-function Element:update(dt, x, y)
-    if not x then
+function Element:update(dt, x, y, mouseBlocked)
+    if not x then -- root element
         x, y = love.mouse.getPosition()
         x, y = x/VAR("scale"), y/VAR("scale")
+        mouseBlocked = false
     end
     
     self.mouse.x = x
     self.mouse.y = y
+    self.mouseBlocked = mouseBlocked
+
+    local childMouseBlocked = self.mouseBlocked
+
+    if  self.mouse.x < self.childBox[1] or self.mouse.x >= self.childBox[1]+self:getInnerWidth() or
+        self.mouse.y < self.childBox[2] or self.mouse.y >= self.childBox[2]+self:getInnerHeight() then
+        childMouseBlocked = true
+    end
+
     
-    for _, v in ipairs(self.children) do
+    for i = #self.children, 1, -1 do
+        local v = self.children[i]
+        
         if v.update then
-            v:update(dt, x-self.childBox[1]-v.x+self.scroll.x, y-self.childBox[2]-v.y+self.scroll.y)
+            local childX = self.mouse.x-self.childBox[1]-v.x+self.scroll.x
+            local childY = self.mouse.y-self.childBox[2]-v.y+self.scroll.y
+
+            v:update(dt, childX, childY, childMouseBlocked)
+
+            if  self.mouse.x-self.childBox[1] >= v.x and self.mouse.x-self.childBox[1] < v.x+v.w and
+                self.mouse.y-self.childBox[2] >= v.y and self.mouse.y-self.childBox[2] < v.y+v.h then
+                childMouseBlocked = true
+            end
         end
     end
 

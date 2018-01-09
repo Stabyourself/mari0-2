@@ -58,7 +58,7 @@ end
 function editor.newWindow(type, elem)
     if type == "test" then
         local testWindow = GUI.Box:new(10, 30, 100, 100)
-        testWindow.draggable = false
+        testWindow.draggable = true
         testWindow.resizeable = true
         testWindow.closeable = true
         testWindow.scrollable = {x=true, y=true}
@@ -78,15 +78,15 @@ function editor.newWindow(type, elem)
         end
         
         
-        local testWindow2 = GUI.Box:new(10, 30, 100, 100)
-        testWindow2.draggable = true
-        testWindow2.resizeable = true
-        testWindow2.closeable = true
-        testWindow2.scrollable = {x=true, y=true}
-        testWindow2.title = "Why did you press"
-        testWindow2.background = game.level.backgroundColor
+        -- local testWindow2 = GUI.Box:new(10, 30, 100, 100)
+        -- testWindow2.draggable = true
+        -- testWindow2.resizeable = true
+        -- testWindow2.closeable = true
+        -- testWindow2.scrollable = {x=true, y=true}
+        -- testWindow2.title = "Why did you press"
+        -- testWindow2.background = game.level.backgroundColor
         
-        testWindow:addChild(testWindow2)
+        -- testWindow:addChild(testWindow2)
         
     elseif type == "tileList" then
         local tileListWindow = GUI.Box:new(10, 20, 200, 200)

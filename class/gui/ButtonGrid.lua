@@ -15,8 +15,8 @@ function ButtonGrid:initialize(x, y, img, buttons, func)
     self.func = func --boogie nights
 end
 
-function ButtonGrid:update(dt, x, y)
-    GUI.Element.update(self, dt, x, y)
+function ButtonGrid:update(dt, x, y, mouseBlocked)
+    GUI.Element.update(self, dt, x, y, mouseBlocked)
     
     local maxWidth = self.parent:getInnerWidth()
     
@@ -31,6 +31,10 @@ function ButtonGrid:updateSize()
 end
 
 function ButtonGrid:getCollision(x, y)
+    if self.mouseBlocked then
+        return false
+    end
+    
     local tileX = math.ceil(x/(self.size.x+self.gutter.x))
     local tileY = math.ceil(y/(self.size.y+self.gutter.y))
     

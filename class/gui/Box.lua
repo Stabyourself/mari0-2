@@ -39,8 +39,8 @@ function Box:initialize(x, y, w, h)
     self.posMax.y = -4
 end
 
-function Box:update(dt, x, y)
-    GUI.Element.update(self, dt, x, y)
+function Box:update(dt, x, y, mouseBlocked)
+    GUI.Element.update(self, dt, x, y, mouseBlocked)
     
     if self.draggable then
         self.sizeMin.x = 19
@@ -128,19 +128,19 @@ function Box:draw(level)
 end
 
 function Box:titleBarCollision(x, y)
-    return x >= 0 and x < self.w and y >= 0 and y < 12
+    return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < 12
 end
 
 function Box:resizeCornerCollision(x, y)
-    return x >= self.w-11 and x < self.w-3 and y >= self.h-12 and y < self.h-4
+    return not self.mouseBlocked and x >= self.w-11 and x < self.w-3 and y >= self.h-12 and y < self.h-4
 end
 
 function Box:closeCollision(x, y)
-    return x >= self.w-12 and x < self.w-3 and y >= 2 and y < 11
+    return not self.mouseBlocked and x >= self.w-12 and x < self.w-3 and y >= 2 and y < 11
 end
 
 function Box:collision(x, y)
-    return x >= -2 and x < self.w+2 and y >= -2 and y < self.h+3
+    return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < self.h
 end
 
 function Box:mousepressed(x, y, button)
@@ -170,6 +170,7 @@ function Box:mousepressed(x, y, button)
         return true
         
     elseif self:collision(x, y) then
+        
         return true
     end
 end

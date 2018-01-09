@@ -23,14 +23,14 @@ function Slider:initialize(min, max, x, y, w, showValue)
     end
     
     self.text = GUI.Text:new(tostring(self:getValue()), w-self.textWidth+1, 0)
-    
+    print(y)
     GUI.Element.initialize(self, x, y, w, 8)
     
     self:addChild(self.text)
 end
 
-function Slider:update(dt, x, y)
-    GUI.Element.update(self, dt, x, y)
+function Slider:update(dt, x, y, mouseBlocked)
+    GUI.Element.update(self, dt, x, y, mouseBlocked)
     
     if self.dragging then
         local pos = (self.mouse.x-self.dragX-self.barOffset)/(self.barWidth)
@@ -52,7 +52,7 @@ end
 function Slider:getCollision(x, y)
     local sliderX = self:getPosX()
     
-    return x >= sliderX-2 and x < sliderX+2 and y >= 0 and y < 8
+    return not self.mouseBlocked and x >= sliderX-2 and x < sliderX+2 and y >= 0 and y < 8
 end
 
 function Slider:getPosX()

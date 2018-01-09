@@ -2,14 +2,14 @@ GUI = class("GUI")
 
 local current_folder = (...):gsub('%.init$', '')
 
-GUI.Element = require(current_folder .. "/Element")
-GUI.Canvas = require(current_folder .. "/Canvas")
-GUI.Box = require(current_folder .. "/Box")
-GUI.Text = require(current_folder .. "/Text")
-GUI.Button = require(current_folder .. "/Button")
-GUI.Slider = require(current_folder .. "/Slider")
-GUI.ButtonGrid = require(current_folder .. "/ButtonGrid")
-GUI.Checkbox = require(current_folder .. "/Checkbox")
+GUI.Element = require(current_folder.. ".Element")
+GUI.Canvas = require(current_folder.. ".Canvas")
+GUI.Box = require(current_folder.. ".Box")
+GUI.Text = require(current_folder.. ".Text")
+GUI.Button = require(current_folder.. ".Button")
+GUI.Slider = require(current_folder.. ".Slider")
+GUI.ButtonGrid = require(current_folder.. ".ButtonGrid")
+GUI.Checkbox = require(current_folder.. ".Checkbox")
 
 function GUI:initialize(folder)
     self.folder = folder

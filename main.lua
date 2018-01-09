@@ -13,29 +13,29 @@ function love.load()
     
     love.graphics.setDefaultFilter("nearest", "nearest")
     
-    sandbox = require "lib/sandbox"
-    JSON = require "lib/JSON"
-    class = require "lib/middleclass"
-    Camera = require "lib/Camera"
-    Color = require "lib/Color"
-    Easing = require "lib/Easing"
-    Vector = require "lib/Vector"
+    sandbox = require "lib.sandbox"
+    JSON = require "lib.JSON"
+    class = require "lib.middleclass"
+    Camera = require "lib.Camera"
+    Color = require "lib.Color"
+    Easing = require "lib.Easing"
+    Vector = require "lib.Vector"
 
-    require "class/fissix"
+    require "class.fissix"
 
-    require "class/CharacterState"
-    require "class/Character"
+    require "class.CharacterState"
+    require "class.Character"
     require "enemyLoader"
 
-    require "class/Level"
-    require "class/Mario"
-    require "class/BlockBounce"
-    require "class/Enemy"
-    require "class/Portal" -- the juicy bits
-    require "class/PortalParticle" -- the juicy bits
-    require "class/gui"
-    require "class/Smb3Ui"
-    require "class/Crosshair"
+    require "class.Level"
+    require "class.Mario"
+    require "class.BlockBounce"
+    require "class.Enemy"
+    require "class.Portal" -- the juicy bits
+    require "class.PortalParticle" -- the juicy bits
+    require "class.gui"
+    require "class.Smb3Ui"
+    require "class.Crosshair"
     
     require "cheats"
 
@@ -309,17 +309,17 @@ end
 function keyDown(cmd)
     local split = cmd:split(".")
     
-    local function recursiveShit(var, t)
+    local function combineTableCall(var, t) -- basically makes var["some.dot.separated.string"] into var.some.dot.separated.string
         local ct = table.remove(t, 1)
         
         if #t == 0 then
             return var[ct]
         else
-            return recursiveShit(var[ct], t)
+            return combineTableCall(var[ct], t)
         end
     end
     
-    return love.keyboard.isDown(recursiveShit(VAR("controls"), split))
+    return love.keyboard.isDown(combineTableCall(VAR("controls"), split))
 end
 
 function skipUpdate()

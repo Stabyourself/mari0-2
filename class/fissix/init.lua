@@ -13,8 +13,8 @@ fissix.TRACER_SIDE_TOP_DIST = 4 -- How far away the side tracers are from the to
 
 local current_folder = (...):gsub('%.init$', '')
 
-fissix.World = require(current_folder .. "/World")
-fissix.PhysObj = require(current_folder .. "/PhysObj")
-fissix.Tile = require(current_folder .. "/Tile")
-fissix.TileMap = require(current_folder .. "/TileMap")
-fissix.Tracer = require(current_folder .. "/Tracer")
+fissix.World = require(current_folder .. ".World")
+fissix.PhysObj = require(current_folder .. ".PhysObj")
+fissix.Tile = require(current_folder .. ".Tile")
+fissix.TileMap = require(current_folder .. ".TileMap")
+fissix.Tracer = require(current_folder .. ".Tracer")

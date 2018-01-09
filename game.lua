@@ -8,8 +8,8 @@ function game.load()
     game.timeLeft = 400
     
     smb3TileMap = fissix.TileMap:new("tilemaps/smb3")
-    SmbMario = require("characters/smb-mario/code")
-    Smb3Mario = require("characters/smb3-mario/code")
+    SmbMario = require("characters.smb-mario.code")
+    Smb3Mario = require("characters.smb3-mario.code")
     
     game.level = Level:new("levels/smb3test.lua", smb3TileMap)
     

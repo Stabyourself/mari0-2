@@ -13,7 +13,7 @@ if fileInfo and fileInfo.type == "file" then
 end
 
 function VAR(i, default)
-    return VARIABLES[i] == nil and default or VARIABLES[i]
+    return VARIABLES[i] ~= nil and VARIABLES[i] or default
 end
 
 function CHEAT(i)

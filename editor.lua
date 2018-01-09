@@ -127,7 +127,7 @@ end
 
 function editor.mousepressed(x, y, button)
     if editor.canvas:mousepressed(x, y, button) then -- don't do tool stuff if the click was on a GUI element
-        return
+        return true
     end
     
     if editor.tool == "paint" then

@@ -23,7 +23,7 @@ function Slider:initialize(min, max, x, y, w, showValue)
     end
     
     self.text = GUI.Text:new(tostring(self:getValue()), w-self.textWidth+1, 0)
-    print(y)
+    
     GUI.Element.initialize(self, x, y, w, 8)
     
     self:addChild(self.text)
@@ -86,9 +86,13 @@ function Slider:mousepressed(x, y, button)
         self.dragging = true
         self.dragX = x-self:getPosX()
     end
+    
+    GUI.Element.mousepressed(self, x, y, button)
 end
 function Slider:mousereleased(x, y, button)
     self.dragging = false
+
+    GUI.Element.mousereleased(self, x, y, button)
 end
 
 return Slider

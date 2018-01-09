@@ -312,10 +312,17 @@ function Element:mousepressed(x, y, button)
             local v = self.children[i]
             
             if v.mousepressed then
-                if v:mousepressed(x-self.childBox[1]-v.x+self.scroll.x, y-self.childBox[2]-v.y+self.scroll.y, button) then
+                local lx = x-self.childBox[1]-v.x+self.scroll.x
+                local ly = y-self.childBox[2]-v.y+self.scroll.y
+
+                v:mousepressed(lx, ly, button)
+
+                if lx >= 0 and lx < v.w and ly >= 0 and ly < v.h then
                     -- push that element to the end
-                    table.insert(self.children, table.remove(self.children, i))
-                    
+                    if v.movesToTheFront then
+                        table.insert(self.children, table.remove(self.children, i))
+                    end
+
                     return true
                 end
             end

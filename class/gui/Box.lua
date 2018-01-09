@@ -24,6 +24,8 @@ local titledBoxQuad = {
     love.graphics.newQuad(4, 13, 3, 4, 7, 17),
 }
 
+Box.movesToTheFront = true
+
 function Box:initialize(x, y, w, h)
     GUI.Element.initialize(self, x, y, w, h)
 
@@ -149,35 +151,21 @@ function Box:mousepressed(x, y, button)
         self.resizing = true
         self.resizePos.x = self.w-x
         self.resizePos.y = self.h-y
-        
-        return true
-    end
-    
-    if GUI.Element.mousepressed(self, x, y, button) then
-        return true
-    end
-    
-    if self.closeable and self:closeCollision(x, y) then
+
+    elseif self.closeable and self:closeCollision(x, y) then
         self.closing = true
-        
-        return true
         
     elseif self.draggable and self:titleBarCollision(x, y) then
         self.dragging = true
         self.dragPos.x = x
         self.dragPos.y = y
         
-        return true
-        
-    elseif self:collision(x, y) then
-        
-        return true
     end
+    
+    GUI.Element.mousepressed(self, x, y, button)
 end
 
 function Box:mousereleased(x, y, button)
-    GUI.Element.mousereleased(self, x, y, button)
-    
     self.dragging = false
     self.resizing = false
     
@@ -187,7 +175,9 @@ function Box:mousereleased(x, y, button)
         else
             self.closing = false
         end
-    end 
+    end
+
+    GUI.Element.mousereleased(self, x, y, button)
 end
 
 return Box

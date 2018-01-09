@@ -56,6 +56,8 @@ function Checkbox:mousepressed(x, y, Checkbox)
     if self:getCollision(x, y) then
         self.pressing = true
     end
+
+    GUI.Element.mousepressed(self, x, y, button)
 end
 
 function Checkbox:mousereleased(x, y, Checkbox)
@@ -68,6 +70,8 @@ function Checkbox:mousereleased(x, y, Checkbox)
     end
     
     self.pressing = false
+
+    GUI.Element.mousereleased(self, x, y, button)
 end
 
 return Checkbox

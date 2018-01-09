@@ -71,6 +71,8 @@ function Button:mousepressed(x, y, button)
     if self:getCollision(x, y) then
         self.pressing = true
     end
+    
+    GUI.Element.mousepressed(self, x, y, button)
 end
 
 function Button:mousereleased(x, y, button)
@@ -81,6 +83,8 @@ function Button:mousereleased(x, y, button)
     end
     
     self.pressing = false
+
+    GUI.Element.mousereleased(self, x, y, button)
 end
 
 return Button

@@ -40,6 +40,8 @@ function Box:initialize(x, y, w, h)
 end
 
 function Box:update(dt, x, y)
+    GUI.Element.update(self, dt, x, y)
+    
     if self.draggable then
         self.sizeMin.x = 19
         self.sizeMin.y = 29
@@ -50,7 +52,6 @@ function Box:update(dt, x, y)
         self.childBox = {2, 3, self.w-4, self.h-6}
     end
     
-    GUI.Element.update(self, dt, x, y)
 end
 
 function Box:draw(level)

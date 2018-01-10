@@ -32,8 +32,8 @@ function love.load()
     require "class.Mario"
     require "class.BlockBounce"
     require "class.Enemy"
-    require "class.Portal" -- the juicy bits
-    require "class.PortalParticle" -- the juicy bits
+    require "class.Portal"
+    require "class.PortalParticle"
     require "class.gui"
     require "class.Smb3Ui"
     require "class.Crosshair"
@@ -81,7 +81,7 @@ function love.load()
         local x = math.floor((glyphNum-1)%glyphWidth+1)
         local y = math.ceil(glyphNum/glyphWidth)
         
-        fontQuad[glyph] = love.graphics.newQuad((x-1)*glyphSize, (y-1)*glyphSize, glyphSize, glyphSize, fontImg:getWidth(), fontImg:getHeight())
+        fontQuad[glyph] = love.graphics.newQuad((x-1)*glyphSize, (y-1)*glyphSize, glyphSize, glyphSize, fontImg:getDimensions())
         
         glyphNum = glyphNum + 1
     end
@@ -132,12 +132,11 @@ function love.load()
     debugCandyImg:setWrap("repeat")
     
     defaultUI = GUI:new("img/gui/default")
-print(GameStateManager)
+    
     gameStateManager = GameStateManager:new()
     
     love.resize(400*VAR("scale"), 224*VAR("scale"))
 
-    print("Loading game")
     game = Game:new()
 
     gameStateManager:loadState(game)

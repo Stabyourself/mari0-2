@@ -134,7 +134,7 @@ function Editor:mousepressed(x, y, button)
     
     if self.tool == "paint" then
         if (button == 1 and keyDown("editor.pipette")) or button == 3 then
-            Editor:pipette(x, y)
+            self:pipette(x, y)
             
         elseif button == 1 then
             self.paint.penDown = true

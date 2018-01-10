@@ -125,7 +125,7 @@ function processImage(name, imgData, colors)
 end
 
 function separateColor(imgData, color)
-    local out = love.image.newImageData(imgData:getWidth(), imgData:getHeight())
+    local out = love.image.newImageData(imgData:getDimensions())
     
     for y = 0, imgData:getHeight()-1 do
         for x = 0, imgData:getWidth()-1 do
@@ -141,7 +141,7 @@ function separateColor(imgData, color)
 end
 
 function separateNotColors(imgData, colors)
-    local out = love.image.newImageData(imgData:getWidth(), imgData:getHeight())
+    local out = love.image.newImageData(imgData:getDimensions())
     
     for y = 0, imgData:getHeight()-1 do
         for x = 0, imgData:getWidth()-1 do

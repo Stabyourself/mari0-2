@@ -81,8 +81,10 @@ function ButtonGrid:draw(level)
 end
 
 function ButtonGrid:mousepressed(x, y, button)
-    if self:getCollision(x, y) then
-        self.func(col)
+    local col = self:getCollision(x, y)
+    
+    if col then
+        self.func(self, col)
     end
     
     GUI.Element.mousepressed(self, x, y, button)

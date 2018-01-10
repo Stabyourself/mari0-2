@@ -363,23 +363,13 @@ function worldDraw(...)
     local arg = {...}
 
     if type(arg[2]) == "number" then
-        if VAR("noSubpixelMovement") then
-            arg[2] = math.round(arg[2])
-            arg[3] = math.round(arg[3])
-            if arg[4] then
-                arg[4] = math.round((arg[4]/(math.pi*2))*16)/16*(math.pi*2)
-            end
-        end
+        arg[2] = math.round(arg[2]*VAR("scale"))/VAR("scale")
+        arg[3] = math.round(arg[3]*VAR("scale"))/VAR("scale")
         
         love.graphics.draw(arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8])
     else
-        if VAR("noSubpixelMovement") then
-            arg[3] = math.round(arg[3])
-            arg[4] = math.round(arg[4])
-            if arg[5] then
-                arg[5] = math.round((arg[5]/(math.pi*2))*16)/16*(math.pi*2)
-            end
-        end
+        arg[3] = math.round(arg[3]*VAR("scale"))/VAR("scale")
+        arg[4] = math.round(arg[4]*VAR("scale"))/VAR("scale")
         
         love.graphics.draw(arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8], arg[9])
     end
@@ -390,12 +380,6 @@ function worldLine(x1, y1, x2, y2)
 end
 
 function worldRectangle(style, x, y, w, h)
-    if VAR("noSubpixelMovement") then
-        x = math.round(x)
-        y = math.round(y)
-        w = math.round(w)
-        h = math.round(h)
-    end
     love.graphics.rectangle(style, x, y, w, h)
 end
 

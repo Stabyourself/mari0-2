@@ -63,7 +63,6 @@ function Level:update(dt)
     
     local x, y = love.mouse.getPosition()
     x, y = x/VAR("scale"), y/VAR("scale")
-    print(self:screenToWorld(x, y))
 end
 
 function Level:draw()
@@ -74,8 +73,6 @@ function Level:draw()
     for _, v in ipairs(self.marios) do
         v.crosshair:draw()
     end
-    
-    print(self:mapToScreen(1, 10))
     
     self.camera:detach()
 end
@@ -177,7 +174,7 @@ function Level:updateCamera(dt)
     -- self.camera.y = math.max(self.camera.y, 0)
     
     self.camera.x = self.marios[1].x+self.marios[1].width/2
-    self.camera.y = self.marios[1].y+self.marios[1].height/2
+    self.camera.y = self.marios[1].y+self.marios[1].height/2+.1
 end
 
 function Level:bumpBlock(x, y)

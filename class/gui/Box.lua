@@ -34,23 +34,23 @@ function Box:initialize(x, y, w, h)
     
     self.children = {}
     
-    self.posMin.x = -3
-    self.posMin.y = -2
+    self.posMin[1] = -3
+    self.posMin[2] = -2
     
-    self.posMax.x = -3
-    self.posMax.y = -4
+    self.posMax[1] = -3
+    self.posMax[2] = -4
 end
 
 function Box:update(dt, x, y, mouseBlocked)
     GUI.Element.update(self, dt, x, y, mouseBlocked)
     
     if self.draggable then
-        self.sizeMin.x = 19
-        self.sizeMin.y = 29
+        self.sizeMin[1] = 19
+        self.sizeMin[2] = 29
         self.childBox = {3, 12, self.w-6, self.h-16}
     else
-        self.sizeMin.x = 17
-        self.sizeMin.y = 19
+        self.sizeMin[1] = 17
+        self.sizeMin[2] = 19
         self.childBox = {2, 3, self.w-4, self.h-6}
     end
     
@@ -63,7 +63,7 @@ function Box:draw(level)
         love.graphics.setColor(self.background)
         love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
     elseif type(self.background) == "userdata" then
-        self.backgroundQuad:setViewport(self.scroll.x%4, self.scroll.y%4, self.childBox[3], self.childBox[4])
+        self.backgroundQuad:setViewport(self.scroll[1]%4, self.scroll[2]%4, self.childBox[3], self.childBox[4])
         self.background:setWrap("repeat", "repeat")
             
         love.graphics.draw(self.background, self.backgroundQuad, self.childBox[1], self.childBox[2])
@@ -100,7 +100,7 @@ function Box:draw(level)
         local img = self.gui.img.boxClose
         if self.closing then
             img = self.gui.img.boxCloseActive
-        elseif self:closeCollision(self.mouse.x, self.mouse.y) then
+        elseif self:closeCollision(self.mouse[1], self.mouse[2]) then
             img = self.gui.img.boxCloseHover
         end
         
@@ -113,7 +113,7 @@ function Box:draw(level)
         local img = self.gui.img.boxResize
         if self.resizing then
             img = self.gui.img.boxResizeActive
-        elseif self:resizeCornerCollision(self.mouse.x, self.mouse.y) then
+        elseif self:resizeCornerCollision(self.mouse[1], self.mouse[2]) then
             img = self.gui.img.boxResizeHover
         end
         
@@ -149,16 +149,16 @@ function Box:mousepressed(x, y, button)
     -- Check resize before the rest because reasons
     if self.resizeable and self:resizeCornerCollision(x, y) then
         self.resizing = true
-        self.resizePos.x = self.w-x
-        self.resizePos.y = self.h-y
+        self.resizePos[1] = self.w-x
+        self.resizePos[2] = self.h-y
 
     elseif self.closeable and self:closeCollision(x, y) then
         self.closing = true
         
     elseif self.draggable and self:titleBarCollision(x, y) then
         self.dragging = true
-        self.dragPos.x = x
-        self.dragPos.y = y
+        self.dragPos[1] = x
+        self.dragPos[2] = y
         
     end
     

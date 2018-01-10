@@ -35,7 +35,7 @@ function Checkbox:draw(level)
     
     if self.pressing then
         img = self.gui.img.checkboxActive
-    elseif self:getCollision(self.mouse.x, self.mouse.y) then
+    elseif self:getCollision(self.mouse[1], self.mouse[2]) then
         img = self.gui.img.checkboxHover
     end
     

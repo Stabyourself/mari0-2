@@ -19,7 +19,6 @@ function love.load()
     Camera = require "lib.Camera"
     Color = require "lib.Color"
     Easing = require "lib.Easing"
-    Vector = require "lib.Vector"
 
     require "class.fissix"
 

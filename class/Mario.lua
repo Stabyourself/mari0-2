@@ -116,7 +116,7 @@ function Mario:ceilCollision(obj2)
         -- Right side
         if self.x > obj2.x+obj2.width - VAR("jumpLeeway") and not game.level:getTile(obj2.blockX+1, obj2.blockY).collision then
             self.x = obj2.x+obj2.width
-            self.speed.x = math.max(self.speed.x, 0)
+            self.speed[1] = math.max(self.speed[1], 0)
 
             return true
         end
@@ -124,7 +124,7 @@ function Mario:ceilCollision(obj2)
         -- Left side
         if self.x + self.width < obj2.x + VAR("jumpLeeway") and not game.level:getTile(obj2.blockX-1, obj2.blockY).collision then
             self.x = obj2.x-self.width
-            self.speed.x = math.min(self.speed.x, 0)
+            self.speed[1] = math.min(self.speed[1], 0)
 
             return true
         end
@@ -145,7 +145,7 @@ function Mario:ceilCollision(obj2)
             end
         end
         
-        self.speed.y = VAR("blockHitForce")
+        self.speed[2] = VAR("blockHitForce")
         
         game.level:bumpBlock(x, y)
     end
@@ -154,7 +154,7 @@ end
 function Mario:bottomCollision(obj2)
     if obj2.stompable then
         obj2:stomp()
-        self.speed.y = -getRequiredSpeed(VAR("enemyBounceHeight"))
+        self.speed[2] = -getRequiredSpeed(VAR("enemyBounceHeight"))
         playSound(stompSound)
         
         return true

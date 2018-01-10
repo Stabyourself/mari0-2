@@ -61,7 +61,7 @@ function editor.newWindow(type, elem)
         testWindow.draggable = true
         testWindow.resizeable = true
         testWindow.closeable = true
-        testWindow.scrollable = {x=true, y=true}
+        testWindow.scrollable = {true, true}
         testWindow.title = "Why did you press"
         testWindow.background = game.level.backgroundColor
         
@@ -82,7 +82,7 @@ function editor.newWindow(type, elem)
         -- testWindow2.draggable = true
         -- testWindow2.resizeable = true
         -- testWindow2.closeable = true
-        -- testWindow2.scrollable = {x=true, y=true}
+        -- testWindow2.scrollable = {true, true}
         -- testWindow2.title = "Why did you press"
         -- testWindow2.background = game.level.backgroundColor
         
@@ -93,7 +93,7 @@ function editor.newWindow(type, elem)
         tileListWindow.draggable = true
         tileListWindow.resizeable = true
         tileListWindow.closeable = true
-        tileListWindow.scrollable = {x=true, y=true}
+        tileListWindow.scrollable = {true, true}
         tileListWindow.title = "tiles"
         tileListWindow.background = checkerboardImg
         

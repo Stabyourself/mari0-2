@@ -30,14 +30,14 @@ function World:update(dt)
 		obj:update(dt)
 		
 		-- Add gravity
-        obj.speed.y = obj.speed.y + (obj.gravity or VAR("gravity")) * 0.5 * dt
-        -- Cap speed.y
-        obj.speed.y = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed.y)
+        obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * 0.5 * dt
+        -- Cap speed[2]
+        obj.speed[2] = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed[2])
         
         local oldX, oldY = obj.x, obj.y
         
-        obj.x = obj.x + obj.speed.x * dt
-        obj.y = obj.y + obj.speed.y * dt
+        obj.x = obj.x + obj.speed[1] * dt
+        obj.y = obj.y + obj.speed[2] * dt
         
         self:checkPortaling(obj, oldX, oldY)
         
@@ -48,9 +48,9 @@ function World:update(dt)
         self:checkPortaling(obj, oldX, oldY)
         
 		-- Add gravity again
-        obj.speed.y = obj.speed.y + (obj.gravity or VAR("gravity")) * 0.5 * dt
-        -- Cap speed.y
-        obj.speed.y = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed.y)
+        obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * 0.5 * dt
+        -- Cap speed[2]
+        obj.speed[2] = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed[2])
         
         if obj.postMovementUpdate then
             obj:postMovementUpdate(dt)
@@ -64,7 +64,7 @@ function World:checkPortaling(obj, oldX, oldY)
             local iX, iY = linesIntersect(oldX+obj.width/2, oldY+obj.height/2, obj.x+obj.width/2, obj.y+obj.height/2, p.x1, p.y1, p.x2, p.y2)
             
             if iX then
-                local x, y, velocity = obj.x+obj.width/2, obj.y+obj.height/2, Vector(obj.groundSpeedX, obj.speed.y)
+                local x, y, velocity = obj.x+obj.width/2, obj.y+obj.height/2, Vector(obj.groundSpeedX, obj.speed[2])
                 local angle = math.atan2(velocity.y, velocity.x)
                 local speed = math.sqrt(velocity.x^2+velocity.y^2)
                 
@@ -74,7 +74,7 @@ function World:checkPortaling(obj, oldX, oldY)
                 obj.y = outY
                 
                 obj.groundSpeedX = math.cos(outAngle)*speed
-                obj.speed.y = math.sin(outAngle)*speed
+                obj.speed[2] = math.sin(outAngle)*speed
                 
                 obj.angle = obj.angle + angleDiff
                 
@@ -92,7 +92,7 @@ function World:checkPortaling(obj, oldX, oldY)
                     outX = obj.x,
                     outY = obj.y,
                     outVX = obj.groundSpeedX,
-                    outVY = obj.speed.y,
+                    outVY = obj.speed[2],
                     
                     reversed = reversed
                 })
@@ -149,7 +149,7 @@ function World:draw()
             if p.open then
                 if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
                     objectWithinPortalRange(p, x, y) then
-                    local angle = math.atan2(obj.speed.y, obj.groundSpeedX)
+                    local angle = math.atan2(obj.speed[2], obj.groundSpeedX)
                     local cX, cY, cAngle, angleDiff, reversed = self:doPortal(p, obj.x+obj.width/2, obj.y+obj.height/2, angle)
                     
                     local xScale = 1

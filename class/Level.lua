@@ -80,7 +80,7 @@ function Level:keypressed(key)
     end
     
     if key == VAR("controls").boost then
-        self.marios[1].speed.x = 1000
+        self.marios[1].speed[1] = 1000
     end
     
     if key == VAR("controls").closePortals then

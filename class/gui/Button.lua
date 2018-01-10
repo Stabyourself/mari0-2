@@ -36,7 +36,7 @@ function Button:initialize(x, y, s, func)
 end
 
 function Button:getCollision(x, y)
-    return not self.mouseBlocked and  x >= 0 and x < self.w and y >= 0 and y < self.h
+    return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < self.h
 end 
 
 function Button:draw(level)
@@ -48,7 +48,7 @@ function Button:draw(level)
     
     if self.pressing then
         img = self.gui.img.buttonActive
-    elseif self:getCollision(self.mouse.x, self.mouse.y) then
+    elseif self:getCollision(self.mouse[1], self.mouse[2]) then
         img = self.gui.img.buttonHover
     end
     

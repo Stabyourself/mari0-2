@@ -36,7 +36,7 @@ function Enemy:update(dt)
     self:movement(dt)
     
     if CHEAT("tumble") then
-        self.angle = self.angle + self.speed.x*dt*0.1
+        self.angle = self.angle + self.speed[1]*dt*0.1
         self:unRotate(0)
     else
         self:unRotate(dt)
@@ -66,7 +66,7 @@ end
 
 function Enemy:movement(dt)
     if self.movementType == "truffleshuffle" then
-        self.speed.x = self.speed*self.shuffleDir
+        self.speed[1] = self.speed*self.shuffleDir
     end
 end
 

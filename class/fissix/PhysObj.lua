@@ -7,7 +7,7 @@ function PhysObj:initialize(world, x, y, width, height)
 	self.height = height
 	self.world = world
 	
-	self.speed = Vector(0, 0)
+	self.speed = {0, 0}
 	self.groundSpeedX = 0
 	
 	self.gravityDirection = math.pi*.5
@@ -28,7 +28,6 @@ function PhysObj:initialize(world, x, y, width, height)
 	
 	local xOff, yOff, distance
 	local step = self.world.tileMap.tileSize
-	
 	
 	-- Create left tracers
 	xOff = math.floor(self.width/2)-1
@@ -152,7 +151,7 @@ function PhysObj:topColCheck()
 	if colY then --Top collision
 		if not self:topCollision() then
 			self.y = colY+1
-			self.speed.y = math.max(self.speed.y, 0)
+			self.speed[2] = math.max(self.speed[2], 0)
 			
 			return {x = colX, y = colY}
 		end
@@ -177,12 +176,12 @@ function PhysObj:bottomColCheck()
 			if not self:bottomCollision({}) then
 				if self.onGround then
 					self.y = colY-self.height
-					self.speed.y = math.min(self.speed.y, 0)
+					self.speed[2] = math.min(self.speed[2], 0)
 					
 					return {x = colX, y = colY, angle = colAngle}
 				else
 					self.y = colY-self.height
-					self.speed.y = math.min(self.speed.y, 0)
+					self.speed[2] = math.min(self.speed[2], 0)
 					self.onGround = true
 					
 					return {x = colX, y = colY, angle = colAngle}
@@ -202,7 +201,7 @@ function PhysObj:checkCollisions()
 		collisions.right = self:rightColCheck()
 	end
 	
-	if self.speed.y > 0 then
+	if self.speed[2] > 0 then
 		collisions.bottom = self:bottomColCheck()
 	end
 	

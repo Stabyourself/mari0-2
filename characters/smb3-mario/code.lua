@@ -671,13 +671,13 @@ end
 
 
 state.jump = function(mario)
-    if not keyDown("jump") or mario.speed.y >= JUMPGRAVITYUNTIL then
+    if not keyDown("jump") or mario.speed[2] >= JUMPGRAVITYUNTIL then
         return "fall"
     end
 end
 
 state.fall = function(mario)
-    if keyDown("jump") and mario.speed.y < JUMPGRAVITYUNTIL then
+    if keyDown("jump") and mario.speed[2] < JUMPGRAVITYUNTIL then
         return "jump"
     end
     -- handled by bottomCollision
@@ -890,11 +890,11 @@ function Character:movement(dt)
     end
     
     if self.state.name == "fly" then
-        self.speed.y = FLYINGASCENSION
+        self.speed[2] = FLYINGASCENSION
     end
     
     if self.state.name == "float" then
-        self.speed.y = FLOATASCENSION
+        self.speed[2] = FLOATASCENSION
     end 
     
     -- P meter
@@ -921,7 +921,7 @@ function Character:movement(dt)
         while self.pMeterTimer >= self.pMeterTime do
             self.pMeterTimer = self.pMeterTimer - self.pMeterTime
             
-            if self.onGround and math.abs(self.speed.x) >= MAXSPEEDS[2] then
+            if self.onGround and math.abs(self.speed[1]) >= MAXSPEEDS[2] then
                 if self.pMeter < VAR("pMeterTicks") then
                     self.pMeterTime = PMETERTIMEUP
                     self.pMeter = self.pMeter + 1
@@ -965,21 +965,21 @@ function Character:movement(dt)
     end
     
     
-    self.speed.x = self.groundSpeedX
+    self.speed[1] = self.groundSpeedX
     
-    -- Adjust speed.x if going downhill or uphill
+    -- Adjust speed[1] if going downhill or uphill
     if self.onGround then
         if self.surfaceAngle > 0 then
             if self.groundSpeedX > 0 then
-                self.speed.x = self.speed.x + DOWNHILLWALKBONUS
+                self.speed[1] = self.speed[1] + DOWNHILLWALKBONUS
             else
-                self.speed.x = self.speed.x * math.cos(self.surfaceAngle)
+                self.speed[1] = self.speed[1] * math.cos(self.surfaceAngle)
             end
         elseif self.surfaceAngle < 0 then
             if self.groundSpeedX < 0 then
-                self.speed.x = self.speed.x - DOWNHILLWALKBONUS
+                self.speed[1] = self.speed[1] - DOWNHILLWALKBONUS
             else
-                self.speed.x = self.speed.x * math.cos(-self.surfaceAngle)
+                self.speed[1] = self.speed[1] * math.cos(-self.surfaceAngle)
             end
         end
     end
@@ -1093,7 +1093,7 @@ function Character:animation(dt)
         self.animationState = "skid"
         
     elseif self.state.name == "stop" or self.state.name == "run" then
-        if math.abs(self.speed.x) >= MAXSPEEDS[3] then
+        if math.abs(self.speed[1]) >= MAXSPEEDS[3] then
             self.animationState = "sprint"
         else
             self.animationState = "run"
@@ -1118,7 +1118,7 @@ function Character:animation(dt)
         elseif (not self.char.canFly and self.maxSpeedJump == MAXSPEEDS[3]) or self.flying then
             self.animationState = "fly"
         else
-            if self.speed.y < 0 then
+            if self.speed[2] < 0 then
                 self.animationState = "jump"
             else
                 self.animationState = "fall"
@@ -1130,7 +1130,7 @@ function Character:animation(dt)
     
     -- Running animation
     if (self.animationState == "run" or self.animationState == "sprint") then
-        self.runAnimationTimer = self.runAnimationTimer + (math.abs(self.speed.x)+50)/8*dt
+        self.runAnimationTimer = self.runAnimationTimer + (math.abs(self.speed[1])+50)/8*dt
         while self.runAnimationTimer > RUNANIMATIONTIME do
             self.runAnimationTimer = self.runAnimationTimer - RUNANIMATIONTIME
             self.runAnimationFrame = self.runAnimationFrame + 1
@@ -1201,7 +1201,7 @@ function Character:jump()
         self.flyAnimationFrame = 1
     end
     
-    if self.char.canFloat and self.speed.y > 0 and (self.state.name == "jump" or self.state.name == "float" or self.state.name == "fall") then
+    if self.char.canFloat and self.speed[2] > 0 and (self.state.name == "jump" or self.state.name == "float" or self.state.name == "fall") then
         self:switchState("float")
         self.floatAnimationTimer = 0
         self.floatAnimationFrame = 1
@@ -1233,7 +1233,7 @@ function Character:jump()
         
         self.maxSpeedJump = maxSpeedJump
         
-        self.speed.y = speedY
+        self.speed[2] = speedY
         
         -- See if Mario should switch to flying mode
         if self.char.canFly then

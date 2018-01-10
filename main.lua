@@ -19,6 +19,7 @@ function love.load()
     Camera = require "lib.Camera"
     Color = require "lib.Color"
     Easing = require "lib.Easing"
+    GameStateManager = require "lib.GameStateManager"
 
     require "class.fissix"
 
@@ -30,18 +31,16 @@ function love.load()
     require "class.Mario"
     require "class.BlockBounce"
     require "class.Enemy"
-    require "class.Portal" -- the juicy bits
-    require "class.PortalParticle" -- the juicy bits
+    require "class.Portal"
+    require "class.PortalParticle"
     require "class.gui"
     require "class.Smb3Ui"
     require "class.Crosshair"
     
     require "cheats"
-
-    require "gameStateManager"
     
-    require "game"
-    require "editor"
+    require "state.Game"
+    require "state.Editor"
     
 	fontImg = love.graphics.newImage("img/font.png")
     fontGlyphs = [[
@@ -81,7 +80,7 @@ function love.load()
         local x = math.floor((glyphNum-1)%glyphWidth+1)
         local y = math.ceil(glyphNum/glyphWidth)
         
-        fontQuad[glyph] = love.graphics.newQuad((x-1)*glyphSize, (y-1)*glyphSize, glyphSize, glyphSize, fontImg:getWidth(), fontImg:getHeight())
+        fontQuad[glyph] = love.graphics.newQuad((x-1)*glyphSize, (y-1)*glyphSize, glyphSize, glyphSize, fontImg:getDimensions())
         
         glyphNum = glyphNum + 1
     end
@@ -133,11 +132,14 @@ function love.load()
     
     defaultUI = GUI:new("img/gui/default")
     
+    gameStateManager = GameStateManager:new()
+    
     love.resize(400*VAR("scale"), 224*VAR("scale"))
 
-    print("Loading game")
-    gameStateManager.loadState(game)
-    gameStateManager.addState(editor)
+    game = Game:new()
+
+    gameStateManager:loadState(game)
+    gameStateManager:addState(Editor:new())
 end
 
 function love.update(dt)
@@ -157,7 +159,7 @@ function love.update(dt)
 		end
     end
     
-    gameStateManager.event("update", dt)
+    gameStateManager:event("update", dt)
 end
 
 function love.draw()
@@ -165,7 +167,7 @@ function love.draw()
         love.graphics.scale(VAR("scale"), VAR("scale"))
     end
     
-    gameStateManager.event("draw")
+    gameStateManager:event("draw")
     
     if VAR("characterStateDebug") then
         marioPrint(game.level.marios[1].state.name, 8, 8)
@@ -209,7 +211,7 @@ function love.keypressed(key)
         love.event.quit()
     end
     
-    gameStateManager.event("keypressed", key)
+    gameStateManager:event("keypressed", key)
 end
 
 function getWorldMouse()
@@ -219,13 +221,13 @@ end
 function love.mousepressed(x, y, button)
     x, y = getWorldMouse()
     
-    gameStateManager.event("mousepressed", x, y, button)
+    gameStateManager:event("mousepressed", x, y, button)
 end
 
 function love.mousereleased(x, y, button)
     x, y = getWorldMouse()
     
-    gameStateManager.event("mousereleased", x, y, button)
+    gameStateManager:event("mousereleased", x, y, button)
 end
 
 function love.resize(w, h)
@@ -246,11 +248,11 @@ function love.resize(w, h)
 
     debugCandyQuad = love.graphics.newQuad(0, 0, SCREENWIDTH, SCREENHEIGHT, 8, 8)
     
-    gameStateManager.event("resize", SCREENWIDTH, SCREENHEIGHT)
+    gameStateManager:event("resize", SCREENWIDTH, SCREENHEIGHT)
 end
 
 function love.wheelmoved(x, y)
-    gameStateManager.event("wheelmoved", x, y)
+    gameStateManager:event("wheelmoved", x, y)
 end
 
 function updateGroup(group, dt)

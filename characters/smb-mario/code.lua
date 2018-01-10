@@ -29,16 +29,16 @@ Character.quads.jumpingWithPassion = {}
 Character.quads.buttSliding = {}
 
 for y = 1, 5 do
-    Character.quads.idle[y] = love.graphics.newQuad(0, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
+    Character.quads.idle[y] = love.graphics.newQuad(0, (y-1)*20, 20, 20, Character.img:getDimensions())
 
     Character.quads.running[y] = {}
     for i = 1, 3 do
-        Character.quads.running[y][i] = love.graphics.newQuad(i*20, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
+        Character.quads.running[y][i] = love.graphics.newQuad(i*20, (y-1)*20, 20, 20, Character.img:getDimensions())
     end
 
     
-    Character.quads.sliding[y] = love.graphics.newQuad(80, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
-    Character.quads.jumping[y] = love.graphics.newQuad(100, (y-1)*20, 20, 20, Character.img:getWidth(), Character.img:getHeight())
+    Character.quads.sliding[y] = love.graphics.newQuad(80, (y-1)*20, 20, 20, Character.img:getDimensions())
+    Character.quads.jumping[y] = love.graphics.newQuad(100, (y-1)*20, 20, 20, Character.img:getDimensions())
 end
 
 function Character:initialize(...)

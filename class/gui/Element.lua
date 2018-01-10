@@ -361,8 +361,8 @@ function Element:wheelmoved(x, y)
     
     for _, v in ipairs(self.children) do
         if v.wheelmoved then
-            if  v.mouse[1] > 0 and v.mouse.x < v.w and
-                v.mouse[2] > 0 and v.mouse.y < v.h then 
+            if  v.mouse[1] > 0 and v.mouse[1] < v.w and
+                v.mouse[2] > 0 and v.mouse[2] < v.h then 
                 if v:wheelmoved(x, y, button) then
                     return true
                 end

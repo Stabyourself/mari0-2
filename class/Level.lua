@@ -14,7 +14,7 @@ function Level:initialize(path, tileMap)
     self.backgroundColor[3] = self.backgroundColor[3]/255
     
     -- Camera stuff
-    self.camera = Camera:new()
+    self.camera = Camera.new()
     self.camera.y = self.height*self.tileSize - CAMERAHEIGHT
     self.spawnLine = 0
     self.spawnI = 1
@@ -60,16 +60,22 @@ function Level:update(dt)
     if newSpawnLine > self.spawnLine then
         self:spawnEnemies(newSpawnLine)
     end
+    
+    local x, y = love.mouse.getPosition()
+    x, y = x/VAR("scale"), y/VAR("scale")
+    print(self:screenToWorld(x, y))
 end
 
 function Level:draw()
-    self.camera:attach()
+    self.camera:attach(0, 0, CAMERAWIDTH, CAMERAHEIGHT)
     
     fissix.World.draw(self)
     
     for _, v in ipairs(self.marios) do
         v.crosshair:draw()
     end
+    
+    print(self:mapToScreen(1, 10))
     
     self.camera:detach()
 end
@@ -136,39 +142,42 @@ function Level:spawnEnemies(untilX)
 end
 
 function Level:updateCamera(dt)
-    local mario = game.level.marios[1]
-    local pX = mario.x
-    local pXr = pX - self.camera.x
+    -- local mario = game.level.marios[1]
+    -- local pX = mario.x
+    -- local pXr = pX - self.camera.x
     
-    -- Horizontal
-    if pXr+mario.width > RIGHTSCROLLBORDER then
-        self.camera.x = math.min(pX+mario.width-RIGHTSCROLLBORDER, self.camera.x + VAR("cameraScrollRate")*dt)
+    -- -- Horizontal
+    -- if pXr+mario.width > RIGHTSCROLLBORDER then
+    --     self.camera.x = math.min(pX+mario.width-RIGHTSCROLLBORDER, self.camera.x + VAR("cameraScrollRate")*dt)
         
-    elseif pXr < LEFTSCROLLBORDER then
-        self.camera.x = math.max(pX-LEFTSCROLLBORDER, self.camera.x - VAR("cameraScrollRate")*dt)
-    end
+    -- elseif pXr < LEFTSCROLLBORDER then
+    --     self.camera.x = math.max(pX-LEFTSCROLLBORDER, self.camera.x - VAR("cameraScrollRate")*dt)
+    -- end
     
-    -- Vertical
-    local pY = mario.y
-    local pYr = pY - self.camera.y
+    -- -- Vertical
+    -- local pY = mario.y
+    -- local pYr = pY - self.camera.y
     
-    if pYr+mario.height > DOWNSCROLLBORDER then
-        self.camera.y = math.min(pY+mario.height-DOWNSCROLLBORDER, self.camera.y + VAR("cameraScrollRate")*dt)
-    end
+    -- if pYr+mario.height > DOWNSCROLLBORDER then
+    --     self.camera.y = math.min(pY+mario.height-DOWNSCROLLBORDER, self.camera.y + VAR("cameraScrollRate")*dt)
+    -- end
         
-    -- Only scroll up in flight mode
-    if mario.flying or self.camera.y < game.level.height*self.tileSize-CAMERAHEIGHT then
-        if pYr < UPSCROLLBORDER then
-            self.camera.y = math.max(pY-UPSCROLLBORDER, self.camera.y - VAR("cameraScrollRate")*dt)
-        end
-    end
+    -- -- Only scroll up in flight mode
+    -- if mario.flying or self.camera.y < game.level.height*self.tileSize-CAMERAHEIGHT then
+    --     if pYr < UPSCROLLBORDER then
+    --         self.camera.y = math.max(pY-UPSCROLLBORDER, self.camera.y - VAR("cameraScrollRate")*dt)
+    --     end
+    -- end
     
-    -- And clamp it to map boundaries
-    self.camera.x = math.min(self.camera.x, game.level.width*self.tileSize - CAMERAWIDTH)
-    self.camera.x = math.max(self.camera.x, 0)
+    -- -- And clamp it to map boundaries
+    -- self.camera.x = math.min(self.camera.x, game.level.width*self.tileSize - CAMERAWIDTH)
+    -- self.camera.x = math.max(self.camera.x, 0)
     
-    self.camera.y = math.min(self.camera.y, game.level.height*self.tileSize - CAMERAHEIGHT)
-    self.camera.y = math.max(self.camera.y, 0)
+    -- self.camera.y = math.min(self.camera.y, game.level.height*self.tileSize - CAMERAHEIGHT)
+    -- self.camera.y = math.max(self.camera.y, 0)
+    
+    self.camera.x = self.marios[1].x+self.marios[1].width/2
+    self.camera.y = self.marios[1].y+self.marios[1].height/2
 end
 
 function Level:bumpBlock(x, y)
@@ -188,7 +197,7 @@ function Level:bumpBlock(x, y)
     end
 end
 
-function Level:objVisible(x, y, w, h)   
+function Level:objVisible(x, y, w, h)
     return x+w > self.camera.x and x < self.camera.x+CAMERAWIDTH and
         y+h > self.camera.y and y < self.camera.y+CAMERAHEIGHT
 end

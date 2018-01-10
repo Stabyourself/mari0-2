@@ -110,10 +110,10 @@ end
 
 function World:draw()
     -- Map
-    local xStart = math.floor(self.camera.x/self.tileSize)+1
+    local xStart = math.floor((self.camera.x-CAMERAWIDTH/2)/self.tileSize)+1
     local xEnd = xStart+WIDTH
 
-    local yStart = math.floor(self.camera.y/self.tileSize)+1
+    local yStart = math.floor((self.camera.y-CAMERAHEIGHT/2)/self.tileSize)+1
     local yEnd = yStart+HEIGHT
 
     for x = xStart, xEnd do
@@ -473,7 +473,8 @@ function World:mapToWorld(x, y)
 end
 
 function World:mapToScreen(x, y)
-    return x*self.tileSize-self.camera.x, y*self.tileSize-self.camera.y
+    local x, y = self:mapToWorld(x, y)
+    return self.camera:cameraCoords(x, y, 0, 0, CAMERAWIDTH, CAMERAHEIGHT)
 end
 
 function World:worldToMap(x, y)
@@ -481,7 +482,11 @@ function World:worldToMap(x, y)
 end
 
 function World:screenToMap(x, y)
-    return math.floor((x+self.camera.x)/self.tileSize)+1, math.floor((y+self.camera.y)/self.tileSize)+1
+    return self:worldToMap(self:screenToWorld(x, y))
+end
+
+function World:screenToWorld(x, y)
+    return self.camera:worldCoords(x, y, 0, 0, CAMERAWIDTH, CAMERAHEIGHT)
 end
 
 function World:attemptPortal(tileX, tileY, side, x, y, color, ignoreP)

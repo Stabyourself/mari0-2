@@ -1,8 +1,6 @@
 local Canvas = class("GUI.Canvas", GUI.Element)
 
-function Canvas:initialize(gui, x, y, w, h)
-    self.gui = gui
-    
+function Canvas:initialize(x, y, w, h)
     GUI.Element.initialize(self, x, y, w, h)
     
     self.children = {}

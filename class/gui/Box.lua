@@ -1,29 +1,5 @@
 local Box = class("GUI.Box", GUI.Element)
 
-local boxQuad = {
-    love.graphics.newQuad(0, 0, 2, 3, 5, 7),
-    love.graphics.newQuad(2, 0, 1, 3, 5, 7),
-    love.graphics.newQuad(3, 0, 2, 3, 5, 7),
-    love.graphics.newQuad(0, 3, 2, 1, 5, 7),
-    love.graphics.newQuad(2, 3, 1, 1, 5, 7),
-    love.graphics.newQuad(3, 3, 2, 1, 5, 7),
-    love.graphics.newQuad(0, 4, 2, 3, 5, 7),
-    love.graphics.newQuad(2, 4, 1, 3, 5, 7),
-    love.graphics.newQuad(3, 4, 2, 3, 5, 7),
-}
-
-local titledBoxQuad = {
-    love.graphics.newQuad(0, 0, 3, 12, 7, 17),
-    love.graphics.newQuad(3, 0, 1, 12, 7, 17),
-    love.graphics.newQuad(4, 0, 3, 12, 7, 17),
-    love.graphics.newQuad(0, 12, 3, 1, 7, 17),
-    love.graphics.newQuad(3, 12, 1, 1, 7, 17),
-    love.graphics.newQuad(4, 12, 3, 1, 7, 17),
-    love.graphics.newQuad(0, 13, 3, 4, 7, 17),
-    love.graphics.newQuad(3, 13, 1, 4, 7, 17),
-    love.graphics.newQuad(4, 13, 3, 4, 7, 17),
-}
-
 Box.movesToTheFront = true
 
 function Box:initialize(x, y, w, h)
@@ -74,10 +50,10 @@ function Box:draw(level)
     
     -- Border
     local img = self.gui.img.box
-    local quad = boxQuad
+    local quad = GUI.boxQuad
     if self.draggable then
         img = self.gui.img.boxTitled
-        quad = titledBoxQuad
+        quad = GUI.titledBoxQuad
     end
     
     GUI.drawBox(img, quad, 0, 0, self.w, self.h)

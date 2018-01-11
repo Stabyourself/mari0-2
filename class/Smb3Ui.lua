@@ -12,7 +12,8 @@ function Smb3Ui:initialize()
     self.coins = 0
     self.lives = 0
     
-    self.canvas = GUI.Canvas:new(defaultUI, 0, SCREENHEIGHT-VAR("uiHeight"), SCREENWIDTH, VAR("uiHeight"))
+    self.canvas = GUI.Canvas:new(0, SCREENHEIGHT-VAR("uiHeight"), SCREENWIDTH, VAR("uiHeight"))
+    self.canvas.gui = defaultUI
     self.canvas.background = {0, 0, 0}
     
     self.uiBox = GUI.Box:new(16, 3, 150, 26)

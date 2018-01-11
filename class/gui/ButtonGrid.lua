@@ -7,12 +7,13 @@ ButtonGrid.gutter = {1, 1}
 function ButtonGrid:initialize(x, y, img, buttons, func)
     self.img = img
     self.buttons = buttons
+    self.func = func
     
     GUI.Element.initialize(self, x, y, 0, 0)
     
     self:updateSize()
     
-    self.func = func --boogie nights
+    self.selected = nil
 end
 
 function ButtonGrid:update(dt, x, y, mouseBlocked)
@@ -71,8 +72,17 @@ function ButtonGrid:draw(level)
                 love.graphics.rectangle("fill", x, y, self.size[1], self.size[2])
                 love.graphics.setColor(1, 1, 1, 1)
             end
-            
         end
+    end
+    
+    if self.selected then
+        local tileX = (self.selected-1)%self.perRow+1
+        local tileY = math.ceil(self.selected/self.perRow)-1
+        
+        local x = (tileX-1)*(self.size[1] + self.gutter[1])
+        local y = tileY*(self.size[2] + self.gutter[2])
+        
+        GUI.drawBox(self.gui.img.box, GUI.boxQuad, x-2, y-3, 20, 22)
     end
     
     GUI.Element.draw(self, level)

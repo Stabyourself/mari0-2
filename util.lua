@@ -76,7 +76,7 @@ end
 
 function inITable(t, needle)
 	for i, v in ipairs(t) do
-		if v == needles then
+		if v == needle then
 			return i
 		end
 	end

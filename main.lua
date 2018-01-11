@@ -7,6 +7,7 @@ function love.load()
     love.window.setMode(400*VAR("scale"), 224*VAR("scale"), {
         vsync = VAR("vsync"),
         resizable = true,
+        msaa = msaa,
     })
 
     love.window.setTitle("Definitely not Mari0 2")
@@ -139,7 +140,7 @@ function love.load()
     game = Game:new()
 
     gameStateManager:loadState(game)
-    gameStateManager:addState(Editor:new())
+    gameStateManager:addState(Editor:new(game.level))
 end
 
 function love.update(dt)

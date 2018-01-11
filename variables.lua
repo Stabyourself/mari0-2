@@ -67,4 +67,8 @@ return {
             0, 16,
         }
     },
+    
+    editor = {
+        cameraSpeed = 300
+    }
 }

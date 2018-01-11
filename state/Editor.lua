@@ -2,16 +2,28 @@ Editor = class("Editor")
 
 local checkerboardImg = love.graphics.newImage("img/checkerboard.png")
 
+function Editor:initialize(level)
+    self.level = level
+end
+
 function Editor:load()
-    self.canvas = GUI.Canvas:new(defaultUI, 0, 0, SCREENWIDTH, SCREENHEIGHT)
+    self.canvas = GUI.Canvas:new(0, 0, SCREENWIDTH, SCREENHEIGHT)
+    self.canvas.gui = defaultUI
+    
     self.windows = {}
     
-    self.canvas:addChild(GUI.Button:new(10, 30, "don't press", function(button) self:newWindow("test", button) end))
-    self.canvas:addChild(GUI.Button:new(10, 10, "open tiles", function(button) self:newWindow("tileList", button) end))
+    self.menuBar = GUI.Canvas:new(0, 0, SCREENWIDTH, 14)
+    self.menuBar.background = {255, 255, 255}
+    self.menuBar.noClip = true
     
-    self.canvas:addChild(GUI.Checkbox:new(10, 50, "draw grid", function(checkbox) self:toggleGrid(checkbox.value) end))
+    self.canvas:addChild(self.menuBar)
     
-    self.tool = "paint"
+    self.menuBar:addChild(GUI.Button:new(0, 0, "open tiles", function(button) self:newWindow("tiles", button) end))
+    self.menuBar:addChild(GUI.Button:new(100, 0, "don't press", function(button) self:newWindow("test", button) end))
+    
+    self.menuBar:addChild(GUI.Checkbox:new(200, 2, "draw grid", function(checkbox) self:toggleGrid(checkbox.value) end))
+    
+    self:selectTool("paint")
     
     self.paint = {
         tile = 1,
@@ -28,33 +40,83 @@ function Editor:update(dt)
     self.canvas:update(dt)
     
     if self.paint.penDown then
-        local x, y = game.level:screenToMap(getWorldMouse())
+        local x, y = self.level:cameraToMap(getWorldMouse())
         
-        game.level:setMap(x, y, self.paint.tile)
+        self.level:setMap(x, y, self.paint.tile)
+    end
+    
+    if self.freeCamera then
+        local cameraSpeed = dt*VAR("editor").cameraSpeed--*(1/self.level.camera.scale)
+        
+        if keyDown("right") then
+            self.level.camera.x = self.level.camera.x + cameraSpeed
+        end
+        
+        if keyDown("left") then
+            self.level.camera.x = self.level.camera.x - cameraSpeed
+        end
+        
+        if keyDown("down") then
+            self.level.camera.y = self.level.camera.y + cameraSpeed
+        end
+        
+        if keyDown("up") then
+            self.level.camera.y = self.level.camera.y - cameraSpeed
+        end
     end
 end
 
 function Editor:draw()
+    self.level.camera:attach()
+    
     if self.tool == "paint" then
         local mouseX, mouseY = getWorldMouse()
-        local mapX, mapY = game.level:screenToMap(mouseX, mouseY)
-        local worldX, worldY = game.level:mapToScreen(mapX-1, mapY-1)
+        local mapX, mapY = self.level:cameraToMap(mouseX, mouseY)
+        local worldX, worldY = self.level:mapToWorld(mapX-1, mapY-1)
         
-        game.level.tileMap.tiles[self.paint.tile]:draw(worldX, worldY, true)
+        self.level.tileMap.tiles[self.paint.tile]:draw(worldX, worldY, true)
     end
     
     if self.showGrid then
-        game.level.camera:attach()
-        self.gridQuad:setViewport(-(CAMERAWIDTH/2)%game.level.tileSize, -(CAMERAHEIGHT/2)%game.level.tileSize, CAMERAWIDTH+game.level.tileSize, CAMERAHEIGHT+game.level.tileSize)
-        love.graphics.draw(self.gridImg, self.gridQuad, math.floor(game.level.camera.x/game.level.tileSize)*16-CAMERAWIDTH/2, math.floor(game.level.camera.y/game.level.tileSize)*16-CAMERAHEIGHT/2)
-        game.level.camera:detach()
+        local xl, yt = self.level:cameraToWorld(0, 0)
+        local xr, yb = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)
+        
+        self.gridQuad:setViewport(
+            (xl)%self.level.tileSize,
+            (yt)%self.level.tileSize,
+            xr-xl+self.level.tileSize,
+            yb-yt+self.level.tileSize
+        )
+        
+        love.graphics.draw(
+            self.gridImg,
+            self.gridQuad,
+            xl,
+            yt
+        )
     end
+    
+    self.level.camera:detach()
     
     self.canvas:draw()
 end
 
 function Editor:toggleGrid(on)
     self.showGrid = on
+end
+
+function Editor:selectTool(tool)
+    self.tool = tool
+    
+    if self.tool == "portal" then
+        self.level.camera.target = self.level.marios[1]
+        self.level.controlsEnabled = true
+        self.freeCamera = false
+    else
+        self.level.camera.target = nil
+        self.level.controlsEnabled = false
+        self.freeCamera = true
+    end
 end
 
 function Editor:newWindow(type, button)
@@ -67,7 +129,7 @@ function Editor:newWindow(type, button)
         testWindow.closeable = true
         testWindow.scrollable = {true, true}
         testWindow.title = "Why did you press"
-        testWindow.background = game.level.backgroundColor
+        testWindow.background = self.level.backgroundColor
         
         self.canvas:addChild(testWindow)
         
@@ -88,11 +150,11 @@ function Editor:newWindow(type, button)
         -- testWindow2.closeable = true
         -- testWindow2.scrollable = {true, true}
         -- testWindow2.title = "Why did you press"
-        -- testWindow2.background = game.level.backgroundColor
+        -- testWindow2.background = self.level.backgroundColor
         
         -- testWindow:addChild(testWindow2)
         
-    elseif type == "tileList" then
+    elseif type == "tiles" then
         local tileListWindow = GUI.Box:new(10, y, 200, 200)
         tileListWindow.draggable = true
         tileListWindow.resizeable = true
@@ -108,16 +170,21 @@ function Editor:newWindow(type, button)
         tileListWindow:addChild(backButton)
         
         
-        local tileListButtonGrid = GUI.ButtonGrid:new(5, 20, game.level.tileMap.img, game.level.tileMap.quad, function(buttonGrid, i) self:selectTile(i) end)
+        local tileListButtonGrid = GUI.ButtonGrid:new(5, 20, self.level.tileMap.img, self.level.tileMap.quad, 
+            function(buttonGrid, i) 
+                buttonGrid.selected = i
+                self:selectTile(i) 
+            end
+        )
         tileListWindow:addChild(tileListButtonGrid)
         
     end
 end
 
 function Editor:pipette(x, y)
-    local mapX, mapY = game.level:screenToMap(getWorldMouse())
+    local mapX, mapY = self.level:mouseToMap()
     
-    self.paint.tile = game.level.map[mapX][mapY]
+    self.paint.tile = self.level.map[mapX][mapY]
 end
 
 function Editor:selectTile(i)
@@ -163,10 +230,19 @@ function Editor:wheelmoved(x, y)
     end
 
     if y ~= 0 then
-        game.level.camera:zoom(1+y/10)
+        local zoom
+         
+        if y > 0 then -- out
+            zoom = 1.1^y
+        else
+            zoom = 1/(1.1^-y)
+        end
+        
+        self.level.camera:zoom(zoom)
     end
 end
 
 function Editor:resize(w, h)
     self.canvas:resize(w, h)
+    self.menuBar:resize(w, self.menuBar.h)
 end

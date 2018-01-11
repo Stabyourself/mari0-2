@@ -11,6 +11,30 @@ GUI.Slider = require(current_folder.. ".Slider")
 GUI.ButtonGrid = require(current_folder.. ".ButtonGrid")
 GUI.Checkbox = require(current_folder.. ".Checkbox")
 
+GUI.boxQuad = {
+    love.graphics.newQuad(0, 0, 2, 3, 5, 7),
+    love.graphics.newQuad(2, 0, 1, 3, 5, 7),
+    love.graphics.newQuad(3, 0, 2, 3, 5, 7),
+    love.graphics.newQuad(0, 3, 2, 1, 5, 7),
+    love.graphics.newQuad(2, 3, 1, 1, 5, 7),
+    love.graphics.newQuad(3, 3, 2, 1, 5, 7),
+    love.graphics.newQuad(0, 4, 2, 3, 5, 7),
+    love.graphics.newQuad(2, 4, 1, 3, 5, 7),
+    love.graphics.newQuad(3, 4, 2, 3, 5, 7),
+}
+
+GUI.titledBoxQuad = {
+    love.graphics.newQuad(0, 0, 3, 12, 7, 17),
+    love.graphics.newQuad(3, 0, 1, 12, 7, 17),
+    love.graphics.newQuad(4, 0, 3, 12, 7, 17),
+    love.graphics.newQuad(0, 12, 3, 1, 7, 17),
+    love.graphics.newQuad(3, 12, 1, 1, 7, 17),
+    love.graphics.newQuad(4, 12, 3, 1, 7, 17),
+    love.graphics.newQuad(0, 13, 3, 4, 7, 17),
+    love.graphics.newQuad(3, 13, 1, 4, 7, 17),
+    love.graphics.newQuad(4, 13, 3, 4, 7, 17),
+}
+
 function GUI:initialize(folder)
     self.folder = folder
     
@@ -63,13 +87,13 @@ function GUI.drawBox(img, quad, x, y, w, h)
     local _, _, _, h2 = quad[4]:getViewport()
     local _, _, _, h3 = quad[7]:getViewport()
     
-    love.graphics.draw(img, quad[1], 0, 0)
-    love.graphics.draw(img, quad[2], w1, 0, 0, w-w1-w3, 1)
-    love.graphics.draw(img, quad[3], w-w3, 0)
-    love.graphics.draw(img, quad[4], 0, h1, 0, 1, h-h1-h3)
-    love.graphics.draw(img, quad[5], w1, h1, 0, w-w1-w3, h-h1-h3)
-    love.graphics.draw(img, quad[6], w-w3, h1, 0, 1, h-h1-h3)
-    love.graphics.draw(img, quad[7], 0, h-h3)
-    love.graphics.draw(img, quad[8], w1, h-h3, 0, w-w1-w3, 1)
-    love.graphics.draw(img, quad[9], w-w3, h-h3)
+    love.graphics.draw(img, quad[1], x, y)
+    love.graphics.draw(img, quad[2], x+w1, y, 0, w-w1-w3, 1)
+    love.graphics.draw(img, quad[3], x+w-w3, y)
+    love.graphics.draw(img, quad[4], x, y+h1, 0, 1, h-h1-h3)
+    love.graphics.draw(img, quad[5], x+w1, y+h1, 0, w-w1-w3, h-h1-h3)
+    love.graphics.draw(img, quad[6], x+w-w3, y+h1, 0, 1, h-h1-h3)
+    love.graphics.draw(img, quad[7], x, y+h-h3)
+    love.graphics.draw(img, quad[8], x+w1, y+h-h3, 0, w-w1-w3, 1)
+    love.graphics.draw(img, quad[9], x+w-w3, y+h-h3)
 end

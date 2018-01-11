@@ -14,9 +14,9 @@ function Level:initialize(path, tileMap)
     self.backgroundColor[3] = self.backgroundColor[3]/255
     
     -- Camera stuff
-    self.camera = Camera.new(0, self.height*self.tileSize - CAMERAHEIGHT, CAMERAWIDTH, CAMERAHEIGHT)
+    self.camera = Camera.new(0, 0, CAMERAWIDTH, CAMERAHEIGHT)
     
-    self.camera.rot = 1
+    self.camera.rot = 0
     self.spawnLine = 0
     self.spawnI = 1
 
@@ -48,6 +48,8 @@ function Level:initialize(path, tileMap)
     local x, y = self:mapToWorld(self.spawnX-.5, self.spawnY)
     
     table.insert(self.marios, Smb3Mario:new(self, x, y, "raccoon"))
+    
+    self.camera.target = self.marios[1]
 
     self:spawnEnemies(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end
@@ -177,8 +179,10 @@ function Level:updateCamera(dt)
     -- self.camera.y = math.min(self.camera.y, game.level.height*self.tileSize - CAMERAHEIGHT)
     -- self.camera.y = math.max(self.camera.y, 0)
     
-    self.camera.x = self.marios[1].x+self.marios[1].width/2+0.001
-    self.camera.y = self.marios[1].y+self.marios[1].height/2+0.001
+    if self.camera.target then
+        self.camera.x = self.marios[1].x+self.marios[1].width/2+0.001
+        self.camera.y = self.marios[1].y+self.marios[1].height/2+0.001
+    end
 end
 
 function Level:bumpBlock(x, y)
@@ -199,6 +203,14 @@ function Level:bumpBlock(x, y)
 end
 
 function Level:objVisible(x, y, w, h)
-    return x+w > self.camera.x and x < self.camera.x+CAMERAWIDTH and
-        y+h > self.camera.y and y < self.camera.y+CAMERAHEIGHT
+    local lx, ty = self.camera:worldCoords(0, 0)
+    local rx, by = self.camera:worldCoords(CAMERAWIDTH, CAMERAHEIGHT)
+    
+    return x+w > lx and x < rx and
+        y+h > ty and y < by
+end
+
+function Level:resize(w, h)
+    self.camera.w = w
+    self.camera.h = h
 end

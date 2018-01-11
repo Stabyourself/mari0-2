@@ -36,7 +36,9 @@ function Mario:initialize(world, x, y, powerUpState)
 end
 
 function Mario:update(dt)
-    self:movement(dt)
+    if self.world.controlsEnabled then
+        self:movement(dt)
+    end
     
     if CHEAT("tumble") then
         self.angle = self.angle + self.groundSpeedX*dt*0.1
@@ -55,7 +57,7 @@ function Mario:postMovementUpdate(dt)
         y = y,
     }
     
-    local mx, my = self.world:mousePosition(0, 0, CAMERAWIDTH, CAMERAHEIGHT)
+    local mx, my = self.world:mouseToWorld()
     
     self.crosshair.angle = math.atan2(my-y, mx-x)
     

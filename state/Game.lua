@@ -62,6 +62,7 @@ end
 
 function Game:resize(w, h)
     smb3ui:resize(w, h)
+    self.level:resize(w, h)
 end
 
 function Game:keypressed(key)

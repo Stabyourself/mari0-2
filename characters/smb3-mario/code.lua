@@ -1195,6 +1195,10 @@ function Character:animation(dt)
 end
 
 function Character:jump()
+    if not self.world.controlsEnabled then
+        return
+    end
+    
     if self.char.canFly and self.flying and (self.state.name == "jump" or self.state.name == "fly" or self.state.name == "fall") then
         self:switchState("fly")
         self.flyAnimationTimer = 0
@@ -1266,6 +1270,10 @@ function Character:startFall()
 end
 
 function Character:spin() -- that's a good trick
+    if not self.world.controlsEnabled then
+        return
+    end
+    
     if self.char.canSpin and not self.spinning then
         if not keyDown("down") then -- Make sure it's not colliding with any of the other states
             self.spinning = true
@@ -1276,11 +1284,19 @@ function Character:spin() -- that's a good trick
 end
 
 function Character:star()
+    if not self.world.controlsEnabled then
+        return
+    end
+    
     self.starMan = true
     self.starTimer = 0
 end
 
 function Character:shoot()
+    if not self.world.controlsEnabled then
+        return
+    end
+    
     if self.char.canShoot and not self.shooting then
         if not self.ducking then -- Make sure it's not colliding with any of the other states
             -- This is where I'd spawn some fireballs.

@@ -106,11 +106,13 @@ end
 
 function World:draw()
     -- Map
-    local xStart = math.floor((self.camera.x-CAMERAWIDTH/2)/self.tileSize)+1
-    local xEnd = xStart+WIDTH
+    local lx, ty = self:cameraToMap(0, 0)
+    local rx, by = self:cameraToMap(CAMERAWIDTH, CAMERAHEIGHT)
+    local xStart = lx-1
+    local xEnd = rx
 
-    local yStart = math.floor((self.camera.y-CAMERAHEIGHT/2)/self.tileSize)+1
-    local yEnd = yStart+HEIGHT
+    local yStart = ty-1
+    local yEnd = by
 
     for x = xStart, xEnd do
         for y = yStart, yEnd do
@@ -312,7 +314,9 @@ function World:checkMapCollision(obj, x, y)
 end
 
 function World:setMap(x, y, i)
-    self.map[x][y] = i
+    if self:inMap(x, y) then
+        self.map[x][y] = i
+    end
 end
 
 function World:getTile(x, y)
@@ -468,7 +472,7 @@ function World:mapToWorld(x, y)
     return x*self.tileSize, y*self.tileSize
 end
 
-function World:mapToScreen(x, y)
+function World:mapToCamera(x, y)
     local x, y = self:mapToWorld(x, y)
     return self.camera:cameraCoords(x, y)
 end
@@ -477,19 +481,26 @@ function World:worldToMap(x, y)
     return math.floor(x/self.tileSize)+1, math.floor(y/self.tileSize)+1
 end
 
-function World:screenToMap(x, y)
-    return self:worldToMap(self:screenToWorld(x, y))
+function World:cameraToMap(x, y)
+    return self:worldToMap(self:cameraToWorld(x, y))
 end
 
-function World:screenToWorld(x, y)
+function World:cameraToWorld(x, y)
     return self.camera:worldCoords(x, y)
 end
 
-function World:mousePosition()
+function World:mouseToWorld()
     local x, y = love.mouse.getPosition()
     x, y = x/VAR("scale"), y/VAR("scale")
 
     return self.camera:worldCoords(x, y)
+end
+
+function World:mouseToMap()
+    local x, y = love.mouse.getPosition()
+    x, y = x/VAR("scale"), y/VAR("scale")
+    
+    return self:cameraToMap(x, y)
 end
 
 function World:attemptPortal(tileX, tileY, side, x, y, color, ignoreP)

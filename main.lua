@@ -363,13 +363,13 @@ function worldDraw(...)
     local arg = {...}
 
     if type(arg[2]) == "number" then
-        arg[2] = math.round(arg[2]*VAR("scale"))/VAR("scale")
-        arg[3] = math.round(arg[3]*VAR("scale"))/VAR("scale")
+        -- arg[2] = math.round(arg[2]*VAR("scale"))/VAR("scale")
+        -- arg[3] = math.round(arg[3]*VAR("scale"))/VAR("scale")
         
         love.graphics.draw(arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8])
     else
-        arg[3] = math.round(arg[3]*VAR("scale"))/VAR("scale")
-        arg[4] = math.round(arg[4]*VAR("scale"))/VAR("scale")
+        -- arg[3] = math.round(arg[3]*VAR("scale"))/VAR("scale")
+        -- arg[4] = math.round(arg[4]*VAR("scale"))/VAR("scale")
         
         love.graphics.draw(arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8], arg[9])
     end

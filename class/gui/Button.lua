@@ -12,10 +12,10 @@ local buttonQuad = {
     love.graphics.newQuad(9, 9, 8, 8, 17, 17),
 }
 
-Button.padding = 1
-
-function Button:initialize(x, y, s, border, func)
+function Button:initialize(x, y, s, border, padding, func)
     self.s = s
+    self.padding = padding or 1
+    
     local w = self.padding*2
     local h = self.padding*2
     

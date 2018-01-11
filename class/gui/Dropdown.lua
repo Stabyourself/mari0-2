@@ -3,7 +3,7 @@ local Dropdown = class("GUI.Dropdown", GUI.Element)
 Dropdown.noClip = true
 
 function Dropdown:initialize(x, y, s)
-    self.button = GUI.Button:new(0, 0, s, true, function() self:toggle() end)
+    self.button = GUI.Button:new(0, 0, s, false, 3, function() self:toggle() end)
     
     self.box = GUI.Box:new(0, 14, 50, 100)
     self.box.background = {255, 255, 255}

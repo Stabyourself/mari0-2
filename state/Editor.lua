@@ -12,14 +12,14 @@ function Editor:load()
     
     self.windows = {}
     
-    self.menuBar = GUI.Canvas:new(0, 0, SCREENWIDTH, 16)
+    self.menuBar = GUI.Canvas:new(0, 0, SCREENWIDTH, 14)
     self.menuBar.background = {255, 255, 255}
     self.menuBar.noClip = true
     
     self.canvas:addChild(self.menuBar)
     
     
-    local fileDropdown = GUI.Dropdown:new(1, 1, "file")
+    local fileDropdown = GUI.Dropdown:new(0, 0, "file")
     
     self.menuBar:addChild(fileDropdown)
     
@@ -27,20 +27,20 @@ function Editor:load()
     
     
     
-    self.newWindowDropdown = GUI.Dropdown:new(43, 1, "window")
+    self.newWindowDropdown = GUI.Dropdown:new(38, 0, "window")
     
     self.menuBar:addChild(self.newWindowDropdown)
     
-    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 0, "tiles", false, function(button) self:newWindow("tiles", button) end))
-    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 10, "minimap", false, function(button) self:newWindow("tiles", button) end))
-    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 20, "map options", false, function(button) self:newWindow("tiles", button) end))
+    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 0, "tiles", false, 1, function(button) self:newWindow("tiles", button) end))
+    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 10, "minimap", false, 1, function(button) self:newWindow("tiles", button) end))
+    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 20, "map options", false, 1, function(button) self:newWindow("tiles", button) end))
     
     self.newWindowDropdown:autoSize()
     
     
     
     
-    local viewDropdown = GUI.Dropdown:new(101, 1, "view")
+    local viewDropdown = GUI.Dropdown:new(92, 0, "view")
     
     self.menuBar:addChild(viewDropdown)
     
@@ -53,7 +53,7 @@ function Editor:load()
     
     -- self.menuBar:addChild())
     
-    self:selectTool("portal")
+    self:selectTool("paint")
     
     self.paint = {
         tile = 1,
@@ -198,7 +198,7 @@ function Editor:newWindow(type, button)
         self.canvas:addChild(tileListWindow)
         
         
-        local backButton = GUI.Button:new(0, 0, "< back", function() print("woah") end)
+        local backButton = GUI.Button:new(0, 0, "< back", true, 1, function() print("woah") end)
         tileListWindow:addChild(backButton)
         
         

@@ -56,7 +56,9 @@ function Mario:postMovementUpdate(dt)
         y = y,
     }
     
-    local mx, my = (love.mouse.getX())/VAR("scale")+game.level.camera.x, love.mouse.getY()/VAR("scale")+game.level.camera.y
+    --print(self.world:screenToWorld(100, 0))
+    local mx, my = self.world.camera:mousePosition(0, 0, CAMERAWIDTH, CAMERAHEIGHT)
+    
     self.crosshair.angle = math.atan2(my-y, mx-x)
     
     self.portalGunAngle = self.crosshair.angle

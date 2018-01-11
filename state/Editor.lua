@@ -44,8 +44,10 @@ function Editor:draw()
     end
     
     if self.showGrid then
-        self.gridQuad:setViewport(game.level.camera.x%game.level.tileSize, game.level.camera.y%game.level.tileSize, CAMERAWIDTH+game.level.tileSize, CAMERAHEIGHT+game.level.tileSize)
+        game.level.camera:attach(0, 0, CAMERAWIDTH, CAMERAHEIGHT)
+        self.gridQuad:setViewport(0, 0, CAMERAWIDTH+game.level.tileSize, CAMERAHEIGHT+game.level.tileSize)
         love.graphics.draw(self.gridImg, self.gridQuad, 0, 0)
+        game.level.camera:detach()
     end
     
     self.canvas:draw()
@@ -156,7 +158,13 @@ function Editor:mousereleased(x, y, button)
 end
 
 function Editor:wheelmoved(x, y)
-    self.canvas:wheelmoved(x, y)
+    if self.canvas:wheelmoved(x, y) then
+        return true
+    end
+
+    if y ~= 0 then
+        game.level.camera:zoom(1+y/10)
+    end
 end
 
 function Editor:resize(w, h)

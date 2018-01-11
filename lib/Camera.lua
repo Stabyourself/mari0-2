@@ -168,7 +168,11 @@ end
 
 function camera:mousePosition(ox,oy,w,h)
 	local mx,my = love.mouse.getPosition()
-	return self:worldCoords(mx,my, ox,oy,w,h)
+
+	mx = mx/VAR("scale")
+	my = my/VAR("scale")
+	
+	return self:worldCoords(mx, my, ox,oy,w,h)
 end
 
 -- camera scrolling utilities

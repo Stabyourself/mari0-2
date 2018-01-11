@@ -25,7 +25,7 @@ function GameStateManager:event(event, ...)
         end
     end
 
-    if inTable(self.reversedStates, event) then
+    if inITable(self.reversedStates, event) then
         for i = #self.activeStates, 1, -1 do
             local v = self.activeStates[i]
 

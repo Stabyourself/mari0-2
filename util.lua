@@ -74,6 +74,15 @@ function inTable(t, needle)
 	return false
 end
 
+function inITable(t, needle)
+	for i, v in ipairs(t) do
+		if v == needles then
+			return i
+		end
+	end
+	return false
+end
+
 function math.round(i, decimals)
     local factor = math.pow(10, decimals or 0)
     

@@ -64,9 +64,9 @@ function World:checkPortaling(obj, oldX, oldY)
             local iX, iY = linesIntersect(oldX+obj.width/2, oldY+obj.height/2, obj.x+obj.width/2, obj.y+obj.height/2, p.x1, p.y1, p.x2, p.y2)
             
             if iX then
-                local x, y, velocity = obj.x+obj.width/2, obj.y+obj.height/2, Vector(obj.groundSpeedX, obj.speed[2])
-                local angle = math.atan2(velocity.y, velocity.x)
-                local speed = math.sqrt(velocity.x^2+velocity.y^2)
+                local x, y, velocityX, velocityY = obj.x+obj.width/2, obj.y+obj.height/2, obj.groundSpeedX, obj.speed[2]
+                local angle = math.atan2(velocityY, velocityX)
+                local speed = math.sqrt(velocityX^2+velocityY^2)
                 
                 local outX, outY, outAngle, angleDiff, reversed = self:doPortal(p, x, y, angle)
                 
@@ -86,8 +86,8 @@ function World:checkPortaling(obj, oldX, oldY)
                 table.insert(self.portalVectorDebugs, {
                     inX = x,
                     inY = y,
-                    inVX = velocity.x,
-                    inVY = velocity.y,
+                    inVX = velocityX,
+                    inVY = velocityY,
                     
                     outX = obj.x,
                     outY = obj.y,

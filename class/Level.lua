@@ -60,9 +60,6 @@ function Level:update(dt)
     if newSpawnLine > self.spawnLine then
         self:spawnEnemies(newSpawnLine)
     end
-    
-    local x, y = love.mouse.getPosition()
-    x, y = x/VAR("scale"), y/VAR("scale")
 end
 
 function Level:draw()
@@ -173,8 +170,8 @@ function Level:updateCamera(dt)
     -- self.camera.y = math.min(self.camera.y, game.level.height*self.tileSize - CAMERAHEIGHT)
     -- self.camera.y = math.max(self.camera.y, 0)
     
-    self.camera.x = self.marios[1].x+self.marios[1].width/2
-    self.camera.y = self.marios[1].y+self.marios[1].height/2+.1
+    self.camera.x = self.marios[1].x+self.marios[1].width/2+0.001
+    self.camera.y = self.marios[1].y+self.marios[1].height/2+0.001
 end
 
 function Level:bumpBlock(x, y)

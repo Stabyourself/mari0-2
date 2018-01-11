@@ -1,5 +1,7 @@
 local Canvas = class("GUI.Canvas", GUI.Element)
 
+Canvas.movesToTheFront = true
+
 function Canvas:initialize(x, y, w, h)
     GUI.Element.initialize(self, x, y, w, h)
     

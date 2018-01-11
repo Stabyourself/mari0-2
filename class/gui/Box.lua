@@ -15,6 +15,8 @@ function Box:initialize(x, y, w, h)
     
     self.posMax[1] = -3
     self.posMax[2] = -4
+    
+    self.childBox = {2, 3, self.w-4, self.h-6}
 end
 
 function Box:update(dt, x, y, mouseBlocked)
@@ -42,6 +44,7 @@ function Box:draw(level)
         self.backgroundQuad:setViewport(self.scroll[1]%4, self.scroll[2]%4, self.childBox[3], self.childBox[4])
         self.background:setWrap("repeat", "repeat")
             
+        love.graphics.setColor(1, 1, 1)
         love.graphics.draw(self.background, self.backgroundQuad, self.childBox[1], self.childBox[2])
     end
     

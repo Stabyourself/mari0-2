@@ -113,6 +113,11 @@ function World:draw()
 
     local yStart = ty-1
     local yEnd = by
+    
+    xStart = math.clamp(xStart, 1, self.width)
+    yStart = math.clamp(yStart, 1, self.height)
+    xEnd = math.clamp(xEnd, 1, self.width)
+    yEnd = math.clamp(yEnd, 1, self.height)
 
     for x = xStart, xEnd do
         for y = yStart, yEnd do

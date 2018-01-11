@@ -10,6 +10,7 @@ GUI.Button = require(current_folder.. ".Button")
 GUI.Slider = require(current_folder.. ".Slider")
 GUI.ButtonGrid = require(current_folder.. ".ButtonGrid")
 GUI.Checkbox = require(current_folder.. ".Checkbox")
+GUI.Dropdown = require(current_folder.. ".Dropdown")
 
 GUI.boxQuad = {
     love.graphics.newQuad(0, 0, 2, 3, 5, 7),

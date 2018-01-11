@@ -32,6 +32,8 @@ function Element:initialize(x, y, w, h)
     
     self.childBox = {0, 0, self.w, self.h}
     
+    self.visible = true
+    
     self.children = {}
 end
 
@@ -47,6 +49,8 @@ function Element:addChild(element)
     element.gui = self.gui
     element.parent = self
     table.insert(self.children, element)
+    
+    element:onAssign()
 end
 
 function Element:removeChild(element)
@@ -65,16 +69,17 @@ function Element:update(dt, x, y, mouseBlocked)
     end
     
     self.mouse = {x, y}
-    self.mouseBlocked = mouseBlocked
+    self.mouseBlocked = mouseBlocked or not self.visible
 
     local childMouseBlocked = self.mouseBlocked
 
-    if  self.mouse[1] < self.childBox[1] or self.mouse[1] >= self.childBox[1]+self:getInnerWidth() or
-        self.mouse[2] < self.childBox[2] or self.mouse[2] >= self.childBox[2]+self:getInnerHeight() then
-        childMouseBlocked = true
+    if not self.noClip then
+        if  self.mouse[1] < self.childBox[1] or self.mouse[1] >= self.childBox[1]+self:getInnerWidth() or
+            self.mouse[2] < self.childBox[2] or self.mouse[2] >= self.childBox[2]+self:getInnerHeight() then
+            childMouseBlocked = true
+        end
     end
 
-    
     for i = #self.children, 1, -1 do
         local v = self.children[i]
         
@@ -191,18 +196,26 @@ function Element:draw(level)
     -- Stencil in
     level = level or 1
     
-    love.graphics.stencil(function()
-        love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
-    end, "increment", 1, not clear)
-    
-    love.graphics.setStencilTest("equal", level)
-    
+    if not self.noClip then
+        love.graphics.stencil(function()
+            love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
+        end, "increment", 1, not clear)
+        
+        love.graphics.setStencilTest("equal", level)
+    end
     
     love.graphics.translate(-self.scroll[1]+self.childBox[1], -self.scroll[2]+self.childBox[2])
 
-    level = level or 1
+    local childLevel = level
+    
+    if not self.noClip then
+        childLevel = childLevel + 1
+    end
+    
     for _, v in ipairs(self.children) do
-        v:draw(level+1)
+        if v.visible then
+            v:draw(childLevel)
+        end
     end
     
     love.graphics.translate(self.scroll[1]-self.childBox[1], self.scroll[2]-self.childBox[2])
@@ -235,13 +248,11 @@ function Element:draw(level)
         end
     end
     
-    
-    -- Stencil out
-    level = level or 1
-    
-    love.graphics.stencil(function()
-        love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
-    end, "decrement", 1, true)
+    if not self.noClip then
+        love.graphics.stencil(function()
+            love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
+        end, "decrement", 1, true)
+    end
     
     if level > 1 then
         love.graphics.setStencilTest("equal", level-1)
@@ -292,41 +303,45 @@ function Element:getInnerWidth()
 end
 
 function Element:mousepressed(x, y, button)
+    local toReturn = false
+    
     if self.scrollable[1] and self.hasScrollbar[1] and self:scrollCollision(1, x, y) then
         self.scrolling[1] = true
         self.scrollingDragOffset[1] = x-self:getScrollbarPos(1)
 
-        return true
+        toReturn = true
     end
 
     if self.scrollable[2] and self.hasScrollbar[2] and self:scrollCollision(2, x, y) then
         self.scrolling[2] = true
         self.scrollingDragOffset[2] = y-self:getScrollbarPos(2)
 
-        return true
+        toReturn = true
     end
     
-    if x >= self.childBox[1] and x < self:getInnerWidth()+self.childBox[1] and y >= self.childBox[2] and y < self:getInnerHeight()+self.childBox[2] then
-        for i = #self.children, 1, -1 do
-            local v = self.children[i]
-            
-            if v.mousepressed then
-                local lx = x-self.childBox[1]-v.x+self.scroll[1]
-                local ly = y-self.childBox[2]-v.y+self.scroll[2]
+    for i = #self.children, 1, -1 do
+        local v = self.children[i]
+        
+        if v.mousepressed then
+            local lx = x-self.childBox[1]-v.x+self.scroll[1]
+            local ly = y-self.childBox[2]-v.y+self.scroll[2]
 
-                v:mousepressed(lx, ly, button)
+            v:mousepressed(lx, ly, button)
 
+            if not toReturn then
                 if lx >= 0 and lx < v.w and ly >= 0 and ly < v.h then
                     -- push that element to the end
                     if v.movesToTheFront then
                         table.insert(self.children, table.remove(self.children, i))
                     end
 
-                    return true
+                    toReturn = true
                 end
             end
         end
     end
+    
+    return toReturn
 end
 
 function Element:mousereleased(x, y, button)
@@ -387,5 +402,17 @@ function Element:getChildrenSize()
     
     return w, h
 end
+
+function Element:autoSize()
+    local w, h = self:getChildrenSize()
+    
+    self.w = self.childBox[1]*2+w
+    self.h = self.childBox[2]*2+h
+    
+    self.childBox[3] = w
+    self.childBox[4] = h
+end
+
+function Element:onAssign() end
     
 return Element

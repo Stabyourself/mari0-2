@@ -12,18 +12,48 @@ function Editor:load()
     
     self.windows = {}
     
-    self.menuBar = GUI.Canvas:new(0, 0, SCREENWIDTH, 14)
+    self.menuBar = GUI.Canvas:new(0, 0, SCREENWIDTH, 16)
     self.menuBar.background = {255, 255, 255}
     self.menuBar.noClip = true
     
     self.canvas:addChild(self.menuBar)
     
-    self.menuBar:addChild(GUI.Button:new(0, 0, "open tiles", function(button) self:newWindow("tiles", button) end))
-    self.menuBar:addChild(GUI.Button:new(100, 0, "don't press", function(button) self:newWindow("test", button) end))
     
-    self.menuBar:addChild(GUI.Checkbox:new(200, 2, "draw grid", function(checkbox) self:toggleGrid(checkbox.value) end))
+    local fileDropdown = GUI.Dropdown:new(1, 1, "file")
     
-    self:selectTool("paint")
+    self.menuBar:addChild(fileDropdown)
+    
+    fileDropdown:autoSize()
+    
+    
+    
+    self.newWindowDropdown = GUI.Dropdown:new(43, 1, "window")
+    
+    self.menuBar:addChild(self.newWindowDropdown)
+    
+    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 0, "tiles", false, function(button) self:newWindow("tiles", button) end))
+    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 10, "minimap", false, function(button) self:newWindow("tiles", button) end))
+    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 20, "map options", false, function(button) self:newWindow("tiles", button) end))
+    
+    self.newWindowDropdown:autoSize()
+    
+    
+    
+    
+    local viewDropdown = GUI.Dropdown:new(101, 1, "view")
+    
+    self.menuBar:addChild(viewDropdown)
+    
+    viewDropdown.box:addChild(GUI.Checkbox:new(0, 0, "draw grid", 1, function(checkbox) self:toggleGrid(checkbox.value) end))
+    viewDropdown.box:addChild(GUI.Checkbox:new(0, 11, "autoscroll", 1, function(checkbox)  end))
+    
+    
+    viewDropdown:autoSize()
+    -- self.menuBar:addChild(GUI.Button:new(100, 0, "don't press", function(button) self:newWindow("test", button) end))
+    
+    -- self.menuBar:addChild())
+    
+    self:selectTool("portal")
     
     self.paint = {
         tile = 1,
@@ -121,6 +151,8 @@ end
 
 function Editor:newWindow(type, button)
     local y = button.y+button.h-1
+    
+    self.newWindowDropdown:toggle(false)
 
     if type == "test" then
         local testWindow = GUI.Box:new(10, y, 100, 100)
@@ -184,7 +216,9 @@ end
 function Editor:pipette(x, y)
     local mapX, mapY = self.level:mouseToMap()
     
-    self.paint.tile = self.level.map[mapX][mapY]
+    if self.level:inMap(mapX, mapY) then
+        self.paint.tile = self.level.map[mapX][mapY]
+    end
 end
 
 function Editor:selectTile(i)

@@ -14,10 +14,21 @@ local buttonQuad = {
 
 Button.padding = 1
 
-function Button:initialize(x, y, s, func)
+function Button:initialize(x, y, s, border, func)
     self.s = s
-    local w = self.padding*2+4
-    local h = self.padding*2+4
+    local w = self.padding*2
+    local h = self.padding*2
+    
+    self.border = border
+    
+    local textOff = 0
+    
+    if self.border then
+        w = w + 4
+        h = h + 4
+        
+        textOff = 2
+    end
     
     if self.s then
         w = w+#self.s*8
@@ -27,7 +38,7 @@ function Button:initialize(x, y, s, func)
     GUI.Element.initialize(self, x, y, w, h)
     
     if self.s then
-        self:addChild(GUI.Text:new(self.s, 2+self.padding, 2+self.padding))
+        self:addChild(GUI.Text:new(self.s, textOff+self.padding, textOff+self.padding))
     end
     
     self.func = func
@@ -44,23 +55,36 @@ function Button:draw(level)
     
     love.graphics.setColor(1, 1, 1)
     
-    local img = self.gui.img.button
-    
-    if self.pressing then
-        img = self.gui.img.buttonActive
-    elseif self:getCollision(self.mouse[1], self.mouse[2]) then
-        img = self.gui.img.buttonHover
+    if self.border then
+        local img = self.gui.img.button
+        
+        if self.pressing then
+            img = self.gui.img.buttonActive
+        elseif self:getCollision(self.mouse[1], self.mouse[2]) then
+            img = self.gui.img.buttonHover
+        end
+        
+        love.graphics.draw(img, buttonQuad[1], -6, -6)
+        love.graphics.draw(img, buttonQuad[2], 2, -6, 0, self.w-4, 1)
+        love.graphics.draw(img, buttonQuad[3], self.w-2, -6)
+        love.graphics.draw(img, buttonQuad[4], -6, 2, 0, 1, self.h-4)
+        love.graphics.draw(img, buttonQuad[5], 2, 2, 0, self.w-4, self.h-4)
+        love.graphics.draw(img, buttonQuad[6], self.w-2, 2, 0, 1, self.h-4)
+        love.graphics.draw(img, buttonQuad[7], -6, self.h-2)
+        love.graphics.draw(img, buttonQuad[8], 2, self.h-2, 0, self.w-4, 1)
+        love.graphics.draw(img, buttonQuad[9], self.w-2, self.h-2)
+    else
+        love.graphics.setColor(1, 1, 1)
+        
+        if self.pressing then
+            love.graphics.setColor(0.625, 0.625, 0.625)
+        elseif self:getCollision(self.mouse[1], self.mouse[2]) then
+            love.graphics.setColor(0.75, 0.75, 0.75)
+        end
+        
+        love.graphics.rectangle("fill", 0, 0, self.w, self.h)
+        love.graphics.setColor(1, 1, 1)
     end
-    
-    love.graphics.draw(img, buttonQuad[1], -6, -6)
-    love.graphics.draw(img, buttonQuad[2], 2, -6, 0, self.w-4, 1)
-    love.graphics.draw(img, buttonQuad[3], self.w-2, -6)
-    love.graphics.draw(img, buttonQuad[4], -6, 2, 0, 1, self.h-4)
-    love.graphics.draw(img, buttonQuad[5], 2, 2, 0, self.w-4, self.h-4)
-    love.graphics.draw(img, buttonQuad[6], self.w-2, 2, 0, 1, self.h-4)
-    love.graphics.draw(img, buttonQuad[7], -6, self.h-2)
-    love.graphics.draw(img, buttonQuad[8], 2, self.h-2, 0, self.w-4, 1)
-    love.graphics.draw(img, buttonQuad[9], self.w-2, self.h-2)
     
     GUI.Element.draw(self, level)
     

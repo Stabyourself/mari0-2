@@ -2,9 +2,11 @@ Checkbox = class("GUI.Checkbox", GUI.Element)
 
 Checkbox.checkBoxPadding = 2
 
-function Checkbox:initialize(x, y, s, func)
+function Checkbox:initialize(x, y, s, padding, func)
     self.s = s
-    local w, h = 10, 10
+    self.padding = padding or 0
+    
+    local w, h = 10+self.padding*2, 10+self.padding*2
     
     if self.s then
         w = w + #self.s*8 + Checkbox.checkBoxPadding
@@ -13,7 +15,7 @@ function Checkbox:initialize(x, y, s, func)
     GUI.Element.initialize(self, x, y, w, h)
     
     if self.s then
-        self:addChild(GUI.Text:new(self.s, 10+self.checkBoxPadding, 1))
+        self:addChild(GUI.Text:new(self.s, 10+self.checkBoxPadding+self.padding, self.padding+1))
     end
     
     self.func = func --boogie nights
@@ -45,7 +47,7 @@ function Checkbox:draw(level)
         img = img.off
     end
     
-    love.graphics.draw(img, 0, 0)
+    love.graphics.draw(img, self.padding, self.padding)
     
     GUI.Element.draw(self, level)
     

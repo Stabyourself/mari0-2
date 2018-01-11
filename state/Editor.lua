@@ -44,9 +44,9 @@ function Editor:draw()
     end
     
     if self.showGrid then
-        game.level.camera:attach(0, 0, CAMERAWIDTH, CAMERAHEIGHT)
-        self.gridQuad:setViewport(0, 0, CAMERAWIDTH+game.level.tileSize, CAMERAHEIGHT+game.level.tileSize)
-        love.graphics.draw(self.gridImg, self.gridQuad, 0, 0)
+        game.level.camera:attach()
+        self.gridQuad:setViewport(-(CAMERAWIDTH/2)%game.level.tileSize, -(CAMERAHEIGHT/2)%game.level.tileSize, CAMERAWIDTH+game.level.tileSize, CAMERAHEIGHT+game.level.tileSize)
+        love.graphics.draw(self.gridImg, self.gridQuad, math.floor(game.level.camera.x/game.level.tileSize)*16-CAMERAWIDTH/2, math.floor(game.level.camera.y/game.level.tileSize)*16-CAMERAHEIGHT/2)
         game.level.camera:detach()
     end
     

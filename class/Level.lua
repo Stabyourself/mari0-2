@@ -14,8 +14,9 @@ function Level:initialize(path, tileMap)
     self.backgroundColor[3] = self.backgroundColor[3]/255
     
     -- Camera stuff
-    self.camera = Camera.new()
-    self.camera.y = self.height*self.tileSize - CAMERAHEIGHT
+    self.camera = Camera.new(0, self.height*self.tileSize - CAMERAHEIGHT, CAMERAWIDTH, CAMERAHEIGHT)
+    
+    self.camera.rot = 1
     self.spawnLine = 0
     self.spawnI = 1
 
@@ -55,6 +56,12 @@ function Level:update(dt)
     updateGroup(self.blockBounces, dt)
     fissix.World.update(self, dt)
     self:updateCamera(dt)
+    
+    for _, obj in ipairs(self.objects) do
+        if obj.postMovementUpdate then
+            obj:postMovementUpdate(dt)
+        end
+    end
 
     local newSpawnLine = self.camera.x/self.tileSize+WIDTH+VAR("enemiesSpawnAhead")+2
     if newSpawnLine > self.spawnLine then
@@ -63,7 +70,7 @@ function Level:update(dt)
 end
 
 function Level:draw()
-    self.camera:attach(0, 0, CAMERAWIDTH, CAMERAHEIGHT)
+    self.camera:attach()
     
     fissix.World.draw(self)
     

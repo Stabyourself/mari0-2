@@ -49,15 +49,13 @@ end
 function Mario:postMovementUpdate(dt)
     self:animation(dt)
     
-    
     local x, y = self.x+self.width/2, self.y+self.height/2+2
     self.crosshair.origin = {
         x = x,
         y = y,
     }
     
-    --print(self.world:screenToWorld(100, 0))
-    local mx, my = self.world.camera:mousePosition(0, 0, CAMERAWIDTH, CAMERAHEIGHT)
+    local mx, my = self.world:mousePosition(0, 0, CAMERAWIDTH, CAMERAHEIGHT)
     
     self.crosshair.angle = math.atan2(my-y, mx-x)
     

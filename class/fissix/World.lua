@@ -51,10 +51,6 @@ function World:update(dt)
         obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * 0.5 * dt
         -- Cap speed[2]
         obj.speed[2] = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed[2])
-        
-        if obj.postMovementUpdate then
-            obj:postMovementUpdate(dt)
-        end
 	end
 end
 
@@ -162,7 +158,7 @@ function World:draw()
 
                     if VAR("stencilDebug") then
                         love.graphics.setColor(0, 1, 0)
-                        love.graphics.draw(debugCandyImg, debugCandyQuad, self.camera.x, self.camera.y)
+                        love.graphics.draw(debugCandyImg, debugCandyQuad, self.camera:worldCoords(0, 0))
                         love.graphics.setColor(1, 1, 1)
                     end
 
@@ -192,7 +188,7 @@ function World:draw()
         if VAR("stencilDebug") then
             love.graphics.setStencilTest("greater", 0)
             love.graphics.setColor(1, 0, 0)
-            love.graphics.draw(debugCandyImg, debugCandyQuad, self.camera.x, self.camera.y)
+            love.graphics.draw(debugCandyImg, debugCandyQuad, self.camera:worldCoords(0, 0))
             love.graphics.setColor(1, 1, 1)
         end
         
@@ -474,7 +470,7 @@ end
 
 function World:mapToScreen(x, y)
     local x, y = self:mapToWorld(x, y)
-    return self.camera:cameraCoords(x, y, 0, 0, CAMERAWIDTH, CAMERAHEIGHT)
+    return self.camera:cameraCoords(x, y)
 end
 
 function World:worldToMap(x, y)
@@ -486,7 +482,14 @@ function World:screenToMap(x, y)
 end
 
 function World:screenToWorld(x, y)
-    return self.camera:worldCoords(x, y, 0, 0, CAMERAWIDTH, CAMERAHEIGHT)
+    return self.camera:worldCoords(x, y)
+end
+
+function World:mousePosition()
+    local x, y = love.mouse.getPosition()
+    x, y = x/VAR("scale"), y/VAR("scale")
+
+    return self.camera:worldCoords(x, y)
 end
 
 function World:attemptPortal(tileX, tileY, side, x, y, color, ignoreP)

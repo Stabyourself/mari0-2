@@ -80,6 +80,8 @@ function Element:update(dt, x, y, mouseBlocked)
         end
     end
 
+    local siblingsBlocked = false
+
     for i = #self.children, 1, -1 do
         local v = self.children[i]
         
@@ -87,12 +89,17 @@ function Element:update(dt, x, y, mouseBlocked)
             local childX = self.mouse[1]-self.childBox[1]-v.x+self.scroll[1]
             local childY = self.mouse[2]-self.childBox[2]-v.y+self.scroll[2]
 
-            v:update(dt, childX, childY, childMouseBlocked)
+            local b = v:update(dt, childX, childY, childMouseBlocked)
 
-            if  self.mouse[1]-self.childBox[1] >= v.x and self.mouse[1]-self.childBox[1] < v.x+v.w and
-                self.mouse[2]-self.childBox[2] >= v.y and self.mouse[2]-self.childBox[2] < v.y+v.h then
+            if v.visible and b then
+                siblingsBlocked = true
                 childMouseBlocked = true
             end
+
+            -- if  self.mouse[1]-self.childBox[1] >= v.x and self.mouse[1]-self.childBox[1] < v.x+v.w and
+            --     self.mouse[2]-self.childBox[2] >= v.y and self.mouse[2]-self.childBox[2] < v.y+v.h then
+            --     childMouseBlocked = true
+            -- end
         end
     end
 
@@ -181,6 +188,13 @@ function Element:update(dt, x, y, mouseBlocked)
     
     self.scroll[2] = math.min(childrenH-self:getInnerHeight(), self.scroll[2])
     self.scroll[2] = math.max(0, self.scroll[2])
+
+    -- if self.title == "tiles" then
+    --     print_r(self.mouse)
+    --     print(self.mouse[1] > 0 and self.mouse[1] <= self.w and self.mouse[2] > 0 and self.mouse[2] <= self.h)
+    -- end
+
+    return (self.noClip and siblingsBlocked) or (self.mouse[1] > 0 and self.mouse[1] <= self.w and self.mouse[2] > 0 and self.mouse[2] <= self.h)
 end
 
 function Element:translate()
@@ -329,7 +343,7 @@ function Element:mousepressed(x, y, button)
             v:mousepressed(lx, ly, button)
 
             if not toReturn then
-                if lx >= 0 and lx < v.w and ly >= 0 and ly < v.h then
+                if lx >= 0 and lx < v.w and ly >= 0 and ly < v.h and not v.mouseBlocked then
                     -- push that element to the end
                     if v.movesToTheFront then
                         table.insert(self.children, table.remove(self.children, i))
@@ -355,23 +369,25 @@ function Element:mousereleased(x, y, button)
 end
 
 function Element:wheelmoved(x, y)
-    if self.hasScrollbar[2] and y ~= 0 then
-        self.scroll[2] = self.scroll[2] - y*17
+    if not self.mouseBlocked then
+        if self.hasScrollbar[2] and y ~= 0 then
+            self.scroll[2] = self.scroll[2] - y*17
+            
+            return true
+        end
         
-        return true
-    end
-    
-    -- scroll horizontally if there's no y scrolling
-    if not self.hasScrollbar[2] and self.hasScrollbar[1] and y ~= 0 then
-        self.scroll[1] = self.scroll[1] - y*17
+        -- scroll horizontally if there's no y scrolling
+        if not self.hasScrollbar[2] and self.hasScrollbar[1] and y ~= 0 then
+            self.scroll[1] = self.scroll[1] - y*17
+            
+            return true
+        end
         
-        return true
-    end
-    
-    if self.hasScrollbar[1] and x ~= 0 then
-        self.scroll[1] = self.scroll[1] - x*17
-        
-        return true
+        if self.hasScrollbar[1] and x ~= 0 then
+            self.scroll[1] = self.scroll[1] - x*17
+            
+            return true
+        end
     end
     
     for _, v in ipairs(self.children) do

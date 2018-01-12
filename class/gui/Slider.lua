@@ -30,7 +30,7 @@ function Slider:initialize(min, max, x, y, w, showValue)
 end
 
 function Slider:update(dt, x, y, mouseBlocked)
-    GUI.Element.update(self, dt, x, y, mouseBlocked)
+    local ret = GUI.Element.update(self, dt, x, y, mouseBlocked)
     
     if self.dragging then
         local pos = (self.mouse[1]-self.dragX-self.barOffset)/(self.barWidth)
@@ -43,6 +43,8 @@ function Slider:update(dt, x, y, mouseBlocked)
             self.text:setString(tostring(math.round(self:getValue())))
         end
     end
+
+    return ret
 end
 
 function Slider:getValue()

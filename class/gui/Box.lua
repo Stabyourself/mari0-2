@@ -20,7 +20,7 @@ function Box:initialize(x, y, w, h)
 end
 
 function Box:update(dt, x, y, mouseBlocked)
-    GUI.Element.update(self, dt, x, y, mouseBlocked)
+    local ret = GUI.Element.update(self, dt, x, y, mouseBlocked)
     
     if self.draggable then
         self.sizeMin[1] = 19
@@ -31,7 +31,8 @@ function Box:update(dt, x, y, mouseBlocked)
         self.sizeMin[2] = 19
         self.childBox = {2, 3, self.w-4, self.h-6}
     end
-    
+
+    return ret
 end
 
 function Box:draw(level)

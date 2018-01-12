@@ -14,7 +14,7 @@ function Level:initialize(path, tileMap)
     self.backgroundColor[3] = self.backgroundColor[3]/255
     
     -- Camera stuff
-    self.camera = Camera.new(0, 0, CAMERAWIDTH, CAMERAHEIGHT)
+    self.camera = Camera.new(CAMERAWIDTH/2, CAMERAHEIGHT/2, CAMERAWIDTH, CAMERAHEIGHT)
     
     self.camera.rot = 0
     self.spawnLine = 0

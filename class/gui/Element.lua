@@ -236,8 +236,8 @@ function Element:draw(level)
                 love.graphics.draw(self.gui.img.scrollbarBack, 0, self.childBox[2]+self.childBox[4]-4, 0, self.w, 1, 0, 4)
                 
                 love.graphics.draw(img, scrollbarQuad[1], pos, self.childBox[2]+self.childBox[4]-4, 0, 1, 1, 0, 4)
-                love.graphics.draw(img, scrollbarQuad[2], pos + 1, self.childBox[2]+self.childBox[4]-4, 0, self.scrollbarSize[i]-2, 1, 0, 4)
-                love.graphics.draw(img, scrollbarQuad[3], pos - 1 + self.scrollbarSize[i], self.childBox[2]+self.childBox[4]-4, 0, 1, 1, 0, 4)
+                love.graphics.draw(img, scrollbarQuad[2], pos+1, self.childBox[2]+self.childBox[4]-4, 0, self.scrollbarSize[i]-2, 1, 0, 4)
+                love.graphics.draw(img, scrollbarQuad[3], pos-1+self.scrollbarSize[i], self.childBox[2]+self.childBox[4]-4, 0, 1, 1, 0, 4)
             else
                 love.graphics.draw(self.gui.img.scrollbarBack, self.childBox[1]+self.childBox[3]-4, 0, math.pi/2, self.h, 1, 0, 4)
         

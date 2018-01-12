@@ -93,8 +93,16 @@ function camera:rotateTo(phi)
 	return self
 end
 
-function camera:zoom(mul)
+function camera:zoom(mul, x, y)
+	x = x or self.w/2
+	y = y or self.h/2
+	
+	local px, py = self:worldCoords(x, y)
 	self.scale = self.scale * mul
+
+	local cx, cy = self:cameraCoords(px, py)
+	self:move((cx-x)/self.scale, (cy-y)/self.scale)
+
 	return self
 end
 

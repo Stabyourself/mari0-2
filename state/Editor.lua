@@ -187,7 +187,7 @@ function Editor:newWindow(type, button)
         -- testWindow:addChild(testWindow2)
         
     elseif type == "tiles" then
-        local tileListWindow = GUI.Box:new(10, y, 200, 200)
+        local tileListWindow = GUI.Box:new(10, y, 8*17+15, 200)
         tileListWindow.draggable = true
         tileListWindow.resizeable = true
         tileListWindow.closeable = true
@@ -202,7 +202,7 @@ function Editor:newWindow(type, button)
         tileListWindow:addChild(backButton)
         
         
-        local tileListButtonGrid = GUI.ButtonGrid:new(5, 20, self.level.tileMap.img, self.level.tileMap.quad, 
+        local tileListButtonGrid = GUI.ButtonGrid:new(1, 20, self.level.tileMap.img, self.level.tileMap.quad, 
             function(buttonGrid, i) 
                 buttonGrid.selected = i
                 self:selectTile(i) 
@@ -272,7 +272,7 @@ function Editor:wheelmoved(x, y)
             zoom = 1/(1.1^-y)
         end
         
-        self.level.camera:zoom(zoom)
+        self.level.camera:zoom(zoom, getWorldMouse())
     end
 end
 

@@ -32,8 +32,9 @@ function Editor:load()
     self.menuBar:addChild(self.newWindowDropdown)
     
     self.newWindowDropdown.box:addChild(GUI.Button:new(0, 0, "tiles", false, 1, function(button) self:newWindow("tiles", button) end))
-    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 10, "minimap", false, 1, function(button) self:newWindow("tiles", button) end))
-    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 20, "map options", false, 1, function(button) self:newWindow("tiles", button) end))
+    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 10, "minimap", false, 1, function(button) self:newWindow("minimap", button) end))
+    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 20, "map options", false, 1, function(button) self:newWindow("mapOptions", button) end))
+    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 30, "test", false, 1, function(button) self:newWindow("test", button) end))
     
     self.newWindowDropdown:autoSize()
     
@@ -49,9 +50,6 @@ function Editor:load()
     
     
     viewDropdown:autoSize()
-    -- self.menuBar:addChild(GUI.Button:new(100, 0, "don't press", function(button) self:newWindow("test", button) end))
-    
-    -- self.menuBar:addChild())
     
     self:selectTool("paint")
     
@@ -176,15 +174,15 @@ function Editor:newWindow(type, button)
         end
         
         
-        -- local testWindow2 = GUI.Box:new(10, 30, 100, 100)
-        -- testWindow2.draggable = true
-        -- testWindow2.resizeable = true
-        -- testWindow2.closeable = true
-        -- testWindow2.scrollable = {true, true}
-        -- testWindow2.title = "Why did you press"
-        -- testWindow2.background = self.level.backgroundColor
+        local testWindow2 = GUI.Box:new(10, 30, 100, 100)
+        testWindow2.draggable = true
+        testWindow2.resizeable = true
+        testWindow2.closeable = true
+        testWindow2.scrollable = {true, true}
+        testWindow2.title = "Why did you press"
+        testWindow2.background = self.level.backgroundColor
         
-        -- testWindow:addChild(testWindow2)
+        testWindow:addChild(testWindow2)
         
     elseif type == "tiles" then
         local tileListWindow = GUI.Box:new(10, y, 8*17+15, 200)

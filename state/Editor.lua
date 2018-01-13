@@ -1,17 +1,41 @@
 Editor = class("Editor")
+    
+Editor.toolbarOrder = {"paint", "portal", "select", "move", "fill", "stamp", "pick"}
+Editor.toolbarImg = {}
+
+for _, v in ipairs(Editor.toolbarOrder) do
+    table.insert(Editor.toolbarImg, love.graphics.newImage("img/editor/" .. v .. ".png"))
+end
 
 local checkerboardImg = love.graphics.newImage("img/checkerboard.png")
+
+Editor.toolClasses = {
+    paint = require("class.editortools.Paint"),
+    portal = require("class.editortools.Portal"),
+    select = require("class.editortools.Select"),
+    move = require("class.editortools.Move"),
+    fill = require("class.editortools.Fill"),
+    stamp = require("class.editortools.Stamp"),
+    pick = require("class.editortools.Pick"),
+}
 
 function Editor:initialize(level)
     self.level = level
 end
 
 function Editor:load()
+    self.tools = {}
+    
+    for i, v in pairs(self.toolClasses) do
+        self.tools[i] = v:new(self)
+    end
+    
     self.canvas = GUI.Canvas:new(0, 0, SCREENWIDTH, SCREENHEIGHT)
     self.canvas.gui = defaultUI
     
     self.windows = {}
     
+    -- MENU BAR
     self.menuBar = GUI.Canvas:new(0, 0, SCREENWIDTH, 14)
     self.menuBar.background = {255, 255, 255}
     self.menuBar.noClip = true
@@ -41,6 +65,8 @@ function Editor:load()
     
     
     
+    
+    
     local viewDropdown = GUI.Dropdown:new(92, 0, "view")
     
     self.menuBar:addChild(viewDropdown)
@@ -48,15 +74,30 @@ function Editor:load()
     viewDropdown.box:addChild(GUI.Checkbox:new(0, 0, "draw grid", 1, function(checkbox) self:toggleGrid(checkbox.value) end))
     viewDropdown.box:addChild(GUI.Checkbox:new(0, 11, "hide ui", 1, function(checkbox) self:toggleUI(checkbox.value) end))
     
-    
     viewDropdown:autoSize()
     
-    self:selectTool("paint")
     
-    self.paint = {
-        tile = 1,
-        penDown = false,
-    }
+    
+    -- TOOL BAR
+    self.toolbar = GUI.Canvas:new(0, 14, 14, CAMERAHEIGHT-14)
+    self.toolbar.background = {255, 255, 255}
+    self.canvas:addChild(self.toolbar)
+    
+    
+    local y = 1
+    for i, v in ipairs(self.toolbarOrder) do
+        local button = GUI.Button:new(1, y, self.toolbarImg[i], false, 1, function(button) self:selectTool(self.tools[v]) end)
+        button.color = {0, 0, 0}
+        self.toolbar:addChild(button)
+        
+        y = y + 14
+    end
+    
+    
+    
+    
+    self:selectTool(self.tools.portal)
+    self:selectTool(self.tools.paint)
     
     self.showGrid = false
     self.gridImg = love.graphics.newImage("img/grid.png")
@@ -67,11 +108,7 @@ end
 function Editor:update(dt)
     self.canvas:update(dt)
     
-    if self.paint.penDown then
-        local x, y = self.level:cameraToMap(getWorldMouse())
-        
-        self.level:setMap(x, y, self.paint.tile)
-    end
+    self.tool:update(dt)
     
     if self.freeCamera then
         local cameraSpeed = dt*VAR("editor").cameraSpeed--*(1/self.level.camera.scale)
@@ -97,14 +134,6 @@ end
 function Editor:draw()
     self.level.camera:attach()
     
-    if self.tool == "paint" then
-        local mouseX, mouseY = getWorldMouse()
-        local mapX, mapY = self.level:cameraToMap(mouseX, mouseY)
-        local worldX, worldY = self.level:mapToWorld(mapX-1, mapY-1)
-        
-        self.level.tileMap.tiles[self.paint.tile]:draw(worldX, worldY, true)
-    end
-    
     if self.showGrid then
         local xl, yt = self.level:cameraToWorld(0, 0)
         local xr, yb = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)
@@ -124,6 +153,8 @@ function Editor:draw()
         )
     end
     
+    self.tool:draw()
+    
     self.level.camera:detach()
     
     self.canvas:draw()
@@ -137,6 +168,7 @@ function Editor:toggleUI(on)
     if game.uiVisible ~= not on then
         game.uiVisible = not on
         updateSizes()
+        self.toolbar.h = CAMERAHEIGHT-14
         self.level.camera.h = CAMERAHEIGHT
         
         local offset = (VAR("uiLineHeight")+VAR("uiHeight"))/2/self.level.camera.scale
@@ -150,17 +182,13 @@ function Editor:toggleUI(on)
 end
 
 function Editor:selectTool(tool)
+    if self.tool then
+        self.tool:unSelect()
+    end
+    
     self.tool = tool
     
-    if self.tool == "portal" then
-        self.level.camera.target = self.level.marios[1]
-        self.level.controlsEnabled = true
-        self.freeCamera = false
-    else
-        self.level.camera.target = nil
-        self.level.controlsEnabled = false
-        self.freeCamera = true
-    end
+    self.tool:select()
 end
 
 function Editor:newWindow(type, button)
@@ -227,17 +255,9 @@ function Editor:newWindow(type, button)
     end
 end
 
-function Editor:pipette(x, y)
-    local mapX, mapY = self.level:mouseToMap()
-    
-    if self.level:inMap(mapX, mapY) then
-        self.paint.tile = self.level.map[mapX][mapY]
-    end
-end
-
 function Editor:selectTile(i)
-    self.tool = "paint"
-    self.paint.tile = i
+    self.tool = self.tools.paint
+    self.tools.paint.tile = i
 end
 
 function Editor:keypressed(key)
@@ -249,27 +269,13 @@ function Editor:mousepressed(x, y, button)
         return true
     end
     
-    if self.tool == "paint" then
-        if (button == 1 and keyDown("editor.pipette")) or button == 3 then
-            self:pipette(x, y)
-            
-        elseif button == 1 then
-            self.paint.penDown = true
-            
-        end
-    end
-
-    if self.tool ~= "portal" then
-        return true
-    end
+    return self.tool:mousepressed(x, y, button)
 end
 
 function Editor:mousereleased(x, y, button)
     self.canvas:mousereleased(x, y, button)
     
-    if self.tool == "paint" then
-        self.paint.penDown = false
-    end
+    self.tool:mousereleased(x, y, button)
 end
 
 function Editor:wheelmoved(x, y)
@@ -293,4 +299,5 @@ end
 function Editor:resize(w, h)
     self.canvas:resize(w, h)
     self.menuBar:resize(w, self.menuBar.h)
+    self.toolbar.h = CAMERAHEIGHT-14
 end

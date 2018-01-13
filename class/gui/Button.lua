@@ -1,4 +1,4 @@
-Button = class("GUI.Button", GUI.Element)
+local Button = class("GUI.Button", GUI.Element)
 
 local buttonQuad = {
     love.graphics.newQuad(0, 0, 8, 8, 17, 17),
@@ -12,8 +12,13 @@ local buttonQuad = {
     love.graphics.newQuad(9, 9, 8, 8, 17, 17),
 }
 
-function Button:initialize(x, y, s, border, padding, func)
-    self.s = s
+function Button:initialize(x, y, content, border, padding, func)
+    if type(content) == "string" then
+        self.s = content
+    else
+        self.img = content
+    end
+    
     self.padding = padding or 1
     
     local w = self.padding*2
@@ -33,6 +38,10 @@ function Button:initialize(x, y, s, border, padding, func)
     if self.s then
         w = w+#self.s*8
         h = h + 8
+        
+    elseif self.img then
+        w = w + self.img:getWidth()
+        h = h + self.img:getHeight()
     end
     
     GUI.Element.initialize(self, x, y, w, h)
@@ -44,6 +53,7 @@ function Button:initialize(x, y, s, border, padding, func)
     self.func = func
     
     self.pressing = false
+    self.color = {1, 1, 1}
 end
 
 function Button:getCollision(x, y)
@@ -86,7 +96,15 @@ function Button:draw(level)
         love.graphics.setColor(1, 1, 1)
     end
     
+    love.graphics.setColor(self.color)
+    
     GUI.Element.draw(self, level)
+    
+    if self.img then
+        love.graphics.draw(self.img, self.padding, self.padding)
+    end
+    
+    love.graphics.setColor(1, 1, 1)
     
     GUI.Element.unTranslate(self)
 end

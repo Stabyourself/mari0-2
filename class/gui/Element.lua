@@ -340,8 +340,12 @@ function Element:mousepressed(x, y, button)
             local lx = x-self.childBox[1]-v.x+self.scroll[1]
             local ly = y-self.childBox[2]-v.y+self.scroll[2]
 
-            v:mousepressed(lx, ly, button)
+            local b = v:mousepressed(lx, ly, button)
 
+            if v.mouseBlocked then
+                toReturn = true
+            end
+            
             if not toReturn then
                 if lx >= 0 and lx < v.w and ly >= 0 and ly < v.h and not v.mouseBlocked then
                     -- push that element to the end

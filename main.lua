@@ -235,8 +235,18 @@ function love.resize(w, h)
     SCREENWIDTH = w/VAR("scale")
     SCREENHEIGHT = h/VAR("scale")
     
+    updateSizes()
+    
+    gameStateManager:event("resize", SCREENWIDTH, SCREENHEIGHT)
+end
+
+function updateSizes()
     CAMERAWIDTH = SCREENWIDTH
-    CAMERAHEIGHT = SCREENHEIGHT-VAR("uiHeight")-VAR("uiLineHeight")
+    CAMERAHEIGHT = SCREENHEIGHT
+    
+    if not game or game.uiVisible then
+        CAMERAHEIGHT = CAMERAHEIGHT-VAR("uiLineHeight")-VAR("uiHeight")
+    end
 
     WIDTH = math.ceil(CAMERAWIDTH/VAR("tileSize"))
     HEIGHT = math.ceil(CAMERAHEIGHT/VAR("tileSize"))
@@ -248,8 +258,6 @@ function love.resize(w, h)
     UPSCROLLBORDER = math.ceil(math.min(CAMERAHEIGHT/2, VAR("cameraScrollUpBorder")))
 
     debugCandyQuad = love.graphics.newQuad(0, 0, SCREENWIDTH, SCREENHEIGHT, 8, 8)
-    
-    gameStateManager:event("resize", SCREENWIDTH, SCREENHEIGHT)
 end
 
 function love.wheelmoved(x, y)

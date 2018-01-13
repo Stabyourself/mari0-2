@@ -46,7 +46,7 @@ function Editor:load()
     self.menuBar:addChild(viewDropdown)
     
     viewDropdown.box:addChild(GUI.Checkbox:new(0, 0, "draw grid", 1, function(checkbox) self:toggleGrid(checkbox.value) end))
-    viewDropdown.box:addChild(GUI.Checkbox:new(0, 11, "autoscroll", 1, function(checkbox)  end))
+    viewDropdown.box:addChild(GUI.Checkbox:new(0, 11, "hide ui", 1, function(checkbox) self:toggleUI(checkbox.value) end))
     
     
     viewDropdown:autoSize()
@@ -131,6 +131,22 @@ end
 
 function Editor:toggleGrid(on)
     self.showGrid = on
+end
+
+function Editor:toggleUI(on)
+    if game.uiVisible ~= not on then
+        game.uiVisible = not on
+        updateSizes()
+        self.level.camera.h = CAMERAHEIGHT
+        
+        local offset = (VAR("uiLineHeight")+VAR("uiHeight"))/2/self.level.camera.scale
+        
+        if on then
+            self.level.camera:move(0, offset)
+        else
+            self.level.camera:move(0, -offset)
+        end
+    end
 end
 
 function Editor:selectTool(tool)

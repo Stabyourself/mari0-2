@@ -2,7 +2,7 @@ Checkbox = class("GUI.Checkbox", GUI.Element)
 
 Checkbox.checkBoxPadding = 2
 
-function Checkbox:initialize(x, y, s, padding, func)
+function Checkbox:initialize(x, y, s, padding, func, val)
     self.s = s
     self.padding = padding or 0
     
@@ -21,7 +21,7 @@ function Checkbox:initialize(x, y, s, padding, func)
     self.func = func --boogie nights
     
     self.pressing = false
-    self.value = false
+    self.value = val == nil and false or val
 end
 
 function Checkbox:getCollision(x, y)

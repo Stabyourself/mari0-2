@@ -5,13 +5,11 @@ function Portal:initialize(editor)
 end
 
 function Portal:select()
-    self.editor.level.camera.target = self.editor.level.marios[1]
     self.editor.level.controlsEnabled = true
     self.editor.freeCamera = false
 end
 
 function Portal:unSelect()
-    self.editor.level.camera.target = nil
     self.editor.level.controlsEnabled = false
     self.editor.freeCamera = true
 end

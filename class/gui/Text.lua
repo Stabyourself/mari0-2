@@ -16,7 +16,7 @@ function Text:draw(level)
     
     GUI.Element.draw(self, level)
     
-    marioPrint(self.s, 0, 0)
+    fontOutlined:print(self.s, 0, 0)
 
     GUI.Element.unTranslate(self)
 end

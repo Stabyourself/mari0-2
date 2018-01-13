@@ -75,8 +75,9 @@ function Editor:load()
     
     self.menuBar:addChild(viewDropdown)
     
-    viewDropdown.box:addChild(GUI.Checkbox:new(0, 0, "draw grid", 1, function(checkbox) self:toggleGrid(checkbox.value) end))
-    viewDropdown.box:addChild(GUI.Checkbox:new(0, 11, "hide ui", 1, function(checkbox) self:toggleUI(checkbox.value) end))
+    viewDropdown.box:addChild(GUI.Checkbox:new(0, 0, "free camera", 1, function(checkbox) self:toggleFreeCam(checkbox.value) end, true))
+    viewDropdown.box:addChild(GUI.Checkbox:new(0, 11, "draw grid", 1, function(checkbox) self:toggleGrid(checkbox.value) end))
+    viewDropdown.box:addChild(GUI.Checkbox:new(0, 22, "hide ui", 1, function(checkbox) self:toggleUI(checkbox.value) end))
     
     viewDropdown:autoSize()
     
@@ -84,18 +85,22 @@ function Editor:load()
     
     -- SCALE BAR
     local w = 50
-    local x = CAMERAWIDTH-w-3-9-26
-    self.scaleSlider = GUI.Slider:new(self.scaleMin, self.scaleMax, x, 3, w, false, function(val) self:changeScale(val) end)
+    local fullw = w+52
+    local x = CAMERAWIDTH-fullw
+    self.scaleBar = GUI.Canvas:new(x, 0, fullw, 14)
+    self.menuBar:addChild(self.scaleBar)
+    
+    self.scaleSlider = GUI.Slider:new(self.scaleMin, self.scaleMax, 10, 3, w, false, function(val) self:changeScale(val) end)
     self.scaleSlider.color.bar = {0, 0, 0}
     
-    self.menuBar:addChild(self.scaleSlider)
+    self.scaleBar:addChild(self.scaleSlider)
     
     self:updateScaleSlider()
     
-    self.menuBar:addChild(GUI.Button:new(x-10, 2, "-", false, 1, function() self:zoom(-1) end))
-    self.menuBar:addChild(GUI.Button:new(x+w, 2, "+", false, 1, function() self:zoom(1) end))
+    self.scaleBar:addChild(GUI.Button:new(0, 2, "-", false, 1, function() self:zoom(-1) end))
+    self.scaleBar:addChild(GUI.Button:new(w+10, 2, "+", false, 1, function() self:zoom(1) end))
     
-    self.menuBar:addChild(GUI.Button:new(x+w+10, 2, "1:1", false, 1, function() self:resetZoom() end))
+    self.scaleBar:addChild(GUI.Button:new(w+24, 2, "1:1", false, 1, function() self:resetZoom() end))
     
     
     
@@ -105,10 +110,14 @@ function Editor:load()
     self.toolbar.background = {255, 255, 255}
     self.canvas:addChild(self.toolbar)
     
+    self.toolButtons = {}
     
     local y = 1
     for i, v in ipairs(self.toolbarOrder) do
-        local button = GUI.Button:new(1, y, self.toolbarImg[i], false, 1, function(button) self:selectTool(self.tools[v]) end)
+        local button = GUI.Button:new(1, y, self.toolbarImg[i], false, 1, function(button) self:selectTool(v) end)
+        
+        self.toolButtons[v] = button
+        
         button.color.img = {0, 0, 0}
         self.toolbar:addChild(button)
         
@@ -118,13 +127,14 @@ function Editor:load()
     
     
     
-    self:selectTool(self.tools.portal)
-    self:selectTool(self.tools.paint)
+    self:selectTool("paint")
     
-    self.showGrid = false
     self.gridImg = love.graphics.newImage("img/grid.png")
     self.gridImg:setWrap("repeat", "repeat")
     self.gridQuad = love.graphics.newQuad(0, 0, 16, 16, 16, 16)
+    
+    self:toggleGrid(false)
+    self:toggleFreeCam(true)
 end
 
 function Editor:update(dt)
@@ -190,6 +200,16 @@ function Editor:updateScaleSlider()
     self.scaleSlider:setValue(self.level.camera.scale)
 end
 
+function Editor:toggleFreeCam(on)
+    if on then
+        self.level.camera.target = nil
+        self.freeCamera = true
+    else
+        self.level.camera.target = self.level.marios[1]
+        self.freeCamera = false
+    end
+end
+
 function Editor:toggleGrid(on)
     self.showGrid = on
 end
@@ -211,14 +231,20 @@ function Editor:toggleUI(on)
     end
 end
 
-function Editor:selectTool(tool)
+function Editor:selectTool(toolName)
     if self.tool then
         self.tool:unSelect()
     end
     
-    self.tool = tool
+    self.tool = self.tools[toolName]
     
     self.tool:select()
+    
+    for _, v in pairs(self.toolButtons) do
+        v.color.background = {1, 1, 1}
+    end
+    
+    self.toolButtons[toolName].color.background = {0.75, 0.75, 0.75}
 end
 
 function Editor:newWindow(type, button)
@@ -253,10 +279,12 @@ function Editor:newWindow(type, button)
         testWindow2.resizeable = true
         testWindow2.closeable = true
         testWindow2.scrollable = {true, true}
-        testWindow2.title = "Why did you press"
+        testWindow2.title = ":<"
         testWindow2.background = self.level.backgroundColor
         
         testWindow:addChild(testWindow2)
+        
+        testWindow2:addChild(GUI.Button:new(5, 5, "don't hurt me!", true))
         
     elseif type == "tiles" then
         local tileListWindow = GUI.Box:new(10, y, 8*17+15, 200)
@@ -270,11 +298,11 @@ function Editor:newWindow(type, button)
         self.canvas:addChild(tileListWindow)
         
         
-        local backButton = GUI.Button:new(0, 0, "< back", true, 1, function() print("woah") end)
-        tileListWindow:addChild(backButton)
+        -- local backButton = GUI.Button:new(0, 0, "< back", true, 1, function() print("woah") end)
+        -- tileListWindow:addChild(backButton)
         
         
-        local tileListButtonGrid = GUI.ButtonGrid:new(1, 20, self.level.tileMap.img, self.level.tileMap.quad, 
+        local tileListButtonGrid = GUI.ButtonGrid:new(1, 1, self.level.tileMap.img, self.level.tileMap.quad, 
             function(buttonGrid, i) 
                 buttonGrid.selected = i
                 self:selectTile(i) 
@@ -314,11 +342,11 @@ function Editor:wheelmoved(x, y)
     end
 
     if y ~= 0 then
-        self:zoom(y)
+        self:zoom(y, true)
     end
 end
 
-function Editor:zoom(i)
+function Editor:zoom(i, toMouse)
     local zoom
          
     if i > 0 then -- out
@@ -334,7 +362,12 @@ function Editor:zoom(i)
         zoom = self.scaleMax/self.level.camera.scale
     end
     
-    self.level.camera:zoom(zoom, getWorldMouse())
+    local x, y
+    if toMouse then
+        x, y = getWorldMouse()
+    end
+    
+    self.level.camera:zoom(zoom, x, y)
     
     self:updateScaleSlider()
 end
@@ -346,6 +379,13 @@ end
 
 function Editor:resize(w, h)
     self.canvas:resize(w, h)
+    
     self.menuBar:resize(w, self.menuBar.h)
+    
     self.toolbar.h = CAMERAHEIGHT-14
+    
+    local w = 50
+    local fullw = w+52
+    local x = CAMERAWIDTH-fullw
+    self.scaleBar.x = x
 end

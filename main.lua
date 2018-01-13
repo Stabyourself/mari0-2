@@ -21,6 +21,7 @@ function love.load()
     Color = require "lib.Color"
     Easing = require "lib.Easing"
     GameStateManager = require "lib.GameStateManager"
+    Font3 = require "lib.Font3"
 
     require "class.fissix"
 
@@ -43,11 +44,11 @@ function love.load()
     require "state.Game"
     require "state.Editor"
     
-	fontImg = love.graphics.newImage("img/font.png")
-    fontGlyphs = [[
-        0123456789ab
-        cdefghijklmn
-        opqrstuvwxyz
+    fontOutlined = Font3:new(love.graphics.newImage("img/font-outlined.png"), [[
+        ABCDEFGHIJKLMNOPQRSTUVWXYZ
+        abcdefghijklmnopqrstuvwxyz
+        0123456789
+        &Space;
         &pMeterTick;
         &pMeterTickOn;
         &World1;
@@ -65,52 +66,16 @@ function love.load()
         &Dollarinos;
         &Time;
         &Times;
+        .;:;!?_-<>=+*/\'%
+    ]])
+    
+    font = Font3:new(love.graphics.newImage("img/font.png"), [[
+        ABCDEFGHIJKLMNOPQRSTUVWXYZ
+        abcdefghijklmnopqrstuvwxyz
+        0123456789
         &Space;
         .;:;!?_-<>=+*/\'%
-    ]]
-    
-    local i = 1
-    local glyphNum = 1
-    local inLongName = false
-    local currentGlyph = ""
-    local glyphSize = 8
-    local glyphWidth = fontImg:getWidth()/glyphSize
-    fontQuad = {}
-    
-    local function assignGlyph(glyph)
-        local x = math.floor((glyphNum-1)%glyphWidth+1)
-        local y = math.ceil(glyphNum/glyphWidth)
-        
-        fontQuad[glyph] = love.graphics.newQuad((x-1)*glyphSize, (y-1)*glyphSize, glyphSize, glyphSize, fontImg:getDimensions())
-        
-        glyphNum = glyphNum + 1
-    end
-    
-    for i = 1, #fontGlyphs do
-        local glyph = string.sub(fontGlyphs, i, i)
-        local byte = string.byte(glyph)
-        
-        if byte ~= string.byte("\n") and byte ~= string.byte(" ") then
-            if byte == string.byte(";") and inLongName then
-                if inLongName then
-                    assignGlyph(currentGlyph)
-                    currentGlyph = ""
-                    inLongName = false
-                end
-            elseif byte == string.byte("&") then
-                inLongName = true
-                currentGlyph = ""
-            else
-                if inLongName then
-                    currentGlyph = currentGlyph .. glyph
-                else
-                    assignGlyph(glyph)
-                end
-            end
-        end
-    end
-    
-    fontQuad[" "] = fontQuad["Space"]
+    ]])
 
     print("Loading sound... (might take a while)")
     if not VAR("musicDisabled") then
@@ -171,7 +136,7 @@ function love.draw()
     gameStateManager:event("draw")
     
     if VAR("characterStateDebug") then
-        marioPrint(game.level.marios[1].state.name, 8, 8)
+        fontOutlined:print(game.level.marios[1].state.name, 8, 8)
     end
     
     -- For the stream
@@ -279,41 +244,6 @@ function updateGroup(group, dt)
 	for _, v in ipairs(delete) do
 		table.remove(group, v)
 	end
-end
-
-function marioPrint(s, x, y)
-    local longGlyph = false
-    local char = 0
-    
-    local charX = 0
-    local charY = 0
-    
-    for i = 1, #s do
-        local toPrint = false
-        local glyph = string.sub(s, i, i)
-        local byte = string.byte(glyph)
-        
-        if byte == string.byte("&") then
-            longGlyph = ""
-        elseif byte == string.byte(";") and longGlyph then
-            toPrint = longGlyph
-            longGlyph = false
-        elseif byte == string.byte("\n") then
-            charY = charY + 1
-            charX = 0
-        else
-            if longGlyph then
-                longGlyph = longGlyph .. glyph
-            else
-                toPrint = string.lower(glyph)
-            end
-        end
-        
-        if toPrint then
-            love.graphics.draw(fontImg, fontQuad[toPrint], charX*8+x, charY*8+y)
-            charX = charX + 1
-        end
-    end
 end
 
 function keyDown(cmd)

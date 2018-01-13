@@ -68,7 +68,7 @@ function Box:draw(level)
         end, "increment", 1, true)
         love.graphics.setStencilTest("equal", level)
         
-        marioPrint(self.title, 3, 2)
+        fontOutlined:print(self.title, 3, 2)
         
         love.graphics.stencil(function()
             love.graphics.rectangle("fill", 3, 2, self.w-16, 8)

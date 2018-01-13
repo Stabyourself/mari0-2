@@ -54,10 +54,11 @@ function Button:initialize(x, y, content, border, padding, func)
     
     self.pressing = false
     self.color = {
-        normal = {1, 1, 1},
-        hover = {0.75, 0.75, 0.75},
-        active = {0.625, 0.625, 0.625},
-        img = {1, 1, 1},
+        background = {1, 1, 1},
+        normal = {0, 0, 0, 0},
+        hover = {0, 0, 0, 0.25},
+        active = {0, 0, 0, 0.375},
+        img = {1, 1, 1, 1},
     }
 end
 
@@ -89,6 +90,9 @@ function Button:draw(level)
         love.graphics.draw(img, buttonQuad[8], 2, self.h-2, 0, self.w-4, 1)
         love.graphics.draw(img, buttonQuad[9], self.w-2, self.h-2)
     else
+        love.graphics.setColor(self.color.background)
+        love.graphics.rectangle("fill", 0, 0, self.w, self.h)
+        
         love.graphics.setColor(self.color.normal)
         
         if self.pressing then

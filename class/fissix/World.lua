@@ -153,7 +153,7 @@ function World:draw()
                 if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
                     objectWithinPortalRange(p, x, y) then
                     local angle = math.atan2(obj.speed[2], obj.groundSpeedX)
-                    local cX, cY, cAngle, angleDiff, reversed = self:doPortal(p, obj.x+obj.width/2, obj.y+obj.height/2, angle)
+                    local cX, cY, cAngle, angleDiff, reversed = self:doPortal(p, obj.x+obj.width/2, obj.y+obj.height/2, obj.angle)
                     
                     local xScale = 1
                     if reversed then
@@ -169,7 +169,15 @@ function World:draw()
                         love.graphics.setColor(1, 1, 1)
                     end
 
-                    drawObject(obj, cX, cY, (obj.angle or 0) + angleDiff, (obj.animationDirection or 1)*xScale, 1, obj.centerX, obj.centerY)
+                    local a = angleDiff
+                    
+                    if reversed then
+                        a = a - (obj.angle or 0)
+                    else
+                        a = a + (obj.angle or 0)
+                    end
+                    
+                    drawObject(obj, cX, cY, a, (obj.animationDirection or 1)*xScale, 1, obj.centerX, obj.centerY)
                     
                     love.graphics.setStencilTest()
                     

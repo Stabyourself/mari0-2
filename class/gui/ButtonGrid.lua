@@ -97,7 +97,7 @@ function ButtonGrid:mousepressed(x, y, button)
         self.func(self, col)
     end
     
-    GUI.Element.mousepressed(self, x, y, button)
+    return GUI.Element.mousepressed(self, x, y, button)
 end
 
 return ButtonGrid

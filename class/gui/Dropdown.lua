@@ -34,9 +34,12 @@ function Dropdown:toggle(status)
 end
 
 function Dropdown:mousepressed(x, y, button)
-    if not GUI.Element.mousepressed(self, x, y, button) then
+    local toReturn = GUI.Element.mousepressed(self, x, y, button)
+    if not toReturn then
         self.box.visible = false
     end
+    
+    return toReturn
 end
 
 function Dropdown:autoSize()

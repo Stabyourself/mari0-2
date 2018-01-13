@@ -119,7 +119,7 @@ function Button:mousepressed(x, y, button)
         self.pressing = true
     end
     
-    GUI.Element.mousepressed(self, x, y, button)
+    return GUI.Element.mousepressed(self, x, y, button)
 end
 
 function Button:mousereleased(x, y, button)

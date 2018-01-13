@@ -343,19 +343,17 @@ function Element:mousepressed(x, y, button)
 
             local b = v:mousepressed(lx, ly, button)
 
-            if v.mouseBlocked then
+            if b then
                 toReturn = true
             end
             
-            if not toReturn then
-                if lx >= 0 and lx < v.w and ly >= 0 and ly < v.h and not v.mouseBlocked then
-                    -- push that element to the end
-                    if v.movesToTheFront then
-                        table.insert(self.children, table.remove(self.children, i))
-                    end
-
-                    toReturn = true
+            if lx >= 0 and lx < v.w and ly >= 0 and ly < v.h and not v.mouseBlocked then
+                -- push that element to the end
+                if v.movesToTheFront then
+                    table.insert(self.children, table.remove(self.children, i))
                 end
+
+                toReturn = true
             end
         end
     end

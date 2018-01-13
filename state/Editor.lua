@@ -19,8 +19,8 @@ Editor.toolClasses = {
     pick = require("class.editortools.Pick"),
 }
 
-Editor.scaleMin = 1/VAR("scale")
-Editor.scaleMax = 2
+Editor.scaleMin = 0.1/VAR("scale")
+Editor.scaleMax = 1
 
 function Editor:initialize(level)
     self.level = level
@@ -84,7 +84,7 @@ function Editor:load()
     
     -- SCALE BAR
     local w = 50
-    local x = CAMERAWIDTH-w-3-9-34
+    local x = CAMERAWIDTH-w-3-9-26
     self.scaleSlider = GUI.Slider:new(self.scaleMin, self.scaleMax, x, 3, w, false, function(val) self:changeScale(val) end)
     self.scaleSlider.color.bar = {0, 0, 0}
     
@@ -95,7 +95,7 @@ function Editor:load()
     self.menuBar:addChild(GUI.Button:new(x-10, 2, "-", false, 1, function() self:zoom(-1) end))
     self.menuBar:addChild(GUI.Button:new(x+w, 2, "+", false, 1, function() self:zoom(1) end))
     
-    self.menuBar:addChild(GUI.Button:new(x+w+10, 2, "100%", false, 1, function() self:resetZoom() end))
+    self.menuBar:addChild(GUI.Button:new(x+w+10, 2, "1:1", false, 1, function() self:resetZoom() end))
     
     
     
@@ -340,7 +340,7 @@ function Editor:zoom(i)
 end
     
 function Editor:resetZoom()
-    self.level.camera:zoomTo(1)
+    self.level.camera:zoomTo(1/VAR("scale"))
     self:updateScaleSlider()
 end
 

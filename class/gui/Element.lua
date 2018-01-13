@@ -212,6 +212,12 @@ function Element:draw(level)
     level = level or 1
     
     if not self.noClip then
+        local clear = false
+        
+        if level == 1 then
+            clear = true
+        end
+        
         love.graphics.stencil(function()
             love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
         end, "increment", 1, not clear)

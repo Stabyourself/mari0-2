@@ -4,6 +4,7 @@ Dropdown.noClip = true
 
 function Dropdown:initialize(x, y, s)
     self.button = GUI.Button:new(0, 0, s, false, 3, function() self:toggle() end)
+    self.button.color.normal = {1, 1, 1, 0}
     
     self.box = GUI.Box:new(0, 14, 50, 100)
     self.box.background = {255, 255, 255}

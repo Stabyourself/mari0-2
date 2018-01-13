@@ -66,7 +66,7 @@ function love.load()
         &Time;
         &Times;
         &Space;
-        .;:;!?_-<>=+*/\'
+        .;:;!?_-<>=+*/\'%
     ]]
     
     local i = 1

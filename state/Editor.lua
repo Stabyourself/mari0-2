@@ -1,6 +1,6 @@
 Editor = class("Editor")
     
-Editor.toolbarOrder = {"paint", "portal", "select", "move", "fill", "stamp", "pick"}
+Editor.toolbarOrder = {"paint", "move", "portal", "select", "pick", "fill", "stamp"}
 Editor.toolbarImg = {}
 
 for _, v in ipairs(Editor.toolbarOrder) do
@@ -18,6 +18,9 @@ Editor.toolClasses = {
     stamp = require("class.editortools.Stamp"),
     pick = require("class.editortools.Pick"),
 }
+
+Editor.scaleMin = 1/VAR("scale")
+Editor.scaleMax = 2
 
 function Editor:initialize(level)
     self.level = level
@@ -37,7 +40,7 @@ function Editor:load()
     
     -- MENU BAR
     self.menuBar = GUI.Canvas:new(0, 0, SCREENWIDTH, 14)
-    self.menuBar.background = {255, 255, 255}
+    self.menuBar.background = {1, 1, 1}
     self.menuBar.noClip = true
     
     self.canvas:addChild(self.menuBar)
@@ -50,6 +53,8 @@ function Editor:load()
     fileDropdown:autoSize()
     
     
+    
+    -- WINDOW
     
     self.newWindowDropdown = GUI.Dropdown:new(38, 0, "window")
     
@@ -64,8 +69,7 @@ function Editor:load()
     
     
     
-    
-    
+    -- VIEW
     
     local viewDropdown = GUI.Dropdown:new(92, 0, "view")
     
@@ -78,6 +82,24 @@ function Editor:load()
     
     
     
+    -- SCALE BAR
+    local w = 50
+    local x = CAMERAWIDTH-w-3-9-34
+    self.scaleSlider = GUI.Slider:new(self.scaleMin, self.scaleMax, x, 3, w, false, function(val) self:changeScale(val) end)
+    self.scaleSlider.color.bar = {0, 0, 0}
+    
+    self.menuBar:addChild(self.scaleSlider)
+    
+    self:updateScaleSlider()
+    
+    self.menuBar:addChild(GUI.Button:new(x-10, 2, "-", false, 1, function() self:zoom(-1) end))
+    self.menuBar:addChild(GUI.Button:new(x+w, 2, "+", false, 1, function() self:zoom(1) end))
+    
+    self.menuBar:addChild(GUI.Button:new(x+w+10, 2, "100%", false, 1, function() self:resetZoom() end))
+    
+    
+    
+    
     -- TOOL BAR
     self.toolbar = GUI.Canvas:new(0, 14, 14, CAMERAHEIGHT-14)
     self.toolbar.background = {255, 255, 255}
@@ -87,7 +109,7 @@ function Editor:load()
     local y = 1
     for i, v in ipairs(self.toolbarOrder) do
         local button = GUI.Button:new(1, y, self.toolbarImg[i], false, 1, function(button) self:selectTool(self.tools[v]) end)
-        button.color = {0, 0, 0}
+        button.color.img = {0, 0, 0}
         self.toolbar:addChild(button)
         
         y = y + 14
@@ -158,6 +180,14 @@ function Editor:draw()
     self.level.camera:detach()
     
     self.canvas:draw()
+end
+
+function Editor:changeScale(val)
+    self.level.camera:zoomTo(val)
+end
+
+function Editor:updateScaleSlider()
+    self.scaleSlider:setValue(self.level.camera.scale)
 end
 
 function Editor:toggleGrid(on)
@@ -284,16 +314,34 @@ function Editor:wheelmoved(x, y)
     end
 
     if y ~= 0 then
-        local zoom
-         
-        if y > 0 then -- out
-            zoom = 1.1^y
-        else
-            zoom = 1/(1.1^-y)
-        end
-        
-        self.level.camera:zoom(zoom, getWorldMouse())
+        self:zoom(y)
     end
+end
+
+function Editor:zoom(i)
+    local zoom
+         
+    if i > 0 then -- out
+        zoom = 1.1^i
+    else
+        zoom = 1/(1.1^-i)
+    end
+    
+    
+    if self.level.camera.scale*zoom < self.scaleMin then
+        zoom = self.scaleMin/self.level.camera.scale
+    elseif self.level.camera.scale*zoom > self.scaleMax then
+        zoom = self.scaleMax/self.level.camera.scale
+    end
+    
+    self.level.camera:zoom(zoom, getWorldMouse())
+    
+    self:updateScaleSlider()
+end
+    
+function Editor:resetZoom()
+    self.level.camera:zoomTo(1)
+    self:updateScaleSlider()
 end
 
 function Editor:resize(w, h)

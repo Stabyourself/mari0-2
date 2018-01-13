@@ -33,6 +33,7 @@ function Element:initialize(x, y, w, h)
     self.childBox = {0, 0, self.w, self.h}
     
     self.visible = true
+    self.mouseBlocked = true
     
     self.children = {}
 end

@@ -9,24 +9,31 @@ local sliderQuad = {
 Slider.barOffset = 2
 Slider.textWidth = 25
 
-function Slider:initialize(min, max, x, y, w, showValue)
+function Slider:initialize(min, max, x, y, w, showValue, func)
     self.min = min
     self.max = max
     self.showValue = showValue
     
     self.val = 0
+    self.func = func
     
     self.barWidth = w-self.barOffset*2
     
     if showValue then
         self.barWidth = self.barWidth - self.textWidth
+        self.text = GUI.Text:new(tostring(self:getValue()), w-self.textWidth+1, 0)
     end
-    
-    self.text = GUI.Text:new(tostring(self:getValue()), w-self.textWidth+1, 0)
     
     GUI.Element.initialize(self, x, y, w, 8)
     
-    self:addChild(self.text)
+    if showValue then
+        self:addChild(self.text)
+    end
+    
+    self.color = {
+        bar = {1, 1, 1},
+        slider = {1, 1, 1},
+    }
 end
 
 function Slider:update(dt, x, y, mouseBlocked)
@@ -42,6 +49,10 @@ function Slider:update(dt, x, y, mouseBlocked)
         if self.showValue then
             self.text:setString(tostring(math.round(self:getValue())))
         end
+        
+        if self.func then
+            self.func(self:getValue())
+        end
     end
 
     return ret
@@ -49,6 +60,10 @@ end
 
 function Slider:getValue()
     return self.min + (self.max-self.min)*self.val
+end
+
+function Slider:setValue(val)
+    self.val = (val-self.min)/(self.max-self.min)
 end
 
 function Slider:getCollision(x, y)
@@ -66,6 +81,8 @@ function Slider:draw(level)
     
     GUI.Element.draw(self, level)
     
+    love.graphics.setColor(self.color.bar)
+    
     love.graphics.draw(self.gui.img.sliderBar, sliderQuad[1], 0, 0)
     love.graphics.draw(self.gui.img.sliderBar, sliderQuad[2], 8, 0, 0, self.barWidth+self.barOffset*2-16, 1)
     love.graphics.draw(self.gui.img.sliderBar, sliderQuad[3], self.barWidth+self.barOffset*2-8, 0)
@@ -78,7 +95,11 @@ function Slider:draw(level)
         img = self.gui.img.sliderHover
     end
     
+    love.graphics.setColor(self.color.slider)
+    
     love.graphics.draw(img, self:getPosX(), 0, 0, 1, 1, 4)
+    
+    love.graphics.setColor(1, 1, 1)
 
     GUI.Element.unTranslate(self)
 end

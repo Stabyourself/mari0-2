@@ -53,7 +53,12 @@ function Button:initialize(x, y, content, border, padding, func)
     self.func = func
     
     self.pressing = false
-    self.color = {1, 1, 1}
+    self.color = {
+        normal = {1, 1, 1},
+        hover = {0.75, 0.75, 0.75},
+        active = {0.625, 0.625, 0.625},
+        img = {1, 1, 1},
+    }
 end
 
 function Button:getCollision(x, y)
@@ -84,23 +89,23 @@ function Button:draw(level)
         love.graphics.draw(img, buttonQuad[8], 2, self.h-2, 0, self.w-4, 1)
         love.graphics.draw(img, buttonQuad[9], self.w-2, self.h-2)
     else
-        love.graphics.setColor(1, 1, 1)
+        love.graphics.setColor(self.color.normal)
         
         if self.pressing then
-            love.graphics.setColor(0.625, 0.625, 0.625)
+            love.graphics.setColor(self.color.active)
         elseif self:getCollision(self.mouse[1], self.mouse[2]) then
-            love.graphics.setColor(0.75, 0.75, 0.75)
+            love.graphics.setColor(self.color.hover)
         end
         
         love.graphics.rectangle("fill", 0, 0, self.w, self.h)
-        love.graphics.setColor(1, 1, 1)
     end
     
-    love.graphics.setColor(self.color)
+    love.graphics.setColor(1, 1, 1)
     
     GUI.Element.draw(self, level)
     
     if self.img then
+        love.graphics.setColor(self.color.img)
         love.graphics.draw(self.img, self.padding, self.padding)
     end
     

@@ -56,7 +56,12 @@ return {
         
         editor = {
             pipette = "lshift",
-            delete = "delete"
+            delete = "delete",
+            
+            select = {
+                add = "lshift",
+                subtract = "lctrl"
+            }
         }
     },
 

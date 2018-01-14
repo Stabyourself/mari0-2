@@ -225,10 +225,8 @@ function updateGroup(group, dt)
 		end
 	end
 	
-	table.sort(delete, function(a,b) return a>b end)
-	
-	for _, v in ipairs(delete) do
-		table.remove(group, v)
+	for i = #delete, 1, -1 do
+		table.remove(group, delete[i])
 	end
 end
     

@@ -7,7 +7,11 @@ for _, v in ipairs(Editor.toolbarOrder) do
     table.insert(Editor.toolbarImg, love.graphics.newImage("img/editor/" .. v .. ".png"))
 end
 
-local checkerboardImg = love.graphics.newImage("img/checkerboard.png")
+local checkerboardImg = love.graphics.newImage("img/editor/checkerboard.png")
+local selectionBorderImg = love.graphics.newImage("img/editor/selection-border.png")
+selectionBorderImg:setWrap("repeat")
+
+local selectionQuad = love.graphics.newQuad(0, 4, 16, 1, 4, 1)
 
 Editor.toolClasses = {
     paint = require("class.editortools.Paint"),
@@ -135,6 +139,8 @@ function Editor:load()
     self.gridQuad = love.graphics.newQuad(0, 0, 16, 16, 16, 16)
     
     self.selection = {}
+    self.selectionBorders = {}
+    self.selectionBorderTimer = 0
     
     self:toggleGrid(false)
     self:toggleFreeCam(true)
@@ -166,6 +172,12 @@ function Editor:update(dt)
             self.level.camera.y = self.level.camera.y - cameraSpeed
         end
     end
+    
+    self.selectionBorderTimer = self.selectionBorderTimer + dt*8
+    while self.selectionBorderTimer >= 4 do
+        self.selectionBorderTimer = self.selectionBorderTimer - 4
+    end
+    selectionQuad:setViewport(math.floor(self.selectionBorderTimer), 4, 16, 1)
 end
 
 function Editor:draw()
@@ -192,6 +204,11 @@ function Editor:draw()
     
     if self.tool.draw then
         self.tool:draw()
+    end
+    
+    -- selection
+    for _, v in ipairs(self.selectionBorders) do
+        love.graphics.draw(selectionBorderImg, selectionQuad, v.x, v.y, v.a)
     end
     
     self.level.camera:detach()
@@ -362,7 +379,7 @@ function Editor:wheelmoved(x, y)
         return true
     end
     
-    if self.tool:wheelmoved(x, y) then
+    if self.tool.wheelmoved and self.tool:wheelmoved(x, y) then
         return true
     end
 
@@ -416,6 +433,118 @@ function Editor:resize(w, h)
 end
 
 function Editor:replaceSelection(selection)
-    print("!")
     self.selection = selection
+    self:updateSelectionBorder()
+end
+
+function Editor:addToSelection(selection)
+    for _, v in ipairs(selection) do
+        local found = false
+        
+        for _, w in ipairs(self.selection) do
+            if w.x == v.x and w.y == v.y then
+                found = true
+                break
+            end
+        end
+        
+        if not found then
+            table.insert(self.selection, v)
+        end
+    end
+    
+    self:updateSelectionBorder()
+end
+
+function Editor:subtractFromSelection(selection)
+    local toDelete = {}
+    
+    for i, v in ipairs(self.selection) do
+        local found = false
+        
+        for _, w in ipairs(selection) do
+            if w.x == v.x and w.y == v.y then
+                found = true
+                break
+            end
+        end
+        
+        if found then
+            table.insert(toDelete, i)
+        end
+    end
+    
+    for i = #toDelete, 1, -1 do
+        table.remove(self.selection, toDelete[i])
+    end
+        
+    
+    self:updateSelectionBorder()
+end
+
+function Editor:updateSelectionBorder()
+    self.selectionBorders = {}
+    local SBL = {} -- selectionBordersLookup
+    
+    for _, v in ipairs(self.selection) do
+        local x, y = v.x, v.y
+        
+        if SBL[x-1] and SBL[x-1][y] and SBL[x-1][y].right then
+            SBL[x-1][y].right = false
+        end
+        if SBL[x+1] and SBL[x+1][y] and SBL[x+1][y].left then
+            SBL[x+1][y].left = false
+        end
+        if SBL[x] and SBL[x][y-1] and SBL[x][y-1].bottom then
+            SBL[x][y-1].bottom = false
+        end
+        if SBL[x] and SBL[x][y+1] and SBL[x][y+1].top then
+            SBL[x][y+1].top = false
+        end
+        
+        if not SBL[x] then
+            SBL[x] = {}
+        end
+        
+        SBL[x][y] = {
+            top = true,
+            left = true,
+            right = true,
+            bottom = true
+        }
+        
+        if SBL[x-1] and SBL[x-1][y] then
+            SBL[x][y].left = false
+        end
+        if SBL[x+1] and SBL[x+1][y] then
+            SBL[x][y].right = false
+        end
+        if SBL[x] and SBL[x][y-1] then
+            SBL[x][y].top = false
+        end
+        if SBL[x] and SBL[x][y+1] then
+            SBL[x][y].bottom = false
+        end
+    end
+    
+    for _, v in ipairs(self.selection) do
+        local x, y = v.x, v.y
+        local wx, wy = self.level:mapToWorld(x-1, y-1)
+        
+        if SBL[x][y].top then
+            table.insert(self.selectionBorders, {x=wx, y=wy, a=0})
+        end
+        
+        if SBL[x][y].right then
+            table.insert(self.selectionBorders, {x=wx+16, y=wy, a=math.pi*.5})
+        end
+        
+        if SBL[x][y].bottom then
+            table.insert(self.selectionBorders, {x=wx+16, y=wy+16, a=math.pi})
+        end
+        
+        if SBL[x][y].left then
+            table.insert(self.selectionBorders, {x=wx, y=wy+16, a=-math.pi*.5})
+        end
+    end
 end

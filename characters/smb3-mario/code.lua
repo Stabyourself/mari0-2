@@ -554,6 +554,10 @@ local powerUpStates = {
     }
 }
 
+local function getPath(i, j)
+    return "characters/smb3-mario/graphics/" .. i .. "-" .. j .. ".png"
+end
+
 for i, v in pairs(powerUpStates) do
     Character[i] = {}
     local char = Character[i]
@@ -565,26 +569,22 @@ for i, v in pairs(powerUpStates) do
     char.img = {}
     local imgWidth, imgHeight
     
-    local function getPath(j)
-        return "characters/smb3-mario/graphics/" .. i .. "-" .. j .. ".png"
-    end
-    
     local j = 1
-    local fileInfo = love.filesystem.getInfo(getPath(j))
+    local fileInfo = love.filesystem.getInfo(getPath(i, j))
     
     while fileInfo and fileInfo.type == "file" do
-        char.img[j] = love.graphics.newImage(getPath(j))
+        char.img[j] = love.graphics.newImage(getPath(i, j))
         
         imgWidth = char.img[j]:getWidth()
         imgHeight = char.img[j]:getHeight()
         
         j = j + 1
-        fileInfo = love.filesystem.getInfo(getPath(j))
+        fileInfo = love.filesystem.getInfo(getPath(i, j))
     end
     
-    local fileInfo = love.filesystem.getInfo(getPath("static"))
+    local fileInfo = love.filesystem.getInfo(getPath(i, "static"))
     if fileInfo and fileInfo.type == "file" then
-        char.img["static"] = love.graphics.newImage(getPath("static"))
+        char.img["static"] = love.graphics.newImage(getPath(i, "static"))
         
         imgWidth = char.img["static"]:getWidth()
         imgHeight = char.img["static"]:getHeight()

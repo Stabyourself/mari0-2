@@ -1,5 +1,5 @@
 local Font3 = class("Font3")
-
+    
 function Font3:initialize(img, glyphs)
     self.img = img
     self.glyphs = glyphs
@@ -12,23 +12,16 @@ function Font3:initialize(img, glyphs)
     local glyphSize = 8
     local glyphWidth = self.img:getWidth()/glyphSize
     
-    local function assignGlyph(glyph)
-        local x = math.floor((glyphNum-1)%glyphWidth+1)
-        local y = math.ceil(glyphNum/glyphWidth)
-        
-        self.quad[glyph] = love.graphics.newQuad((x-1)*glyphSize, (y-1)*glyphSize, glyphSize, glyphSize, self.img:getDimensions())
-        
-        glyphNum = glyphNum + 1
-    end
-    
     for i = 1, #self.glyphs do
         local glyph = string.sub(self.glyphs, i, i)
         local byte = string.byte(glyph)
         
         if byte ~= string.byte("\n") and byte ~= string.byte(" ") then
+            local assign = false
+
             if byte == string.byte(";") and inLongName then
                 if inLongName then
-                    assignGlyph(currentGlyph)
+                    assign = currentGlyph
                     currentGlyph = ""
                     inLongName = false
                 end
@@ -39,8 +32,17 @@ function Font3:initialize(img, glyphs)
                 if inLongName then
                     currentGlyph = currentGlyph .. glyph
                 else
-                    assignGlyph(glyph)
+                    assign = glyph
                 end
+            end
+
+            if assign then
+                local x = math.floor((glyphNum-1)%glyphWidth+1)
+                local y = math.ceil(glyphNum/glyphWidth)
+                
+                self.quad[assign] = love.graphics.newQuad((x-1)*glyphSize, (y-1)*glyphSize, glyphSize, glyphSize, self.img:getDimensions())
+
+                glyphNum = glyphNum + 1    
             end
         end
     end

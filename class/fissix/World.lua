@@ -602,197 +602,197 @@ function World:doPortal(portal, x, y, angle)
     return newX, newY, r, rDiff, reversed
 end
 
-function World:checkPortalSurface(tileX, tileY, side, worldX, worldY, ignoreP)
-    local function walkSide(tile, tileX, tileY, side, dir)
-        local nextX, nextY, angle, nextAngle, nextTileX, nextTileY, nextSide, x, y
-        local first = true
+local function walkSide(self, tile, tileX, tileY, side, dir)
+    local nextX, nextY, angle, nextAngle, nextTileX, nextTileY, nextSide, x, y
+    local first = true
+    
+    local found
+    
+    repeat
+        found = false
         
-        local found
-        
-        repeat
-            found = false
+        if dir == "clockwise" then
+            x = tile.collision[side*2-1]
+            y = tile.collision[side*2]
             
-            if dir == "clockwise" then
-                x = tile.collision[side*2-1]
-                y = tile.collision[side*2]
-                
-                nextSide = side + 1
-                
-                if nextSide > #tile.collision/2 then
-                    nextSide = 1
-                end
-            elseif dir == "anticlockwise" then
-                --don't move to nextside on the first, because it's already on it
-                if first then
-                    nextSide = side
-                    
-                    -- Move x and y though because reasons
-                    local tempSide = side + 1
-                    
-                    if tempSide > #tile.collision/2 then
-                        tempSide = 1
-                    end
-                    
-                    x = tile.collision[tempSide*2-1]
-                    y = tile.collision[tempSide*2]
-                else
-                    nextSide = side - 1
-                    if nextSide == 0 then
-                        nextSide = #tile.collision/2
-                    end
-                end
+            nextSide = side + 1
+            
+            if nextSide > #tile.collision/2 then
+                nextSide = 1
             end
-            
-            nextX = tile.collision[nextSide*2-1]
-            nextY = tile.collision[nextSide*2]
-            
-            nextAngle = math.atan2(nextX-x, nextY-y)
-            
+        elseif dir == "anticlockwise" then
+            --don't move to nextside on the first, because it's already on it
             if first then
-                angle = nextAngle
+                nextSide = side
+                
+                -- Move x and y though because reasons
+                local tempSide = side + 1
+                
+                if tempSide > #tile.collision/2 then
+                    tempSide = 1
+                end
+                
+                x = tile.collision[tempSide*2-1]
+                y = tile.collision[tempSide*2]
+            else
+                nextSide = side - 1
+                if nextSide == 0 then
+                    nextSide = #tile.collision/2
+                end
             end
-            
-            if nextAngle == angle then
-                --check which neighbor this line might continue
-                if nextX == 0 or nextX == 16 or nextY == 0 or nextY == 16 then
-                    local moveX = 0
-                    local moveY = 0
-                    
-                    if nextX == 0 and nextY ~= 0 and nextY ~= 16 then -- LEFT
-                        moveX = -1
-                    elseif nextX == 16 and nextY ~= 0 and nextY ~= 16 then -- RIGHT
-                        moveX = 1
-                    elseif nextY == 0 and nextX ~= 0 and nextX ~= 16 then -- UP
-                        moveY = -1
-                    elseif nextY == 16 and nextX ~= 0 and nextX ~= 16 then -- DOWN
-                        moveY = 1
-                    
-                    else
-                        if nextX == 0 and nextY == 0 then -- top left, either upleft or up or left
-                            if dir == "clockwise" and x == 0 then -- UP
-                                moveY = -1
-                            elseif dir == "anticlockwise" and y == 0 then -- LEFT
-                                moveX = -1
-                            else -- upleft
-                                moveX = -1
-                                moveY = -1
-                            end
-                            
-                        elseif nextX == 16 and nextY == 0 then -- top right, either upright or right or up
-                            if dir == "clockwise" and y == 0 then -- RIGHT
-                                moveX = 1
-                            elseif dir == "anticlockwise" and x == 16 then -- UP
-                                moveY = -1
-                            else -- UPRIGHT
-                                moveX = 1
-                                moveY = -1
-                            end
+        end
+        
+        nextX = tile.collision[nextSide*2-1]
+        nextY = tile.collision[nextSide*2]
+        
+        nextAngle = math.atan2(nextX-x, nextY-y)
+        
+        if first then
+            angle = nextAngle
+        end
+        
+        if nextAngle == angle then
+            --check which neighbor this line might continue
+            if nextX == 0 or nextX == 16 or nextY == 0 or nextY == 16 then
+                local moveX = 0
+                local moveY = 0
+                
+                if nextX == 0 and nextY ~= 0 and nextY ~= 16 then -- LEFT
+                    moveX = -1
+                elseif nextX == 16 and nextY ~= 0 and nextY ~= 16 then -- RIGHT
+                    moveX = 1
+                elseif nextY == 0 and nextX ~= 0 and nextX ~= 16 then -- UP
+                    moveY = -1
+                elseif nextY == 16 and nextX ~= 0 and nextX ~= 16 then -- DOWN
+                    moveY = 1
+                
+                else
+                    if nextX == 0 and nextY == 0 then -- top left, either upleft or up or left
+                        if dir == "clockwise" and x == 0 then -- UP
+                            moveY = -1
+                        elseif dir == "anticlockwise" and y == 0 then -- LEFT
+                            moveX = -1
+                        else -- upleft
+                            moveX = -1
+                            moveY = -1
+                        end
                         
-                        elseif nextX == 16 and nextY == 16 then -- bottom right, either downright or down or right
-                            if dir == "clockwise" and x == 16 then -- DOWN
-                                moveY = 1
-                            elseif dir == "anticlockwise" and y == 16 then -- RIGHT
-                                moveX = 1
-                            else -- downright
-                                moveX = 1
-                                moveY = 1
-                            end
-                        
-                        elseif nextX == 0 and nextY == 16 then -- bottom left, either downleft or left or down
-                            if dir == "clockwise" and y == 16 then -- LEFT
-                                moveX = -1
-                            elseif dir == "anticlockwise" and x == 0 then -- DOWN
-                                moveY = 1
-                            else -- downleft
-                                moveX = -1
-                                moveY = 1
-                            end
+                    elseif nextX == 16 and nextY == 0 then -- top right, either upright or right or up
+                        if dir == "clockwise" and y == 0 then -- RIGHT
+                            moveX = 1
+                        elseif dir == "anticlockwise" and x == 16 then -- UP
+                            moveY = -1
+                        else -- UPRIGHT
+                            moveX = 1
+                            moveY = -1
+                        end
+                    
+                    elseif nextX == 16 and nextY == 16 then -- bottom right, either downright or down or right
+                        if dir == "clockwise" and x == 16 then -- DOWN
+                            moveY = 1
+                        elseif dir == "anticlockwise" and y == 16 then -- RIGHT
+                            moveX = 1
+                        else -- downright
+                            moveX = 1
+                            moveY = 1
+                        end
+                    
+                    elseif nextX == 0 and nextY == 16 then -- bottom left, either downleft or left or down
+                        if dir == "clockwise" and y == 16 then -- LEFT
+                            moveX = -1
+                        elseif dir == "anticlockwise" and x == 0 then -- DOWN
+                            moveY = 1
+                        else -- downleft
+                            moveX = -1
+                            moveY = 1
                         end
                     end
-                    
-                    -- Check if there's a tile in the way
-                    
-                    -- Dirty check, maybe change
-                    -- Find where on the "windmill" we are
-                    local windMill = {
-                        -1, -1,
-                        0, -1,
-                        1, -1,
-                        1,  0,
-                        1,  1,
-                        0,  1,
-                        -1,  1,
-                        -1, 0
-                    }
+                end
+                
+                -- Check if there's a tile in the way
+                
+                -- Dirty check, maybe change
+                -- Find where on the "windmill" we are
+                local windMill = {
+                    -1, -1,
+                    0, -1,
+                    1, -1,
+                    1,  0,
+                    1,  1,
+                    0,  1,
+                    -1,  1,
+                    -1, 0
+                }
 
-                    local pos
-                    for i = 1, #windMill, 2 do
-                        if windMill[i] == moveX and windMill[i+1] == moveY then
-                            pos = (i+1)/2
-                        end
+                local pos
+                for i = 1, #windMill, 2 do
+                    if windMill[i] == moveX and windMill[i+1] == moveY then
+                        pos = (i+1)/2
                     end
-                    
-                    local nextPos
-                    
-                    if dir == "clockwise" then
-                        nextPos = pos - 1
+                end
+                
+                local nextPos
+                
+                if dir == "clockwise" then
+                    nextPos = pos - 1
+                        
+                    if nextPos == 0 then
+                        nextPos = 8
+                    end
+                elseif dir == "anticlockwise" then
+                    nextPos = pos + 1
+                        
+                    if nextPos > 8 then
+                        nextPos = 1
+                    end
+                end
+                
+                local checkTileX = tileX + windMill[nextPos*2-1]
+                local checkTileY = tileY + windMill[nextPos*2]
+                
+                local checkTile
+                
+                if self:inMap(checkTileX, checkTileY) then
+                    checkTile = self:getTile(checkTileX, checkTileY)
+                end
+                
+                nextTileX = tileX + moveX
+                nextTileY = tileY + moveY
+                
+                x = nextX - moveX*self.tileSize
+                y = nextY - moveY*self.tileSize
+                
+                tileX = nextTileX
+                tileY = nextTileY
+                
+                if not checkTile or not checkTile.collision then
+                    --check if next tile has a point on the same spot as nextX/nextY
+                    if self:inMap(tileX, tileY) then
+                        local nextTile = self:getTile(tileX, tileY)
+                        if nextTile and nextTile.collision then
+                            local points = nextTile.collision
                             
-                        if nextPos == 0 then
-                            nextPos = 8
-                        end
-                    elseif dir == "anticlockwise" then
-                        nextPos = pos + 1
-                            
-                        if nextPos > 8 then
-                            nextPos = 1
-                        end
-                    end
-                    
-                    local checkTileX = tileX + windMill[nextPos*2-1]
-                    local checkTileY = tileY + windMill[nextPos*2]
-                    
-                    local checkTile
-                    
-                    if self:inMap(checkTileX, checkTileY) then
-                        checkTile = self:getTile(checkTileX, checkTileY)
-                    end
-                    
-                    nextTileX = tileX + moveX
-                    nextTileY = tileY + moveY
-                    
-                    x = nextX - moveX*self.tileSize
-                    y = nextY - moveY*self.tileSize
-                    
-                    tileX = nextTileX
-                    tileY = nextTileY
-                    
-                    if not checkTile or not checkTile.collision then
-                        --check if next tile has a point on the same spot as nextX/nextY
-                        if self:inMap(tileX, tileY) then
-                            local nextTile = self:getTile(tileX, tileY)
-                            if nextTile and nextTile.collision then
-                                local points = nextTile.collision
-                                
-                                for i = 1, #points, 2 do
-                                    if points[i] == x and points[i+1] == y then
-                                        -- Make sure the angle of this side is the same
-                                        found = true
-                                        side = (i+1)/2
-                                        tile = nextTile
-                                    end
+                            for i = 1, #points, 2 do
+                                if points[i] == x and points[i+1] == y then
+                                    -- Make sure the angle of this side is the same
+                                    found = true
+                                    side = (i+1)/2
+                                    tile = nextTile
                                 end
                             end
                         end
                     end
                 end
             end
-            
-            first = false
-        until not found
+        end
         
-        return tileX+x/self.tileSize-1, tileY+y/self.tileSize-1
-    end
+        first = false
+    until not found
     
+    return tileX+x/self.tileSize-1, tileY+y/self.tileSize-1
+end
+
+function World:checkPortalSurface(tileX, tileY, side, worldX, worldY, ignoreP)
     if not self:inMap(tileX, tileY) then
         return false
     end
@@ -803,8 +803,8 @@ function World:checkPortalSurface(tileX, tileY, side, worldX, worldY, ignoreP)
         return false
     end
     
-    local startX, startY = walkSide(tile, tileX, tileY, side, "anticlockwise")
-    local endX, endY = walkSide(tile, tileX, tileY, side, "clockwise")
+    local startX, startY = walkSide(self, tile, tileX, tileY, side, "anticlockwise")
+    local endX, endY = walkSide(self, tile, tileX, tileY, side, "clockwise")
     
     startX, startY = self:mapToWorld(startX, startY)
     endX, endY = self:mapToWorld(endX, endY)

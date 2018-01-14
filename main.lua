@@ -128,6 +128,14 @@ function love.update(dt)
     gameStateManager:event("update", dt)
 end
 
+local function setColorBasedOn(key)
+    if keyDown(key) then
+        love.graphics.setColor(1, 1, 1)
+    else
+        love.graphics.setColor(0.2, 0.2, 0.2)
+    end
+end
+
 function love.draw()
     if VAR("scale") ~= 1 then
         love.graphics.scale(VAR("scale"), VAR("scale"))
@@ -141,14 +149,6 @@ function love.draw()
     
     -- For the stream
     if VAR("inputDebug") then
-        local function setColorBasedOn(key)
-            if keyDown(key) then
-                love.graphics.setColor(1, 1, 1)
-            else
-                love.graphics.setColor(0.2, 0.2, 0.2)
-            end
-        end
-        
         setColorBasedOn("up")
         love.graphics.rectangle("fill", 16, SCREENHEIGHT-32, 8, 8)
         setColorBasedOn("left")
@@ -245,19 +245,19 @@ function updateGroup(group, dt)
 		table.remove(group, v)
 	end
 end
+    
+local function combineTableCall(var, t) -- basically makes var["some.dot.separated.string"] into var.some.dot.separated.string
+    local ct = table.remove(t, 1)
+    
+    if #t == 0 then
+        return var[ct]
+    else
+        return combineTableCall(var[ct], t)
+    end
+end
 
 function keyDown(cmd)
     local split = cmd:split(".")
-    
-    local function combineTableCall(var, t) -- basically makes var["some.dot.separated.string"] into var.some.dot.separated.string
-        local ct = table.remove(t, 1)
-        
-        if #t == 0 then
-            return var[ct]
-        else
-            return combineTableCall(var[ct], t)
-        end
-    end
     
     return love.keyboard.isDown(combineTableCall(VAR("controls"), split))
 end

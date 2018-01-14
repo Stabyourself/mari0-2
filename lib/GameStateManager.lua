@@ -1,6 +1,6 @@
 local GameStateManager = class("GameStateManager")
 
-GameStateManager.reversedStates = {"mousepressed", "keypressed"}
+GameStateManager.reversedEvents = {"mousepressed", "keypressed"}
 
 function GameStateManager:initialize()
     self.activeStates = {}
@@ -17,30 +17,21 @@ function GameStateManager:addState(state)
 end
 
 function GameStateManager:event(event, ...)
-    local function callStateEvent(state, event, ...)
+    local from, to, step = 1, #self.activeStates, 1
+    
+    if inITable(self.reversedEvents, event) then
+        from, to, step = to, from, -1
+    end 
+
+    for i = from, to, step do 
+        local state = self.activeStates[i]
+
         if type(state[event]) == "function" then
             if state[event](state, ...) then
-                return true
-            end
-        end
-    end
-    
-    if inITable(self.reversedStates, event) then
-        for i = #self.activeStates, 1, -1 do
-            local v = self.activeStates[i]
-
-            if callStateEvent(v, event, ...) then
                 break
             end
         end
-
-    else
-        for _, v in ipairs(self.activeStates) do
-            if callStateEvent(v, event, ...) then
-                break
-            end
-        end
-    end
+    end 
 end
 
 return GameStateManager

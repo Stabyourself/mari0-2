@@ -54,7 +54,7 @@ end
 function Select:getTiles(x, y, w, h)
     local lx, rx, ty, by
     
-    if w < 3 and h < 3 then
+    if math.abs(w) < 3 and math.abs(h) < 3 then
         lx, ty = self.editor.level:worldToMap(x, y)
         rx, by = lx, ty
     else

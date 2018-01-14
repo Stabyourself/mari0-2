@@ -191,13 +191,9 @@ function Level:bumpBlock(x, y)
         local blockBounce = BlockBounce:new(x, y)
         
         table.insert(self.blockBounces, blockBounce)
-        
-        playSound(blockSound)
 
         if Tile.coinBlock then
             self:setMap(x, y, 113)
-
-            playSound(coinSound)
         end
     end
 end

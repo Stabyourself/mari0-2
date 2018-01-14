@@ -17,10 +17,6 @@ function Game:load()
     self.uiVisible = true
     
     love.graphics.setBackgroundColor(self.level.backgroundColor)
-
-    if not VAR("musicDisabled") then
-        playMusic(overworldMusic)
-    end
     
     skipUpdate()
 end

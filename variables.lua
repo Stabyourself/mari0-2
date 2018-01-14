@@ -55,7 +55,8 @@ return {
         closePortals = "r",
         
         editor = {
-            pipette = "lshift"
+            pipette = "lshift",
+            delete = "delete"
         }
     },
 

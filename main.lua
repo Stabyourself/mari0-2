@@ -8,6 +8,8 @@ function love.load()
         vsync = VAR("vsync"),
         resizable = true,
         msaa = msaa,
+        minwidth = 232*VAR("scale"),
+        minheight = 151*VAR("scale"),
     })
 
     love.window.setTitle("Definitely not Mari0 2")
@@ -76,22 +78,6 @@ function love.load()
         &Space;
         .;:;!?_-<>=+*/\'%
     ]])
-
-    print("Loading sound... (might take a while)")
-    if not VAR("musicDisabled") then
-        overworldMusic = love.audio.newSource("sound/music/overworld.ogg", "stream")
-        overworldMusic:setLooping(true)
-        overworldMusic:setVolume(VAR("volume"))
-    end
-
-    jumpSound = love.audio.newSource("sound/jump.ogg", "static")
-    jumpSound:setVolume(VAR("volume"))
-    blockSound = love.audio.newSource("sound/block.ogg", "static")
-    blockSound:setVolume(VAR("volume"))
-    coinSound = love.audio.newSource("sound/coin.ogg", "static")
-    coinSound:setVolume(VAR("volume"))
-    stompSound = love.audio.newSource("sound/stomp.ogg", "static")
-    stompSound:setVolume(VAR("volume"))
 
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")
     debugCandyImg:setWrap("repeat")
@@ -256,10 +242,14 @@ local function combineTableCall(var, t) -- basically makes var["some.dot.separat
     end
 end
 
-function keyDown(cmd)
+function getKey(cmd)
     local split = cmd:split(".")
     
-    return love.keyboard.isDown(combineTableCall(VAR("controls"), split))
+    return combineTableCall(VAR("controls"), split)
+end
+
+function keyDown(cmd)
+    return love.keyboard.isDown(getKey(cmd))
 end
 
 function skipUpdate()

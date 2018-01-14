@@ -14,20 +14,4 @@ function Portal:unSelect()
     self.editor.freeCamera = true
 end
 
-function Portal:update(dt)
-    
-end
-
-function Portal:draw()
-    
-end
-
-function Portal:mousepressed(x, y, button)
-    
-end
-
-function Portal:mousereleased(x, y, button)
-    
-end
-
 return Portal

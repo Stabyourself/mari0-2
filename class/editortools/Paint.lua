@@ -7,14 +7,6 @@ function Paint:initialize(editor)
     self.tile = 1
 end
 
-function Paint:select()
-    
-end
-
-function Paint:unSelect()
-    
-end
-
 function Paint:update(dt)
     if self.penDown then
         local x, y = self.editor.level:cameraToMap(getWorldMouse())
@@ -52,6 +44,11 @@ function Paint:pipette(x, y)
     
     if self.editor.level:inMap(mapX, mapY) then
         self.tile = self.editor.level.map[mapX][mapY]
+        
+        if self.tile == 0 then
+            self.tile = 1
+            self.editor:selectTool("erase")
+        end
     end
 end
 

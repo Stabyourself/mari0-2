@@ -122,10 +122,10 @@ function World:draw()
     for x = xStart, xEnd do
         for y = yStart, yEnd do
             if self:inMap(x, y) then
-                local Tile = self:getTile(x, y)
+                local tile = self:getTile(x, y)
                 
-                if Tile and not Tile.invisible then
-                    Tile:draw((x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
+                if tile then
+                    tile:draw((x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
                 end
             end
         end
@@ -318,12 +318,16 @@ function World:checkMapCollision(obj, x, y)
 		return false
     end
     
-	local inTileX = math.fmod(x, self.tileSize)
-    local inTileY = math.fmod(y, self.tileSize)
+    local tile = self:getTile(tileX, tileY)
     
-	local col = self:getTile(tileX, tileY):checkCollision(inTileX, inTileY)
-	
-	return col
+    if tile then
+        local inTileX = math.fmod(x, self.tileSize)
+        local inTileY = math.fmod(y, self.tileSize)
+        
+        return tile:checkCollision(inTileX, inTileY)
+    else
+        return col
+    end
 end
 
 function World:setMap(x, y, i)
@@ -333,7 +337,13 @@ function World:setMap(x, y, i)
 end
 
 function World:getTile(x, y)
-    return self.tileMap.tiles[self.map[x][y]]
+    local tileNum = self.map[x][y]
+    
+    if tileNum == 0 then
+        return false
+    end
+    
+    return self.tileMap.tiles[tileNum]
 end
 
 function World:inMap(x, y)
@@ -386,7 +396,7 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
             cubeCol = true
         else
             local tile = self:getTile(mapX, mapY)
-            if tile.collision then
+            if tile and tile.collision then
                 if tile.collision == VAR("collision").cube then
                     cubeCol = true
                 else

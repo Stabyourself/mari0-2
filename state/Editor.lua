@@ -1,6 +1,6 @@
 Editor = class("Editor")
     
-Editor.toolbarOrder = {"paint", "move", "portal", "select", "pick", "fill", "stamp"}
+Editor.toolbarOrder = {"paint", "erase", "move", "portal", "select", "pick", "fill", "stamp"}
 Editor.toolbarImg = {}
 
 for _, v in ipairs(Editor.toolbarOrder) do
@@ -17,6 +17,7 @@ Editor.toolClasses = {
     fill = require("class.editortools.Fill"),
     stamp = require("class.editortools.Stamp"),
     pick = require("class.editortools.Pick"),
+    erase = require("class.editortools.Erase"),
 }
 
 Editor.scaleMin = 0.1/VAR("scale")
@@ -133,6 +134,8 @@ function Editor:load()
     self.gridImg:setWrap("repeat", "repeat")
     self.gridQuad = love.graphics.newQuad(0, 0, 16, 16, 16, 16)
     
+    self.selection = {}
+    
     self:toggleGrid(false)
     self:toggleFreeCam(true)
 end
@@ -140,7 +143,9 @@ end
 function Editor:update(dt)
     self.canvas:update(dt)
     
-    self.tool:update(dt)
+    if self.tool.update then
+        self.tool:update(dt)
+    end
     
     if self.freeCamera then
         local cameraSpeed = dt*VAR("editor").cameraSpeed--*(1/self.level.camera.scale)
@@ -185,7 +190,9 @@ function Editor:draw()
         )
     end
     
-    self.tool:draw()
+    if self.tool.draw then
+        self.tool:draw()
+    end
     
     self.level.camera:detach()
     
@@ -232,13 +239,15 @@ function Editor:toggleUI(on)
 end
 
 function Editor:selectTool(toolName)
-    if self.tool then
+    if self.tool and self.tool.unselect then
         self.tool:unSelect()
     end
     
     self.tool = self.tools[toolName]
     
-    self.tool:select()
+    if self.tool.select then
+        self.tool:select()
+    end
     
     for _, v in pairs(self.toolButtons) do
         v.color.background = {1, 1, 1}
@@ -305,7 +314,7 @@ function Editor:newWindow(type, button)
         local tileListButtonGrid = GUI.ButtonGrid:new(1, 1, self.level.tileMap.img, self.level.tileMap.quad, 
             function(buttonGrid, i) 
                 buttonGrid.selected = i
-                self:selectTile(i) 
+                self:selectTile(i)
             end
         )
         tileListWindow:addChild(tileListButtonGrid)
@@ -319,7 +328,15 @@ function Editor:selectTile(i)
 end
 
 function Editor:keypressed(key)
+    if self.tool.keypressed and self.tool:keypressed(key) then
+        return true
+    end
     
+    if key == getKey("editor.delete") then
+        for _, v in ipairs(self.selection) do
+            self.level:setMap(v.x, v.y, 1)
+        end
+    end
 end
 
 function Editor:mousepressed(x, y, button)
@@ -327,17 +344,25 @@ function Editor:mousepressed(x, y, button)
         return true
     end
     
-    return self.tool:mousepressed(x, y, button)
+    if self.tool.mousepressed and self.tool:mousepressed(x, y, button) then
+        return true
+    end
 end
 
 function Editor:mousereleased(x, y, button)
     self.canvas:mousereleased(x, y, button)
     
-    self.tool:mousereleased(x, y, button)
+    if self.tool.mousereleased then
+        self.tool:mousereleased(x, y, button)
+    end
 end
 
 function Editor:wheelmoved(x, y)
     if self.canvas:wheelmoved(x, y) then
+        return true
+    end
+    
+    if self.tool:wheelmoved(x, y) then
         return true
     end
 
@@ -388,4 +413,9 @@ function Editor:resize(w, h)
     local fullw = w+52
     local x = CAMERAWIDTH-fullw
     self.scaleBar.x = x
+end
+
+function Editor:replaceSelection(selection)
+    print("!")
+    self.selection = selection
 end

@@ -1,10 +1,5 @@
 local tiles = {
     {
-        name = "sky",
-        invisible = true
-    },
-
-    {
         name = "ground",
         collision = VAR("collision").cube
     },

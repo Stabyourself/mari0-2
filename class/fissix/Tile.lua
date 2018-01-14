@@ -7,7 +7,6 @@ function Tile:initialize(tileMap, img, quad, x, y, props)
 	self.y = y
 	self.props = props or {}
 	
-	self.invisible = self.props.invisible or false
 	self.type = self.props.type or "normal"
 	self.angle = self.props.angle or 0
 
@@ -47,12 +46,10 @@ function Tile:draw(x, y, ghost)
 		love.graphics.setColor(1, 1, 1, 0.5)
 	end
 	
-	if not self.invisible then
-		if self.type == "normal" then
-			worldDraw(self.img, self.quad, x, y)
-		elseif self.type == "coinAnimation" then
-			worldDraw(self.img, self.quad[game.coinAnimationFrame], x, y)
-		end
+	if self.type == "normal" then
+		worldDraw(self.img, self.quad, x, y)
+	elseif self.type == "coinAnimation" then
+		worldDraw(self.img, self.quad[game.coinAnimationFrame], x, y)
 	end
 end
 

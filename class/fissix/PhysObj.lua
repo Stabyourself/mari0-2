@@ -220,7 +220,10 @@ function PhysObj:checkCollisions()
 		local x, y = self.world:worldToMap(collisions.bottom.x, collisions.bottom.y)
 		
 		local tile = self.world:getTile(x, y)
-		self.surfaceAngle = tile.angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
+		
+		if tile then
+			self.surfaceAngle = tile.angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
+		end
 	end
 end
 

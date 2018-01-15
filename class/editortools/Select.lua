@@ -1,18 +1,5 @@
 local Select = class("Editor.Select")
 
-local selectImg = love.graphics.newImage("img/editor/selection-preview.png")
-local selectQuad = {
-    love.graphics.newQuad(0, 0, 2, 2, 5, 5),
-    love.graphics.newQuad(2, 0, 1, 2, 5, 5),
-    love.graphics.newQuad(3, 0, 2, 2, 5, 5),
-    love.graphics.newQuad(0, 2, 2, 1, 5, 5),
-    love.graphics.newQuad(2, 2, 1, 1, 5, 5),
-    love.graphics.newQuad(3, 2, 2, 1, 5, 5),
-    love.graphics.newQuad(0, 3, 2, 2, 5, 5),
-    love.graphics.newQuad(2, 3, 1, 2, 5, 5),
-    love.graphics.newQuad(3, 3, 2, 2, 5, 5),
-}
-
 function Select:initialize(editor)
     self.editor = editor
     
@@ -30,7 +17,7 @@ function Select:draw()
         local h = (by-ty+1)*self.editor.level.tileSize
         
         if w > 0 and h > 0 then
-            GUI.drawBox(selectImg, selectQuad, x, y, w, h)
+            GUI.drawBox(self.editor.selectImg, self.editor.selectQuad, x, y, w, h)
         elseif w > 0 or h > 0 then -- line
             love.graphics.setColor(0, 0, 0)
             if w == 0 then

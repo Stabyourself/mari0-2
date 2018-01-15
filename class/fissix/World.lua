@@ -1,8 +1,7 @@
 local World = class("fissix.World")
 
-function World:initialize(tileMap)
-	self.tileMap = tileMap
-    self.tileSize = self.tileMap.tileSize
+function World:initialize()
+    self.tileSize = 16 --lol hardcode
     
     self.map = {}
 	
@@ -16,11 +15,43 @@ function World:addObject(PhysObj)
 	PhysObj.World = self
 end
 
-function World:loadMap(map)
-	self.map = map
-
-    self.width = #self.map
-	self.height = #self.map[1]
+function World:loadMap(data)
+    self.map = {}
+    
+    -- load any used tilemaps
+    self.tileMaps = {}
+    local tileLookup = {}
+    
+    for i, v in pairs(data.tileMaps) do
+        self.tileMaps[i] = fissix.TileMap:new("tilemaps/" .. i)
+        
+        for j, w in pairs(v) do
+            tileLookup[j] = {tile = w, tileMap = self.tileMaps[i]}
+        end
+    end
+    
+    
+    self.width = #data.map
+	self.height = #data.map[1]
+    
+    for x = 1, #data.map do
+        self.map[x] = {}
+        for y = 1, #data.map[1] do
+            local mapTile = data.map[x][y]
+            
+            if mapTile ~= 0 then
+                local lookup = tileLookup[mapTile]
+                
+                if not lookup then
+                    print("Couldn't load real tile for \"" .. mapTile .. "\"")
+                    error("Wew that map didn't load so well, did it")
+                end
+                
+                local realY = self.height-y+1
+                self.map[x][realY] = lookup.tileMap.tiles[lookup.tile]
+            end
+        end
+    end
 end
 
 function World:update(dt)
@@ -125,7 +156,7 @@ function World:draw()
                 local tile = self:getTile(x, y)
                 
                 if tile then
-                    tile:draw((x-1)*self.tileMap.tileSize, (y-1)*self.tileMap.tileSize)
+                    tile:draw((x-1)*self.tileSize, (y-1)*self.tileSize)
                 end
             end
         end
@@ -337,13 +368,7 @@ function World:setMap(x, y, i)
 end
 
 function World:getTile(x, y)
-    local tileNum = self.map[x][y]
-    
-    if tileNum == 0 then
-        return false
-    end
-    
-    return self.tileMap.tiles[tileNum]
+    return self.map[x][y]
 end
 
 function World:inMap(x, y)
@@ -524,6 +549,36 @@ function World:mouseToMap()
     x, y = x/VAR("scale"), y/VAR("scale")
     
     return self:cameraToMap(x, y)
+end
+
+function World:getMapRectangle(x, y, w, h, clamp)
+    local lx, rx, ty, by
+    
+    if w < 0 then
+        x = x + w
+        w = -w
+    end
+    
+    if h < 0 then
+        y = y + h
+        h = -h
+    end
+    
+    lx, ty = self:worldToMap(x+8, y+8)
+    rx, by = self:worldToMap(x+w-8, y+h-8)
+    
+    if clamp then
+        if lx > self.width or rx < 1 or ty > self.height or by < 1 then -- selection is completely outside map
+            return {}
+        end
+        
+        lx = math.max(lx, 1)
+        rx = math.min(rx, self.width)
+        ty = math.max(ty, 1)
+        by = math.min(by, self.height)
+    end
+    
+    return lx, rx, ty, by
 end
 
 function World:attemptPortal(tileX, tileY, side, x, y, color, ignoreP)
@@ -848,6 +903,109 @@ function World:checkPortalSurface(tileX, tileY, side, worldX, worldY, ignoreP)
     end
 
     return startX, startY, endX, endY, angle
+end
+
+function World:getFloodArea(x, y)
+    local targetTile = self:getTile(x, y)
+    local tileLookupTable = {}
+    
+    for x = 1, self.width do
+        tileLookupTable[x] = {}
+    end
+    
+    stack = {{x, y}}
+    
+    repeat
+        cur = table.remove(stack, 1)
+        
+        if  self:inMap(cur[1], cur[2]) and 
+            not tileLookupTable[cur[1]][cur[2]] and
+            self:getTile(cur[1], cur[2]) == targetTile then
+                
+            tileLookupTable[cur[1]][cur[2]] = true
+            
+            table.insert(stack, {cur[1]-1, cur[2]})
+            table.insert(stack, {cur[1]+1, cur[2]})
+            table.insert(stack, {cur[1], cur[2]-1})
+            table.insert(stack, {cur[1], cur[2]+1})
+        end
+    until #stack == 0
+    
+    local tileTable = {}
+    
+    for y = 1, self.height do
+        for x = 1, self.width do
+            if tileLookupTable[x][y] then
+                table.insert(tileTable, {x=x, y=y})
+            end
+        end
+    end
+    
+    return tileTable
+end
+
+function World:expandMapTo(x, y)
+    local moveStuff = {0, 0}
+    
+    if x > self.width then
+        for newX = self.width+1, x do
+            self.map[newX] = {}
+        end
+        
+        self.width = x
+    end
+    
+    if x <= 0 then
+        local newColumns = -x+1
+        
+        self.width = self.width+newColumns
+        
+        for newX = self.width, newColumns+1, -1 do
+            self.map[newX] = self.map[newX-newColumns]
+        end
+        
+        for newX = 1, newColumns do
+            self.map[newX] = {}
+        end
+        
+        moveStuff[1] = newColumns
+    end
+    
+    if y > self.height then
+        self.height = y
+    end
+    
+    if y <= 0 then
+        local newRows = -y+1
+        
+        self.height = self.height+newRows
+        
+        for newY = self.height, newRows+1, -1 do
+            for lx = 1, self.width do
+                self.map[lx][newY] = self.map[lx][newY-newRows]
+            end
+        end
+        
+        for newY = 1, newRows do
+            for lx = 1, self.width do
+                self.map[lx][newY] = nil
+            end
+        end
+        
+        moveStuff[2] = newRows
+    end
+    
+    self.camera.x = self.camera.x+moveStuff[1]*16
+    self.camera.y = self.camera.y+moveStuff[2]*16
+        
+    for _, v in ipairs(self.objects) do
+        v.x = v.x + moveStuff[1]*16
+        v.y = v.y + moveStuff[2]*16
+    end
+    
+    print(self.width, self.height)
+    
+    return moveStuff[1], moveStuff[2], moveStuff[1]*16, moveStuff[2]*16
 end
 
 return World

@@ -8,7 +8,7 @@ function Erase:update(dt)
     if self.penDown then
         local x, y = self.editor.level:cameraToMap(getWorldMouse())
             
-        self.editor.level:setMap(x, y, 0)
+        self.editor.level:setMap(x, y, nil)
     end
 end
 
@@ -34,7 +34,7 @@ function Erase:pipette(x, y)
     if self.editor.level:inMap(mapX, mapY) then
         local tile = self.editor.level.map[mapX][mapY]
         
-        if tile ~= 0 then
+        if tile then
             self.editor:selectTool("paint")
             self.editor.tool.tile = tile
         end

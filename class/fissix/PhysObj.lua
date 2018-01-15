@@ -27,7 +27,7 @@ function PhysObj:initialize(world, x, y, width, height)
 	world:addObject(self)
 	
 	local xOff, yOff, distance
-	local step = self.world.tileMap.tileSize
+	local step = self.world.tileSize
 	
 	-- Create left tracers
 	xOff = math.floor(self.width/2)-1

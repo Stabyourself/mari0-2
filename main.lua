@@ -77,6 +77,7 @@ function love.load()
         0123456789
         &Space;
         .;:;!?_-<>=+*/\'%
+        &Intersect;
     ]])
 
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")

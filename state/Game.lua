@@ -7,7 +7,6 @@ function Game:load()
     self.coinAnimationTimer = 0
     self.timeLeft = 400
     
-    smb3TileMap = fissix.TileMap:new("tilemaps/smb3")
     SmbMario = require("characters.smb-mario.code")
     Smb3Mario = require("characters.smb3-mario.code")
     
@@ -26,7 +25,7 @@ function Game:update(dt)
     
     self.level:update(dt)
     
-    if self.level.marios[1].y > self.level.height*self.level.tileMap.tileSize+.5 then
+    if self.level.marios[1].y > self.level.height*self.level.tileSize+.5 then
         self.level.marios[1].y = -1
     end
     

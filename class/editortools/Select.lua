@@ -1,5 +1,18 @@
 local Select = class("Editor.Select")
 
+local selectImg = love.graphics.newImage("img/editor/selection-preview.png")
+local selectQuad = {
+    love.graphics.newQuad(0, 0, 2, 2, 5, 5),
+    love.graphics.newQuad(2, 0, 1, 2, 5, 5),
+    love.graphics.newQuad(3, 0, 2, 2, 5, 5),
+    love.graphics.newQuad(0, 2, 2, 1, 5, 5),
+    love.graphics.newQuad(2, 2, 1, 1, 5, 5),
+    love.graphics.newQuad(3, 2, 2, 1, 5, 5),
+    love.graphics.newQuad(0, 3, 2, 2, 5, 5),
+    love.graphics.newQuad(2, 3, 1, 2, 5, 5),
+    love.graphics.newQuad(3, 3, 2, 2, 5, 5),
+}
+
 function Select:initialize(editor)
     self.editor = editor
     
@@ -10,12 +23,37 @@ function Select:draw()
     local mx, my = self.editor.level:mouseToWorld()
     
     if self.pressing then
-        love.graphics.rectangle("line", self.selectionStart[1], self.selectionStart[2], mx-self.selectionStart[1], my-self.selectionStart[2])
+        local lx, rx, ty, by = self.editor.level:getMapRectangle(self.selectionStart[1], self.selectionStart[2], mx-self.selectionStart[1], my-self.selectionStart[2])
+        local x = (lx-1)*self.editor.level.tileSize
+        local y = (ty-1)*self.editor.level.tileSize
+        local w = (rx-lx+1)*self.editor.level.tileSize
+        local h = (by-ty+1)*self.editor.level.tileSize
+        
+        if w > 0 and h > 0 then
+            GUI.drawBox(selectImg, selectQuad, x, y, w, h)
+        elseif w > 0 or h > 0 then -- line
+            love.graphics.setColor(0, 0, 0)
+            if w == 0 then
+                x = x - 1
+                w = 2
+            end
+            
+            if h == 0 then
+                y = y - 1
+                h = 2
+            end
+            
+            love.graphics.rectangle("fill", x, y, w, h)
+            love.graphics.setColor(1, 1, 1)
+        end
+        -- love.graphics.rectangle("line", (lx-1)*self.editor.level.tileSize, (ty-1)*self.editor.level.tileSize, (rx-lx+1)*self.editor.level.tileSize, (by-ty+1)*self.editor.level.tileSize)
     end
     
     love.graphics.setColor(0, 0, 0)
     
-    if keyDown("editor.select.add") then
+    if keyDown("editor.select.add") and keyDown("editor.select.subtract") then
+        font:print("&Intersect;", mx-9, my+2)
+    elseif keyDown("editor.select.add") then
         font:print("+", mx-9, my+2)
     elseif keyDown("editor.select.subtract") then
         font:print("-", mx-9, my+2)
@@ -39,12 +77,16 @@ function Select:mousereleased(x, y, button)
     if self.pressing then
         local tiles = self:getTiles(self.selectionStart[1], self.selectionStart[2], mx-self.selectionStart[1], my-self.selectionStart[2])
         
-        if keyDown("editor.select.add") then
+        if keyDown("editor.select.add") and keyDown("editor.select.subtract") then
+            self.editor:intersectSelection(tiles)
+        elseif keyDown("editor.select.add") then
             self.editor:addToSelection(tiles)
         elseif keyDown("editor.select.subtract") then
             self.editor:subtractFromSelection(tiles)
-        else
+        elseif #tiles > 1 then
             self.editor:replaceSelection(tiles)
+        else
+            self.editor:clearSelection()
         end
     end
     
@@ -58,28 +100,8 @@ function Select:getTiles(x, y, w, h)
         lx, ty = self.editor.level:worldToMap(x, y)
         rx, by = lx, ty
     else
-        if w < 0 then
-            x = x + w
-            w = -w
-        end
-        
-        if h < 0 then
-            y = y + h
-            h = -h
-        end
-        
-        lx, ty = self.editor.level:worldToMap(x+8, y+8)
-        rx, by = self.editor.level:worldToMap(x+w-8, y+h-8)
+        lx, rx, ty, by = self.editor.level:getMapRectangle(x, y, w, h, true)
     end
-    
-    if lx > self.editor.level.width or rx < 1 or ty > self.editor.level.height or by < 1 then -- selection is completely outside map
-        return {}
-    end
-    
-    lx = math.max(lx, 1)
-    rx = math.min(rx, self.editor.level.width)
-    ty = math.max(ty, 1)
-    by = math.min(by, self.editor.level.height)
     
     local ret = {}
     

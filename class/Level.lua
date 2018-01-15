@@ -1,12 +1,11 @@
 Level = class("Level", fissix.World)
 
-function Level:initialize(path, tileMap)
+function Level:initialize(path)
     local levelCode = love.filesystem.read(path)
     self.data = sandbox.run(levelCode)
-    self.tileMap = tileMap
 
-    fissix.World.initialize(self, tileMap)
-    self:loadMap(self.data.map)
+    fissix.World.initialize(self)
+    self:loadMap(self.data)
     
     self.backgroundColor = self.data.backgroundColor or {156, 252, 240}
     self.backgroundColor[1] = self.backgroundColor[1]/255

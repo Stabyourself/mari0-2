@@ -61,6 +61,10 @@ return {
             select = {
                 add = "lshift",
                 subtract = "lctrl"
+            },
+            
+            wand = {
+                global = "lalt"
             }
         }
     },

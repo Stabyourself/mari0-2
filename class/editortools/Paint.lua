@@ -4,13 +4,18 @@ function Paint:initialize(editor)
     self.editor = editor
     
     self.penDown = false
-    self.tile = 1
+    self.tileMap = self.editor.level.tileMaps.smb3
+    self.tile = self.tileMap.tiles[1]
 end
 
 function Paint:update(dt)
     if self.penDown then
         local x, y = self.editor.level:cameraToMap(getWorldMouse())
-            
+        
+        if not self.editor.level:inMap(x, y) then
+            self.editor:expandMapTo(x, y)
+        end
+        
         self.editor.level:setMap(x, y, self.tile)
     end
 end
@@ -20,7 +25,7 @@ function Paint:draw()
     local mapX, mapY = self.editor.level:cameraToMap(mouseX, mouseY)
     local worldX, worldY = self.editor.level:mapToWorld(mapX-1, mapY-1)
     
-    self.editor.level.tileMap.tiles[self.tile]:draw(worldX, worldY, true)
+    self.tile:draw(worldX, worldY, true)
 end
 
 function Paint:mousepressed(x, y, button)
@@ -43,10 +48,11 @@ function Paint:pipette(x, y)
     local mapX, mapY = self.editor.level:mouseToMap()
     
     if self.editor.level:inMap(mapX, mapY) then
-        self.tile = self.editor.level.map[mapX][mapY]
+        local tile = self.editor.level:getTile(mapX, mapY)
         
-        if self.tile == 0 then
-            self.tile = 1
+        if tile then
+            self.tile = tile
+        else
             self.editor:selectTool("erase")
         end
     end

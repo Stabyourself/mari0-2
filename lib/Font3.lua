@@ -85,4 +85,10 @@ function Font3:print(s, x, y)
     end
 end
 
+function Font3:getLength(s)
+    local withoutSpecialChars = string.gsub(s, "&.-;", "x")
+    
+    return #withoutSpecialChars
+end
+
 return Font3

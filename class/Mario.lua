@@ -82,8 +82,6 @@ function Mario:jump()
 
         self.gravity = VAR("gravityjumping")
         
-        playSound(jumpSound)
-        
         return true
     end
 end
@@ -157,7 +155,6 @@ function Mario:bottomCollision(obj2)
     if obj2.stompable then
         obj2:stomp()
         self.speed[2] = -getRequiredSpeed(VAR("enemyBounceHeight"))
-        playSound(stompSound)
         
         return true
     end

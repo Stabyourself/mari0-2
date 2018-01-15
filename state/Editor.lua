@@ -11,7 +11,7 @@ local checkerboardImg = love.graphics.newImage("img/editor/checkerboard.png")
 local selectionBorderImg = love.graphics.newImage("img/editor/selection-border.png")
 selectionBorderImg:setWrap("repeat")
 
-local selectionQuad = love.graphics.newQuad(0, 4, 16, 1, 4, 1)
+local selectionQuad = love.graphics.newQuad(0, 0, 16, 1, 4, 1)
 
 Editor.toolClasses = {
     paint = require("class.editortools.Paint"),
@@ -177,7 +177,7 @@ function Editor:update(dt)
     while self.selectionBorderTimer >= 4 do
         self.selectionBorderTimer = self.selectionBorderTimer - 4
     end
-    selectionQuad:setViewport(math.floor(self.selectionBorderTimer), 4, 16, 1)
+    selectionQuad:setViewport(math.floor(self.selectionBorderTimer), 0, 16, 1)
 end
 
 function Editor:draw()
@@ -202,13 +202,13 @@ function Editor:draw()
         )
     end
     
-    if self.tool.draw then
-        self.tool:draw()
-    end
-    
     -- selection
     for _, v in ipairs(self.selectionBorders) do
         love.graphics.draw(selectionBorderImg, selectionQuad, v.x, v.y, v.a)
+    end
+    
+    if self.tool.draw then
+        self.tool:draw()
     end
     
     self.level.camera:detach()
@@ -328,7 +328,7 @@ function Editor:newWindow(type, button)
         -- tileListWindow:addChild(backButton)
         
         
-        local tileListButtonGrid = GUI.ButtonGrid:new(1, 1, self.level.tileMap.img, self.level.tileMap.quad, 
+        local tileListButtonGrid = GUI.ButtonGrid:new(1, 1, self.level.tileMaps.smb3.img, self.level.tileMaps.smb3.quad, 
             function(buttonGrid, i) 
                 buttonGrid.selected = i
                 self:selectTile(i)
@@ -340,8 +340,11 @@ function Editor:newWindow(type, button)
 end
 
 function Editor:selectTile(i)
-    self.tool = self.tools.paint
-    self.tools.paint.tile = i
+    if self.tool ~= self.tools.paint and self.tool ~= self.tools.fill then
+        self:selectTool("paint")
+    end
+    
+    self.tools.paint.tile = self.level.tileMaps.smb3.tiles[i]
 end
 
 function Editor:keypressed(key)
@@ -351,7 +354,7 @@ function Editor:keypressed(key)
     
     if key == getKey("editor.delete") then
         for _, v in ipairs(self.selection) do
-            self.level:setMap(v.x, v.y, 1)
+            self.level:setMap(v.x, v.y, nil)
         end
     end
 end
@@ -432,6 +435,11 @@ function Editor:resize(w, h)
     self.scaleBar.x = x
 end
 
+function Editor:clearSelection()
+    self.selection = {}
+    self:updateSelectionBorder()
+end
+
 function Editor:replaceSelection(selection)
     self.selection = selection
     self:updateSelectionBorder()
@@ -478,6 +486,29 @@ function Editor:subtractFromSelection(selection)
         table.remove(self.selection, toDelete[i])
     end
         
+    
+    self:updateSelectionBorder()
+end
+
+function Editor:intersectSelection(selection)
+    local newSelection = {}
+    
+    for _, v in ipairs(selection) do
+        local found = false
+        
+        for _, w in ipairs(self.selection) do
+            if w.x == v.x and w.y == v.y then
+                found = true
+                break
+            end
+        end
+        
+        if found then
+            table.insert(newSelection, v)
+        end
+    end
+    
+    self.selection = newSelection
     
     self:updateSelectionBorder()
 end
@@ -546,5 +577,19 @@ function Editor:updateSelectionBorder()
         if SBL[x][y].left then
             table.insert(self.selectionBorders, {x=wx, y=wy+16, a=-math.pi*.5})
         end
+    end
+end
+
+function Editor:expandMapTo(x, y)
+    local moveMapX, moveMapY, moveWorldX, moveWorldY = self.level:expandMapTo(x, y)
+    
+    for _, v in ipairs(self.selection) do
+        v.x = v.x + moveMapX
+        v.y = v.y + moveMapY
+    end
+    
+    for _, v in ipairs(self.selectionBorders) do
+        v.x = v.x + moveWorldX
+        v.y = v.y + moveWorldY
     end
 end

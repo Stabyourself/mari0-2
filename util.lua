@@ -29,6 +29,7 @@ function print_r (t, name, indent) -- Credits to http://www.hpelbers.org/lua/pri
       local out = {}	-- result
       if type(t) == "table" then
         if tableList[t] ~= nil then table.insert(out, tag .. '{} -- ' .. tableList[t] .. ' (self reference)')
+        elseif t.isInstanceOf and indent ~= '' then table.insert(out, tag .. tostring(t))
         else
           tableList[t]= full and (full .. '.' .. id) or id
           if next(t) then -- Table not empty

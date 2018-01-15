@@ -69,12 +69,89 @@ return {
         }
     },
 
-    collision = {
+    tileTemplates = {
         cube = {
-            0,  0,
-            16,  0,
-            16, 16,
-            0, 16,
+            angle = 0,
+            collision = {
+                0,  0,
+                16,  0,
+                16, 16,
+                0, 16,
+            }
+        },
+
+        smallSlopeRight1 = {
+            angle = -math.pi/8,
+            collision = {
+                0,  16,
+                16,  8,
+                16, 16,
+            }
+        },
+
+        smallSlopeRight2 = {
+            angle = -math.pi/8,
+            collision = {
+                 0,  8,
+                16,  0,
+                16, 16,
+                 0, 16,
+            }
+        },
+
+        bigSlopeRight = {
+            angle = -math.pi/4,
+            collision = {
+                 0, 16,
+                16,  0,
+                16, 16,
+            }
+        },
+
+        smallSlopeLeft1 = {
+            angle = math.pi/8,
+            collision = {
+                 0,  0,
+                16,  8,
+                16, 16,
+                 0, 16,
+            }
+        },
+
+        smallSlopeLeft2 = {
+            angle = math.pi/8,
+            collision = {
+                 0,  8,
+                16, 16,
+                 0, 16,
+            }
+        },
+
+        bigSlopeLeft = {
+            angle = math.pi/4,
+            collision = {
+                 0,  0,
+                16, 16,
+                 0, 16,
+            }
+        },
+        
+        bigSlopeLeftUpsideDown = {
+            angle = 0,
+            collision = {
+                 0,  0,
+                16, 0,
+                 0, 16,
+            }
+        },
+
+        bigSlopeRightUpsideDown = {
+            angle = 0,
+            collision = {
+                 0,  0,
+                16,  0,
+                16, 16,
+            }
         }
     },
     

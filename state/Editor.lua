@@ -328,7 +328,7 @@ function Editor:newWindow(type, button)
         -- tileListWindow:addChild(backButton)
         
         
-        local tileListButtonGrid = GUI.ButtonGrid:new(1, 1, self.level.tileMaps.smb3.img, self.level.tileMaps.smb3.quad, 
+        local tileListButtonGrid = GUI.ButtonGrid:new(1, 1, self.level.tileMaps["smb3-grass"].img, self.level.tileMaps["smb3-grass"].quad, 
             function(buttonGrid, i) 
                 buttonGrid.selected = i
                 self:selectTile(i)
@@ -344,7 +344,7 @@ function Editor:selectTile(i)
         self:selectTool("paint")
     end
     
-    self.tools.paint.tile = self.level.tileMaps.smb3.tiles[i]
+    self.tools.paint.tile = self.level.tileMaps["smb3-grass"].tiles[i]
 end
 
 function Editor:keypressed(key)

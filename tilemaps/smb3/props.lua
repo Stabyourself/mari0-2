@@ -1,12 +1,12 @@
 local tiles = {}
 
-tiles[1119] = {collision = VAR("collision").cube}
-tiles[1120] = {collision = VAR("collision").cube}
-tiles[1121] = {collision = VAR("collision").cube}
+tiles[1119] = VAR("tileTemplates").cube
+tiles[1120] = VAR("tileTemplates").cube
+tiles[1121] = VAR("tileTemplates").cube
 
-tiles[1192] = {collision = VAR("collision").cube}
-tiles[1193] = {collision = VAR("collision").cube}
-tiles[1194] = {collision = VAR("collision").cube}
+tiles[1192] = VAR("tileTemplates").cube
+tiles[1193] = VAR("tileTemplates").cube
+tiles[1194] = VAR("tileTemplates").cube
 
 tiles[1337] = {
     collision = {

@@ -422,7 +422,7 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
         else
             local tile = self:getTile(mapX, mapY)
             if tile and tile.collision then
-                if tile.collision == VAR("collision").cube then
+                if tile.collision == VAR("tileTemplates").cube.collision then
                     cubeCol = true
                 else
                 
@@ -1002,9 +1002,7 @@ function World:expandMapTo(x, y)
         v.x = v.x + moveStuff[1]*16
         v.y = v.y + moveStuff[2]*16
     end
-    
-    print(self.width, self.height)
-    
+
     return moveStuff[1], moveStuff[2], moveStuff[1]*16, moveStuff[2]*16
 end
 

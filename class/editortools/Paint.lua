@@ -4,7 +4,7 @@ function Paint:initialize(editor)
     self.editor = editor
     
     self.penDown = false
-    self.tileMap = self.editor.level.tileMaps.smb3
+    self.tileMap = self.editor.level.tileMaps["smb3-grass"]
     self.tile = self.tileMap.tiles[1]
 end
 

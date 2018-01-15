@@ -28,7 +28,7 @@ function Tile:checkCollision(x, y)
 		return false
 	end
 	
-	if self.collision == VAR("collision").cube then -- optimization for cubes
+	if self.collision == VAR("tileTemplates").cube.collision then -- optimization for cubes
 		return true
 	else
 		for _, points in ipairs(self.collisionTriangulated) do

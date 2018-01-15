@@ -9,7 +9,7 @@ function love.load()
         resizable = true,
         msaa = msaa,
         minwidth = 232*VAR("scale"),
-        minheight = 151*VAR("scale"),
+        minheight = 165*VAR("scale"),
     })
 
     love.window.setTitle("Definitely not Mari0 2")

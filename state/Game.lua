@@ -66,8 +66,8 @@ function Game:resize(w, h)
     self.level:resize(w, h)
 end
 
-function Game:keypressed(key)
-    self.level:keypressed(key)
+function Game:cmdpressed(key)
+    self.level:cmdpressed(key)
 end
 
 function Game:mousepressed(x, y, button)

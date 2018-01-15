@@ -117,7 +117,7 @@ function love.update(dt)
 end
 
 local function setColorBasedOn(key)
-    if keyDown(key) then
+    if cmdDown(key) then
         love.graphics.setColor(1, 1, 1)
     else
         love.graphics.setColor(0.2, 0.2, 0.2)
@@ -160,11 +160,50 @@ function love.draw()
     end
 end
 
+function appendCmds(cmds, t)
+    if type(t) == "string" then
+        cmds[t] = true
+    elseif type(t) == "table" then
+        for _, v in ipairs(t) do
+            cmds[v] = true
+        end
+    end
+end
+
 function love.keypressed(key)
-    if key == VAR("controls").quit then
-        love.event.quit()
+    -- Convert the key to its binding
+    -- ^ctrl !alt +shift
+    
+    local cmds = {}
+    local sendCmds = false
+    if CONTROLS(key) then
+        appendCmds(cmds, CONTROLS(key))
+        sendCmds = true
+    end
+
+    if love.keyboard.isDown({"lctrl", "rctrl"}) and CONTROLS("^" .. key) then
+        appendCmds(cmds, CONTROLS("^" .. key))
+        sendCmds = true
+    end
+
+    if love.keyboard.isDown({"lalt", "ralt"}) and CONTROLS("!" .. key) then
+        appendCmds(cmds, CONTROLS("!" .. key))
+        sendCmds = true
+    end
+
+    if love.keyboard.isDown({"lshift", "rshift"}) and CONTROLS("+" .. key) then
+        appendCmds(cmds, CONTROLS("+" .. key))
+        sendCmds = true
     end
     
+    if cmds["quit"] then
+        love.event.quit()
+        return
+    end
+    
+    if sendCmds then
+        gameStateManager:event("cmdpressed", cmds)
+    end
     gameStateManager:event("keypressed", key)
 end
 
@@ -230,26 +269,6 @@ function updateGroup(group, dt)
 	for i = #delete, 1, -1 do
 		table.remove(group, delete[i])
 	end
-end
-    
-local function combineTableCall(var, t) -- basically makes var["some.dot.separated.string"] into var.some.dot.separated.string
-    local ct = table.remove(t, 1)
-    
-    if #t == 0 then
-        return var[ct]
-    else
-        return combineTableCall(var[ct], t)
-    end
-end
-
-function getKey(cmd)
-    local split = cmd:split(".")
-    
-    return combineTableCall(VAR("controls"), split)
-end
-
-function keyDown(cmd)
-    return love.keyboard.isDown(getKey(cmd))
 end
 
 function skipUpdate()

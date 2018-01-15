@@ -82,25 +82,21 @@ function Level:draw()
     self.camera:detach()
 end
 
-function Level:keypressed(key)
-    if key == VAR("controls").jump then
+function Level:cmdpressed(cmds)
+    if cmds["jump"] then
         self.marios[1]:jump()
     end
     
-    if key == VAR("controls").boost then
-        self.marios[1].speed[1] = 1000
-    end
-    
-    if key == VAR("controls").closePortals then
+    if cmds["closePortals"] then
         self.marios[1]:closePortals()
     end
     
-    if key == VAR("controls").run then
+    if cmds["run"] then
         self.marios[1]:spin()
         self.marios[1]:shoot()
     end
     
-    if key == VAR("controls").star then
+    if cmds["star"] then
         self.marios[1]:star()
     end
 end

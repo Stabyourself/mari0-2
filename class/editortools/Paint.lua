@@ -29,7 +29,7 @@ function Paint:draw()
 end
 
 function Paint:mousepressed(x, y, button)
-    if (button == 1 and keyDown("editor.pipette")) or button == 3 then
+    if (button == 1 and cmdDown("editor.pipette")) or button == 3 then
         self:pipette(x, y)
         
     elseif button == 1 then
@@ -41,9 +41,11 @@ function Paint:mousepressed(x, y, button)
 end
 
 function Paint:mousereleased(x, y, button)
-    self.penDown = false
+    if self.penDown then
+        self.penDown = false
 
-    self.editor:saveState()
+        self.editor:saveState()
+    end
 end
 
 function Paint:pipette(x, y)

@@ -40,37 +40,6 @@ return {
     
     cameraScrollRate = 300,
 
-    controls = {
-        quit = "escape",
-        frameDataDisplay = "f",
-        boost = "b",
-        star = "p", -- p is for power up
-        
-        left = "a",
-        right = "d",
-        down = "s",
-        up = "w",
-        jump = "space",
-        run = "lshift",
-        closePortals = "r",
-        
-        editor = {
-            pipette = "lshift",
-            delete = "delete",
-            undo = "z",
-            redo = "y",
-            
-            select = {
-                add = "lshift",
-                subtract = "lctrl"
-            },
-            
-            wand = {
-                global = "lalt"
-            }
-        }
-    },
-
     tileTemplates = {
         cube = {
             angle = 0,

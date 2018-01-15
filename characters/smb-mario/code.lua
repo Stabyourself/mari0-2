@@ -57,13 +57,13 @@ function Character:movement(dt)
     local acceleration = 0
 
     -- Normal left/right acceleration
-    if (not keyDown("run") and math.abs(self.speed[1]) <= MAXWALKSPEED) or (keyDown("run") and math.abs(self.speed[1]) <= MAXRUNSPEED) then
+    if (not cmdDown("run") and math.abs(self.speed[1]) <= MAXWALKSPEED) or (cmdDown("run") and math.abs(self.speed[1]) <= MAXRUNSPEED) then
         local accelerationVal = WALKACCELERATION
-        if keyDown("run") then
+        if cmdDown("run") then
             accelerationVal = RUNACCELERATION
         end
 
-        if keyDown("left") then
+        if cmdDown("left") then
             acceleration = acceleration - accelerationVal
 
             if not self.onGround and self.speed[1] > 0 then
@@ -71,7 +71,7 @@ function Character:movement(dt)
             end
         end
 
-        if keyDown("right") then
+        if cmdDown("right") then
             acceleration = acceleration + accelerationVal
 
             if not self.onGround and self.speed[1] < 0 then
@@ -81,10 +81,10 @@ function Character:movement(dt)
     end
 
     -- Apply friction?
-    if  (not keyDown("right") and not keyDown("left")) or 
+    if  (not cmdDown("right") and not cmdDown("left")) or 
         (self.ducking and self.onGround) or
         self.disabled or
-        (not keyDown("run") and math.abs(self.speed[1]) > MAXWALKSPEED) or
+        (not cmdDown("run") and math.abs(self.speed[1]) > MAXWALKSPEED) or
         math.abs(self.speed[1]) > MAXRUNSPEED or
         ((acceleration < 0 and self.speed[1] > 0) or (acceleration > 0 and self.speed[1] < 0)) then
 
@@ -106,9 +106,9 @@ function Character:movement(dt)
     -- Clamp max speeds for walk and run
     local maxSpeed
 
-    if (not keyDown("run") and math.abs(self.speed[1]) < MAXWALKSPEED) then
+    if (not cmdDown("run") and math.abs(self.speed[1]) < MAXWALKSPEED) then
         maxSpeed = MAXWALKSPEED
-    elseif (keyDown("run") and math.abs(self.speed[1]) < MAXRUNSPEED) then
+    elseif (cmdDown("run") and math.abs(self.speed[1]) < MAXRUNSPEED) then
         maxSpeed = MAXRUNSPEED
     end
 
@@ -123,7 +123,7 @@ function Character:movement(dt)
     end
 
     -- Kill movement below a threshold
-    if math.abs(self.speed[1]) < MINSPEED and (not keyDown("right") and not keyDown("left")) then
+    if math.abs(self.speed[1]) < MINSPEED and (not cmdDown("right") and not cmdDown("left")) then
         self.speed[1] = 0
     end
 end
@@ -133,7 +133,7 @@ function Character:animation(dt)
         self.animationState = "idle"
     end
 
-    if self.onGround and ((keyDown("left") and self.speed[1] > 0) or (keyDown("right") and self.speed[1] < 0)) then
+    if self.onGround and ((cmdDown("left") and self.speed[1] > 0) or (cmdDown("right") and self.speed[1] < 0)) then
         self.animationState = "sliding"
     elseif self.onGround and self.speed[1] ~= 0 then
         self.animationState = "running"
@@ -151,9 +151,9 @@ function Character:animation(dt)
         end
     end
 
-    if keyDown("left") and self.onGround then
+    if cmdDown("left") and self.onGround then
         self.animationDirection = -1
-    elseif keyDown("right") and self.onGround then
+    elseif cmdDown("right") and self.onGround then
         self.animationDirection = 1
     end
 

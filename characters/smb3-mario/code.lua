@@ -623,7 +623,7 @@ local state = {}
 
 
 state.idle = function(mario)
-    if keyDown("right") or keyDown("left") then
+    if cmdDown("right") or cmdDown("left") then
         return "run"
     end
     
@@ -634,7 +634,7 @@ end
 
 
 state.stop = function(mario)
-    if keyDown("right") or keyDown("left") then
+    if cmdDown("right") or cmdDown("left") then
         return "run"
     end
     
@@ -645,12 +645,12 @@ end
 
 
 state.run = function(mario)
-    if not keyDown("right") and not keyDown("left") then
+    if not cmdDown("right") and not cmdDown("left") then
         return "stop"
     end
     
-    if  mario.groundSpeedX > 0 and keyDown("left") or
-        mario.groundSpeedX < 0 and keyDown("right") then
+    if  mario.groundSpeedX > 0 and cmdDown("left") or
+        mario.groundSpeedX < 0 and cmdDown("right") then
         return "skid"
     end
 end
@@ -661,23 +661,23 @@ state.skid = function(mario)
         return "idle"
     end
     
-    if  (mario.groundSpeedX < 0 and keyDown("left") and not keyDown("right")) or
-        (mario.groundSpeedX > 0 and keyDown("right") and not keyDown("right")) or
-        (mario.groundSpeedX > 0 and not keyDown("left")) or
-        (mario.groundSpeedX < 0 and not keyDown("right")) then
+    if  (mario.groundSpeedX < 0 and cmdDown("left") and not cmdDown("right")) or
+        (mario.groundSpeedX > 0 and cmdDown("right") and not cmdDown("right")) or
+        (mario.groundSpeedX > 0 and not cmdDown("left")) or
+        (mario.groundSpeedX < 0 and not cmdDown("right")) then
         return "run"
     end
 end
 
 
 state.jump = function(mario)
-    if not keyDown("jump") or mario.speed[2] >= JUMPGRAVITYUNTIL then
+    if not cmdDown("jump") or mario.speed[2] >= JUMPGRAVITYUNTIL then
         return "fall"
     end
 end
 
 state.fall = function(mario)
-    if keyDown("jump") and mario.speed[2] < JUMPGRAVITYUNTIL then
+    if cmdDown("jump") and mario.speed[2] < JUMPGRAVITYUNTIL then
         return "jump"
     end
     -- handled by bottomCollision
@@ -685,7 +685,7 @@ end
 
 
 state.buttSlide = function(mario)
-    if keyDown("right") or keyDown("left") or (mario.groundSpeedX == 0 and mario.surfaceAngle == 0) then
+    if cmdDown("right") or cmdDown("left") or (mario.groundSpeedX == 0 and mario.surfaceAngle == 0) then
         return "idle"
     end
 end
@@ -825,15 +825,15 @@ function Character:movement(dt)
     if self.state.name == "run" then
         local maxSpeed = 0
         
-        if keyDown("left") or keyDown("right") then
+        if cmdDown("left") or cmdDown("right") then
             maxSpeed = MAXSPEEDS[1]
         end
         
-        if keyDown("run") then
+        if cmdDown("run") then
             maxSpeed = MAXSPEEDS[2]
         end
         
-        if self.pMeter == VAR("pMeterTicks") and keyDown("run") then
+        if self.pMeter == VAR("pMeterTicks") and cmdDown("run") then
             maxSpeed = MAXSPEEDS[3]
         end
         
@@ -870,8 +870,8 @@ function Character:movement(dt)
     
     if (self.flying and (self.state.name == "jump" or self.state.name == "fall")) or self.state.name == "fly" or self.state.name == "float" then
         if math.abs(self.groundSpeedX) > MAXSPEEDFLY then
-            if  self.groundSpeedX > 0 and keyDown("right") or
-                self.groundSpeedX < 0 and keyDown("left") then
+            if  self.groundSpeedX > 0 and cmdDown("right") or
+                self.groundSpeedX < 0 and cmdDown("left") then
                 self:friction(dt, FRICTIONFLYSMALL, MAXSPEEDFLY)
             else
                 self:friction(dt, FRICTIONFLYBIG, MAXSPEEDFLY)
@@ -909,8 +909,8 @@ function Character:movement(dt)
     if self.pMeter == VAR("pMeterTicks") and
         (not self.onGround or 
         (math.abs(self.groundSpeedX) >= MAXSPEEDS[2] and
-        keyDown("run") and 
-        ((self.groundSpeedX > 0 and keyDown("right")) or (self.groundSpeedX < 0 and keyDown("left"))))) then
+        cmdDown("run") and 
+        ((self.groundSpeedX > 0 and cmdDown("right")) or (self.groundSpeedX < 0 and cmdDown("left"))))) then
         self.pMeterTimer = 0
         self.pMeterTime = PMETERTIMEMARGIN
     end
@@ -941,7 +941,7 @@ function Character:movement(dt)
     
     -- Ducking
     if self.onGround then
-        if keyDown("down") and not keyDown("left") and not keyDown("right") and self.state.name ~= "buttSlide" then
+        if cmdDown("down") and not cmdDown("left") and not cmdDown("right") and self.state.name ~= "buttSlide" then
             if self.surfaceAngle ~= 0 then -- check if buttslide
                 self:switchState("buttSlide")
                 
@@ -1011,22 +1011,22 @@ function Character:friction(dt, friction, min)
 end
 
 function Character:skid(dt)
-    if keyDown("right") and self.groundSpeedX < 0 then
+    if cmdDown("right") and self.groundSpeedX < 0 then
         self.groundSpeedX = math.min(0, self.groundSpeedX + FRICTIONSKID*dt)
     end
     
-    if keyDown("left") and self.groundSpeedX > 0 then
+    if cmdDown("left") and self.groundSpeedX > 0 then
         self.groundSpeedX = math.max(0, self.groundSpeedX - FRICTIONSKID*dt)
     end
 end
 
 function Character:accelerate(dt, maxSpeed)
     if math.abs(self.groundSpeedX) < maxSpeed then
-        if keyDown("left") and not keyDown("right") and self.groundSpeedX <= 0 then
+        if cmdDown("left") and not cmdDown("right") and self.groundSpeedX <= 0 then
             self.groundSpeedX = math.max(-maxSpeed, self.groundSpeedX - ACCELERATION*dt)
         end
 
-        if keyDown("right") and not keyDown("left") and self.groundSpeedX >= 0 then
+        if cmdDown("right") and not cmdDown("left") and self.groundSpeedX >= 0 then
             self.groundSpeedX = math.min(maxSpeed, self.groundSpeedX + ACCELERATION*dt)
         end
     end
@@ -1053,9 +1053,9 @@ function Character:animation(dt)
         end
         
     else -- look towards last pressed direction
-        if keyDown("left") then
+        if cmdDown("left") then
             self.animationDirection = -1
-        elseif keyDown("right") then
+        elseif cmdDown("right") then
             self.animationDirection = 1
         end
     end
@@ -1275,7 +1275,7 @@ function Character:spin() -- that's a good trick
     end
     
     if self.char.canSpin and not self.spinning then
-        if not keyDown("down") then -- Make sure it's not colliding with any of the other states
+        if not cmdDown("down") then -- Make sure it's not colliding with any of the other states
             self.spinning = true
             self.spinTimer = 0
             self.spinDirection = self.animationDirection

@@ -1,6 +1,7 @@
 -- I'd like to dedicate this file to stackoverflow.
 
 local VARIABLES = require "variables"
+local CONTROLTABLE = require "controls"
 
 local fileInfo = love.filesystem.getInfo("environment.lua")
 
@@ -18,6 +19,10 @@ end
 
 function CHEAT(i)
     return CHEATENABLED[i]
+end
+
+function CONTROLS(key)
+    return CONTROLTABLE[key]
 end
 
 function print_r (t, name, indent) -- Credits to http://www.hpelbers.org/lua/print_r
@@ -230,3 +235,88 @@ function normalizeAngle(a)
     
     return a
 end
+    
+local function combineTableCall(var, t) -- basically makes var["some.dot.separated.string"] into var.some.dot.separated.string
+    local ct = table.remove(t, 1)
+    
+    if #t == 0 then
+        return var[ct]
+    else
+        return combineTableCall(var[ct], t)
+    end
+end
+
+local CMDTABLE = {}
+function assignCmd(v, cmd)
+    if CMDTABLE[cmd] then
+        table.insert(CMDTABLE[cmd], v)
+    else
+        CMDTABLE[cmd] = {v}
+    end
+end
+
+-- generate the cmdDown lookup table
+for key, cmd in pairs(CONTROLTABLE) do
+    if type(cmd) == "string" then
+        assignCmd(key, cmd)
+    elseif type(cmd) == "table" then
+        for _, v in ipairs(cmd) do
+            assignCmd(key, v)
+        end
+    end
+end
+
+-- ^ctrl !alt +shift
+function cmdDown(cmd)
+    local keys = CMDTABLE[cmd]
+    
+    for _, key in ipairs(keys) do
+        local pass = true
+        local firstChar = string.sub(key, 1, 1)
+        
+        if firstChar == "^" then
+            if not love.keyboard.isDown({"lctrl", "rctrl"}) then
+                pass = false
+            end
+        end
+        
+        if firstChar == "!" then
+            if not love.keyboard.isDown({"lalt", "ralt"}) then
+                pass = false
+            end
+        end
+        
+        if firstChar == "+" then
+            if not love.keyboard.isDown({"lshift", "rshift"}) then
+                pass = false
+            end
+        end
+        
+        if pass then
+            if love.keyboard.isDown(key) then
+                return true
+            end
+        end
+    end
+    
+    return false
+end
+        
+    
+    -- local key = combineTableCall(VAR("controls"), cmd:split("."))
+    
+    -- if type(key) == "string" then
+    --     return love.keyboard.isDown(key)
+    -- elseif type(key) == "table" then
+    --     if type(key[1]) == "string" then
+    --         return love.keyboard.isDown(key)
+    --     else
+    --         for _, v in ipairs(key) do
+    --             if not love.keyboard.isDown(v) then
+    --                 return false
+    --             end
+    --         end
+            
+    --         return true
+    --     end
+    -- end

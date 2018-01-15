@@ -1,6 +1,6 @@
 local GameStateManager = class("GameStateManager")
 
-GameStateManager.reversedEvents = {"mousepressed", "keypressed"}
+GameStateManager.reversedEvents = {"mousepressed", "cmdpressed"}
 
 function GameStateManager:initialize()
     self.activeStates = {}

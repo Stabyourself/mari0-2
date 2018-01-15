@@ -32,7 +32,7 @@ function Fill:mousereleased(x, y, button)
                 local found = false
                 
                 for _, v in ipairs(self.editor.selection) do
-                    if v.x == x and v.y == y then
+                    if v[1] == x and v[2] == y then
                         found = true
                         break
                     end
@@ -40,6 +40,7 @@ function Fill:mousereleased(x, y, button)
                 
                 if found then
                     self:fillTiles(self.editor.selection, self.editor.tools.paint.tile)
+                    self.editor:saveState()
                     return
                 end
             end
@@ -47,6 +48,7 @@ function Fill:mousereleased(x, y, button)
             local tiles = self.editor.level:getFloodArea(x, y)
             
             self:fillTiles(tiles, self.editor.tools.paint.tile)
+            self.editor:saveState()
         end
     end
     
@@ -55,7 +57,7 @@ end
 
 function Fill:fillTiles(tiles, tile)
     for _, v in ipairs(tiles) do
-        self.editor.level:setMap(v.x, v.y, tile)
+        self.editor.level:setMap(v[1], v[2], tile)
     end
 end
 

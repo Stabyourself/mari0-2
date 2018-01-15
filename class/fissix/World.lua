@@ -848,6 +848,9 @@ local function walkSide(self, tile, tileX, tileY, side, dir)
                         end
                     end
                 end
+            else
+                x = nextX
+                y = nextY
             end
         end
         
@@ -936,7 +939,7 @@ function World:getFloodArea(x, y)
     for y = 1, self.height do
         for x = 1, self.width do
             if tileLookupTable[x][y] then
-                table.insert(tileTable, {x=x, y=y})
+                table.insert(tileTable, {x, y})
             end
         end
     end

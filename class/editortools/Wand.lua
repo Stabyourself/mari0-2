@@ -13,15 +13,15 @@ function Wand:draw()
     
     local addition = ""
     
-    if keyDown("editor.wand.global") then
+    if cmdDown("editor.wand.global") then
         addition = addition .. "G"
     end
     
-    if keyDown("editor.select.add") and keyDown("editor.select.subtract") then
+    if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
         addition = addition .. "&Intersect;"
-    elseif keyDown("editor.select.add") then
+    elseif cmdDown("editor.select.add") then
         addition = addition .. "+"
-    elseif keyDown("editor.select.subtract") then
+    elseif cmdDown("editor.select.subtract") then
         addition = addition .. "-"
     end
     
@@ -50,7 +50,7 @@ function Wand:mousereleased(x, y, button)
         if mx == self.pressingPos[1] and my == self.pressingPos[2] then
             local tiles
             
-            if keyDown("editor.wand.global") then
+            if cmdDown("editor.wand.global") then
                 local referenceTile = self.editor.level:getTile(mx, my)
                 tiles = {}
                 
@@ -59,23 +59,25 @@ function Wand:mousereleased(x, y, button)
                         local tile = self.editor.level:getTile(x, y)
                         
                         if tile == referenceTile then
-                            table.insert(tiles, {x=x, y=y})
+                            table.insert(tiles, {x, y})
                         end
                     end
                 end
             else
                 tiles = self.editor.level:getFloodArea(mx, my)
             end
-                
-            if keyDown("editor.select.add") and keyDown("editor.select.subtract") then
+            
+            if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
                 self.editor:intersectSelection(tiles)
-            elseif keyDown("editor.select.add") then
+            elseif cmdDown("editor.select.add") then
                 self.editor:addToSelection(tiles)
-            elseif keyDown("editor.select.subtract") then
+            elseif cmdDown("editor.select.subtract") then
                 self.editor:subtractFromSelection(tiles)
             else
                 self.editor:replaceSelection(tiles)
             end
+            
+            self.editor:saveState()
         end
     end
     

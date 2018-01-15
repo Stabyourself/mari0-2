@@ -21,7 +21,7 @@ function Erase:update(dt)
 end
 
 function Erase:mousepressed(x, y, button)
-    if (button == 1 and keyDown("editor.pipette")) or button == 3 then
+    if (button == 1 and cmdDown("editor.pipette")) or button == 3 then
         self:pipette(x, y)
         
     elseif button == 1 then
@@ -33,7 +33,10 @@ function Erase:mousepressed(x, y, button)
 end
 
 function Erase:mousereleased(x, y, button)
-    self.penDown = false
+    if self.penDown then
+        self.editor:saveState()
+        self.penDown = false
+    end
 end
 
 function Erase:pipette(x, y)

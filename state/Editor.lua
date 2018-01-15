@@ -159,6 +159,11 @@ function Editor:load()
     self.editorState = 1
     self:saveState()
     
+    self.mapBoundsQuads = {}
+    for i = 1, 4 do
+        self.mapBoundsQuads[i] = love.graphics.newQuad(0, 0, 8, 8, 8, 8)
+    end
+    
     self:toggleGrid(false)
     self:toggleFreeCam(true)
 end
@@ -173,19 +178,19 @@ function Editor:update(dt)
     if self.freeCamera then
         local cameraSpeed = dt*VAR("editor").cameraSpeed--*(1/self.level.camera.scale)
         
-        if keyDown("right") then
+        if cmdDown("right") then
             self.level.camera.x = self.level.camera.x + cameraSpeed
         end
         
-        if keyDown("left") then
+        if cmdDown("left") then
             self.level.camera.x = self.level.camera.x - cameraSpeed
         end
         
-        if keyDown("down") then
+        if cmdDown("down") then
             self.level.camera.y = self.level.camera.y + cameraSpeed
         end
         
-        if keyDown("up") then
+        if cmdDown("up") then
             self.level.camera.y = self.level.camera.y - cameraSpeed
         end
     end
@@ -200,10 +205,21 @@ end
 function Editor:draw()
     self.level.camera:attach()
     
-    if self.showGrid then
-        local xl, yt = self.level:cameraToWorld(0, 0)
-        local xr, yb = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)
+    local xl, yt = self.level:cameraToWorld(0, 0)
+    local xr, yb = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)
+    
+    -- Map bounds graphics
+    love.graphics.stencil(function()
+        love.graphics.rectangle("fill", 0, 0, self.level.width*16, self.level.height*16)
+    end)
+    love.graphics.setStencilTest("notequal", 1)
+    
+    self.mapBoundsQuads[1]:setViewport(0, 0, xr-xl, yb-yt)
+    love.graphics.draw(debugCandyImg, self.mapBoundsQuads[1], xl, yt)
+    
+    love.graphics.setStencilTest()
         
+    if self.showGrid then
         self.gridQuad:setViewport(
             (xl)%self.level.tileSize,
             (yt)%self.level.tileSize,
@@ -221,7 +237,7 @@ function Editor:draw()
     
     -- selection
     for _, v in ipairs(self.selectionBorders) do
-        love.graphics.draw(selectionBorderImg, selectionQuad, v.x, v.y, v.a)
+        love.graphics.draw(selectionBorderImg, selectionQuad, v[1], v[2], v[3])
     end
     
     if self.tool.draw then
@@ -364,17 +380,20 @@ function Editor:selectTile(i)
     self.tools.paint.tile = self.level.tileMaps["smb3-grass"].tiles[i]
 end
 
-function Editor:keypressed(key)
-    if self.tool.keypressed and self.tool:keypressed(key) then
+function Editor:cmdpressed(key)
+    if self.tool.cmdpressed and self.tool:cmdpressed(key) then
         return true
     end
     
-    if key == getKey("editor.delete") then
+    if key["editor.delete"] then
         for _, v in ipairs(self.selection) do
-            self.level:setMap(v.x, v.y, nil)
+            self.level:setMap(v[1], v[2], nil)
         end
-    elseif key == getKey("editor.undo") then
-        self:loadState()
+        self:saveState()
+    elseif key["editor.undo"] then
+        self:undo()
+    elseif key["editor.redo"] then
+        self:redo()
     end
 end
 
@@ -469,7 +488,7 @@ function Editor:addToSelection(selection)
         local found = false
         
         for _, w in ipairs(self.selection) do
-            if w.x == v.x and w.y == v.y then
+            if w[1] == v[1] and w[2] == v[2] then
                 found = true
                 break
             end
@@ -490,7 +509,7 @@ function Editor:subtractFromSelection(selection)
         local found = false
         
         for _, w in ipairs(selection) do
-            if w.x == v.x and w.y == v.y then
+            if w[1] == v[1] and w[2] == v[2] then
                 found = true
                 break
             end
@@ -516,7 +535,7 @@ function Editor:intersectSelection(selection)
         local found = false
         
         for _, w in ipairs(self.selection) do
-            if w.x == v.x and w.y == v.y then
+            if w[1] == v[1] and w[2] == v[2] then
                 found = true
                 break
             end
@@ -537,7 +556,7 @@ function Editor:updateSelectionBorder()
     local SBL = {} -- selectionBordersLookup
     
     for _, v in ipairs(self.selection) do
-        local x, y = v.x, v.y
+        local x, y = v[1], v[2]
         
         if SBL[x-1] and SBL[x-1][y] and SBL[x-1][y].right then
             SBL[x-1][y].right = false
@@ -578,23 +597,23 @@ function Editor:updateSelectionBorder()
     end
     
     for _, v in ipairs(self.selection) do
-        local x, y = v.x, v.y
+        local x, y = v[1], v[2]
         local wx, wy = self.level:mapToWorld(x-1, y-1)
         
         if SBL[x][y].top then
-            table.insert(self.selectionBorders, {x=wx, y=wy, a=0})
+            table.insert(self.selectionBorders, {wx, wy, 0})
         end
         
         if SBL[x][y].right then
-            table.insert(self.selectionBorders, {x=wx+16, y=wy, a=math.pi*.5})
+            table.insert(self.selectionBorders, {wx+16, wy, math.pi*.5})
         end
         
         if SBL[x][y].bottom then
-            table.insert(self.selectionBorders, {x=wx+16, y=wy+16, a=math.pi})
+            table.insert(self.selectionBorders, {wx+16, wy+16, math.pi})
         end
         
         if SBL[x][y].left then
-            table.insert(self.selectionBorders, {x=wx, y=wy+16, a=-math.pi*.5})
+            table.insert(self.selectionBorders, {wx, wy+16, -math.pi*.5})
         end
     end
 end
@@ -603,13 +622,13 @@ function Editor:expandMapTo(x, y)
     local moveMapX, moveMapY, moveWorldX, moveWorldY = self.level:expandMapTo(x, y)
     
     for _, v in ipairs(self.selection) do
-        v.x = v.x + moveMapX
-        v.y = v.y + moveMapY
+        v[1] = v[1] + moveMapX
+        v[2] = v[2] + moveMapY
     end
     
     for _, v in ipairs(self.selectionBorders) do
-        v.x = v.x + moveWorldX
-        v.y = v.y + moveWorldY
+        v[1] = v[1] + moveWorldX
+        v[2] = v[2] + moveWorldY
     end
 end
 
@@ -617,19 +636,24 @@ function Editor:saveState()
     for i = 1, self.editorState-1 do
         table.remove(self.editorStates, 1)
     end
-
+    
+    print(#self.editorStates)
+    
     table.insert(self.editorStates, 1, EditorState:new(self))
 
     self.editorState = 1
-
-    print_r(self.editorStates)
 end
 
-function Editor:loadState()
-    if #self.editorStates >= 2 then
+function Editor:undo()
+    if #self.editorStates >= 2 and self.editorState < #self.editorStates then
         self.editorState = self.editorState + 1
         self.editorStates[self.editorState]:load()
     end
+end
 
-    print_r(self.editorStates)
+function Editor:redo()
+    if self.editorState > 1 then
+        self.editorState = self.editorState - 1
+        self.editorStates[self.editorState]:load()
+    end
 end

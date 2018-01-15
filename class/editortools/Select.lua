@@ -38,11 +38,11 @@ function Select:draw()
     
     love.graphics.setColor(0, 0, 0)
     
-    if keyDown("editor.select.add") and keyDown("editor.select.subtract") then
+    if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
         font:print("&Intersect;", mx-9, my+2)
-    elseif keyDown("editor.select.add") then
+    elseif cmdDown("editor.select.add") then
         font:print("+", mx-9, my+2)
-    elseif keyDown("editor.select.subtract") then
+    elseif cmdDown("editor.select.subtract") then
         font:print("-", mx-9, my+2)
     end
     
@@ -64,17 +64,19 @@ function Select:mousereleased(x, y, button)
     if self.pressing then
         local tiles = self:getTiles(self.selectionStart[1], self.selectionStart[2], mx-self.selectionStart[1], my-self.selectionStart[2])
         
-        if keyDown("editor.select.add") and keyDown("editor.select.subtract") then
+        if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
             self.editor:intersectSelection(tiles)
-        elseif keyDown("editor.select.add") then
+        elseif cmdDown("editor.select.add") then
             self.editor:addToSelection(tiles)
-        elseif keyDown("editor.select.subtract") then
+        elseif cmdDown("editor.select.subtract") then
             self.editor:subtractFromSelection(tiles)
         elseif #tiles > 1 then
             self.editor:replaceSelection(tiles)
         else
             self.editor:clearSelection()
         end
+        
+        self.editor:saveState()
     end
     
     self.pressing = false
@@ -94,7 +96,7 @@ function Select:getTiles(x, y, w, h)
     
     for x = lx, rx do
         for y = ty, by do
-            table.insert(ret, {x=x, y=y})
+            table.insert(ret, {x, y})
         end
     end
     

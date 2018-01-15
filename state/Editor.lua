@@ -154,6 +154,10 @@ function Editor:load()
     self.selection = {}
     self.selectionBorders = {}
     self.selectionBorderTimer = 0
+
+    self.editorStates = {}
+    self.editorState = 1
+    self:saveState()
     
     self:toggleGrid(false)
     self:toggleFreeCam(true)
@@ -369,6 +373,8 @@ function Editor:keypressed(key)
         for _, v in ipairs(self.selection) do
             self.level:setMap(v.x, v.y, nil)
         end
+    elseif key == getKey("editor.undo") then
+        self:loadState()
     end
 end
 
@@ -605,4 +611,25 @@ function Editor:expandMapTo(x, y)
         v.x = v.x + moveWorldX
         v.y = v.y + moveWorldY
     end
+end
+
+function Editor:saveState()
+    for i = 1, self.editorState-1 do
+        table.remove(self.editorStates, 1)
+    end
+
+    table.insert(self.editorStates, 1, EditorState:new(self))
+
+    self.editorState = 1
+
+    print_r(self.editorStates)
+end
+
+function Editor:loadState()
+    if #self.editorStates >= 2 then
+        self.editorState = self.editorState + 1
+        self.editorStates[self.editorState]:load()
+    end
+
+    print_r(self.editorStates)
 end

@@ -42,6 +42,8 @@ end
 
 function Paint:mousereleased(x, y, button)
     self.penDown = false
+
+    self.editor:saveState()
 end
 
 function Paint:pipette(x, y)

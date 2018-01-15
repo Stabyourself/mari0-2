@@ -57,6 +57,8 @@ return {
         editor = {
             pipette = "lshift",
             delete = "delete",
+            undo = "z",
+            redo = "y",
             
             select = {
                 add = "lshift",

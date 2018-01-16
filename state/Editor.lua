@@ -480,15 +480,23 @@ function Editor:replaceSelection(selection)
 end
 
 function Editor:addToSelection(selection)
-    self.selection:add(selection)
+    if self.selection then
+        self.selection:add(selection)
+    else
+        self.selection = Selection:new(self, selection)
+    end
 end
 
 function Editor:subtractFromSelection(selection)
-    self.selection:subtract(selection)
+    if self.selection then
+        self.selection:subtract(selection)
+    end
 end
 
 function Editor:intersectSelection(selection)
-    self.selection:intersect(selection)
+    if self.selection then
+        self.selection:intersect(selection)
+    end
 end
 
 function Editor:expandMapTo(x, y)

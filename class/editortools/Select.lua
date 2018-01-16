@@ -53,7 +53,7 @@ function Select:mousepressed(x, y, button)
     if button == 1 then
         local worldX, worldY = self.editor.level:mouseToWorld()
         
-        if self.editor.selection and self.editor.selection:collision() then
+        if not cmdDown("editor.select.add") and not cmdDown("editor.select.subtract") and self.editor.selection and self.editor.selection:collision() then
             self.editor.selection:startDrag(worldX, worldY)
         else
             self.editor:unFloatSelection()

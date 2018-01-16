@@ -8,10 +8,6 @@ for _, v in ipairs(Editor.toolbarOrder) do
 end
 
 local checkerboardImg = love.graphics.newImage("img/editor/checkerboard.png")
-local selectionBorderImg = love.graphics.newImage("img/editor/selection-border.png")
-selectionBorderImg:setWrap("repeat")
-
-local selectionQuad = love.graphics.newQuad(0, 0, 16, 1, 4, 1)
 
 Editor.toolClasses = {
     paint = require("class.editortools.Paint"),
@@ -150,10 +146,6 @@ function Editor:load()
     self.gridImg = love.graphics.newImage("img/grid.png")
     self.gridImg:setWrap("repeat", "repeat")
     self.gridQuad = love.graphics.newQuad(0, 0, 16, 16, 16, 16)
-    
-    self.selection = {}
-    self.selectionBorders = {}
-    self.selectionBorderTimer = 0
 
     self.editorStates = {}
     self.editorState = 1
@@ -195,11 +187,9 @@ function Editor:update(dt)
         end
     end
     
-    self.selectionBorderTimer = self.selectionBorderTimer + dt*8
-    while self.selectionBorderTimer >= 4 do
-        self.selectionBorderTimer = self.selectionBorderTimer - 4
+    if self.selection then
+        self.selection:update(dt)
     end
-    selectionQuad:setViewport(math.floor(self.selectionBorderTimer), 0, 16, 1)
 end
 
 function Editor:draw()
@@ -215,7 +205,9 @@ function Editor:draw()
     love.graphics.setStencilTest("notequal", 1)
     
     self.mapBoundsQuads[1]:setViewport(0, 0, xr-xl, yb-yt)
+    love.graphics.setColor(0, 0, 0, 0.1)
     love.graphics.draw(debugCandyImg, self.mapBoundsQuads[1], xl, yt)
+    love.graphics.setColor(1, 1, 1)
     
     love.graphics.setStencilTest()
         
@@ -235,9 +227,8 @@ function Editor:draw()
         )
     end
     
-    -- selection
-    for _, v in ipairs(self.selectionBorders) do
-        love.graphics.draw(selectionBorderImg, selectionQuad, v[1], v[2], v[3])
+    if self.selection then
+        self.selection:draw()
     end
     
     if self.tool.draw then
@@ -289,7 +280,7 @@ function Editor:toggleUI(on)
 end
 
 function Editor:selectTool(toolName)
-    if self.tool and self.tool.unselect then
+    if self.tool and self.tool.unSelect then
         self.tool:unSelect()
     end
     
@@ -386,10 +377,13 @@ function Editor:cmdpressed(key)
     end
     
     if key["editor.delete"] then
-        for _, v in ipairs(self.selection) do
-            self.level:setMap(v[1], v[2], nil)
+        if self.selection then
+            if self.selection:delete() then
+                self:clearSelection()
+            end
+            
+            self:saveState()
         end
-        self:saveState()
     elseif key["editor.undo"] then
         self:undo()
     elseif key["editor.redo"] then
@@ -412,6 +406,10 @@ function Editor:mousereleased(x, y, button)
     
     if self.tool.mousereleased then
         self.tool:mousereleased(x, y, button)
+    end
+    
+    if self.selection then
+        self.selection:mousereleased(x, y, button)
     end
 end
 
@@ -474,159 +472,34 @@ function Editor:resize(w, h)
 end
 
 function Editor:clearSelection()
-    self.selection = {}
-    self:updateSelectionBorder()
+    self.selection = nil
 end
 
 function Editor:replaceSelection(selection)
-    self.selection = selection
-    self:updateSelectionBorder()
+    self.selection = Selection:new(self, selection)
 end
 
 function Editor:addToSelection(selection)
-    for _, v in ipairs(selection) do
-        local found = false
-        
-        for _, w in ipairs(self.selection) do
-            if w[1] == v[1] and w[2] == v[2] then
-                found = true
-                break
-            end
-        end
-        
-        if not found then
-            table.insert(self.selection, v)
-        end
-    end
-    
-    self:updateSelectionBorder()
+    self.selection:add(selection)
 end
 
 function Editor:subtractFromSelection(selection)
-    local toDelete = {}
-    
-    for i, v in ipairs(self.selection) do
-        local found = false
-        
-        for _, w in ipairs(selection) do
-            if w[1] == v[1] and w[2] == v[2] then
-                found = true
-                break
-            end
-        end
-        
-        if found then
-            table.insert(toDelete, i)
-        end
-    end
-    
-    for i = #toDelete, 1, -1 do
-        table.remove(self.selection, toDelete[i])
-    end
-        
-    
-    self:updateSelectionBorder()
+    self.selection:subtract(selection)
 end
 
 function Editor:intersectSelection(selection)
-    local newSelection = {}
-    
-    for _, v in ipairs(selection) do
-        local found = false
-        
-        for _, w in ipairs(self.selection) do
-            if w[1] == v[1] and w[2] == v[2] then
-                found = true
-                break
-            end
-        end
-        
-        if found then
-            table.insert(newSelection, v)
-        end
-    end
-    
-    self.selection = newSelection
-    
-    self:updateSelectionBorder()
-end
-
-function Editor:updateSelectionBorder()
-    self.selectionBorders = {}
-    local SBL = {} -- selectionBordersLookup
-    
-    for _, v in ipairs(self.selection) do
-        local x, y = v[1], v[2]
-        
-        if SBL[x-1] and SBL[x-1][y] and SBL[x-1][y].right then
-            SBL[x-1][y].right = false
-        end
-        if SBL[x+1] and SBL[x+1][y] and SBL[x+1][y].left then
-            SBL[x+1][y].left = false
-        end
-        if SBL[x] and SBL[x][y-1] and SBL[x][y-1].bottom then
-            SBL[x][y-1].bottom = false
-        end
-        if SBL[x] and SBL[x][y+1] and SBL[x][y+1].top then
-            SBL[x][y+1].top = false
-        end
-        
-        if not SBL[x] then
-            SBL[x] = {}
-        end
-        
-        SBL[x][y] = {
-            top = true,
-            left = true,
-            right = true,
-            bottom = true
-        }
-        
-        if SBL[x-1] and SBL[x-1][y] then
-            SBL[x][y].left = false
-        end
-        if SBL[x+1] and SBL[x+1][y] then
-            SBL[x][y].right = false
-        end
-        if SBL[x] and SBL[x][y-1] then
-            SBL[x][y].top = false
-        end
-        if SBL[x] and SBL[x][y+1] then
-            SBL[x][y].bottom = false
-        end
-    end
-    
-    for _, v in ipairs(self.selection) do
-        local x, y = v[1], v[2]
-        local wx, wy = self.level:mapToWorld(x-1, y-1)
-        
-        if SBL[x][y].top then
-            table.insert(self.selectionBorders, {wx, wy, 0})
-        end
-        
-        if SBL[x][y].right then
-            table.insert(self.selectionBorders, {wx+16, wy, math.pi*.5})
-        end
-        
-        if SBL[x][y].bottom then
-            table.insert(self.selectionBorders, {wx+16, wy+16, math.pi})
-        end
-        
-        if SBL[x][y].left then
-            table.insert(self.selectionBorders, {wx, wy+16, -math.pi*.5})
-        end
-    end
+    self.selection:intersect(selection)
 end
 
 function Editor:expandMapTo(x, y)
     local moveMapX, moveMapY, moveWorldX, moveWorldY = self.level:expandMapTo(x, y)
     
-    for _, v in ipairs(self.selection) do
+    for _, v in ipairs(self.selection.tiles) do
         v[1] = v[1] + moveMapX
         v[2] = v[2] + moveMapY
     end
     
-    for _, v in ipairs(self.selectionBorders) do
+    for _, v in ipairs(self.selection.borders) do
         v[1] = v[1] + moveWorldX
         v[2] = v[2] + moveWorldY
     end
@@ -636,8 +509,6 @@ function Editor:saveState()
     for i = 1, self.editorState-1 do
         table.remove(self.editorStates, 1)
     end
-    
-    print(#self.editorStates)
     
     table.insert(self.editorStates, 1, EditorState:new(self))
 
@@ -655,5 +526,17 @@ function Editor:redo()
     if self.editorState > 1 then
         self.editorState = self.editorState - 1
         self.editorStates[self.editorState]:load()
+    end
+end
+
+function Editor:floatSelection()
+    if self.selection and not self.selection.floating then
+        self.selection:float()
+    end
+end
+
+function Editor:unFloatSelection()
+    if self.selection and self.selection.floating then
+        self.selection:unFloat()
     end
 end

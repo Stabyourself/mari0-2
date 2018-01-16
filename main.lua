@@ -41,6 +41,7 @@ function love.load()
     require "class.Smb3Ui"
     require "class.Crosshair"
     require "class.EditorState"
+    require "class.Selection"
     
     require "cheats"
     

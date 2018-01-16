@@ -51,9 +51,16 @@ end
 
 function Select:mousepressed(x, y, button)
     if button == 1 then
-        local mx, my = self.editor.level:mouseToWorld()
-        self.pressing = true
-        self.selectionStart = {mx, my}
+        local worldX, worldY = self.editor.level:mouseToWorld()
+        
+        if self.editor.selection and self.editor.selection:collision() then
+            self.editor.selection:startDrag(worldX, worldY)
+        else
+            self.editor:unFloatSelection()
+            local worldX, worldY = self.editor.level:mouseToWorld()
+            self.pressing = true
+            self.selectionStart = {worldX, worldY}
+        end
     end
         
     return true
@@ -62,7 +69,7 @@ end
 function Select:mousereleased(x, y, button)
     local mx, my = self.editor.level:mouseToWorld()
     if self.pressing then
-        local tiles = self:getTiles(self.selectionStart[1], self.selectionStart[2], mx-self.selectionStart[1], my-self.selectionStart[2])
+        local tiles, dirty = self:getTiles(self.selectionStart[1], self.selectionStart[2], mx-self.selectionStart[1], my-self.selectionStart[2])
         
         if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
             self.editor:intersectSelection(tiles)
@@ -70,24 +77,26 @@ function Select:mousereleased(x, y, button)
             self.editor:addToSelection(tiles)
         elseif cmdDown("editor.select.subtract") then
             self.editor:subtractFromSelection(tiles)
-        elseif #tiles > 1 then
+        elseif #tiles > 0 and not dirty then
             self.editor:replaceSelection(tiles)
         else
             self.editor:clearSelection()
         end
         
         self.editor:saveState()
+        
+        self.pressing = false
     end
-    
-    self.pressing = false
 end
 
 function Select:getTiles(x, y, w, h)
     local lx, rx, ty, by
+    local dirtySelect = false
     
     if math.abs(w) < 3 and math.abs(h) < 3 then
         lx, ty = self.editor.level:worldToMap(x, y)
         rx, by = lx, ty
+        dirtySelect = true
     else
         lx, rx, ty, by = self.editor.level:getMapRectangle(x, y, w, h, true)
     end
@@ -100,7 +109,11 @@ function Select:getTiles(x, y, w, h)
         end
     end
     
-    return ret
+    return ret, dirtySelect
+end
+
+function Select:unSelect()
+    self.editor:unFloatSelection()
 end
 
 return Select

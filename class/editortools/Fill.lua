@@ -28,7 +28,7 @@ function Fill:mousereleased(x, y, button)
         x, y = self.editor.level:cameraToMap(x, y)
         
         if x == self.pressingPos[1] and y == self.pressingPos[2] then
-            if #self.editor.selection > 0 then
+            if self.editor.selection and #self.editor.selection.tiles > 0 then
                 local found = false
                 
                 for _, v in ipairs(self.editor.selection) do
@@ -39,7 +39,7 @@ function Fill:mousereleased(x, y, button)
                 end
                 
                 if found then
-                    self:fillTiles(self.editor.selection, self.editor.tools.paint.tile)
+                    self:fillTiles(self.editor.selection.tiles, self.editor.tools.paint.tile)
                     self.editor:saveState()
                     return
                 end

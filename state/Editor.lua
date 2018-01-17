@@ -190,6 +190,10 @@ function Editor:update(dt)
     if self.selection then
         self.selection:update(dt)
     end
+    
+    if self.floatingSelection then
+        self.floatingSelection:update(dt)
+    end
 end
 
 function Editor:draw()
@@ -229,6 +233,11 @@ function Editor:draw()
     
     if self.selection then
         self.selection:draw()
+    end
+    
+    
+    if self.floatingSelection then
+        self.floatingSelection:draw()
     end
     
     if self.tool.draw then
@@ -384,6 +393,10 @@ function Editor:cmdpressed(key)
             
             self:saveState()
         end
+
+        if self.floatingSelection then
+            self.floatingSelection = nil
+        end
     elseif key["editor.undo"] then
         self:undo()
     elseif key["editor.redo"] then
@@ -410,6 +423,10 @@ function Editor:mousereleased(x, y, button)
     
     if self.selection then
         self.selection:mousereleased(x, y, button)
+    end
+    
+    if self.floatingSelection then
+        self.floatingSelection:mousereleased(x, y, button)
     end
 end
 
@@ -538,13 +555,16 @@ function Editor:redo()
 end
 
 function Editor:floatSelection()
-    if self.selection and not self.selection.floating then
-        self.selection:float()
+    if self.selection then
+        self.floatingSelection = self.selection:getFloatingSelection()
+        self.selection = nil
     end
 end
 
 function Editor:unFloatSelection()
-    if self.selection and self.selection.floating then
-        self.selection:unFloat()
+    if self.floatingSelection then
+        self.floatingSelection:unFloat()
+        self.selection = self.floatingSelection:getSelection()
+        self.floatingSelection = nil
     end
 end

@@ -302,7 +302,10 @@ function cmdDown(cmd)
     return false
 end
 
-function getTileBorders(tiles)
+function getTileBorders(tiles, offsetX, offsetY)
+    offsetX = offsetX or 0
+    offsetY = offsetY or 0
+
     local borders = {}
     local SBL = {} -- selectionBordersLookup
     
@@ -349,7 +352,7 @@ function getTileBorders(tiles)
     
     for _, v in ipairs(tiles) do
         local x, y = v[1], v[2]
-        local wx, wy = (x-1)*16, (y-1)*16
+        local wx, wy = (x-1+offsetX)*16, (y-1+offsetY)*16
         
         if SBL[x][y].top then
             table.insert(borders, {wx, wy, 0})

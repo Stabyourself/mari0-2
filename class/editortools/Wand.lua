@@ -25,8 +25,6 @@ function Wand:draw()
         addition = addition .. "-"
     end
     
-    font:getLength(addition)
-    
     if addition ~= "" then
         font:print(addition, mx-font:getLength(addition)*8-1, my+2)
     end

@@ -538,17 +538,20 @@ function World:cameraToWorld(x, y)
 end
 
 function World:mouseToWorld()
-    local x, y = love.mouse.getPosition()
-    x, y = x/VAR("scale"), y/VAR("scale")
+    local x, y = self:getMouse()
 
     return self.camera:worldCoords(x, y)
 end
 
 function World:mouseToMap()
-    local x, y = love.mouse.getPosition()
-    x, y = x/VAR("scale"), y/VAR("scale")
+    local x, y = self:getMouse()
     
     return self:cameraToMap(x, y)
+end
+
+function World:getMouse()
+    local x, y = love.mouse.getPosition()
+    return x/VAR("scale"), y/VAR("scale")
 end
 
 function World:getMapRectangle(x, y, w, h, clamp)

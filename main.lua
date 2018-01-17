@@ -42,6 +42,7 @@ function love.load()
     require "class.Crosshair"
     require "class.EditorState"
     require "class.Selection"
+    require "class.FloatingSelection"
     
     require "cheats"
     
@@ -80,6 +81,7 @@ function love.load()
         &Space;
         .;:;!?_-<>=+*/\'%
         &Intersect;
+        &Move;
     ]])
 
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")

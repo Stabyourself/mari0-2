@@ -301,22 +301,72 @@ function cmdDown(cmd)
     
     return false
 end
+
+function getTileBorders(tiles)
+    local borders = {}
+    local SBL = {} -- selectionBordersLookup
+    
+    for _, v in ipairs(tiles) do
+        local x, y = v[1], v[2]
         
+        if SBL[x-1] and SBL[x-1][y] and SBL[x-1][y].right then
+            SBL[x-1][y].right = false
+        end
+        if SBL[x+1] and SBL[x+1][y] and SBL[x+1][y].left then
+            SBL[x+1][y].left = false
+        end
+        if SBL[x] and SBL[x][y-1] and SBL[x][y-1].bottom then
+            SBL[x][y-1].bottom = false
+        end
+        if SBL[x] and SBL[x][y+1] and SBL[x][y+1].top then
+            SBL[x][y+1].top = false
+        end
+        
+        if not SBL[x] then
+            SBL[x] = {}
+        end
+        
+        SBL[x][y] = {
+            top = true,
+            left = true,
+            right = true,
+            bottom = true
+        }
+        
+        if SBL[x-1] and SBL[x-1][y] then
+            SBL[x][y].left = false
+        end
+        if SBL[x+1] and SBL[x+1][y] then
+            SBL[x][y].right = false
+        end
+        if SBL[x] and SBL[x][y-1] then
+            SBL[x][y].top = false
+        end
+        if SBL[x] and SBL[x][y+1] then
+            SBL[x][y].bottom = false
+        end
+    end
     
-    -- local key = combineTableCall(VAR("controls"), cmd:split("."))
-    
-    -- if type(key) == "string" then
-    --     return love.keyboard.isDown(key)
-    -- elseif type(key) == "table" then
-    --     if type(key[1]) == "string" then
-    --         return love.keyboard.isDown(key)
-    --     else
-    --         for _, v in ipairs(key) do
-    --             if not love.keyboard.isDown(v) then
-    --                 return false
-    --             end
-    --         end
-            
-    --         return true
-    --     end
-    -- end
+    for _, v in ipairs(tiles) do
+        local x, y = v[1], v[2]
+        local wx, wy = (x-1)*16, (y-1)*16
+        
+        if SBL[x][y].top then
+            table.insert(borders, {wx, wy, 0})
+        end
+        
+        if SBL[x][y].right then
+            table.insert(borders, {wx+16, wy, math.pi*.5})
+        end
+        
+        if SBL[x][y].bottom then
+            table.insert(borders, {wx+16, wy+16, math.pi})
+        end
+        
+        if SBL[x][y].left then
+            table.insert(borders, {wx, wy+16, -math.pi*.5})
+        end
+    end
+
+    return borders
+end

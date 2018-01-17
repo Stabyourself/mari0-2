@@ -84,6 +84,10 @@ function love.load()
 
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")
     debugCandyImg:setWrap("repeat")
+
+    if love.math.random() > 0.9 then
+        funkyImg = love.graphics.newImage("img/funky.png")
+    end
     
     defaultUI = GUI:new("img/gui/default")
     
@@ -158,6 +162,10 @@ function love.draw()
 
     if VAR("scale") ~= 1 then
         love.graphics.scale(1/VAR("scale"), 1/VAR("scale"))
+    end
+
+    if funkyImg then
+        love.graphics.draw(funkyImg, love.graphics.getWidth(), 0, 0, 1, 1, 340)
     end
 end
 

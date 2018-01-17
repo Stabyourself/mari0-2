@@ -32,13 +32,10 @@ function EditorState:serialize()
             table.insert(state.selection.tiles, {v[1], v[2]})
         end
         
-        state.selection.box = {selection.box[1], selection.box[2], selection.box[3], selection.box[4]}
-        state.selection.width = selection.width
-        state.selection.height = selection.height
-        
-        state.selection.floating = selection.floating
-        
-        if selection.floating then
+        if self.editor.floatingSelection then
+            state.selection.box = {selection.box[1], selection.box[2], selection.box[3], selection.box[4]}
+            state.selection.width = selection.width
+            state.selection.height = selection.height
             state.selection.totalOffset = {selection.totalOffset[1], selection.totalOffset[2]}
             state.selection.floatMap = {}
             

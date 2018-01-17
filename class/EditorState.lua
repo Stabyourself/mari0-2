@@ -37,6 +37,8 @@ function EditorState:serialize()
     if floatingSelection then
         state.floatingSelection = {}
         state.floatingSelection.pos = {floatingSelection.pos[1], floatingSelection.pos[2]}
+        state.floatingSelection.width = floatingSelection.width
+        state.floatingSelection.height = floatingSelection.height
         
         state.floatingSelection.tiles = {}
         for _, v in ipairs(floatingSelection.tiles) do
@@ -95,10 +97,10 @@ function EditorState:load()
         self.editor.floatingSelection.pos[2] = state.floatingSelection.pos[2]
 
         self.editor.floatingSelection.floatMap = {}
-        for x = 1, #state.floatingSelection.floatMap do
+        for x = 1, state.floatingSelection.width do
             self.editor.floatingSelection.floatMap[x] = {}
 
-            for y = 1, #state.floatingSelection.floatMap[x] do
+            for y = 1, state.floatingSelection.height do
                 self.editor.floatingSelection.floatMap[x][y] = state.floatingSelection.floatMap[x][y]
             end
         end

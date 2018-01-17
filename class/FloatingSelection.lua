@@ -106,11 +106,9 @@ end
 
 function FloatingSelection:mousereleased(x, y, button)
     self.dragging = false
-    self.editor:saveState()
 end
 
 function FloatingSelection:unFloat()
-    print_r(self.pos)
     if self.pos[1] < 0 or self.pos[2] < 0 then
         local moveX, moveY = self.level:expandMapTo(self.pos[1], self.pos[2])
         self.pos[1] = self.pos[1] + moveX
@@ -130,8 +128,6 @@ function FloatingSelection:unFloat()
     end
     
     self.totalOffset = {0, 0}
-    
-    --self:updateCache()
 end
 
 function FloatingSelection:startDrag(x, y)
@@ -158,8 +154,6 @@ end
 
 function FloatingSelection:getSelection()
     local tiles = {}
-
-    print_r(self.pos)
 
     for x = 1, self.width do
         for y = 1, self.height do

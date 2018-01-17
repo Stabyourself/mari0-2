@@ -563,6 +563,7 @@ end
 
 function Editor:unFloatSelection()
     if self.floatingSelection then
+        self:saveState()
         self.floatingSelection:unFloat()
         self.selection = self.floatingSelection:getSelection()
         self.floatingSelection = nil

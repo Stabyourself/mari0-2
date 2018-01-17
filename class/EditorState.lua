@@ -4,7 +4,6 @@ function EditorState:initialize(editor)
     self.editor = editor
 
     self.state = self:serialize()
-    print("state saved")
 end
 
 function EditorState:serialize()
@@ -31,20 +30,25 @@ function EditorState:serialize()
         for _, v in ipairs(selection.tiles) do
             table.insert(state.selection.tiles, {v[1], v[2]})
         end
+    end
+
+    local floatingSelection = self.editor.floatingSelection
+
+    if floatingSelection then
+        state.floatingSelection = {}
+        state.floatingSelection.pos = {floatingSelection.pos[1], floatingSelection.pos[2]}
         
-        if self.editor.floatingSelection then
-            state.selection.box = {selection.box[1], selection.box[2], selection.box[3], selection.box[4]}
-            state.selection.width = selection.width
-            state.selection.height = selection.height
-            state.selection.totalOffset = {selection.totalOffset[1], selection.totalOffset[2]}
-            state.selection.floatMap = {}
-            
-            for x = 1, selection.width do
-                state.selection.floatMap[x] = {}
-                
-                for y = 1, selection.height do
-                    state.selection.floatMap[x][y] = selection.floatMap[x][y]
-                end
+        state.floatingSelection.tiles = {}
+        for _, v in ipairs(floatingSelection.tiles) do
+            table.insert(state.floatingSelection.tiles, {v[1], v[2]})
+        end
+
+        state.floatingSelection.floatMap = {}
+        for x = 1, floatingSelection.width do
+            state.floatingSelection.floatMap[x] = {}
+
+            for y = 1, floatingSelection.height do
+                state.floatingSelection.floatMap[x][y] = floatingSelection.floatMap[x][y]
             end
         end
     end
@@ -67,6 +71,9 @@ function EditorState:load()
     self.editor.level.width = state.width
     self.editor.level.height = state.height
     
+    self.editor.selection = nil
+    self.editor.floatingSelection = nil
+    
     if state.selection then
         local tiles = {}
         for _, v in ipairs(state.selection.tiles) do
@@ -75,27 +82,25 @@ function EditorState:load()
         
         local selection = Selection:new(self.editor, tiles)
         self.editor.selection = selection
-        
-        selection.box = {state.selection.box[1], state.selection.box[2], state.selection.box[3], state.selection.box[4]}
-        selection.width = state.selection.width
-        selection.height = state.selection.height
-        
-        selection.floating = state.selection.floating
-        
-        if state.selection.floating then
-            selection.totalOffset = {state.selection.totalOffset[1], state.selection.totalOffset[2]}
-            
-            selection.floatMap = {}
-            
-            for x = 1, selection.width do
-                selection.floatMap[x] = {}
-                
-                for y = 1, selection.height do
-                    selection.floatMap[x][y] = state.selection.floatMap[x][y]
-                end
+    end
+
+    if state.floatingSelection then
+        local tiles = {}
+        for _, v in ipairs(state.floatingSelection.tiles) do
+            table.insert(tiles, {v[1], v[2]})
+        end
+
+        self.editor.floatingSelection = FloatingSelection:new(self.editor, tiles)
+        self.editor.floatingSelection.pos[1] = state.floatingSelection.pos[1]
+        self.editor.floatingSelection.pos[2] = state.floatingSelection.pos[2]
+
+        self.editor.floatingSelection.floatMap = {}
+        for x = 1, #state.floatingSelection.floatMap do
+            self.editor.floatingSelection.floatMap[x] = {}
+
+            for y = 1, #state.floatingSelection.floatMap[x] do
+                self.editor.floatingSelection.floatMap[x][y] = state.floatingSelection.floatMap[x][y]
             end
         end
-    else
-        self.editor.selection = nil
     end
 end

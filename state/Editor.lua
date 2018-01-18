@@ -1,6 +1,6 @@
 Editor = class("Editor")
     
-Editor.toolbarOrder = {"paint", "erase", "move", "portal", "select", "wand", "fill", "stamp"}
+Editor.toolbarOrder = {"paint", "erase", "move", "portal", "select", "wand", "fill", "stamp", "object"}
 Editor.toolbarImg = {}
 
 for _, v in ipairs(Editor.toolbarOrder) do
@@ -18,6 +18,7 @@ Editor.toolClasses = {
     stamp = require("class.editortools.Stamp"),
     wand = require("class.editortools.Wand"),
     erase = require("class.editortools.Erase"),
+    object = require("class.editortools.Object"),
 }
 
 Editor.scaleMin = 0.1/VAR("scale")

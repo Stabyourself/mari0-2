@@ -14,6 +14,11 @@ return {
     ["delete"] = "editor.delete",
     ["^z"] = "editor.undo",
     ["^y"] = "editor.redo",
+
+    ["^c"] = "editor.copy",
+    ["^x"] = "editor.cut",
+    ["^v"] = "editor.paste",
+
     ["lctrl"] = "editor.select.subtract",
     ["lalt"] = "editor.wand.global",
     ["ralt"] = "editor.wand.global",

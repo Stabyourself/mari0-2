@@ -155,6 +155,8 @@ function Editor:load()
     for i = 1, 4 do
         self.mapBoundsQuads[i] = love.graphics.newQuad(0, 0, 8, 8, 8, 8)
     end
+
+    self.pastePos = {1, 1}
     
     self:toggleGrid(false)
     self:toggleFreeCam(true)
@@ -380,12 +382,12 @@ function Editor:selectTile(i)
     self.tools.paint.tile = self.level.tileMaps["smb3-grass"].tiles[i]
 end
 
-function Editor:cmdpressed(key)
-    if self.tool.cmdpressed and self.tool:cmdpressed(key) then
+function Editor:cmdpressed(cmd)
+    if self.tool.cmdpressed and self.tool:cmdpressed(cmd) then
         return true
     end
     
-    if key["editor.delete"] then
+    if cmd["editor.delete"] then
         if self.selection then
             if self.selection:delete() then
                 self:clearSelection()
@@ -397,10 +399,38 @@ function Editor:cmdpressed(key)
         if self.floatingSelection then
             self.floatingSelection = nil
         end
-    elseif key["editor.undo"] then
+
+    elseif cmd["editor.undo"] then
         self:undo()
-    elseif key["editor.redo"] then
+
+    elseif cmd["editor.redo"] then
         self:redo()
+
+    elseif cmd["editor.copy"] or cmd["editor.cut"] then
+        if self.selection then
+            self.clipboard, self.pastePos[1], self.pastePos[2] = self.selection:getStampMap()
+
+            if cmd["editor.cut"] then
+                self.selection:delete()
+            end
+
+        elseif self.floatingSelection then
+            self.clipboard, self.pastePos[1], self.pastePos[2] = self.floatingSelection:getStampMap()
+
+            if cmd["editor.cut"] then
+                self.floatingSelection = nil
+            end
+        end
+    
+    elseif cmd["editor.paste"] then
+        if self.clipboard then
+            if self.floatingSelection then
+                self.floatingSelection:unFloat()
+            end
+
+            self.floatingSelection = FloatingSelection:new(self, self.clipboard, {self.pastePos[1], self.pastePos[2]})
+            self.selection = nil
+        end
     end
 end
 
@@ -519,20 +549,22 @@ end
 function Editor:expandMapTo(x, y)
     local moveMapX, moveMapY, moveWorldX, moveWorldY = self.level:expandMapTo(x, y)
     
-    for _, v in ipairs(self.selection.tiles) do
-        v[1] = v[1] + moveMapX
-        v[2] = v[2] + moveMapY
-    end
-    
-    for _, v in ipairs(self.selection.borders) do
-        v[1] = v[1] + moveWorldX
-        v[2] = v[2] + moveWorldY
+    if self.selection then
+        for _, v in ipairs(self.selection.tiles) do
+            v[1] = v[1] + moveMapX
+            v[2] = v[2] + moveMapY
+        end
+
+        for _, v in ipairs(self.selection.borders) do
+            v[1] = v[1] + moveWorldX
+            v[2] = v[2] + moveWorldY
+        end
     end
 end
 
 function Editor:saveState()
     for i = 1, self.editorState-1 do
-        table.remove(self.editorStates, 1)
+        table.remove(self.editorStates, 1) -- Todo: Garbage collection doesn't seem to find the state
     end
     
     table.insert(self.editorStates, 1, EditorState:new(self))

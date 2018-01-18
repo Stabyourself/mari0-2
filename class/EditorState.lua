@@ -35,24 +35,8 @@ function EditorState:serialize()
     local floatingSelection = self.editor.floatingSelection
 
     if floatingSelection then
-        state.floatingSelection = {}
-        state.floatingSelection.pos = {floatingSelection.pos[1], floatingSelection.pos[2]}
-        state.floatingSelection.width = floatingSelection.width
-        state.floatingSelection.height = floatingSelection.height
-        
-        state.floatingSelection.tiles = {}
-        for _, v in ipairs(floatingSelection.tiles) do
-            table.insert(state.floatingSelection.tiles, {v[1], v[2]})
-        end
-
-        state.floatingSelection.floatMap = {}
-        for x = 1, floatingSelection.width do
-            state.floatingSelection.floatMap[x] = {}
-
-            for y = 1, floatingSelection.height do
-                state.floatingSelection.floatMap[x][y] = floatingSelection.floatMap[x][y]
-            end
-        end
+        state.floatingSelection = floatingSelection:getStampMap()
+        state.floatingSelectionPos = {floatingSelection.pos[1], floatingSelection.pos[2]}
     end
 
     return state
@@ -87,22 +71,7 @@ function EditorState:load()
     end
 
     if state.floatingSelection then
-        local tiles = {}
-        for _, v in ipairs(state.floatingSelection.tiles) do
-            table.insert(tiles, {v[1], v[2]})
-        end
-
-        self.editor.floatingSelection = FloatingSelection:new(self.editor, tiles)
-        self.editor.floatingSelection.pos[1] = state.floatingSelection.pos[1]
-        self.editor.floatingSelection.pos[2] = state.floatingSelection.pos[2]
-
-        self.editor.floatingSelection.floatMap = {}
-        for x = 1, state.floatingSelection.width do
-            self.editor.floatingSelection.floatMap[x] = {}
-
-            for y = 1, state.floatingSelection.height do
-                self.editor.floatingSelection.floatMap[x][y] = state.floatingSelection.floatMap[x][y]
-            end
-        end
+        self.editor.floatingSelection = FloatingSelection:new(self.editor, state.floatingSelection, state.floatingSelectionPos)
+        self.editor.floatingSelection.pos = {state.floatingSelectionPos[1], state.floatingSelectionPos[2]}
     end
 end

@@ -107,15 +107,7 @@ function Selection:updateBorders()
 end
 
 function Selection:getFloatingSelection()
-    local tiles = {}
-
-    for _, v in ipairs(self.tiles) do
-        if self.level:getTile(v[1], v[2]) then
-            table.insert(tiles, {v[1], v[2]})
-        end
-    end
-
-    return FloatingSelection:new(self.editor, tiles)
+    return FloatingSelection.fromSelection(self.editor, self)
 end
 
 function Selection:collision(x, y)
@@ -147,4 +139,8 @@ function Selection:delete()
     for _, v in ipairs(self.tiles) do
         self.level:setMap(v[1], v[2], nil)
     end
+end
+
+function Selection:getStampMap()
+    return StampMap.fromSelection(self.editor, self)
 end

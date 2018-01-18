@@ -43,6 +43,7 @@ function love.load()
     require "class.EditorState"
     require "class.Selection"
     require "class.FloatingSelection"
+    require "class.StampMap"
     
     require "cheats"
     

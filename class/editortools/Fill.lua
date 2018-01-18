@@ -31,7 +31,7 @@ function Fill:mousereleased(x, y, button)
             if self.editor.selection and #self.editor.selection.tiles > 0 then
                 local found = false
                 
-                for _, v in ipairs(self.editor.selection) do
+                for _, v in ipairs(self.editor.selection.tiles) do
                     if v[1] == x and v[2] == y then
                         found = true
                         break

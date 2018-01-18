@@ -8,8 +8,10 @@ function FloatingSelection.fromSelection(editor, selection)
 
     for x = 1, stampMap.width do
         for y = 1, stampMap.height do
-            if editor.level:inMap(x+xl-1, y+yt-1) and editor.level:getTile(x+xl-1, y+yt-1) then
-                editor.level:setMap(x+xl-1, y+yt-1, nil)
+            local absX, absY = x+xl-1, y+yt-1
+            
+            if stampMap.map[x][y] and editor.level:inMap(absX, absY) and editor.level:getTile(absX, absY) then
+                editor.level:setMap(absX, absY, nil)
             end
         end
     end

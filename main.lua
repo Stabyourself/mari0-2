@@ -163,6 +163,10 @@ function love.draw()
         love.graphics.setColor(1, 1, 1)
     end
 
+    if VAR("memoryDebug") then
+        fontOutlined:print(tostring(collectgarbage("count")*1024), 10, 10)
+    end
+
     if VAR("scale") ~= 1 then
         love.graphics.scale(1/VAR("scale"), 1/VAR("scale"))
     end

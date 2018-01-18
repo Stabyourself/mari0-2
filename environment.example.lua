@@ -4,6 +4,7 @@ return {
     stencilDebug = false,
     inputDebug = true,
     portalVectorDebug = false,
+    memoryDebug = false,
 
     noEnemies = false,
     musicDisabled = false,

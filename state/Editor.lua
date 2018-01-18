@@ -424,12 +424,17 @@ function Editor:cmdpressed(cmd)
     
     elseif cmd["editor.paste"] then
         if self.clipboard then
+            self:selectTool("select")
+
             if self.floatingSelection then
+                self.pastePos = {unpack(self.floatingSelection.pos)}
                 self.floatingSelection:unFloat()
             end
 
             self.floatingSelection = FloatingSelection:new(self, self.clipboard, {self.pastePos[1], self.pastePos[2]})
             self.selection = nil
+
+            self:saveState()
         end
     end
 end

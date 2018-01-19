@@ -23,5 +23,14 @@ return {
     ["lalt"] = "editor.wand.global",
     ["ralt"] = "editor.wand.global",
     
+    ["1"] = "editor.tool.paint",
+    ["2"] = "editor.tool.erase",
+    ["3"] = "editor.tool.move",
+    ["4"] = "editor.tool.portal",
+    ["5"] = "editor.tool.select",
+    ["6"] = "editor.tool.wand",
+    ["7"] = "editor.tool.fill",
+    ["8"] = "editor.tool.stamp",
+    
     ["p"] = "debug.star",
 }

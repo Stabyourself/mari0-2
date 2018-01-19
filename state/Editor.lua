@@ -441,6 +441,12 @@ function Editor:cmdpressed(cmd)
             self:saveState()
         end
     end
+    
+    for _, v in ipairs(self.toolbarOrder) do
+        if cmd["editor.tool." .. v] then
+            self:selectTool(v)
+        end
+    end
 end
 
 function Editor:mousepressed(x, y, button)

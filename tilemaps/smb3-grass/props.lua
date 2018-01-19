@@ -26,9 +26,23 @@ tiles[38] = templates.bigSlopeRightUpsideDown
 
 local stampMaps = {
     {
-        {0, 10, 0},
-        {10, 10, 10},
-        {0, 10, 0},
+        name = "test",
+        t = "simple",
+        map = {
+            {0, 10, 0},
+            {10, 10, 10},
+            {0, 10, 0},
+        }
+    },
+    
+    {
+        name = "ground",
+        type = "quads",
+        map = {
+            {1, 2, 3},
+            {9, 10, 11},
+        },
+        paddings = {1, 1, 0, 1}, -- clockwise from top (like in css)
     }
 }
 

@@ -1,6 +1,6 @@
 --Mari3 - MIT License.
 function love.load()
-    print("Mari3 POC by Stabyourself.net")
+    --print("Mari3 POC by Stabyourself.net")
     
     require "util"
     

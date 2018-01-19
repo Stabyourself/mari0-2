@@ -442,9 +442,9 @@ function Editor:cmdpressed(cmd)
         end
     end
     
-    for _, v in ipairs(self.toolbarOrder) do
-        if cmd["editor.tool." .. v] then
-            self:selectTool(v)
+    for i, _ in pairs(self.toolClasses) do
+        if cmd["editor.tool." .. i] then
+            self:selectTool(i)
         end
     end
 end

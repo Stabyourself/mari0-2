@@ -120,7 +120,7 @@ function love.update(dt)
 			end
 		end
     end
-    
+
     gameStateManager:event("update", dt)
 end
 
@@ -197,29 +197,40 @@ function love.keypressed(key)
         sendCmds = true
     end
 
-    if love.keyboard.isDown({"lctrl", "rctrl"}) and CONTROLS("^" .. key) then
-        appendCmds(cmds, CONTROLS("^" .. key))
-        sendCmds = true
-    end
+    appendCmds(cmds, CONTROLS(key))
 
-    if love.keyboard.isDown({"lalt", "ralt"}) and CONTROLS("!" .. key) then
-        appendCmds(cmds, CONTROLS("!" .. key))
-        sendCmds = true
-    end
+    local keyModified = key
 
-    if love.keyboard.isDown({"lshift", "rshift"}) and CONTROLS("+" .. key) then
-        appendCmds(cmds, CONTROLS("+" .. key))
-        sendCmds = true
+    if key ~= "lshift" and key ~= "rshift" and key ~= "lalt" and key ~= "ralt" and key ~= "lctrl" and key ~= "rctrl" then
+        if love.keyboard.isDown({"lshift", "rshift"}) then
+            keyModified = "+" .. keyModified
+        end
+
+        if love.keyboard.isDown({"lalt", "ralt"}) then
+            keyModified = "!" .. keyModified
+        end
+
+        if love.keyboard.isDown({"lctrl", "rctrl"}) then
+            keyModified = "^" .. keyModified
+        end
+    end
+    
+    if keyModified ~= key then
+        if CONTROLS(keyModified) then
+            appendCmds(cmds, CONTROLS(keyModified))
+            sendCmds = true
+        end
     end
     
     if cmds["quit"] then
         love.event.quit()
         return
     end
-    
+
     if sendCmds then
         gameStateManager:event("cmdpressed", cmds)
     end
+    
     gameStateManager:event("keypressed", key)
 end
 

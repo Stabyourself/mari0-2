@@ -272,24 +272,29 @@ function cmdDown(cmd)
     
     for _, key in ipairs(keys) do
         local pass = true
-        local firstChar = string.sub(key, 1, 1)
         
+        local firstChar = string.sub(key, 1, 1)
         if firstChar == "^" then
             if not love.keyboard.isDown({"lctrl", "rctrl"}) then
                 pass = false
             end
+            key = string.sub(key, 2, -1)
         end
         
+        local firstChar = string.sub(key, 1, 1)
         if firstChar == "!" then
             if not love.keyboard.isDown({"lalt", "ralt"}) then
                 pass = false
             end
+            key = string.sub(key, 2, -1)
         end
         
+        local firstChar = string.sub(key, 1, 1)
         if firstChar == "+" then
             if not love.keyboard.isDown({"lshift", "rshift"}) then
                 pass = false
             end
+            key = string.sub(key, 2, -1)
         end
         
         if pass then

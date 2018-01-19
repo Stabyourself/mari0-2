@@ -1,6 +1,6 @@
 Editor = class("Editor")
     
-Editor.toolbarOrder = {"paint", "erase", "move", "portal", "select", "wand", "fill", "stamp", "object"}
+Editor.toolbarOrder = {"paint", "erase", "move", "portal", "select", "wand", "fill", "stamp"}
 Editor.toolbarImg = {}
 
 for _, v in ipairs(Editor.toolbarOrder) do
@@ -18,7 +18,7 @@ Editor.toolClasses = {
     stamp = require("class.editortools.Stamp"),
     wand = require("class.editortools.Wand"),
     erase = require("class.editortools.Erase"),
-    object = require("class.editortools.Object"),
+    -- object = require("class.editortools.Object"),
 }
 
 Editor.scaleMin = 0.1/VAR("scale")
@@ -42,6 +42,8 @@ function Editor:initialize(level)
 end
 
 function Editor:load()
+    self.tileMap = self.level.tileMaps["smb3-grass"]
+    
     self.tools = {}
     
     for i, v in pairs(self.toolClasses) do
@@ -59,7 +61,8 @@ function Editor:load()
     self.menuBar.noClip = true
     
     self.canvas:addChild(self.menuBar)
-    
+
+
     
     local fileDropdown = GUI.Dropdown:new(0, 0, "file")
     
@@ -364,7 +367,7 @@ function Editor:newWindow(type, button)
         -- tileListWindow:addChild(backButton)
         
         
-        local tileListButtonGrid = GUI.ButtonGrid:new(1, 1, self.level.tileMaps["smb3-grass"].img, self.level.tileMaps["smb3-grass"].quad, 
+        local tileListButtonGrid = GUI.ButtonGrid:new(1, 1, self.tileMap.img, self.tileMap.quad, 
             function(buttonGrid, i) 
                 buttonGrid.selected = i
                 self:selectTile(i)
@@ -380,7 +383,7 @@ function Editor:selectTile(i)
         self:selectTool("paint")
     end
     
-    self.tools.paint.tile = self.level.tileMaps["smb3-grass"].tiles[i]
+    self.tools.paint.tile = self.tileMap.tiles[i]
 end
 
 function Editor:cmdpressed(cmd)

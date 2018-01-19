@@ -20,13 +20,13 @@ function World:loadMap(data)
     
     -- load any used tilemaps
     self.tileMaps = {}
-    local tileLookup = {}
+    self.tileLookup = {}
     
     for i, v in pairs(data.tileMaps) do
         self.tileMaps[i] = fissix.TileMap:new("tilemaps/" .. i)
         
         for j, w in pairs(v) do
-            tileLookup[j] = {tile = w, tileMap = self.tileMaps[i]}
+            self.tileLookup[j] = self.tileMaps[i].tiles[w]
         end
     end
     
@@ -40,15 +40,15 @@ function World:loadMap(data)
             local mapTile = data.map[x][y]
             
             if mapTile ~= 0 then
-                local lookup = tileLookup[mapTile]
+                local tile = self.tileLookup[mapTile]
                 
-                if not lookup then
+                if not tile then
                     print("Couldn't load real tile for \"" .. mapTile .. "\"")
                     error("Wew that map didn't load so well, did it")
                 end
                 
                 local realY = self.height-y+1
-                self.map[x][realY] = lookup.tileMap.tiles[lookup.tile]
+                self.map[x][realY] = tile
             end
         end
     end

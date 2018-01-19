@@ -3,27 +3,27 @@ local Paint = class("Editor.Paint")
 function Paint:initialize(editor)
     self.editor = editor
     
+    self.level = self.editor.level
     self.penDown = false
-    self.tileMap = self.editor.level.tileMaps["smb3-grass"]
-    self.tile = self.tileMap.tiles[1]
+    self.tile = self.editor.tileMap.tiles[1]
 end
 
 function Paint:update(dt)
     if self.penDown then
-        local x, y = self.editor.level:cameraToMap(getWorldMouse())
+        local x, y = self.level:cameraToMap(getWorldMouse())
         
-        if not self.editor.level:inMap(x, y) then
+        if not self.level:inMap(x, y) then
             self.editor:expandMapTo(x, y)
         end
         
-        self.editor.level:setMap(x, y, self.tile)
+        self.level:setMap(x, y, self.tile)
     end
 end
 
 function Paint:draw()
     local mouseX, mouseY = getWorldMouse()
-    local mapX, mapY = self.editor.level:cameraToMap(mouseX, mouseY)
-    local worldX, worldY = self.editor.level:mapToWorld(mapX-1, mapY-1)
+    local mapX, mapY = self.level:cameraToMap(mouseX, mouseY)
+    local worldX, worldY = self.level:mapToWorld(mapX-1, mapY-1)
     
     self.tile:draw(worldX, worldY, true)
 end
@@ -49,10 +49,10 @@ function Paint:mousereleased(x, y, button)
 end
 
 function Paint:pipette(x, y)
-    local mapX, mapY = self.editor.level:mouseToMap()
+    local mapX, mapY = self.level:mouseToMap()
     
-    if self.editor.level:inMap(mapX, mapY) then
-        local tile = self.editor.level:getTile(mapX, mapY)
+    if self.level:inMap(mapX, mapY) then
+        local tile = self.level:getTile(mapX, mapY)
         
         if tile then
             self.tile = tile

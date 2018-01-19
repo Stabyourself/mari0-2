@@ -24,10 +24,19 @@ tiles[27] = templates.bigSlopeLeft
 tiles[35] = templates.bigSlopeLeftUpsideDown
 tiles[38] = templates.bigSlopeRightUpsideDown
 
+local stampMaps = {
+    {
+        {0, 10, 0},
+        {10, 10, 10},
+        {0, 10, 0},
+    }
+}
+
 local props = {
     tileSize = 16,
     tileMap = "tiles.png",
-    tiles = tiles
+    tiles = tiles,
+    stampMaps = stampMaps,
 }
 
 return props

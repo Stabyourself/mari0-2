@@ -3,11 +3,12 @@ local Wand = class("Editor.Wand")
 function Wand:initialize(editor)
     self.editor = editor
     
+    self.level = self.editor.level
     self.pressing = false
 end
 
 function Wand:draw()
-    local mx, my = self.editor.level:mouseToWorld()
+    local mx, my = self.level:mouseToWorld()
     
     love.graphics.setColor(0, 0, 0)
     
@@ -34,7 +35,7 @@ end
 
 function Wand:mousepressed(x, y, button)
     if button == 1 then
-        self.pressingPos = {self.editor.level:cameraToMap(x, y)}
+        self.pressingPos = {self.level:cameraToMap(x, y)}
         self.pressing = true
     end
     
@@ -43,18 +44,18 @@ end
 
 function Wand:mousereleased(x, y, button)
     if button == 1 and self.pressing then
-        mx, my = self.editor.level:cameraToMap(x, y)
+        mx, my = self.level:cameraToMap(x, y)
         
         if mx == self.pressingPos[1] and my == self.pressingPos[2] then
             local tiles
             
             if cmdDown("editor.wand.global") then
-                local referenceTile = self.editor.level:getTile(mx, my)
+                local referenceTile = self.level:getTile(mx, my)
                 tiles = {}
                 
-                for y = 1, self.editor.level.height do
-                    for x = 1, self.editor.level.width do
-                        local tile = self.editor.level:getTile(x, y)
+                for y = 1, self.level.height do
+                    for x = 1, self.level.width do
+                        local tile = self.level:getTile(x, y)
                         
                         if tile == referenceTile then
                             table.insert(tiles, {x, y})
@@ -62,7 +63,7 @@ function Wand:mousereleased(x, y, button)
                     end
                 end
             else
-                tiles = self.editor.level:getFloodArea(mx, my)
+                tiles = self.level:getFloodArea(mx, my)
             end
             
             if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then

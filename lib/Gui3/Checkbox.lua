@@ -1,4 +1,4 @@
-Checkbox = class("GUI.Checkbox", GUI.Element)
+Checkbox = class("Gui3.Checkbox", Gui3.Element)
 
 Checkbox.checkBoxPadding = 2
 
@@ -12,10 +12,10 @@ function Checkbox:initialize(x, y, s, padding, func, val)
         w = w + #self.s*8 + Checkbox.checkBoxPadding
     end
     
-    GUI.Element.initialize(self, x, y, w, h)
+    Gui3.Element.initialize(self, x, y, w, h)
     
     if self.s then
-        self:addChild(GUI.Text:new(self.s, 10+self.checkBoxPadding+self.padding, self.padding+1))
+        self:addChild(Gui3.Text:new(self.s, 10+self.checkBoxPadding+self.padding, self.padding+1))
     end
     
     self.func = func --boogie nights
@@ -29,7 +29,7 @@ function Checkbox:getCollision(x, y)
 end 
 
 function Checkbox:draw(level)
-    GUI.Element.translate(self)
+    Gui3.Element.translate(self)
     
     love.graphics.setColor(1, 1, 1)
     
@@ -49,9 +49,9 @@ function Checkbox:draw(level)
     
     love.graphics.draw(img, self.padding, self.padding)
     
-    GUI.Element.draw(self, level)
+    Gui3.Element.draw(self, level)
     
-    GUI.Element.unTranslate(self)
+    Gui3.Element.unTranslate(self)
 end
 
 function Checkbox:mousepressed(x, y, Checkbox)
@@ -59,7 +59,7 @@ function Checkbox:mousepressed(x, y, Checkbox)
         self.pressing = true
     end
 
-    return GUI.Element.mousepressed(self, x, y, button)
+    return Gui3.Element.mousepressed(self, x, y, button)
 end
 
 function Checkbox:mousereleased(x, y, Checkbox)
@@ -73,7 +73,7 @@ function Checkbox:mousereleased(x, y, Checkbox)
     
     self.pressing = false
 
-    return GUI.Element.mousereleased(self, x, y, button)
+    return Gui3.Element.mousereleased(self, x, y, button)
 end
 
 return Checkbox

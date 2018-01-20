@@ -1,4 +1,4 @@
-Mario = class("Mario", fissix.PhysObj)
+Mario = class("Mario", Physics3.PhysObj)
 
 function Mario:initialize(world, x, y, powerUpState)
     self.powerUpState = powerUpState or "small"
@@ -9,7 +9,7 @@ function Mario:initialize(world, x, y, powerUpState)
         height = 24
     end
     
-    fissix.PhysObj.initialize(self, world, x-width/2, y-height, width, height)
+    Physics3.PhysObj.initialize(self, world, x-width/2, y-height, width, height)
     
     self.jumping = false
     self.ducking = false

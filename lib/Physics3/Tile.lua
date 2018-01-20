@@ -1,4 +1,4 @@
-local Tile = class("fissix.Tile")
+local Tile = class("Physics3.Tile")
 
 function Tile:initialize(tileMap, img, quad, x, y, num, props)
 	self.tileMap = tileMap

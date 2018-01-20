@@ -1,4 +1,4 @@
-local Button = class("GUI.Button", GUI.Element)
+local Button = class("Gui3.Button", Gui3.Element)
 
 local buttonQuad = {
     love.graphics.newQuad(0, 0, 8, 8, 17, 17),
@@ -44,10 +44,10 @@ function Button:initialize(x, y, content, border, padding, func)
         h = h + self.img:getHeight()
     end
     
-    GUI.Element.initialize(self, x, y, w, h)
+    Gui3.Element.initialize(self, x, y, w, h)
     
     if self.s then
-        self:addChild(GUI.Text:new(self.s, textOff+self.padding, textOff+self.padding))
+        self:addChild(Gui3.Text:new(self.s, textOff+self.padding, textOff+self.padding))
     end
     
     self.func = func
@@ -67,7 +67,7 @@ function Button:getCollision(x, y)
 end 
 
 function Button:draw(level)
-    GUI.Element.translate(self)
+    Gui3.Element.translate(self)
     
     love.graphics.setColor(1, 1, 1)
     
@@ -106,7 +106,7 @@ function Button:draw(level)
     
     love.graphics.setColor(1, 1, 1)
     
-    GUI.Element.draw(self, level)
+    Gui3.Element.draw(self, level)
     
     if self.img then
         love.graphics.setColor(self.color.img)
@@ -115,7 +115,7 @@ function Button:draw(level)
     
     love.graphics.setColor(1, 1, 1)
     
-    GUI.Element.unTranslate(self)
+    Gui3.Element.unTranslate(self)
 end
 
 function Button:mousepressed(x, y, button)
@@ -123,7 +123,7 @@ function Button:mousepressed(x, y, button)
         self.pressing = true
     end
     
-    return GUI.Element.mousepressed(self, x, y, button)
+    return Gui3.Element.mousepressed(self, x, y, button)
 end
 
 function Button:mousereleased(x, y, button)
@@ -135,7 +135,7 @@ function Button:mousereleased(x, y, button)
     
     self.pressing = false
 
-    GUI.Element.mousereleased(self, x, y, button)
+    Gui3.Element.mousereleased(self, x, y, button)
 end
 
 return Button

@@ -11,7 +11,7 @@ function Erase:draw()
     local mapX, mapY = self.level:cameraToMap(mouseX, mouseY)
     local worldX, worldY = self.level:mapToWorld(mapX-1, mapY-1)
     
-    GUI.drawBox(self.editor.selectImg, self.editor.selectQuad, worldX, worldY, 16, 16)
+    Gui3.drawBox(self.editor.selectImg, self.editor.selectQuad, worldX, worldY, 16, 16)
 end
 
 function Erase:update(dt)

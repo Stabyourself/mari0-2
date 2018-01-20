@@ -1,4 +1,4 @@
-local Element = class("GUI.Element")
+local Element = class("Gui3.Element")
 
 local scrollbarQuad = {
     love.graphics.newQuad(0, 0, 1, 8, 3, 8),

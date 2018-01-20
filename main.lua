@@ -24,8 +24,8 @@ function love.load()
     Easing = require "lib.Easing"
     GameStateManager = require "lib.GameStateManager"
     Font3 = require "lib.Font3"
-
-    require "class.fissix"
+    require "lib.Physics3"
+    require "lib.Gui3"
 
     require "class.CharacterState"
     require "class.Character"
@@ -37,7 +37,6 @@ function love.load()
     require "class.Enemy"
     require "class.Portal"
     require "class.PortalParticle"
-    require "class.gui"
     require "class.Smb3Ui"
     require "class.Crosshair"
     require "class.EditorState"
@@ -92,7 +91,7 @@ function love.load()
         funkyImg = love.graphics.newImage("img/funky.png")
     end
     
-    defaultUI = GUI:new("img/gui/default")
+    defaultUI = Gui3:new("img/gui/default")
     
     gameStateManager = GameStateManager:new()
     

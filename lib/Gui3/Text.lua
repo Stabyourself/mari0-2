@@ -1,9 +1,9 @@
-local Text = class("GUI.Text", GUI.Element)
+local Text = class("Gui3.Text", Gui3.Element)
 
 function Text:initialize(s, x, y)
     self.s = s
     
-    GUI.Element.initialize(self, x, y, #self.s*8, 8)
+    Gui3.Element.initialize(self, x, y, #self.s*8, 8)
 end
 
 function Text:setString(s)
@@ -12,13 +12,13 @@ function Text:setString(s)
 end
 
 function Text:draw(level)
-    GUI.Element.translate(self)
+    Gui3.Element.translate(self)
     
-    GUI.Element.draw(self, level)
+    Gui3.Element.draw(self, level)
     
     fontOutlined:print(self.s, 0, 0)
 
-    GUI.Element.unTranslate(self)
+    Gui3.Element.unTranslate(self)
 end
 
 return Text

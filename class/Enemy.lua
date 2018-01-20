@@ -1,8 +1,8 @@
-Enemy = class("Enemy", fissix.PhysObj)
+Enemy = class("Enemy", Physics3.PhysObj)
 
 function Enemy:initialize(world, x, y, json, img, quad)
     self.json = json
-    fissix.PhysObj.initialize(self, world, x-json.width/2, y-json.height, json.width, json.height)
+    Physics3.PhysObj.initialize(self, world, x-json.width/2, y-json.height, json.width, json.height)
 
     self.img = img
     self.quadList = quad

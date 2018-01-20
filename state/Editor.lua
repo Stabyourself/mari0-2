@@ -50,13 +50,13 @@ function Editor:load()
         self.tools[i] = v:new(self)
     end
     
-    self.canvas = GUI.Canvas:new(0, 0, SCREENWIDTH, SCREENHEIGHT)
+    self.canvas = Gui3.Canvas:new(0, 0, SCREENWIDTH, SCREENHEIGHT)
     self.canvas.gui = defaultUI
     
     self.windows = {}
     
     -- MENU BAR
-    self.menuBar = GUI.Canvas:new(0, 0, SCREENWIDTH, 14)
+    self.menuBar = Gui3.Canvas:new(0, 0, SCREENWIDTH, 14)
     self.menuBar.background = {1, 1, 1}
     self.menuBar.noClip = true
     
@@ -64,12 +64,12 @@ function Editor:load()
 
 
     
-    self.fileDropdown = GUI.Dropdown:new(0, 0, "file")
+    self.fileDropdown = Gui3.Dropdown:new(0, 0, "file")
     
     self.menuBar:addChild(self.fileDropdown)
     
-    self.fileDropdown.box:addChild(GUI.Button:new(0, 0, "save", false, 1, function(button) self:saveMap() end))
-    self.fileDropdown.box:addChild(GUI.Button:new(0, 10, "load", false, 1, function(button) self:loadMap("test.json") end))
+    self.fileDropdown.box:addChild(Gui3.Button:new(0, 0, "save", false, 1, function(button) self:saveMap() end))
+    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadMap("test.json") end))
     
     self.fileDropdown:autoSize()
     
@@ -77,14 +77,14 @@ function Editor:load()
     
     -- WINDOW
     
-    self.newWindowDropdown = GUI.Dropdown:new(38, 0, "window")
+    self.newWindowDropdown = Gui3.Dropdown:new(38, 0, "window")
     
     self.menuBar:addChild(self.newWindowDropdown)
     
-    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 0, "tiles", false, 1, function(button) self:newWindow("tiles", button) end))
-    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 10, "minimap", false, 1, function(button) self:newWindow("minimap", button) end))
-    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 20, "map options", false, 1, function(button) self:newWindow("mapOptions", button) end))
-    self.newWindowDropdown.box:addChild(GUI.Button:new(0, 30, "test", false, 1, function(button) self:newWindow("test", button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 0, "tiles", false, 1, function(button) self:newWindow("tiles", button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 10, "minimap", false, 1, function(button) self:newWindow("minimap", button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 20, "map options", false, 1, function(button) self:newWindow("mapOptions", button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 30, "test", false, 1, function(button) self:newWindow("test", button) end))
     
     self.newWindowDropdown:autoSize()
     
@@ -92,13 +92,13 @@ function Editor:load()
     
     -- VIEW
     
-    local viewDropdown = GUI.Dropdown:new(92, 0, "view")
+    local viewDropdown = Gui3.Dropdown:new(92, 0, "view")
     
     self.menuBar:addChild(viewDropdown)
     
-    viewDropdown.box:addChild(GUI.Checkbox:new(0, 0, "free camera", 1, function(checkbox) self:toggleFreeCam(checkbox.value) end, true))
-    viewDropdown.box:addChild(GUI.Checkbox:new(0, 11, "draw grid", 1, function(checkbox) self:toggleGrid(checkbox.value) end))
-    viewDropdown.box:addChild(GUI.Checkbox:new(0, 22, "hide ui", 1, function(checkbox) self:toggleUI(checkbox.value) end))
+    viewDropdown.box:addChild(Gui3.Checkbox:new(0, 0, "free camera", 1, function(checkbox) self:toggleFreeCam(checkbox.value) end, true))
+    viewDropdown.box:addChild(Gui3.Checkbox:new(0, 11, "draw grid", 1, function(checkbox) self:toggleGrid(checkbox.value) end))
+    viewDropdown.box:addChild(Gui3.Checkbox:new(0, 22, "hide ui", 1, function(checkbox) self:toggleUI(checkbox.value) end))
     
     viewDropdown:autoSize()
     
@@ -108,26 +108,26 @@ function Editor:load()
     local w = 50
     local fullw = w+52
     local x = CAMERAWIDTH-fullw
-    self.scaleBar = GUI.Canvas:new(x, 0, fullw, 14)
+    self.scaleBar = Gui3.Canvas:new(x, 0, fullw, 14)
     self.menuBar:addChild(self.scaleBar)
     
-    self.scaleSlider = GUI.Slider:new(self.scaleMin, self.scaleMax, 10, 3, w, false, function(val) self:changeScale(val) end)
+    self.scaleSlider = Gui3.Slider:new(self.scaleMin, self.scaleMax, 10, 3, w, false, function(val) self:changeScale(val) end)
     self.scaleSlider.color.bar = {0, 0, 0}
     
     self.scaleBar:addChild(self.scaleSlider)
     
     self:updateScaleSlider()
     
-    self.scaleBar:addChild(GUI.Button:new(0, 2, "-", false, 1, function() self:zoom(-1) end))
-    self.scaleBar:addChild(GUI.Button:new(w+10, 2, "+", false, 1, function() self:zoom(1) end))
+    self.scaleBar:addChild(Gui3.Button:new(0, 2, "-", false, 1, function() self:zoom(-1) end))
+    self.scaleBar:addChild(Gui3.Button:new(w+10, 2, "+", false, 1, function() self:zoom(1) end))
     
-    self.scaleBar:addChild(GUI.Button:new(w+24, 2, "1:1", false, 1, function() self:resetZoom() end))
+    self.scaleBar:addChild(Gui3.Button:new(w+24, 2, "1:1", false, 1, function() self:resetZoom() end))
     
     
     
     
     -- TOOL BAR
-    self.toolbar = GUI.Canvas:new(0, 14, 14, CAMERAHEIGHT-14)
+    self.toolbar = Gui3.Canvas:new(0, 14, 14, CAMERAHEIGHT-14)
     self.toolbar.background = {255, 255, 255}
     self.canvas:addChild(self.toolbar)
     
@@ -135,7 +135,7 @@ function Editor:load()
     
     local y = 1
     for i, v in ipairs(self.toolbarOrder) do
-        local button = GUI.Button:new(1, y, self.toolbarImg[i], false, 1, function(button) self:selectTool(v) end)
+        local button = Gui3.Button:new(1, y, self.toolbarImg[i], false, 1, function(button) self:selectTool(v) end)
         
         self.toolButtons[v] = button
         
@@ -321,7 +321,7 @@ function Editor:newWindow(type, button)
     self.newWindowDropdown:toggle(false)
 
     if type == "test" then
-        local testWindow = GUI.Box:new(10, y, 100, 100)
+        local testWindow = Gui3.Box:new(10, y, 100, 100)
         testWindow.draggable = true
         testWindow.resizeable = true
         testWindow.closeable = true
@@ -333,16 +333,16 @@ function Editor:newWindow(type, button)
         
         
         for y = 0, 80, 20 do
-            local text = GUI.Text:new("Important", 0, y)
+            local text = Gui3.Text:new("Important", 0, y)
             testWindow:addChild(text)
             
-            local slider = GUI.Slider:new(0, 100, 0, y+9, 100, true)
+            local slider = Gui3.Slider:new(0, 100, 0, y+9, 100, true)
             
             testWindow:addChild(slider)
         end
         
         
-        local testWindow2 = GUI.Box:new(10, 30, 100, 100)
+        local testWindow2 = Gui3.Box:new(10, 30, 100, 100)
         testWindow2.draggable = true
         testWindow2.resizeable = true
         testWindow2.closeable = true
@@ -352,10 +352,10 @@ function Editor:newWindow(type, button)
         
         testWindow:addChild(testWindow2)
         
-        testWindow2:addChild(GUI.Button:new(5, 5, "don't hurt me!", true))
+        testWindow2:addChild(Gui3.Button:new(5, 5, "don't hurt me!", true))
         
     elseif type == "tiles" then
-        local tileListWindow = GUI.Box:new(10, y, 8*17+15, 200)
+        local tileListWindow = Gui3.Box:new(10, y, 8*17+15, 200)
         tileListWindow.draggable = true
         tileListWindow.resizeable = true
         tileListWindow.closeable = true
@@ -366,11 +366,11 @@ function Editor:newWindow(type, button)
         self.canvas:addChild(tileListWindow)
         
         
-        -- local backButton = GUI.Button:new(0, 0, "< back", true, 1, function() print("woah") end)
+        -- local backButton = Gui3.Button:new(0, 0, "< back", true, 1, function() print("woah") end)
         -- tileListWindow:addChild(backButton)
         
         
-        local tileListButtonGrid = GUI.ButtonGrid:new(1, 1, self.tileMap.img, self.tileMap.quad, 
+        local tileListButtonGrid = Gui3.ButtonGrid:new(1, 1, self.tileMap.img, self.tileMap.quad, 
             function(buttonGrid, i) 
                 buttonGrid.selected = i
                 self:selectTile(i)

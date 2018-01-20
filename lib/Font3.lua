@@ -1,3 +1,5 @@
+-- Font thing for Mari3. Feel free to use it, MIT License
+
 local Font3 = class("Font3")
     
 function Font3:initialize(img, glyphs)

@@ -1,4 +1,4 @@
-ButtonGrid = class("GUI.Button", GUI.Element)
+ButtonGrid = class("Gui3.Button", Gui3.Element)
 
 ButtonGrid.perRow = 73
 ButtonGrid.size = {16, 16}
@@ -9,7 +9,7 @@ function ButtonGrid:initialize(x, y, img, buttons, func)
     self.buttons = buttons
     self.func = func
     
-    GUI.Element.initialize(self, x, y, 0, 0)
+    Gui3.Element.initialize(self, x, y, 0, 0)
     
     self:updateSize()
     
@@ -17,7 +17,7 @@ function ButtonGrid:initialize(x, y, img, buttons, func)
 end
 
 function ButtonGrid:update(dt, x, y, mouseBlocked)
-    GUI.Element.update(self, dt, x, y, mouseBlocked)
+    Gui3.Element.update(self, dt, x, y, mouseBlocked)
     
     local maxWidth = self.parent:getInnerWidth()
     
@@ -48,7 +48,7 @@ function ButtonGrid:getCollision(x, y)
 end 
 
 function ButtonGrid:draw(level)
-    GUI.Element.translate(self)
+    Gui3.Element.translate(self)
     
     love.graphics.setColor(1, 1, 1)
     
@@ -82,12 +82,12 @@ function ButtonGrid:draw(level)
         local x = (tileX-1)*(self.size[1] + self.gutter[1])
         local y = tileY*(self.size[2] + self.gutter[2])
         
-        GUI.drawBox(self.gui.img.box, GUI.boxQuad, x-2, y-3, 20, 22)
+        Gui3.drawBox(self.gui.img.box, Gui3.boxQuad, x-2, y-3, 20, 22)
     end
     
-    GUI.Element.draw(self, level)
+    Gui3.Element.draw(self, level)
     
-    GUI.Element.unTranslate(self)
+    Gui3.Element.unTranslate(self)
 end
 
 function ButtonGrid:mousepressed(x, y, button)
@@ -97,7 +97,7 @@ function ButtonGrid:mousepressed(x, y, button)
         self.func(self, col)
     end
     
-    return GUI.Element.mousepressed(self, x, y, button)
+    return Gui3.Element.mousepressed(self, x, y, button)
 end
 
 return ButtonGrid

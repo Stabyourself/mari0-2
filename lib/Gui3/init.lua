@@ -1,18 +1,20 @@
-GUI = class("GUI")
+-- GUI library thing for Mari3. Feel free to use it, MIT License
+
+Gui3 = class("Gui3")
 
 local current_folder = (...):gsub('%.init$', '')
 
-GUI.Element = require(current_folder.. ".Element")
-GUI.Canvas = require(current_folder.. ".Canvas")
-GUI.Box = require(current_folder.. ".Box")
-GUI.Text = require(current_folder.. ".Text")
-GUI.Button = require(current_folder.. ".Button")
-GUI.Slider = require(current_folder.. ".Slider")
-GUI.ButtonGrid = require(current_folder.. ".ButtonGrid")
-GUI.Checkbox = require(current_folder.. ".Checkbox")
-GUI.Dropdown = require(current_folder.. ".Dropdown")
+Gui3.Element = require(current_folder.. ".Element")
+Gui3.Canvas = require(current_folder.. ".Canvas")
+Gui3.Box = require(current_folder.. ".Box")
+Gui3.Text = require(current_folder.. ".Text")
+Gui3.Button = require(current_folder.. ".Button")
+Gui3.Slider = require(current_folder.. ".Slider")
+Gui3.ButtonGrid = require(current_folder.. ".ButtonGrid")
+Gui3.Checkbox = require(current_folder.. ".Checkbox")
+Gui3.Dropdown = require(current_folder.. ".Dropdown")
 
-GUI.boxQuad = {
+Gui3.boxQuad = {
     love.graphics.newQuad(0, 0, 2, 3, 5, 7),
     love.graphics.newQuad(2, 0, 1, 3, 5, 7),
     love.graphics.newQuad(3, 0, 2, 3, 5, 7),
@@ -24,7 +26,7 @@ GUI.boxQuad = {
     love.graphics.newQuad(3, 4, 2, 3, 5, 7),
 }
 
-GUI.titledBoxQuad = {
+Gui3.titledBoxQuad = {
     love.graphics.newQuad(0, 0, 3, 12, 7, 17),
     love.graphics.newQuad(3, 0, 1, 12, 7, 17),
     love.graphics.newQuad(4, 0, 3, 12, 7, 17),
@@ -36,7 +38,7 @@ GUI.titledBoxQuad = {
     love.graphics.newQuad(4, 13, 3, 4, 7, 17),
 }
 
-function GUI:initialize(folder)
+function Gui3:initialize(folder)
     self.folder = folder
     
     self.img = {}
@@ -79,7 +81,7 @@ function GUI:initialize(folder)
     }
 end
 
-function GUI.drawBox(img, quad, x, y, w, h)
+function Gui3.drawBox(img, quad, x, y, w, h)
     local _, _, w1 = quad[1]:getViewport()
     local _, _, w2 = quad[2]:getViewport()
     local _, _, w3 = quad[3]:getViewport()

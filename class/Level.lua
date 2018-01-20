@@ -1,4 +1,4 @@
-Level = class("Level", fissix.World)
+Level = class("Level", Physics3.World)
 
 function Level:initialize(path)
     local data = JSON:decode(love.filesystem.read(path))
@@ -11,8 +11,8 @@ end
 function Level:loadMap(data)
     self.data = data
     
-    fissix.World.initialize(self)
-    fissix.World.loadMap(self, self.data)
+    Physics3.World.initialize(self)
+    Physics3.World.loadMap(self, self.data)
     
     self.backgroundColor = self.data.backgroundColor or {156, 252, 240}
     self.backgroundColor[1] = self.backgroundColor[1]/255
@@ -60,7 +60,7 @@ end
 
 function Level:update(dt)
     updateGroup(self.blockBounces, dt)
-    fissix.World.update(self, dt)
+    Physics3.World.update(self, dt)
     self:updateCamera(dt)
     
     for _, obj in ipairs(self.objects) do
@@ -78,7 +78,7 @@ end
 function Level:draw()
     self.camera:attach()
     
-    fissix.World.draw(self)
+    Physics3.World.draw(self)
     
     for _, v in ipairs(self.marios) do
         v.crosshair:draw()

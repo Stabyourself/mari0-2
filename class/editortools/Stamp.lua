@@ -37,6 +37,17 @@ function Stamp:draw()
         if self.dragging then
             local startX, startY = self.dragStart[1], self.dragStart[2]
             local w, h = mapX-startX+1, mapY-startY+1
+            
+            if w < 1 then
+                startX = startX + w-1
+                w = -w+2
+            end
+            
+            if h < 1 then
+                startY = startY + h-1
+                h = -h+2
+            end
+            
             local quadStampMap = self:getQuadStampMap(w, h)
             
             for x = 1, w do
@@ -199,6 +210,16 @@ function Stamp:getQuadStampMap(w, h)
 end
     
 function Stamp:quadStamp(x, y, w, h)
+    if w < 1 then
+        x = x + w-1
+        w = -w+2
+    end
+    
+    if h < 1 then
+        y = y + h-1
+        h = -h+2
+    end
+    
     local quadStampMap = self:getQuadStampMap(w, h)
     
     for lx = 1, w do

@@ -1,9 +1,9 @@
-local Box = class("GUI.Box", GUI.Element)
+local Box = class("Gui3.Box", Gui3.Element)
 
 Box.movesToTheFront = true
 
 function Box:initialize(x, y, w, h)
-    GUI.Element.initialize(self, x, y, w, h)
+    Gui3.Element.initialize(self, x, y, w, h)
 
     self.background = {0, 0, 0, 0}
     self.backgroundQuad = love.graphics.newQuad(0, 0, 4, 4, 4, 4)
@@ -20,7 +20,7 @@ function Box:initialize(x, y, w, h)
 end
 
 function Box:update(dt, x, y, mouseBlocked)
-    local ret = GUI.Element.update(self, dt, x, y, mouseBlocked)
+    local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked)
     
     if self.draggable then
         self.sizeMin[1] = 19
@@ -36,7 +36,7 @@ function Box:update(dt, x, y, mouseBlocked)
 end
 
 function Box:draw(level)
-    GUI.Element.translate(self)
+    Gui3.Element.translate(self)
     
     if type(self.background) == "table" then
         love.graphics.setColor(self.background)
@@ -54,13 +54,13 @@ function Box:draw(level)
     
     -- Border
     local img = self.gui.img.box
-    local quad = GUI.boxQuad
+    local quad = Gui3.boxQuad
     if self.draggable then
         img = self.gui.img.boxTitled
-        quad = GUI.titledBoxQuad
+        quad = Gui3.titledBoxQuad
     end
     
-    GUI.drawBox(img, quad, 0, 0, self.w, self.h)
+    Gui3.drawBox(img, quad, 0, 0, self.w, self.h)
     
     if self.title then
         love.graphics.stencil(function()
@@ -87,7 +87,7 @@ function Box:draw(level)
         love.graphics.draw(img, self.w-12, 2)
     end
     
-    GUI.Element.draw(self, level)
+    Gui3.Element.draw(self, level)
     
     if self.resizeable then
         local img = self.gui.img.boxResize
@@ -106,7 +106,7 @@ function Box:draw(level)
         love.graphics.draw(img, x, y)
     end
     
-    GUI.Element.unTranslate(self)
+    Gui3.Element.unTranslate(self)
 end
 
 function Box:titleBarCollision(x, y)
@@ -142,7 +142,7 @@ function Box:mousepressed(x, y, button)
         
     end
     
-    return GUI.Element.mousepressed(self, x, y, button)
+    return Gui3.Element.mousepressed(self, x, y, button)
 end
 
 function Box:mousereleased(x, y, button)
@@ -157,7 +157,7 @@ function Box:mousereleased(x, y, button)
         end
     end
 
-    GUI.Element.mousereleased(self, x, y, button)
+    Gui3.Element.mousereleased(self, x, y, button)
 end
 
 return Box

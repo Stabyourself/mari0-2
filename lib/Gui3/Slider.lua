@@ -1,4 +1,4 @@
-local Slider = class("GUI.Slider", GUI.Element)
+local Slider = class("Gui3.Slider", Gui3.Element)
 
 local sliderQuad = {
     love.graphics.newQuad(0, 0, 8, 8, 17, 8),
@@ -21,10 +21,10 @@ function Slider:initialize(min, max, x, y, w, showValue, func)
     
     if showValue then
         self.barWidth = self.barWidth - self.textWidth
-        self.text = GUI.Text:new(tostring(self:getValue()), w-self.textWidth+1, 0)
+        self.text = Gui3.Text:new(tostring(self:getValue()), w-self.textWidth+1, 0)
     end
     
-    GUI.Element.initialize(self, x, y, w, 8)
+    Gui3.Element.initialize(self, x, y, w, 8)
     
     if showValue then
         self:addChild(self.text)
@@ -37,7 +37,7 @@ function Slider:initialize(min, max, x, y, w, showValue, func)
 end
 
 function Slider:update(dt, x, y, mouseBlocked)
-    local ret = GUI.Element.update(self, dt, x, y, mouseBlocked)
+    local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked)
     
     if self.dragging then
         local pos = (self.mouse[1]-self.dragX-self.barOffset)/(self.barWidth)
@@ -77,9 +77,9 @@ function Slider:getPosX()
 end
 
 function Slider:draw(level)
-    GUI.Element.translate(self)
+    Gui3.Element.translate(self)
     
-    GUI.Element.draw(self, level)
+    Gui3.Element.draw(self, level)
     
     love.graphics.setColor(self.color.bar)
     
@@ -101,7 +101,7 @@ function Slider:draw(level)
     
     love.graphics.setColor(1, 1, 1)
 
-    GUI.Element.unTranslate(self)
+    Gui3.Element.unTranslate(self)
 end
 
 function Slider:mousepressed(x, y, button)
@@ -110,12 +110,12 @@ function Slider:mousepressed(x, y, button)
         self.dragX = x-self:getPosX()
     end
     
-    return GUI.Element.mousepressed(self, x, y, button)
+    return Gui3.Element.mousepressed(self, x, y, button)
 end
 function Slider:mousereleased(x, y, button)
     self.dragging = false
 
-    GUI.Element.mousereleased(self, x, y, button)
+    Gui3.Element.mousereleased(self, x, y, button)
 end
 
 return Slider

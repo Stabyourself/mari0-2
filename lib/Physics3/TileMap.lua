@@ -1,4 +1,4 @@
-local TileMap = class("fissix.TileMap")
+local TileMap = class("Physics3.TileMap")
 
 function TileMap:initialize(path, name)
 	self.path = path .. "/"
@@ -25,7 +25,7 @@ function TileMap:initialize(path, name)
 		for x = 1, (self.img:getWidth()+self.tileMargin)/(self.tileSize+self.tileMargin) do
 			local quad = love.graphics.newQuad((x-1)*(self.tileSize+self.tileMargin), (y-1)*(self.tileSize+self.tileMargin), self.tileSize, self.tileSize, self.img:getWidth(), self.img:getHeight())
 			
-			table.insert(self.tiles, fissix.Tile:new(self, self.img, quad, x, y, i, self.data.tiles[i]))
+			table.insert(self.tiles, Physics3.Tile:new(self, self.img, quad, x, y, i, self.data.tiles[i]))
 			table.insert(self.quad, quad)
 			i = i + 1
 		end

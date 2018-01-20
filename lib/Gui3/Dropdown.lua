@@ -1,16 +1,16 @@
-local Dropdown = class("GUI.Dropdown", GUI.Element)
+local Dropdown = class("Gui3.Dropdown", Gui3.Element)
 
 Dropdown.noClip = true
 
 function Dropdown:initialize(x, y, s)
-    self.button = GUI.Button:new(0, 0, s, false, 3, function() self:toggle() end)
+    self.button = Gui3.Button:new(0, 0, s, false, 3, function() self:toggle() end)
     self.button.color.normal = {1, 1, 1, 0}
     
-    self.box = GUI.Box:new(0, 14, 50, 100)
+    self.box = Gui3.Box:new(0, 14, 50, 100)
     self.box.background = {255, 255, 255}
     self.box.visible = false
     
-    GUI.Element.initialize(self, x, y, #s*8, 8)
+    Gui3.Element.initialize(self, x, y, #s*8, 8)
     
     self:addChild(self.button)
     self:addChild(self.box)
@@ -22,11 +22,11 @@ function Dropdown:onAssign()
 end
 
 function Dropdown:draw(level)
-    GUI.Element.translate(self)
+    Gui3.Element.translate(self)
     
-    GUI.Element.draw(self, level)
+    Gui3.Element.draw(self, level)
 
-    GUI.Element.unTranslate(self)
+    Gui3.Element.unTranslate(self)
 end
 
 function Dropdown:toggle(status)
@@ -34,7 +34,7 @@ function Dropdown:toggle(status)
 end
 
 function Dropdown:mousepressed(x, y, button)
-    local toReturn = GUI.Element.mousepressed(self, x, y, button)
+    local toReturn = Gui3.Element.mousepressed(self, x, y, button)
     if not toReturn then
         self.box.visible = false
     end

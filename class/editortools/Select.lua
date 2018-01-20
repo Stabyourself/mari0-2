@@ -20,7 +20,7 @@ function Select:draw()
         local h = (by-ty+1)*self.level.tileSize
         
         if w > 0 and h > 0 then
-            GUI.drawBox(self.editor.selectImg, self.editor.selectQuad, x, y, w, h)
+            Gui3.drawBox(self.editor.selectImg, self.editor.selectQuad, x, y, w, h)
         elseif w > 0 or h > 0 then -- line
             love.graphics.setColor(0, 0, 0)
             if w == 0 then

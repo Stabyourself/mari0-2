@@ -41,8 +41,9 @@ local stampMaps = {
         map = {
             {1, 2, 3},
             {9, 10, 11},
+            {9, 10, 11},
         },
-        paddings = {1, 1, 0, 1}, -- clockwise from top (like in css)
+        paddings = {1, 1, 1, 1}, -- clockwise from top (like in css)
     }
 }
 

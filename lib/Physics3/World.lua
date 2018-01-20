@@ -1,4 +1,4 @@
-local World = class("fissix.World")
+local World = class("Physics3.World")
 
 function World:initialize()
     self.tileSize = 16 --lol hardcode
@@ -251,7 +251,7 @@ function World:loadMap(data)
     self.tileLookup = {}
     
     for i, v in pairs(data.tileMaps) do
-        self.tileMaps[i] = fissix.TileMap:new("tilemaps/" .. i, i)
+        self.tileMaps[i] = Physics3.TileMap:new("tilemaps/" .. i, i)
         
         for j, w in pairs(v) do
             self.tileLookup[j] = self.tileMaps[i].tiles[w]

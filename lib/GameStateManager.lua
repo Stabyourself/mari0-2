@@ -1,6 +1,9 @@
 local GameStateManager = class("GameStateManager")
 
-GameStateManager.reversedEvents = {"mousepressed", "cmdpressed"}
+GameStateManager.reversedEvents = {
+    mousepressed = true, 
+    cmdpressed = true
+}
 
 function GameStateManager:initialize()
     self.activeStates = {}
@@ -19,7 +22,7 @@ end
 function GameStateManager:event(event, ...)
     local from, to, step = 1, #self.activeStates, 1
     
-    if inITable(self.reversedEvents, event) then
+    if self.reversedEvents[event] then
         from, to, step = to, from, -1
     end 
 

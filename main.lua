@@ -72,6 +72,8 @@ function love.load()
         &Time;
         &Times;
         .;:;!?_-<>=+*/\'%
+        &Intersect;
+        &Move;
     ]])
     
     font = Font3:new(love.graphics.newImage("img/font.png"), [[

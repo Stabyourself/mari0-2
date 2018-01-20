@@ -1,6 +1,6 @@
 -- ^ctrl !alt +shift (the order is important)
 return {
-    ["escape"] = "quit",
+    ["escape"] = {"quit-", "editor.select.clear"},
     
     ["a"] = "left",
     ["d"] = "right",
@@ -24,6 +24,8 @@ return {
     ["lctrl"] = "editor.select.subtract",
     ["lalt"] = "editor.wand.global",
     ["ralt"] = "editor.wand.global",
+    
+    ["return"] = "editor.select.unFloat",
     
     ["1"] = "editor.tool.paint",
     ["2"] = "editor.tool.erase",

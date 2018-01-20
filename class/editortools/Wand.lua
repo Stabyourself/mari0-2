@@ -10,8 +10,6 @@ end
 function Wand:draw()
     local mx, my = self.level:mouseToWorld()
     
-    love.graphics.setColor(0, 0, 0)
-    
     local addition = ""
     
     if cmdDown("editor.wand.global") then
@@ -27,10 +25,8 @@ function Wand:draw()
     end
     
     if addition ~= "" then
-        font:print(addition, mx-font:getLength(addition)*8-1, my+2)
+        fontOutlined:print(addition, mx-font:getLength(addition)*8-1, my+2)
     end
-    
-    love.graphics.setColor(1, 1, 1)
 end
 
 function Wand:mousepressed(x, y, button)

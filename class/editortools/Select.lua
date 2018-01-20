@@ -38,8 +38,6 @@ function Select:draw()
         end
         -- love.graphics.rectangle("line", (lx-1)*self.level.tileSize, (ty-1)*self.level.tileSize, (rx-lx+1)*self.level.tileSize, (by-ty+1)*self.level.tileSize)
     end
-    
-    love.graphics.setColor(0, 0, 0)
 
     local addition = ""
     
@@ -57,10 +55,8 @@ function Select:draw()
     end
 
     if addition ~= "" then
-        font:print(addition, worldX-font:getLength(addition)*8-1, worldY+2)
+        fontOutlined:print(addition, worldX-font:getLength(addition)*8-1, worldY+2)
     end
-    
-    love.graphics.setColor(1, 1, 1)
 end
 
 function Select:mousepressed(x, y, button)

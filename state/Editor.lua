@@ -449,6 +449,24 @@ function Editor:cmdpressed(cmd)
         
     elseif cmd["editor.load"] then
         self:loadMap("test.json")
+        
+    elseif cmd["editor.select.clear"] then
+        if self.selection then
+            self.selection = nil
+        end
+        
+        if self.floatingSelection then
+            self.floatingSelection:reset()
+            self.floatingSelection:unFloat()
+            self.floatingSelection = nil
+        end
+        
+    elseif cmd["editor.select.unFloat"] then
+        if self.floatingSelection then
+            self.floatingSelection:unFloat()
+            self.floatingSelection = nil
+        end
+        
     end
     
     for i, _ in pairs(self.toolClasses) do

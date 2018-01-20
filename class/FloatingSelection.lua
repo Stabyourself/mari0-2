@@ -31,6 +31,7 @@ function FloatingSelection:initialize(editor, stampMap, pos)
     self.width = stampMap.width
     self.height = stampMap.height
     self.pos = pos
+    self.startPos = {self.pos[1], self.pos[2]}
 
     self:updateBorders()
 end
@@ -78,6 +79,11 @@ end
 
 function FloatingSelection:mousereleased(x, y, button)
     self.dragging = false
+end
+
+function FloatingSelection:reset()
+    self.pos[1] = self.startPos[1]
+    self.pos[2] = self.startPos[2]
 end
 
 function FloatingSelection:unFloat()

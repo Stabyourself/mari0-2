@@ -31,7 +31,6 @@ return {
     ["r"] = "editor.tool.paint",
     ["e"] = "editor.tool.erase",
     ["3"] = "editor.tool.move",
-    ["z"] = "editor.tool.portal",
     ["q"] = "editor.tool.select",
     ["g"] = "editor.tool.wand",
     ["f"] = "editor.tool.fill",

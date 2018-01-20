@@ -6,10 +6,10 @@ return {
     ["d"] = "right",
     ["s"] = "down",
     ["w"] = "up",
-    ["space"] = "jump",
+    ["space"] = {"jump", "editor.tool.entity"},
     ["lshift"] = {"run", "editor.pipette", "editor.select.add"},
     ["rshift"] = {"run", "editor.pipette", "editor.select.add"},
-    ["r"] = "closePortals",
+    ["r"] = {"closePortals", "editor.tool.paint"},
     
     ["delete"] = "editor.delete",
     ["^z"] = "editor.undo",
@@ -22,19 +22,20 @@ return {
     ["^s"] = "editor.save",
 
     ["lctrl"] = "editor.select.subtract",
+    ["rctrl"] = "editor.select.subtract",
     ["lalt"] = "editor.wand.global",
     ["ralt"] = "editor.wand.global",
     
     ["return"] = "editor.select.unFloat",
     
-    ["1"] = "editor.tool.paint",
-    ["2"] = "editor.tool.erase",
+    ["r"] = "editor.tool.paint",
+    ["e"] = "editor.tool.erase",
     ["3"] = "editor.tool.move",
-    ["4"] = "editor.tool.portal",
-    ["5"] = "editor.tool.select",
-    ["6"] = "editor.tool.wand",
-    ["7"] = "editor.tool.fill",
-    ["8"] = "editor.tool.stamp",
+    ["z"] = "editor.tool.portal",
+    ["q"] = "editor.tool.select",
+    ["g"] = "editor.tool.wand",
+    ["f"] = "editor.tool.fill",
+    ["t"] = "editor.tool.stamp",
     
     ["p"] = "debug.star",
 }

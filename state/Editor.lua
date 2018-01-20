@@ -1,6 +1,6 @@
 Editor = class("Editor")
-    
-Editor.toolbarOrder = {"paint", "erase", "move", "portal", "select", "wand", "fill", "stamp"}
+
+Editor.toolbarOrder = {"entity", "paint", "erase", "move", "select", "wand", "fill", "stamp"}
 Editor.toolbarImg = {}
 
 for _, v in ipairs(Editor.toolbarOrder) do
@@ -10,6 +10,7 @@ end
 local checkerboardImg = love.graphics.newImage("img/editor/checkerboard.png")
 
 Editor.toolClasses = {
+    entity = require("class.editortools.entity"),
     paint = require("class.editortools.Paint"),
     portal = require("class.editortools.Portal"),
     select = require("class.editortools.Select"),
@@ -18,7 +19,6 @@ Editor.toolClasses = {
     stamp = require("class.editortools.Stamp"),
     wand = require("class.editortools.Wand"),
     erase = require("class.editortools.Erase"),
-    -- object = require("class.editortools.Object"),
 }
 
 Editor.scaleMin = 0.1/VAR("scale")

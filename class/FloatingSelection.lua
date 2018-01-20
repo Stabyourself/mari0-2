@@ -61,7 +61,7 @@ function FloatingSelection:draw()
             
             if tile then
                 worldX, worldY = self.level:mapToWorld(x+self.pos[1]-2, y+self.pos[2]-2)
-                tile:draw(worldX, worldY)
+                tile:draw(worldX, worldY, true)
             end
         end
     end
@@ -72,6 +72,8 @@ function FloatingSelection:draw()
         scaleY = 2
     end
 
+    love.graphics.setColor(1, 1, 1)
+    
     for _, v in ipairs(self.borders) do
         love.graphics.draw(borderImg, self.quad, v[1]+(self.pos[1]-1)*16, v[2]+(self.pos[2]-1)*16, v[3])
     end

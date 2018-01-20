@@ -28,7 +28,7 @@ end
 
 function ButtonGrid:updateSize()
     self.w = self.perRow*(self.size[1]+self.gutter[1])-self.gutter[1]
-    self.h = math.ceil(#self.buttons/self.perRow*(self.size[2]+self.gutter[2])-self.gutter[2])
+    self.h = math.ceil(#self.buttons/self.perRow)*(self.size[2]+self.gutter[2])
 end
 
 function ButtonGrid:getCollision(x, y)
@@ -54,23 +54,26 @@ function ButtonGrid:draw(level)
     
     local mouseTile = self:getCollision(self.mouse[1], self.mouse[2])
     
-    for i = 1, #self.buttons do
-        local tileX = (i-1)%self.perRow+1
-        local tileY = math.ceil(i/self.perRow)-1
-        
-        local topY = math.floor((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]))
-        local bottomY = math.floor((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]) + (self.parent:getInnerHeight())/(self.size[2]+self.gutter[2]))
-        
-        if tileY >= topY and tileY <= bottomY then
-            local x = (tileX-1)*(self.size[1] + self.gutter[1])
-            local y = tileY*(self.size[2] + self.gutter[2])
+    local topY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]))
+    local bottomY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]) + (self.parent:getInnerHeight())/(self.size[2]+self.gutter[2]))
+    
+    print(bottomY)
+    
+    for tileY = topY, bottomY do
+        for tileX = 1, self.perRow do
+            local tileNum = (tileY-1)*self.perRow+tileX
             
-            love.graphics.draw(self.img, self.buttons[i], x, y)
-            
-            if i == mouseTile then
-                love.graphics.setColor(1, 1, 1, 0.7)
-                love.graphics.rectangle("fill", x, y, self.size[1], self.size[2])
-                love.graphics.setColor(1, 1, 1, 1)
+            if self.buttons[tileNum] then
+                local x = (tileX-1)*(self.size[1] + self.gutter[1])
+                local y = (tileY-1)*(self.size[2] + self.gutter[2])
+                
+                love.graphics.draw(self.img, self.buttons[tileNum], x, y)
+                
+                if tileNum == mouseTile then
+                    love.graphics.setColor(1, 1, 1, 0.7)
+                    love.graphics.rectangle("fill", x, y, self.size[1], self.size[2])
+                    love.graphics.setColor(1, 1, 1, 1)
+                end
             end
         end
     end

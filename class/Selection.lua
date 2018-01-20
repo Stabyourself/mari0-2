@@ -97,7 +97,7 @@ function Selection:intersect(tiles)
         end
     end
     
-    self.tiles = tiles
+    self.tiles = newSelection
     
     self:updateBorders()
 end

@@ -18,6 +18,8 @@ return {
     ["^c"] = "editor.copy",
     ["^x"] = "editor.cut",
     ["^v"] = "editor.paste",
+    
+    ["^s"] = "editor.save",
 
     ["lctrl"] = "editor.select.subtract",
     ["lalt"] = "editor.wand.global",

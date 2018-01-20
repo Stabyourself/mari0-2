@@ -64,11 +64,14 @@ function Editor:load()
 
 
     
-    local fileDropdown = GUI.Dropdown:new(0, 0, "file")
+    self.fileDropdown = GUI.Dropdown:new(0, 0, "file")
     
-    self.menuBar:addChild(fileDropdown)
+    self.menuBar:addChild(self.fileDropdown)
     
-    fileDropdown:autoSize()
+    self.fileDropdown.box:addChild(GUI.Button:new(0, 0, "save", false, 1, function(button) self:saveMap() end))
+    self.fileDropdown.box:addChild(GUI.Button:new(0, 10, "load", false, 1, function(button) self:loadMap("test.json") end))
+    
+    self.fileDropdown:autoSize()
     
     
     
@@ -440,6 +443,12 @@ function Editor:cmdpressed(cmd)
 
             self:saveState()
         end
+        
+    elseif cmd["editor.save"] then
+        self:saveMap()
+        
+    elseif cmd["editor.load"] then
+        self:loadMap("test.json")
     end
     
     for i, _ in pairs(self.toolClasses) do
@@ -531,6 +540,19 @@ function Editor:resize(w, h)
     local fullw = w+52
     local x = CAMERAWIDTH-fullw
     self.scaleBar.x = x
+end
+
+function Editor:saveMap()
+    self.fileDropdown:toggle(false)
+    
+    self.level:saveMap("test.json")
+end
+
+function Editor:loadMap(path)
+    self.fileDropdown:toggle(false)
+    
+    local data = JSON:decode(love.filesystem.read(path))
+    self.level:loadMap(data)
 end
 
 function Editor:clearSelection()

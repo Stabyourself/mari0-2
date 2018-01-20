@@ -1,11 +1,18 @@
 Level = class("Level", fissix.World)
 
 function Level:initialize(path)
-    local levelCode = love.filesystem.read(path)
-    self.data = sandbox.run(levelCode)
+    local data = JSON:decode(love.filesystem.read(path))
+    
+    self:loadMap(data)
+    
+    self.camera.target = self.marios[1]
+end
 
+function Level:loadMap(data)
+    self.data = data
+    
     fissix.World.initialize(self)
-    self:loadMap(self.data)
+    fissix.World.loadMap(self, self.data)
     
     self.backgroundColor = self.data.backgroundColor or {156, 252, 240}
     self.backgroundColor[1] = self.backgroundColor[1]/255
@@ -47,8 +54,6 @@ function Level:initialize(path)
     local x, y = self:mapToWorld(self.spawnX-.5, self.spawnY)
     
     table.insert(self.marios, Smb3Mario:new(self, x, y, "raccoon"))
-    
-    self.camera.target = self.marios[1]
 
     self:spawnEnemies(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end

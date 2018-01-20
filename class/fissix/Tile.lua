@@ -1,10 +1,11 @@
 local Tile = class("fissix.Tile")
 
-function Tile:initialize(tileMap, img, quad, x, y, props)
+function Tile:initialize(tileMap, img, quad, x, y, num, props)
 	self.tileMap = tileMap
 	self.img = img
 	self.x = x
 	self.y = y
+	self.num = num
 	self.props = props or {}
 	
 	self.type = self.props.type or "normal"

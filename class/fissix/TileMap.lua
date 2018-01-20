@@ -1,7 +1,9 @@
 local TileMap = class("fissix.TileMap")
 
-function TileMap:initialize(path)
+function TileMap:initialize(path, name)
 	self.path = path .. "/"
+	self.name = name
+	
 	local tileMapCode = love.filesystem.read(self.path .. "props.lua")
     self.data = sandbox.run(tileMapCode, {env={
 		VAR = VAR
@@ -23,7 +25,7 @@ function TileMap:initialize(path)
 		for x = 1, (self.img:getWidth()+self.tileMargin)/(self.tileSize+self.tileMargin) do
 			local quad = love.graphics.newQuad((x-1)*(self.tileSize+self.tileMargin), (y-1)*(self.tileSize+self.tileMargin), self.tileSize, self.tileSize, self.img:getWidth(), self.img:getHeight())
 			
-			table.insert(self.tiles, fissix.Tile:new(self, self.img, quad, x, y, self.data.tiles[i]))
+			table.insert(self.tiles, fissix.Tile:new(self, self.img, quad, x, y, i, self.data.tiles[i]))
 			table.insert(self.quad, quad)
 			i = i + 1
 		end

@@ -59,7 +59,7 @@ function Checkbox:mousepressed(x, y, Checkbox)
         self.pressing = true
     end
 
-    GUI.Element.mousepressed(self, x, y, button)
+    return GUI.Element.mousepressed(self, x, y, button)
 end
 
 function Checkbox:mousereleased(x, y, Checkbox)

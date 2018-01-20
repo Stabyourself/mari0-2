@@ -110,7 +110,7 @@ function Slider:mousepressed(x, y, button)
         self.dragX = x-self:getPosX()
     end
     
-    GUI.Element.mousepressed(self, x, y, button)
+    return GUI.Element.mousepressed(self, x, y, button)
 end
 function Slider:mousereleased(x, y, button)
     self.dragging = false

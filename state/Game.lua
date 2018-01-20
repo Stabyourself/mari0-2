@@ -10,7 +10,7 @@ function Game:load()
     SmbMario = require("characters.smb-mario.code")
     Smb3Mario = require("characters.smb3-mario.code")
     
-    self.level = Level:new("levels/smb3test.lua", smb3TileMap)
+    self.level = Level:new("levels/smb3test.json")
     
     smb3ui = Smb3Ui:new()
     self.uiVisible = true

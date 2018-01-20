@@ -1,0 +1,26 @@
+- Editor related stuff
+    - Text input GUI
+    - Select GUI
+    - The whole mappack structure thing
+        - "New Map"
+        - Save dialog (requires text input?)
+        - Load dialog (requires text input?)
+    - Stamp menu
+        - Click stamp to select it
+        - Save stamps (to where? requires text input)
+    - Minimap
+    - Entities (not yet)
+    - Move tool (doesn't do much)
+    - Restrict camera to map boundaries
+    - Map options (requires text input, mappack structure)
+
+- Game related stuff
+    - Animated tiles (graphics only)
+    - Swim physics
+    - Frog physics
+    - Fix camera
+    - Enemies (not yet)
+    - Grabbing stuff (requires enemies)
+    - World map (not yet)
+    - Autoscroll (not yet)
+    - Power up/power down code (animations and stages)

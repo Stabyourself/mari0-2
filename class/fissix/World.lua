@@ -10,50 +10,6 @@ function World:initialize()
     self.portalVectorDebugs = {}
 end
 
-function World:addObject(PhysObj)
-	table.insert(self.objects, PhysObj)
-	PhysObj.World = self
-end
-
-function World:loadMap(data)
-    self.map = {}
-    
-    -- load any used tilemaps
-    self.tileMaps = {}
-    self.tileLookup = {}
-    
-    for i, v in pairs(data.tileMaps) do
-        self.tileMaps[i] = fissix.TileMap:new("tilemaps/" .. i)
-        
-        for j, w in pairs(v) do
-            self.tileLookup[j] = self.tileMaps[i].tiles[w]
-        end
-    end
-    
-    
-    self.width = #data.map
-	self.height = #data.map[1]
-    
-    for x = 1, #data.map do
-        self.map[x] = {}
-        for y = 1, #data.map[1] do
-            local mapTile = data.map[x][y]
-            
-            if mapTile ~= 0 then
-                local tile = self.tileLookup[mapTile]
-                
-                if not tile then
-                    print("Couldn't load real tile for \"" .. mapTile .. "\"")
-                    error("Wew that map didn't load so well, did it")
-                end
-                
-                local realY = self.height-y+1
-                self.map[x][realY] = tile
-            end
-        end
-    end
-end
-
 function World:update(dt)
     updateGroup(self.portals, dt)
     
@@ -280,6 +236,133 @@ function drawObject(obj, x, y, r, sx, sy, cx, cy)
     else
         worldDraw(obj.img, obj.quad, x, y, r, sx, sy, cx, cy)
     end
+end
+
+function World:addObject(PhysObj)
+	table.insert(self.objects, PhysObj)
+	PhysObj.World = self
+end
+
+function World:loadMap(data)
+    self.map = {}
+    
+    -- load any used tilemaps
+    self.tileMaps = {}
+    self.tileLookup = {}
+    
+    for i, v in pairs(data.tileMaps) do
+        self.tileMaps[i] = fissix.TileMap:new("tilemaps/" .. i, i)
+        
+        for j, w in pairs(v) do
+            self.tileLookup[j] = self.tileMaps[i].tiles[w]
+        end
+    end
+    
+    
+    self.width = #data.map
+	self.height = #data.map[1]
+    
+    for x = 1, #data.map do
+        self.map[x] = {}
+        for y = 1, #data.map[1] do
+            local mapTile = data.map[x][y]
+            
+            if mapTile ~= 0 then
+                local tile = self.tileLookup[mapTile]
+                
+                if not tile then
+                    print("Couldn't load real tile for \"" .. mapTile .. "\"")
+                    error("Wew that map didn't load so well, did it")
+                end
+                
+                local realY = self.height-y+1
+                self.map[x][realY] = tile
+            end
+        end
+    end
+end
+
+function World:saveMap(outPath)
+    local out = {}
+    
+    -- build the lookup table
+    local lookUp = {}
+    
+    for y = 1, self.height do
+        for x = 1, self.width do
+            local tile = self:getTile(x, y)
+            
+            if tile then
+                if not lookUp[tile.tileMap.name] then
+                    lookUp[tile.tileMap.name] = {}
+                end
+                
+                mapLookUp = lookUp[tile.tileMap.name]
+                
+                -- See if the tile is already in the table
+                local found = false
+                
+                for i, v in ipairs(mapLookUp) do
+                    if v.tileNum == tile.num then
+                        found = i
+                        break
+                    end
+                end
+                
+                if found then
+                    mapLookUp[found].count = mapLookUp[found].count + 1
+                else
+                    table.insert(mapLookUp, {tileNum = tile.num, count = 1})
+                end
+            end
+        end
+    end
+    
+    out.tileMaps = {}
+    local tileMapLookUp = {}
+    
+    for i, v in pairs(lookUp) do
+        table.sort(v, function(a, b) return a.count > b.count end)
+        
+        out.tileMaps[i] = {}
+        
+        tileMapLookUp[i] = {}
+        
+        for j, w in ipairs(v) do
+            table.insert(out.tileMaps[i], w.tileNum)
+            tileMapLookUp[i][w.tileNum] = j
+        end
+    end
+    
+    -- build map based on lookup
+    out.map = {}
+    
+    for x = 1, self.width do
+        out.map[x] = {}
+        
+        for y = 1, self.height do
+            local tile = self:getTile(x, y)
+            if tile then
+                local tileMap = tile.tileMap.name
+                local tileNum = tile.num
+                
+                local found = false
+                
+                out.map[x][self.height-y+1] = tileMapLookUp[tileMap][tileNum]
+            else
+                out.map[x][self.height-y+1] = 0
+            end
+        end
+    end
+    
+    -- Entities
+    out.entities = {}
+    
+    table.insert(out.entities, {type="spawn", x=self.spawnX, y=self.spawnY})
+    
+    local outJson = JSON:encode(out)
+    
+    love.filesystem.write(outPath, outJson)
 end
 
 function World:physicsDebug()

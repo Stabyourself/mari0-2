@@ -54,7 +54,7 @@ function Level:loadMap(data)
 
     local x, y = self:mapToWorld(self.spawnX-.5, self.spawnY)
     
-    table.insert(self.marios, Smb3Mario:new(self, x, y, "raccoon"))
+    table.insert(self.marios, Smb3Mario:new(self, x, y, "small"))
 
     self:spawnEnemies(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end

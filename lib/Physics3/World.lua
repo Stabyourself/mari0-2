@@ -215,6 +215,10 @@ function World:draw()
 		self:physicsDebug()
     end
     
+	if VAR("advancedPhysicsDebug") then
+		self:advancedPhysicsDebug()
+    end
+    
     if VAR("portalVectorDebug") then
         self:portalVectorDebug()
     end
@@ -368,31 +372,51 @@ end
 function World:physicsDebug()
     love.graphics.setColor(1, 1, 1)
 
-	for x = 1, #self.map do
-        for y = 1, #self.map[x] do
-            if self:objVisible((x-1)*self.tileSize, (y-1)*self.tileSize, 16, 16) then
-                local tile = self:getTile(x, y)
+	-- for x = 1, #self.map do
+    --     for y = 1, #self.map[x] do
+    --         if self:objVisible((x-1)*self.tileSize, (y-1)*self.tileSize, 16, 16) then
+    --             local tile = self:getTile(x, y)
                 
-                if tile.collision then
-                    if tile.collision ~= VAR("collision").cube then -- optimization for cubes
-                        local points = {}
-                        for i = 1, #tile.collision, 2 do
-                            table.insert(points, tile.collision[i]+(x-1)*self.tileSize)
-                            table.insert(points, tile.collision[i+1]+(y-1)*self.tileSize)
-                        end
+    --             if tile and tile.collision then
+    --                 if tile.collision ~= VAR("tileTemplates").cube then -- optimization for cubes
+    --                     local points = {}
+    --                     for i = 1, #tile.collision, 2 do
+    --                         table.insert(points, tile.collision[i]+(x-1)*self.tileSize)
+    --                         table.insert(points, tile.collision[i+1]+(y-1)*self.tileSize)
+    --                     end
                         
-                        worldPolygon("line", unpack(points))
-                    else
-                        worldRectangle("line", (x-1)*self.tileSize, (y-1)*self.tileSize, 1*self.tileSize, 1*self.tileSize)
-                    end
-                end
-            end
-        end
-    end
+    --                     worldPolygon("line", unpack(points))
+    --                 else
+    --                     worldRectangle("line", (x-1)*self.tileSize, (y-1)*self.tileSize, 1*self.tileSize, 1*self.tileSize)
+    --                 end
+    --             end
+    --         end
+    --     end
+    -- end
     
 	for i, v in ipairs(self.objects) do
 		v:debugDraw()
 	end
+end
+
+function World:advancedPhysicsDebug()
+    if not self.advancedPhysicsDebugImg or true then
+        self.advancedPhysicsDebugImgData = love.image.newImageData(CAMERAWIDTH, CAMERAHEIGHT)
+        
+        for x = 0, CAMERAWIDTH-1 do
+            for y = 0, CAMERAHEIGHT-1 do
+                local worldX = math.round(self.camera.x-CAMERAWIDTH/2+x)
+                local worldY = math.round(self.camera.y-CAMERAHEIGHT/2+y)
+                if self:checkMapCollision(worldX, worldY, self.marios[1]) then
+                    self.advancedPhysicsDebugImgData:setPixel(x, y, 1, 1, 1, 1)
+                end
+            end
+        end
+        
+        self.advancedPhysicsDebugImg = love.graphics.newImage(self.advancedPhysicsDebugImgData)
+    end
+    
+    love.graphics.draw(self.advancedPhysicsDebugImg, math.round(self.camera.x-CAMERAWIDTH/2), math.round(self.camera.y-CAMERAHEIGHT/2))
 end
 
 function World:portalVectorDebug()
@@ -408,19 +432,30 @@ function World:portalVectorDebug()
     end
 end
 
-function World:checkMapCollision(obj, x, y)
-    -- Portal hijacking
-    for _, p in ipairs(self.portals) do
-        if p.open and objectWithinPortalRange(p, obj.x+obj.width/2, obj.y+obj.height/2) then
-            -- check if pixel is inside portal wallspace
-            -- rotate x, y around portal origin
-            local nx, ny = pointAroundPoint(x, y, p.x1, p.y1, -p.angle)
+function World:checkMapCollision(x, y, obj)
+    if obj then
+        -- Portal hijacking
+        for _, p in ipairs(self.portals) do
+            if p.open and objectWithinPortalRange(p, obj.x+obj.width/2, obj.y+obj.height/2) then
+                -- check if pixel is inside portal wallspace
+                -- rotate x, y around portal origin
+                local nx, ny = pointAroundPoint(x, y, p.x1, p.y1, -p.angle)
 
-            if ny >= p.y1-1 and ny < p.y1+64 then -- vertically inside the portal
-                if nx > p.x1 and nx < p.x1+p.size then -- horizontally INside the portal
-                    return false
-                else -- horizontally OUTside the portal
-                    return true
+                nx, ny = math.round(nx), math.round(ny)
+                
+                if ny > p.y1-1 then
+                    if  ny > p.y1-1 and
+                        nx >= p.x1+1 and nx <= p.x1+p.size then
+                        return false
+                        
+                    elseif
+                        (nx < p.x1+1 or nx > p.x1+p.size) then
+                        if ny <= p.y1+1 then
+                            return true
+                        else
+                            return false
+                        end
+                    end
                 end
             end
         end

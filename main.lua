@@ -102,7 +102,7 @@ function love.load()
     game = Game:new()
 
     gameStateManager:loadState(game)
-    gameStateManager:addState(Editor:new(game.level))
+    --gameStateManager:addState(Editor:new(game.level))
 end
 
 function love.update(dt)
@@ -271,11 +271,11 @@ function updateSizes()
     WIDTH = math.ceil(CAMERAWIDTH/VAR("tileSize"))
     HEIGHT = math.ceil(CAMERAHEIGHT/VAR("tileSize"))
     
-    RIGHTSCROLLBORDER = math.floor(math.max(CAMERAWIDTH/2, CAMERAWIDTH-VAR("cameraScrollRightBorder")))
-    LEFTSCROLLBORDER = math.ceil(math.min(CAMERAWIDTH/2, VAR("cameraScrollLeftBorder")))
+    RIGHTSCROLLBORDER = VAR("cameraScrollRightBorder")
+    LEFTSCROLLBORDER = VAR("cameraScrollLeftBorder")
     
-    DOWNSCROLLBORDER = math.floor(math.max(CAMERAHEIGHT/2, CAMERAHEIGHT-VAR("cameraScrollDownBorder")))
-    UPSCROLLBORDER = math.ceil(math.min(CAMERAHEIGHT/2, VAR("cameraScrollUpBorder")))
+    DOWNSCROLLBORDER = VAR("cameraScrollDownBorder")
+    UPSCROLLBORDER = VAR("cameraScrollUpBorder")
 
     debugCandyQuad = love.graphics.newQuad(0, 0, SCREENWIDTH, SCREENHEIGHT, 8, 8)
 end

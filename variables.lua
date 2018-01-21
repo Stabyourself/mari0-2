@@ -33,10 +33,10 @@ return {
     pMeterTicks = 7,
     pMeterBlinkTime = 8/60,
     
-    cameraScrollLeftBorder = 115,
-    cameraScrollRightBorder = 115,
-    cameraScrollUpBorder = 47,
-    cameraScrollDownBorder = 75,
+    cameraScrollLeftBorder = -85,
+    cameraScrollRightBorder = 85,
+    cameraScrollUpBorder = -53,
+    cameraScrollDownBorder = 25,
     
     cameraScrollRate = 300,
 

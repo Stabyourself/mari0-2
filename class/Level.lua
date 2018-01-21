@@ -23,6 +23,7 @@ function Level:loadMap(data)
     self.camera = Camera.new(CAMERAWIDTH/2, CAMERAHEIGHT/2, CAMERAWIDTH, CAMERAHEIGHT)
     
     self.camera.rot = 0
+    self.controlsEnabled = true
     self.spawnLine = 0
     self.spawnI = 1
 
@@ -39,7 +40,7 @@ function Level:loadMap(data)
             table.insert(self.spawnList, {
                 enemy = enemy,
                 x = v.x,
-                y = v.y
+                y = v.y,
             })
         elseif v.type == "spawn" then
             self.spawnX = v.x
@@ -145,44 +146,39 @@ function Level:spawnEnemies(untilX)
 end
 
 function Level:updateCamera(dt)
-    -- local mario = game.level.marios[1]
-    -- local pX = mario.x
-    -- local pXr = pX - self.camera.x
+    local mario = self.marios[1]
+    local pX = mario.x + mario.width/2
+    local pXr = pX - self.camera.x
     
-    -- -- Horizontal
-    -- if pXr+mario.width > RIGHTSCROLLBORDER then
-    --     self.camera.x = math.min(pX+mario.width-RIGHTSCROLLBORDER, self.camera.x + VAR("cameraScrollRate")*dt)
+    -- Horizontal
+    if pXr > RIGHTSCROLLBORDER then
+        self.camera.x = math.min(pX-RIGHTSCROLLBORDER, self.camera.x + VAR("cameraScrollRate")*dt)
         
-    -- elseif pXr < LEFTSCROLLBORDER then
-    --     self.camera.x = math.max(pX-LEFTSCROLLBORDER, self.camera.x - VAR("cameraScrollRate")*dt)
-    -- end
+    elseif pXr < LEFTSCROLLBORDER then
+        self.camera.x = math.max(pX+LEFTSCROLLBORDER, self.camera.x - VAR("cameraScrollRate")*dt)
+    end
     
-    -- -- Vertical
-    -- local pY = mario.y
-    -- local pYr = pY - self.camera.y
+    -- Vertical
+    local pY = mario.y + mario.height/2
+    local pYr = pY - self.camera.y
     
-    -- if pYr+mario.height > DOWNSCROLLBORDER then
-    --     self.camera.y = math.min(pY+mario.height-DOWNSCROLLBORDER, self.camera.y + VAR("cameraScrollRate")*dt)
-    -- end
+    if pYr+mario.height > DOWNSCROLLBORDER then
+        self.camera.y = math.min(pY+DOWNSCROLLBORDER, self.camera.y + VAR("cameraScrollRate")*dt)
+    end
         
-    -- -- Only scroll up in flight mode
-    -- if mario.flying or self.camera.y < game.level.height*self.tileSize-CAMERAHEIGHT then
-    --     if pYr < UPSCROLLBORDER then
-    --         self.camera.y = math.max(pY-UPSCROLLBORDER, self.camera.y - VAR("cameraScrollRate")*dt)
-    --     end
-    -- end
+    -- Only scroll up in flight mode
+    if mario.flying or self.camera.y < self.height*self.tileSize-CAMERAHEIGHT then
+        if pYr < UPSCROLLBORDER then
+            self.camera.y = math.max(pY-UPSCROLLBORDER, self.camera.y - VAR("cameraScrollRate")*dt)
+        end
+    end
     
     -- -- And clamp it to map boundaries
-    -- self.camera.x = math.min(self.camera.x, game.level.width*self.tileSize - CAMERAWIDTH)
-    -- self.camera.x = math.max(self.camera.x, 0)
+    self.camera.x = math.min(self.camera.x, self.width*self.tileSize-CAMERAWIDTH/2)
+    self.camera.x = math.max(self.camera.x, CAMERAWIDTH/2)
     
-    -- self.camera.y = math.min(self.camera.y, game.level.height*self.tileSize - CAMERAHEIGHT)
-    -- self.camera.y = math.max(self.camera.y, 0)
-    
-    if self.camera.target then
-        self.camera.x = self.marios[1].x+self.marios[1].width/2+0.001
-        self.camera.y = self.marios[1].y+self.marios[1].height/2+0.001
-    end
+    self.camera.y = math.min(self.camera.y, self.height*self.tileSize-CAMERAHEIGHT/2)
+    self.camera.y = math.max(self.camera.y, CAMERAHEIGHT/2)
 end
 
 function Level:bumpBlock(x, y)

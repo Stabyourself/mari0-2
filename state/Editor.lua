@@ -12,7 +12,6 @@ local checkerboardImg = love.graphics.newImage("img/editor/checkerboard.png")
 Editor.toolClasses = {
     entity = require("class.editortools.entity"),
     paint = require("class.editortools.Paint"),
-    portal = require("class.editortools.Portal"),
     select = require("class.editortools.Select"),
     move = require("class.editortools.Move"),
     fill = require("class.editortools.Fill"),
@@ -82,9 +81,10 @@ function Editor:load()
     self.menuBar:addChild(self.newWindowDropdown)
     
     self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 0, "tiles", false, 1, function(button) self:newWindow("tiles", button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 10, "minimap", false, 1, function(button) self:newWindow("minimap", button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 20, "map options", false, 1, function(button) self:newWindow("mapOptions", button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 30, "test", false, 1, function(button) self:newWindow("test", button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 10, "stamps", false, 1, function(button) self:newWindow("stamps", button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 20, "minimap", false, 1, function(button) self:newWindow("minimap", button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 30, "map options", false, 1, function(button) self:newWindow("mapOptions", button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 40, "test", false, 1, function(button) self:newWindow("test", button) end))
     
     self.newWindowDropdown:autoSize()
     
@@ -195,6 +195,10 @@ function Editor:update(dt)
             self.level.camera.y = self.level.camera.y - cameraSpeed
         end
     end
+    
+    -- Limit camera position so you can't lose the level
+    self.level.camera.x = math.clamp(self.level.camera.x, 0, self.level.width*16)
+    self.level.camera.y = math.clamp(self.level.camera.y, 0, self.level.height*16)
     
     if self.selection then
         self.selection:update(dt)
@@ -316,12 +320,13 @@ function Editor:selectTool(toolName)
 end
 
 function Editor:newWindow(type, button)
-    local y = button.y+button.h-1
+    local y = 14
+    local x = 14
     
     self.newWindowDropdown:toggle(false)
 
     if type == "test" then
-        local testWindow = Gui3.Box:new(10, y, 100, 100)
+        local testWindow = Gui3.Box:new(x, y, 100, 100)
         testWindow.draggable = true
         testWindow.resizeable = true
         testWindow.closeable = true
@@ -355,7 +360,7 @@ function Editor:newWindow(type, button)
         testWindow2:addChild(Gui3.Button:new(5, 5, "don't hurt me!", true))
         
     elseif type == "tiles" then
-        local tileListWindow = Gui3.Box:new(10, y, 8*17+15, 200)
+        local tileListWindow = Gui3.Box:new(x, y, 8*17+15, 200)
         tileListWindow.draggable = true
         tileListWindow.resizeable = true
         tileListWindow.closeable = true

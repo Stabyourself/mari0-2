@@ -1,6 +1,6 @@
 -- ^ctrl !alt +shift (the order is important)
 return {
-    ["escape"] = {"quit-", "editor.select.clear"},
+    ["escape"] = {"quit", "editor.select.clear"},
     
     ["a"] = "left",
     ["d"] = "right",

@@ -57,8 +57,6 @@ function ButtonGrid:draw(level)
     local topY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]))
     local bottomY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]) + (self.parent:getInnerHeight())/(self.size[2]+self.gutter[2]))
     
-    print(bottomY)
-    
     for tileY = topY, bottomY do
         for tileX = 1, self.perRow do
             local tileNum = (tileY-1)*self.perRow+tileX

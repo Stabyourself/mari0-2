@@ -106,7 +106,7 @@ function love.load()
 end
 
 function love.update(dt)
-    dt = math.min(1/10, dt)
+    dt = math.min(1/60, dt)
     gdt = dt
 
     if skipNext then

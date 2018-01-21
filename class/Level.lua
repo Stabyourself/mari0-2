@@ -152,24 +152,40 @@ function Level:updateCamera(dt)
     
     -- Horizontal
     if pXr > RIGHTSCROLLBORDER then
-        self.camera.x = math.min(pX-RIGHTSCROLLBORDER, self.camera.x + VAR("cameraScrollRate")*dt)
+        self.camera.x = self.camera.x + VAR("cameraScrollRate")*dt
+        
+        if pX - self.camera.x < RIGHTSCROLLBORDER then
+            self.camera.x = pX - RIGHTSCROLLBORDER
+        end
         
     elseif pXr < LEFTSCROLLBORDER then
-        self.camera.x = math.max(pX+LEFTSCROLLBORDER, self.camera.x - VAR("cameraScrollRate")*dt)
+        self.camera.x = self.camera.x - VAR("cameraScrollRate")*dt
+        
+        if pX - self.camera.x > LEFTSCROLLBORDER then
+            self.camera.x = pX - LEFTSCROLLBORDER
+        end
     end
     
     -- Vertical
     local pY = mario.y + mario.height/2
     local pYr = pY - self.camera.y
     
-    if pYr+mario.height > DOWNSCROLLBORDER then
-        self.camera.y = math.min(pY+DOWNSCROLLBORDER, self.camera.y + VAR("cameraScrollRate")*dt)
+    if pYr > DOWNSCROLLBORDER then
+        self.camera.y = self.camera.y + VAR("cameraScrollRate")*dt
+        
+        if pY - self.camera.y < DOWNSCROLLBORDER then
+            self.camera.y = pY - DOWNSCROLLBORDER
+        end
     end
         
     -- Only scroll up in flight mode
     if mario.flying or self.camera.y < self.height*self.tileSize-CAMERAHEIGHT then
         if pYr < UPSCROLLBORDER then
-            self.camera.y = math.max(pY-UPSCROLLBORDER, self.camera.y - VAR("cameraScrollRate")*dt)
+            self.camera.y = self.camera.y - VAR("cameraScrollRate")*dt
+        
+            if pY - self.camera.y > UPSCROLLBORDER then
+                self.camera.y = pY - UPSCROLLBORDER
+            end
         end
     end
     

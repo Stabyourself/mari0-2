@@ -37,7 +37,7 @@ function Tile:initialize(tileMap, img, x, y, num, props, path)
 end
 
 function Tile:getDelay()
-	return self.props.delays[1]
+	return self.props.delays[(self.frame-1)%#self.props.delays+1]
 end
 
 function Tile:update(dt)

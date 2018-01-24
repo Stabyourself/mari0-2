@@ -10,7 +10,7 @@ Gui3.Box = require(current_folder.. ".Box")
 Gui3.Text = require(current_folder.. ".Text")
 Gui3.Button = require(current_folder.. ".Button")
 Gui3.Slider = require(current_folder.. ".Slider")
-Gui3.ButtonGrid = require(current_folder.. ".ButtonGrid")
+Gui3.TileGrid = require(current_folder.. ".TileGrid")
 Gui3.Checkbox = require(current_folder.. ".Checkbox")
 Gui3.Dropdown = require(current_folder.. ".Dropdown")
 

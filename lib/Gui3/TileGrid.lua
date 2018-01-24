@@ -1,12 +1,12 @@
-ButtonGrid = class("Gui3.Button", Gui3.Element)
+TileGrid = class("Gui3.TileGrid", Gui3.Element)
 
-ButtonGrid.perRow = 73
-ButtonGrid.size = {16, 16}
-ButtonGrid.gutter = {1, 1}
+TileGrid.perRow = 8
+TileGrid.size = {16, 16}
+TileGrid.gutter = {1, 1}
 
-function ButtonGrid:initialize(x, y, img, buttons, func)
-    self.img = img
-    self.buttons = buttons
+function TileGrid:initialize(x, y, tileMap, func)
+    self.tileMap = tileMap
+    self.tiles = tileMap.tiles
     self.func = func
     
     Gui3.Element.initialize(self, x, y, 0, 0)
@@ -16,7 +16,7 @@ function ButtonGrid:initialize(x, y, img, buttons, func)
     self.selected = nil
 end
 
-function ButtonGrid:update(dt, x, y, mouseBlocked)
+function TileGrid:update(dt, x, y, mouseBlocked)
     Gui3.Element.update(self, dt, x, y, mouseBlocked)
     
     local maxWidth = self.parent:getInnerWidth()
@@ -26,12 +26,12 @@ function ButtonGrid:update(dt, x, y, mouseBlocked)
     self:updateSize()
 end
 
-function ButtonGrid:updateSize()
+function TileGrid:updateSize()
     self.w = self.perRow*(self.size[1]+self.gutter[1])-self.gutter[1]
-    self.h = math.ceil(#self.buttons/self.perRow)*(self.size[2]+self.gutter[2])
+    self.h = math.ceil(#self.tiles/self.perRow)*(self.size[2]+self.gutter[2])
 end
 
-function ButtonGrid:getCollision(x, y)
+function TileGrid:getCollision(x, y)
     if self.mouseBlocked then
         return false
     end
@@ -40,17 +40,15 @@ function ButtonGrid:getCollision(x, y)
     local tileY = math.ceil(y/(self.size[2]+self.gutter[2]))
     
     if tileX < 1 or tileX > self.perRow or
-        tileY < 1 or tileY > math.ceil(#self.buttons/self.perRow) then
+        tileY < 1 or tileY > math.ceil(#self.tiles/self.perRow) then
         return false
     end
     
     return (tileY-1)*self.perRow+tileX
 end 
 
-function ButtonGrid:draw(level)
+function TileGrid:draw(level)
     Gui3.Element.translate(self)
-    
-    love.graphics.setColor(1, 1, 1)
     
     local mouseTile = self:getCollision(self.mouse[1], self.mouse[2])
     
@@ -61,11 +59,11 @@ function ButtonGrid:draw(level)
         for tileX = 1, self.perRow do
             local tileNum = (tileY-1)*self.perRow+tileX
             
-            if self.buttons[tileNum] then
+            if self.tiles[tileNum] then
                 local x = (tileX-1)*(self.size[1] + self.gutter[1])
                 local y = (tileY-1)*(self.size[2] + self.gutter[2])
                 
-                love.graphics.draw(self.img, self.buttons[tileNum], x, y)
+                self.tiles[tileNum]:draw(x, y)
                 
                 if tileNum == mouseTile then
                     love.graphics.setColor(1, 1, 1, 0.7)
@@ -91,7 +89,7 @@ function ButtonGrid:draw(level)
     Gui3.Element.unTranslate(self)
 end
 
-function ButtonGrid:mousepressed(x, y, button)
+function TileGrid:mousepressed(x, y, button)
     local col = self:getCollision(x, y)
     
     if col then
@@ -101,4 +99,4 @@ function ButtonGrid:mousepressed(x, y, button)
     return Gui3.Element.mousepressed(self, x, y, button)
 end
 
-return ButtonGrid
+return TileGrid

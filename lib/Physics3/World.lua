@@ -11,6 +11,10 @@ function World:initialize()
 end
 
 function World:update(dt)
+    for _, v in pairs(self.tileMaps) do
+        v:update(dt)
+    end
+
     updateGroup(self.portals, dt)
     
     for i, obj in ipairs(self.objects) do
@@ -258,7 +262,7 @@ function World:loadMap(data)
         self.tileMaps[i] = Physics3.TileMap:new("tilemaps/" .. i, i)
         
         for j, w in pairs(v) do
-            self.tileLookup[j] = self.tileMaps[i].tiles[w]
+            self.tileLookup[tonumber(j)] = self.tileMaps[i].tiles[w]
         end
     end
     
@@ -297,26 +301,20 @@ function World:saveMap(outPath)
             local tile = self:getTile(x, y)
             
             if tile then
-                if not lookUp[tile.tileMap.name] then
-                    lookUp[tile.tileMap.name] = {}
-                end
-                
-                mapLookUp = lookUp[tile.tileMap.name]
-                
                 -- See if the tile is already in the table
                 local found = false
                 
-                for i, v in ipairs(mapLookUp) do
-                    if v.tileNum == tile.num then
+                for i, v in ipairs(lookUp) do
+                    if v.tileNum == tile.num and v.tileMap == tile.tileMap then
                         found = i
                         break
                     end
                 end
                 
                 if found then
-                    mapLookUp[found].count = mapLookUp[found].count + 1
+                    lookUp[found].count = lookUp[found].count + 1
                 else
-                    table.insert(mapLookUp, {tileNum = tile.num, count = 1})
+                    table.insert(lookUp, {tileMap = tile.tileMap, tileNum = tile.num, count = 1})
                 end
             end
         end
@@ -325,17 +323,16 @@ function World:saveMap(outPath)
     out.tileMaps = {}
     local tileMapLookUp = {}
     
-    for i, v in pairs(lookUp) do
-        table.sort(v, function(a, b) return a.count > b.count end)
-        
-        out.tileMaps[i] = {}
-        
-        tileMapLookUp[i] = {}
-        
-        for j, w in ipairs(v) do
-            table.insert(out.tileMaps[i], w.tileNum)
-            tileMapLookUp[i][w.tileNum] = j
+    table.sort(lookUp, function(a, b) return a.count > b.count end)
+    
+    for j, w in ipairs(lookUp) do
+        if not out.tileMaps[w.tileMap.name] then
+            out.tileMaps[w.tileMap.name] = {}
+            tileMapLookUp[w.tileMap.name] = {}
         end
+
+        out.tileMaps[w.tileMap.name][tostring(j)] = w.tileNum
+        tileMapLookUp[w.tileMap.name][w.tileNum] = j
     end
     
     -- build map based on lookup
@@ -540,7 +537,7 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
         else
             local tile = self:getTile(mapX, mapY)
             if tile and tile.collision then
-                if tile.collision == VAR("tileTemplates").cube.collision then
+                if tile.collision == VAR("tileTemplates").cube then
                     cubeCol = true
                 else
                 

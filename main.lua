@@ -102,17 +102,12 @@ function love.load()
     game = Game:new()
 
     gameStateManager:loadState(game)
-    --gameStateManager:addState(Editor:new(game.level))
+    gameStateManager:addState(Editor:new(game.level))
 end
 
 function love.update(dt)
-    dt = math.min(1/60, dt)
+    dt = math.min(1/30, dt)
     gdt = dt
-
-    if skipNext then
-        skipNext = false
-        return
-    end
 
 	if VAR("ffKeys") then
         for _, v in ipairs(VAR("ffKeys")) do
@@ -251,6 +246,12 @@ function love.mousereleased(x, y, button)
     gameStateManager:event("mousereleased", x, y, button)
 end
 
+function love.mousemoved(x, y, dx, dy)
+    dx, dy = dx/VAR("scale"), dy/VAR("scale")
+    
+    gameStateManager:event("mousemoved", dx, dy)
+end
+
 function love.resize(w, h)
     SCREENWIDTH = w/VAR("scale")
     SCREENHEIGHT = h/VAR("scale")
@@ -297,10 +298,6 @@ function updateGroup(group, dt)
 	for i = #delete, 1, -1 do
 		table.remove(group, delete[i])
 	end
-end
-
-function skipUpdate()
-    skipNext = true
 end
 
 function playMusic(music)

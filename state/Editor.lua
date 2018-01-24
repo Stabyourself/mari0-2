@@ -41,7 +41,7 @@ function Editor:initialize(level)
 end
 
 function Editor:load()
-    self.tileMap = self.level.tileMaps["smb3-grass"]
+    self.tileMap = self.level.tileMaps["smb3-general"]
     
     self.tools = {}
     
@@ -375,13 +375,13 @@ function Editor:newWindow(type, button)
         -- tileListWindow:addChild(backButton)
         
         
-        local tileListButtonGrid = Gui3.ButtonGrid:new(1, 1, self.tileMap.img, self.tileMap.quad, 
-            function(buttonGrid, i) 
-                buttonGrid.selected = i
+        local tileListTileGrid = Gui3.TileGrid:new(1, 1, self.tileMap, 
+            function(TileGrid, i) 
+                TileGrid.selected = i
                 self:selectTile(i)
             end
         )
-        tileListWindow:addChild(tileListButtonGrid)
+        tileListWindow:addChild(tileListTileGrid)
         
     end
 end
@@ -504,6 +504,12 @@ function Editor:mousereleased(x, y, button)
     
     if self.floatingSelection then
         self.floatingSelection:mousereleased(x, y, button)
+    end
+end
+
+function Editor:mousemoved(x, y)
+    if self.tool.mousemoved then
+        self.tool:mousemoved(x, y, button)
     end
 end
 

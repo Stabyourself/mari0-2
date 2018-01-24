@@ -54,7 +54,7 @@ function Level:loadMap(data)
 
     local x, y = self:mapToWorld(self.spawnX-.5, self.spawnY)
     
-    table.insert(self.marios, Smb3Mario:new(self, x, y, "small"))
+    table.insert(self.marios, Smb3Mario:new(self, x, y, "raccoon"))
 
     self:spawnEnemies(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end
@@ -146,55 +146,57 @@ function Level:spawnEnemies(untilX)
 end
 
 function Level:updateCamera(dt)
-    local mario = self.marios[1]
-    local pX = mario.x + mario.width/2
-    local pXr = pX - self.camera.x
-    
-    -- Horizontal
-    if pXr > RIGHTSCROLLBORDER then
-        self.camera.x = self.camera.x + VAR("cameraScrollRate")*dt
+    if self.camera.target then
+        local target = self.camera.target
+        local pX = target.x + target.width/2
+        local pXr = pX - self.camera.x
         
-        if pX - self.camera.x < RIGHTSCROLLBORDER then
-            self.camera.x = pX - RIGHTSCROLLBORDER
-        end
-        
-    elseif pXr < LEFTSCROLLBORDER then
-        self.camera.x = self.camera.x - VAR("cameraScrollRate")*dt
-        
-        if pX - self.camera.x > LEFTSCROLLBORDER then
-            self.camera.x = pX - LEFTSCROLLBORDER
-        end
-    end
-    
-    -- Vertical
-    local pY = mario.y + mario.height/2
-    local pYr = pY - self.camera.y
-    
-    if pYr > DOWNSCROLLBORDER then
-        self.camera.y = self.camera.y + VAR("cameraScrollRate")*dt
-        
-        if pY - self.camera.y < DOWNSCROLLBORDER then
-            self.camera.y = pY - DOWNSCROLLBORDER
-        end
-    end
-        
-    -- Only scroll up in flight mode
-    if mario.flying or self.camera.y < self.height*self.tileSize-CAMERAHEIGHT then
-        if pYr < UPSCROLLBORDER then
-            self.camera.y = self.camera.y - VAR("cameraScrollRate")*dt
-        
-            if pY - self.camera.y > UPSCROLLBORDER then
-                self.camera.y = pY - UPSCROLLBORDER
+        -- Horizontal
+        if pXr > RIGHTSCROLLBORDER then
+            self.camera.x = self.camera.x + VAR("cameraScrollRate")*dt
+            
+            if pX - self.camera.x < RIGHTSCROLLBORDER then
+                self.camera.x = pX - RIGHTSCROLLBORDER
+            end
+            
+        elseif pXr < LEFTSCROLLBORDER then
+            self.camera.x = self.camera.x - VAR("cameraScrollRate")*dt
+            
+            if pX - self.camera.x > LEFTSCROLLBORDER then
+                self.camera.x = pX - LEFTSCROLLBORDER
             end
         end
+        
+        -- Vertical
+        local pY = target.y + target.height/2
+        local pYr = pY - self.camera.y
+        
+        if pYr > DOWNSCROLLBORDER then
+            self.camera.y = self.camera.y + VAR("cameraScrollRate")*dt
+            
+            if pY - self.camera.y < DOWNSCROLLBORDER then
+                self.camera.y = pY - DOWNSCROLLBORDER
+            end
+        end
+            
+        -- Only scroll up in flight mode
+        if target.flying or self.camera.y < self.height*self.tileSize-CAMERAHEIGHT then
+            if pYr < UPSCROLLBORDER then
+                self.camera.y = self.camera.y - VAR("cameraScrollRate")*dt
+            
+                if pY - self.camera.y > UPSCROLLBORDER then
+                    self.camera.y = pY - UPSCROLLBORDER
+                end
+            end
+        end
+        
+        -- -- And clamp it to map boundaries
+        self.camera.x = math.min(self.camera.x, self.width*self.tileSize-CAMERAWIDTH/2)
+        self.camera.x = math.max(self.camera.x, CAMERAWIDTH/2)
+        
+        self.camera.y = math.min(self.camera.y, self.height*self.tileSize-CAMERAHEIGHT/2)
+        self.camera.y = math.max(self.camera.y, CAMERAHEIGHT/2)
     end
-    
-    -- -- And clamp it to map boundaries
-    self.camera.x = math.min(self.camera.x, self.width*self.tileSize-CAMERAWIDTH/2)
-    self.camera.x = math.max(self.camera.x, CAMERAWIDTH/2)
-    
-    self.camera.y = math.min(self.camera.y, self.height*self.tileSize-CAMERAHEIGHT/2)
-    self.camera.y = math.max(self.camera.y, CAMERAHEIGHT/2)
 end
 
 function Level:bumpBlock(x, y)

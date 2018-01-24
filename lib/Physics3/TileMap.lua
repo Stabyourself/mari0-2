@@ -11,22 +11,20 @@ function TileMap:initialize(path, name)
 	self.tileSize = self.data.tileSize or 16
 	self.tileMargin = self.data.tileMargin or 1
 	self.img = love.graphics.newImage(self.path .. self.data.tileMap)
-	self.quad = {}
 	
 	self.tiles = {}
-	
-	self.coinQuad = {}
-	for i = 1, 5 do
-		self.coinQuad[i] = love.graphics.newQuad((i-1)*16, 0, VAR("tileSize"), VAR("tileSize"), VAR("tileSize")*5, VAR("tileSize"))
-	end
+	self.updateTiles = {}
 
 	local i = 1
 	for y = 1, (self.img:getHeight()+self.tileMargin)/(self.tileSize+self.tileMargin) do
 		for x = 1, (self.img:getWidth()+self.tileMargin)/(self.tileSize+self.tileMargin) do
-			local quad = love.graphics.newQuad((x-1)*(self.tileSize+self.tileMargin), (y-1)*(self.tileSize+self.tileMargin), self.tileSize, self.tileSize, self.img:getWidth(), self.img:getHeight())
-			
-			table.insert(self.tiles, Physics3.Tile:new(self, self.img, quad, x, y, i, self.data.tiles[i]))
-			table.insert(self.quad, quad)
+			local tile = Physics3.Tile:new(self, self.img, x, y, i, self.data.tiles[i], self.path)
+			table.insert(self.tiles, tile)
+
+			if tile.quads then
+				table.insert(self.updateTiles, tile)
+			end
+
 			i = i + 1
 		end
 	end
@@ -56,7 +54,12 @@ function TileMap:initialize(path, name)
 			table.insert(self.stampMaps, stampMap)
 		end
 	end
+end
 
+function TileMap:update(dt)
+	for _, v in ipairs(self.updateTiles) do
+		v:update(dt)
+	end
 end
 
 return TileMap

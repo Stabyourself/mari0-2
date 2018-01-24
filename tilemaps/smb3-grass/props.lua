@@ -2,14 +2,14 @@ local tiles = {}
 
 local templates = VAR("tileTemplates")
 
-tiles[1] = templates.cube
-tiles[2] = templates.cube
-tiles[3] = templates.cube
-tiles[7] = templates.cube
+tiles[1] = {collision = templates.cube}
+tiles[2] = {collision = templates.cube}
+tiles[3] = {collision = templates.cube}
+tiles[7] = {collision = templates.cube}
 
-tiles[9] = templates.cube
-tiles[10] = templates.cube
-tiles[11] = templates.cube
+tiles[9] = {collision = templates.cube}
+tiles[10] = {collision = templates.cube}
+tiles[11] = {collision = templates.cube}
 
 tiles[17] = templates.smallSlopeRight1
 tiles[18] = templates.smallSlopeRight2

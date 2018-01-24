@@ -2,9 +2,7 @@ Game = class("Game")
 
 function Game:load()
     gameState = "game"
-    
-    self.coinAnimationFrame = 1
-    self.coinAnimationTimer = 0
+
     self.timeLeft = 400
     
     SmbMario = require("characters.smb-mario.code")
@@ -16,8 +14,6 @@ function Game:load()
     self.uiVisible = true
     
     love.graphics.setBackgroundColor(self.level.backgroundColor)
-    
-    skipUpdate()
 end
 
 function Game:update(dt)
@@ -27,17 +23,6 @@ function Game:update(dt)
     
     if self.level.marios[1].y > self.level.height*self.level.tileSize+.5 then
         self.level.marios[1].y = -1
-    end
-    
-	self.coinAnimationTimer = self.coinAnimationTimer + dt
-	while self.coinAnimationTimer >= VAR("coinAnimationTime") do
-        self.coinAnimationFrame = self.coinAnimationFrame + 1
-        
-        if self.coinAnimationFrame > 5 then
-            self.coinAnimationFrame = 1
-        end
-
-		self.coinAnimationTimer = self.coinAnimationTimer - VAR("coinAnimationTime")
     end
     
     if self.uiVisible then

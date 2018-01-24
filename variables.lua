@@ -1,6 +1,3 @@
-PMETERTICKS = 10
-
-
 return {
     vsync = 2,
     scale = 1,
@@ -23,8 +20,6 @@ return {
     jumpLeeway = 6/16,
     blockHitForce = 2,
 
-    coinAnimationTime = 0.14,
-
     enemiesSpawnAhead = 0,
 
     portalSize = 32,
@@ -42,13 +37,10 @@ return {
 
     tileTemplates = {
         cube = {
-            angle = 0,
-            collision = {
-                0,  0,
-                16,  0,
-                16, 16,
-                0, 16,
-            }
+            0,  0,
+            16,  0,
+            16, 16,
+            0, 16,
         },
 
         smallSlopeRight1 = {

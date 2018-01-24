@@ -61,14 +61,20 @@ end
 
 function Level:update(dt)
     updateGroup(self.blockBounces, dt)
+    
+    prof.push("World")
     Physics3.World.update(self, dt)
+    prof.pop()
+
     self:updateCamera(dt)
     
+    prof.push("Post Movement")
     for _, obj in ipairs(self.objects) do
         if obj.postMovementUpdate then
             obj:postMovementUpdate(dt)
         end
     end
+    prof.pop()
 
     local newSpawnLine = self.camera.x/self.tileSize+WIDTH+VAR("enemiesSpawnAhead")+2
     if newSpawnLine > self.spawnLine then

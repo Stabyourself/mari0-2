@@ -17,7 +17,8 @@ function Game:load()
 end
 
 function Game:update(dt)
-    self.timeLeft = math.max(0, self.timeLeft-2.5*dt)
+    prof.push("Game")
+    self.timeLeft = math.max(0, self.timeLeft-(60/42)*dt)
     
     self.level:update(dt)
     
@@ -25,9 +26,12 @@ function Game:update(dt)
         self.level.marios[1].y = -1
     end
     
+    prof.push("Game UI")
     if self.uiVisible then
         smb3ui:update(dt)
     end
+    prof.pop()
+    prof.pop()
 end
 
 function Game:draw()

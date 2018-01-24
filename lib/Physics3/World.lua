@@ -11,14 +11,19 @@ function World:initialize()
 end
 
 function World:update(dt)
+    prof.push("Tiles")
     for _, v in pairs(self.tileMaps) do
         v:update(dt)
     end
+    prof.pop()
 
     updateGroup(self.portals, dt)
     
+    prof.push("Objects")
     for i, obj in ipairs(self.objects) do
+        prof.push("Think")
 		obj:update(dt)
+        prof.pop()
 		
 		-- Add gravity
         obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * 0.5 * dt
@@ -34,7 +39,9 @@ function World:update(dt)
         
         local oldX, oldY = obj.x, obj.y
         
+        prof.push("Collisions")
         obj:checkCollisions()
+        prof.pop()
         
         self:checkPortaling(obj, oldX, oldY)
         
@@ -42,7 +49,8 @@ function World:update(dt)
         obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * 0.5 * dt
         -- Cap speed[2]
         obj.speed[2] = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed[2])
-	end
+    end
+    prof.pop()
 end
 
 function World:checkPortaling(obj, oldX, oldY)

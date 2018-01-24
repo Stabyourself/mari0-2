@@ -63,7 +63,9 @@ function Mario:postMovementUpdate(dt)
     
     self.portalGunAngle = self.crosshair.angle
     
+    prof.push("Crosshair")
     self.crosshair:update(dt)
+    prof.pop()
 end
 
 function Mario:closePortals()

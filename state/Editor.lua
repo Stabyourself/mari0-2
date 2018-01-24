@@ -170,11 +170,16 @@ function Editor:load()
 end
 
 function Editor:update(dt)
+    prof.push("Editor")
+    prof.push("Editor UI")
     self.canvas:update(dt)
+    prof.pop()
     
+    prof.push("Tool update")
     if self.tool.update then
         self.tool:update(dt)
     end
+    prof.pop()
     
     if self.freeCamera then
         local cameraSpeed = dt*VAR("editor").cameraSpeed--*(1/self.level.camera.scale)
@@ -200,13 +205,16 @@ function Editor:update(dt)
     self.level.camera.x = math.clamp(self.level.camera.x, 0, self.level.width*16)
     self.level.camera.y = math.clamp(self.level.camera.y, 0, self.level.height*16)
     
+    prof.push("Selection")
     if self.selection then
         self.selection:update(dt)
     end
-    
+
     if self.floatingSelection then
         self.floatingSelection:update(dt)
     end
+    prof.pop()
+    prof.pop()
 end
 
 function Editor:draw()

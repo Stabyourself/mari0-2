@@ -26,6 +26,7 @@ function love.load()
     Font3 = require "lib.Font3"
     require "lib.Physics3"
     require "lib.Gui3"
+    prof = require "lib.jprof"
 
     require "class.CharacterState"
     require "class.Character"
@@ -106,8 +107,9 @@ function love.load()
 end
 
 function love.update(dt)
+    prof.enabled(true)
+    prof.push("frame")
     dt = math.min(1/30, dt)
-    gdt = dt
 
 	if VAR("ffKeys") then
         for _, v in ipairs(VAR("ffKeys")) do
@@ -118,6 +120,8 @@ function love.update(dt)
     end
 
     gameStateManager:event("update", dt)
+    prof.pop("frame")
+    prof.enabled(false)
 end
 
 local function setColorBasedOn(key)
@@ -259,6 +263,12 @@ function love.resize(w, h)
     updateSizes()
     
     gameStateManager:event("resize", SCREENWIDTH, SCREENHEIGHT)
+end
+
+function love.quit()
+    if PROF_CAPTURE then
+        prof.write("lastrun.prof")
+    end
 end
 
 function updateSizes()

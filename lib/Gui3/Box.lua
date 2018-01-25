@@ -71,7 +71,7 @@ function Box:draw(level)
     Gui3.drawBox(img, quad, 0, 0, self.w, self.h)
     
     if self.title then
-        fontOutlined:print(self.title, 3, 2)
+        love.graphics.print(self.title, 3, 2)
     end
     
     if self.closeable then

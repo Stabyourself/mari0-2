@@ -83,33 +83,31 @@ function Smb3Ui:draw()
 end
 
 function Smb3Ui:getWorldText()
-    return "&World1;&World2;&World3;&World4;" .. self.world
+    return "1234" .. self.world
 end
 
 function Smb3Ui:getPMeterText()
     local s = ""
     
     for i = 1, math.min(VAR("pMeterTicks")-1, self.pMeter) do
-        s = s .. "&pMeterTickOn;"
+        s = s .. "A"
     end
     
     for i = 1, VAR("pMeterTicks")-1-self.pMeter do
-        s = s .. "&pMeterTick;"
+        s = s .. "B"
     end
     
     if self.pMeter == VAR("pMeterTicks") and self.pMeterBlinkTimer >= VAR("pMeterBlinkTime") then
-        s = s .. "&pMeterOn1;&pMeterOn2;"
+        s = s .. "CD"
     else
-        s = s .. "&pMeter1;&pMeter2;"
+        s = s .. "EF"
     end
     
     return s
 end
 
 function Smb3Ui:getCoinsText()
-    local s = ""
-    
-    s = s .. "&Dollarinos;"
+    local s = "$"
     
     if self.coins < 10 then
         s = s .. " " .. self.coins
@@ -122,7 +120,7 @@ end
 
 function Smb3Ui:getLivesText()
     local s = ""
-    s = "&Mario1;&Mario2;&Times;"
+    s = "MNX"
     
     if self.lives < 10 then
         s = s .. " " .. self.lives
@@ -138,5 +136,5 @@ function Smb3Ui:getScoreText()
 end
 
 function Smb3Ui:getTimeText()
-    return "&Time;" .. padZeroes(self.time, 3)
+    return "T" .. padZeroes(self.time, 3)
 end

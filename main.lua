@@ -1,7 +1,7 @@
 --Mari3 - MIT License.
+require "loop"
+
 function love.load()
-    --print("Mari3 POC by Stabyourself.net")
-    
     require "util"
     
     love.window.setMode(400*VAR("scale"), 224*VAR("scale"), {
@@ -51,42 +51,18 @@ function love.load()
     require "state.Game"
     require "state.Editor"
     
-    fontOutlined = Font3:new(love.graphics.newImage("img/font-outlined.png"), [[
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ
-        abcdefghijklmnopqrstuvwxyz
-        0123456789
-        &Space;
-        &pMeterTick;
-        &pMeterTickOn;
-        &World1;
-        &World2;
-        &World3;
-        &World4;
-        &pMeter1;
-        &pMeter2;
-        &pMeterOn1;
-        &pMeterOn2;
-        &Mario1;
-        &Mario2;
-        &Luigi1;
-        &Luigi2;
-        &Dollarinos;
-        &Time;
-        &Times;
-        .;:;!?_-<>=+*/\'%
-        &Intersect;
-        &Move;
-    ]])
-    
-    font = Font3:new(love.graphics.newImage("img/font.png"), [[
-        ABCDEFGHIJKLMNOPQRSTUVWXYZ
-        abcdefghijklmnopqrstuvwxyz
-        0123456789
-        &Space;
-        .;:;!?_-<>=+*/\'%
-        &Intersect;
-        &Move;
-    ]])
+    fontOutlined = love.graphics.newImageFont("img/font-outlined.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$.,:;!?_-<>=+*\\/'%^~")
+    love.graphics.setFont(fontOutlined)
+
+    -- font = Font3:new(love.graphics.newImage("img/font.png"), [[
+    --     ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    --     abcdefghijklmnopqrstuvwxyz
+    --     0123456789
+    --     &Space;
+    --     .;:;!?_-<>=+*/\'%
+    --     &Intersect;
+    --     &Move;
+    -- ]])
 
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")
     debugCandyImg:setWrap("repeat")
@@ -142,7 +118,7 @@ function love.draw()
     gameStateManager:event("draw")
     
     if VAR("characterStateDebug") then
-        fontOutlined:print(game.level.marios[1].state.name, 8, 8)
+        love.graphics.print(game.level.marios[1].state.name, 8, 8)
     end
     
     -- For the stream
@@ -166,7 +142,7 @@ function love.draw()
     end
 
     if VAR("memoryDebug") then
-        fontOutlined:print(tostring(collectgarbage("count")*1024), 10, 10)
+        love.graphics.print(tostring(collectgarbage("count")*1024), 10, 10)
     end
 
     if VAR("scale") ~= 1 then
@@ -322,23 +298,23 @@ function playSound(sound)
     sound:play()
 end
 
-function love.graphics.print(s, x, y, align)
-    local len = string.len(tostring(s))
+-- function love.graphics.print(s, x, y, align)
+--     local len = string.len(tostring(s))
     
-    if align == "center" then
-        x = x - len*4
-    elseif align == "right" then
-        x = x - len*8
-    end
+--     if align == "center" then
+--         x = x - len*4
+--     elseif align == "right" then
+--         x = x - len*8
+--     end
     
-	for i = 1, len do
-		local quad = fontQuad[string.sub(s, i, i)]
+-- 	for i = 1, len do
+-- 		local quad = fontQuad[string.sub(s, i, i)]
         
-		if quad then
-			love.graphics.draw(fontImg, quad, (x+(i-1)*8), y, 0, 1, 1)
-		end
-	end
-end
+-- 		if quad then
+-- 			love.graphics.draw(fontImg, quad, (x+(i-1)*8), y, 0, 1, 1)
+-- 		end
+-- 	end
+-- end
 
 function worldArrow(x, y, xDir, yDir)
     local scale = math.sqrt(xDir^2+yDir^2)/8

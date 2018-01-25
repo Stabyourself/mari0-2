@@ -127,6 +127,7 @@ function World:draw()
         for y = yStart, yEnd do
             if self:inMap(x, y) then
                 local tile = self:getTile(x, y)
+                
                 if tile then
                     tile:draw((x-1)*self.tileSize, (y-1)*self.tileSize)
                 end

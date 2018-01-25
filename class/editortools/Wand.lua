@@ -17,7 +17,7 @@ function Wand:draw()
     end
     
     if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
-        addition = addition .. "&Intersect;"
+        addition = addition .. "^"
     elseif cmdDown("editor.select.add") then
         addition = addition .. "+"
     elseif cmdDown("editor.select.subtract") then
@@ -25,7 +25,7 @@ function Wand:draw()
     end
     
     if addition ~= "" then
-        fontOutlined:print(addition, mx-font:getLength(addition)*8-1, my+2)
+        love.graphics.print(addition, mx-#addition*8-1, my+2)
     end
 end
 

@@ -36,6 +36,8 @@ Editor.selectQuad = {
     love.graphics.newQuad(3, 3, 2, 2, 5, 5),
 }
 
+Gui3.boxCache[Editor.selectQuad] = Gui3.makeBoxCache(Editor.selectQuad)
+
 function Editor:initialize(level)
     self.level = level
 end

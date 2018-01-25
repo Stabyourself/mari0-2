@@ -43,19 +43,19 @@ function Select:draw()
     
     if not self.editor.floatingSelection or not self.editor.floatingSelection.dragging then
         if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
-            addition = "&Intersect;"
+            addition = "^"
         elseif cmdDown("editor.select.add") then
             addition = "+"
         elseif cmdDown("editor.select.subtract") then
             addition = "-"
         elseif  self.editor.selection and self.editor.selection:collision(mouseX, mouseY) or
                 self.editor.floatingSelection and self.editor.floatingSelection:collision(mouseX, mouseY) then
-            addition = "&Move;"
+            addition = "~"
         end
     end
-
+    
     if addition ~= "" then
-        fontOutlined:print(addition, worldX-font:getLength(addition)*8-1, worldY+2)
+        love.graphics.print(addition, worldX-#addition*8-1, worldY+2)
     end
 end
 

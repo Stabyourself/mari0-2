@@ -136,9 +136,6 @@ function Portal:draw(side)
     love.graphics.pop()
 end
 
-function Portal:drawThing(a, img)
-end
-
 function Portal:connectTo(portal)
     self.connectsTo = portal
     self.open = true

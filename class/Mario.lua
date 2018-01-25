@@ -152,7 +152,7 @@ function Mario:ceilCollision(obj2)
 end
 
 function Mario:bottomCollision(obj2)
-    if obj2.stompable then
+    if obj2 and obj2.stompable then
         obj2:stomp()
         self.speed[2] = -getRequiredSpeed(VAR("enemyBounceHeight"))
         

@@ -111,17 +111,17 @@ function sideOfLine(ox, oy, p1x, p1y, p2x, p2y) -- Credits to https://stackoverf
     return (p2y-p1y)*ox + (p1x-p2x)*oy + (p2x*p1y-p1x*p2y)
 end
 
+local pointPositions = {}
+
 function rectangleOnLine(x, y, w, h, p1x, p1y, p2x, p2y) -- See above
     -- A
     local xr = x+w -- right side
     local yb = y+h -- bottom side
 
-    local pointPositions = {
-        sideOfLine(x, y, p1x, p1y, p2x, p2y),
-        sideOfLine(xr, y, p1x, p1y, p2x, p2y),
-        sideOfLine(x, yb, p1x, p1y, p2x, p2y),
-        sideOfLine(xr, yb, p1x, p1y, p2x, p2y),
-    }
+    pointPositions[1] = sideOfLine(x, y, p1x, p1y, p2x, p2y)
+    pointPositions[2] = sideOfLine(xr, y, p1x, p1y, p2x, p2y)
+    pointPositions[3] = sideOfLine(x, yb, p1x, p1y, p2x, p2y)
+    pointPositions[4] = sideOfLine(xr, yb, p1x, p1y, p2x, p2y)
 
     local above, below = false, false
 

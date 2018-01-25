@@ -126,8 +126,9 @@ function World:draw()
     for x = xStart, xEnd do
         for y = yStart, yEnd do
             if self:inMap(x, y) then
-                if self:getTile(x, y) then
-                    self:getTile(x, y):draw((x-1)*self.tileSize, (y-1)*self.tileSize)
+                local tile = self:getTile(x, y)
+                if tile then
+                    tile:draw((x-1)*self.tileSize, (y-1)*self.tileSize)
                 end
             end
         end
@@ -200,6 +201,7 @@ function World:draw()
                 if p.open then
                     if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
                         objectWithinPortalRange(p, x, y) then
+                        
                         p:stencilRectangle("in")
                     end
                 end

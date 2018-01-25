@@ -108,7 +108,7 @@ function PhysObj:leftColCheck()
 		if not self:leftCollision() then
 			self.x = colX+1
 			self.groundSpeedX = math.max(self.groundSpeedX, 0)
-			return {x = colX, y = colY}
+			return {colX, colY}
 		end
 	end
 	
@@ -130,7 +130,7 @@ function PhysObj:rightColCheck()
 		if not self:rightCollision() then
 			self.x = colX-self.width
 			self.groundSpeedX = math.min(self.groundSpeedX, 0)
-			return {x = colX, y = colY}
+			return {colX, colY}
 		end
 	end
 	
@@ -153,7 +153,7 @@ function PhysObj:topColCheck()
 			self.y = colY+1
 			self.speed[2] = math.max(self.speed[2], 0)
 			
-			return {x = colX, y = colY}
+			return {colX, colY}
 		end
 	end
 	
@@ -164,28 +164,24 @@ function PhysObj:bottomColCheck()
 	local colX, colY
 	
 	for i, v in ipairs(self.tracers.down) do
-		local currentTraceX, currentTraceY, currentTraceAngle = v:trace()
+		local currentTraceX, currentTraceY = v:trace()
 		
 		if currentTraceX and (not colX or currentTraceY < colY) then
-			colX, colY, colAngle = currentTraceX, currentTraceY, currentTraceAngle
+			colX, colY = currentTraceX, currentTraceY
 		end
 	end
 	
 	if colY then --Ground collision
 		if self.onGround or colY <= self.y + self.height then
-			if not self:bottomCollision({}) then
-				if self.onGround then
-					self.y = colY-self.height
-					self.speed[2] = math.min(self.speed[2], 0)
-					
-					return {x = colX, y = colY, angle = colAngle}
-				else
-					self.y = colY-self.height
-					self.speed[2] = math.min(self.speed[2], 0)
+			if not self:bottomCollision(nil) then
+				if not self.onGround then
 					self.onGround = true
-					
-					return {x = colX, y = colY, angle = colAngle}
 				end
+				
+				self.y = colY-self.height
+				self.speed[2] = math.min(self.speed[2], 0)
+				
+				return {colX, colY}
 			end
 		end
 	end
@@ -193,7 +189,7 @@ function PhysObj:bottomColCheck()
 	return false
 end
 
-function PhysObj:checkCollisions()	
+function PhysObj:checkCollisions()
 	local collisions = {}
 	
 	collisions.left = self:leftColCheck()
@@ -217,7 +213,7 @@ function PhysObj:checkCollisions()
 	end
 	
 	if collisions.bottom then
-		local x, y = self.world:worldToMap(collisions.bottom.x, collisions.bottom.y)
+		local x, y = self.world:worldToMap(collisions.bottom[1], collisions.bottom[2])
 		
 		local tile = self.world:getTile(x, y)
 		

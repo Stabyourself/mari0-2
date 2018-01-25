@@ -71,17 +71,7 @@ function Box:draw(level)
     Gui3.drawBox(img, quad, 0, 0, self.w, self.h)
     
     if self.title then
-        love.graphics.stencil(function()
-            love.graphics.rectangle("fill", 3, 2, self.w-16, 8)
-        end, "increment", 1, true)
-        love.graphics.setStencilTest("equal", level)
-        
         fontOutlined:print(self.title, 3, 2)
-        
-        love.graphics.stencil(function()
-            love.graphics.rectangle("fill", 3, 2, self.w-16, 8)
-        end, "decrement", 1, true)
-        love.graphics.setStencilTest("equal", level-1)
     end
     
     if self.closeable then

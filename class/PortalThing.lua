@@ -3,6 +3,7 @@ PortalThing = class("PortalThing")
 function PortalThing:initialize(img, offset)
     self.img = img
     self.offset = offset
+    self.a = offset
 end
 
 function PortalThing:update(dt, a)

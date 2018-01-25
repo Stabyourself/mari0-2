@@ -301,17 +301,10 @@ function love.wheelmoved(x, y)
 end
 
 function updateGroup(group, dt)
-	local delete = {}
-	
-	for i, v in ipairs(group) do
-		if v:update(dt) or v.deleteMe then
-            v.deleteMe = true
-			table.insert(delete, i)
+	for i = #group, 1, -1 do
+		if group[i]:update(dt) or group[i].deleteMe then
+			table.remove(group, i)
 		end
-	end
-	
-	for i = #delete, 1, -1 do
-		table.remove(group, delete[i])
 	end
 end
 

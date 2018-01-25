@@ -209,35 +209,12 @@ function Element:unTranslate()
     love.graphics.pop()
 end
 
-function Element:draw(level)
-    -- Stencil in
-    level = level or 1
-    
-    if not self.noClip then
-        local clear = false
-        
-        if level == 1 then
-            clear = true
-        end
-        
-        love.graphics.stencil(function()
-            love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
-        end, "increment", 1, not clear)
-        
-        love.graphics.setStencilTest("equal", level)
-    end
-    
+function Element:draw()
     love.graphics.translate(-self.scroll[1]+self.childBox[1], -self.scroll[2]+self.childBox[2])
 
-    local childLevel = level
-    
-    if not self.noClip then
-        childLevel = childLevel + 1
-    end
-    
     for _, v in ipairs(self.children) do
         if v.visible then
-            v:draw(childLevel)
+            v:draw()
         end
     end
     
@@ -256,13 +233,13 @@ function Element:draw(level)
             end
 
             if i == 1 then
-                love.graphics.draw(self.gui.img.scrollbarBack, 0, self.childBox[2]+self.childBox[4]-4, 0, self.w, 1, 0, 4)
+                love.graphics.draw(self.gui.img.scrollbarBack, self.childBox[1], self.childBox[2]+self.childBox[4]-4, 0, self.childBox[3], 1, 0, 4)
                 
                 love.graphics.draw(img, scrollbarQuad[1], pos, self.childBox[2]+self.childBox[4]-4, 0, 1, 1, 0, 4)
                 love.graphics.draw(img, scrollbarQuad[2], pos+1, self.childBox[2]+self.childBox[4]-4, 0, self.scrollbarSize[i]-2, 1, 0, 4)
                 love.graphics.draw(img, scrollbarQuad[3], pos-1+self.scrollbarSize[i], self.childBox[2]+self.childBox[4]-4, 0, 1, 1, 0, 4)
             else
-                love.graphics.draw(self.gui.img.scrollbarBack, self.childBox[1]+self.childBox[3]-4, 0, math.pi/2, self.h, 1, 0, 4)
+                love.graphics.draw(self.gui.img.scrollbarBack, self.childBox[1]+self.childBox[3]-4, self.childBox[2], math.pi/2, self.childBox[4], 1, 0, 4)
         
                 love.graphics.draw(img, scrollbarQuad[1], self.childBox[1]+self.childBox[3]-4, pos, math.pi/2, 1, 1, 0, 4)
                 love.graphics.draw(img, scrollbarQuad[2], self.childBox[1]+self.childBox[3]-4, pos + 1, math.pi/2, self.scrollbarSize[i]-2, 1, 0, 4)
@@ -270,19 +247,6 @@ function Element:draw(level)
             end
         end
     end
-    
-    if not self.noClip then
-        love.graphics.stencil(function()
-            love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
-        end, "decrement", 1, true)
-    end
-    
-    if level > 1 then
-        love.graphics.setStencilTest("equal", level-1)
-    else -- Clean up after the root element (likely the canvas)
-        love.graphics.stencil(function() end)
-        love.graphics.setStencilTest()
-    end 
 end
 
 function Element:scrollCollision(i, x, y)

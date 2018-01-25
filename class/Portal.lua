@@ -30,6 +30,27 @@ function Portal:initialize(world, x1, y1, x2, y2, color)
     self.openTimer = 0
     self.particleTimer = 0
     self.particles = {}
+    
+    self.portalThings = {}
+
+    for i = 1, PORTALTHINGS do
+        for j = 1, 3 do
+            local img = self.thingImg
+            local offset = (i-1)*PORTALTHINGDIFF
+            
+            if j == 2 then
+                img = self.thingMediumImg
+                offset = offset - math.pi*PORTALMEDIUMLAG
+            end
+            
+            if j == 3 then
+                img = self.thingSmallImg
+                offset = offset - math.pi*PORTALSMALLLAG
+            end
+
+            table.insert(self.portalThings, PortalThing:new(img, offset))
+        end
+    end
 end
 
 function Portal:updatePosition()
@@ -75,45 +96,8 @@ function Portal:update(dt)
     
     local a = math.fmod(self.timer, PORTALANIMATIONTIME)/PORTALANIMATIONTIME*math.pi*2
     
-    self.thingList = {background = {}, foreground = {}}
-    
-    for i = 1, PORTALTHINGS do
-        for j = 1, 3 do
-            local a = a + (i-1)*PORTALTHINGDIFF
-            
-            if j == 2 then
-                a = a - math.pi*PORTALMEDIUMLAG
-            end
-            
-            if j == 3 then
-                a = a - math.pi*PORTALSMALLLAG
-            end
-            
-            a = math.fmod(a, math.pi*2)
-            
-            local insertInto = self.thingList.background
-            local diff = math.abs(a-math.pi)/math.pi
-            
-            if diff < 0.5 then
-                insertInto = self.thingList.foreground
-            end
-
-            local img = self.thingImg
-
-            if j == 2 then
-                img = self.thingMediumImg
-            end
-
-            if j == 3 then
-                img = self.thingSmallImg
-            end
-            
-            table.insert(insertInto, {
-                a = a,
-                diff = diff,
-                img = img
-            })
-        end
+    for _, v in ipairs(self.portalThings) do
+        v:update(dt, a)
     end
 end
 
@@ -124,17 +108,14 @@ function Portal:draw(side)
     love.graphics.rotate(self.angle)
     love.graphics.translate(self.size/2, 0)
     
+
     if side == "background" then
         local glowI = math.fmod(self.timer*PORTALTHINGS*0.5, PORTALANIMATIONTIME)/PORTALANIMATIONTIME*math.pi*2
         local glowA = math.sin(glowI)*0.2+0.8
         
         if self.open then
-            love.graphics.setColor(1, 1, 1, 0.7)
-            worldDraw(self.glowImg, 0, 0, 0, math.max(0, self.size*self.openProgress-2), 1, .5, 16)
-        end
-        
-        for _, v in ipairs(self.thingList.background) do
-            self:drawThing(v.a, v.img)
+            love.graphics.setColor(1, 1, 1, glowA)
+            love.graphics.draw(self.glowImg, 0, 0, 0, math.max(0, self.size*self.openProgress-2), 1, .5, 16)
         end
         
     else
@@ -143,44 +124,19 @@ function Portal:draw(side)
         end
         
         love.graphics.setColor(self.color:rgb())
-        worldDraw(self.baseImg, 0, 0, 0, self.size*self.openProgress, 1, .5, 1)
+        love.graphics.draw(self.baseImg, 0, 0, 0, self.size*self.openProgress, 1, .5, 1)
+    end
     
-        for _, v in ipairs(self.thingList.foreground) do
-            self:drawThing(v.a, v.img)
-        end
+    local mult = (self.size/2*self.openProgress - 2)
+
+    for _, v in ipairs(self.portalThings) do
+        v:draw(side, self.color, mult)
     end
     
     love.graphics.pop()
 end
 
 function Portal:drawThing(a, img)
-    --darken based on distance to "front"
-    
-    local darken = math.abs(a-math.pi)/math.pi*0.6
-    love.graphics.setColor(self.color:darken(darken):rgb())
-    
-    local dist = (self.size/2*self.openProgress - 2)
-    
-    local x = math.sin(a)
-    
-    -- make portal more oval shaped by squaring the result
-    if x > 0 then
-        x = 1-(1-x)^1.5
-    else
-        x = -(1-(1+x)^1.5)
-    end
-    
-    x = x
-    
-    local sx = (1-(math.abs(x)))*0.7+0.3
-    
-    -- turn around on the way to left
-    -- Actually no because the portalthings are symmetrical
-    -- if a > math.pi*0.5 and a < math.pi*1.5 then
-    --     sx = -sx
-    -- end
-    
-    worldDraw(img, x*dist, 0, 0, sx, 1, img:getWidth()/2, img:getHeight()+1)
 end
 
 function Portal:connectTo(portal)

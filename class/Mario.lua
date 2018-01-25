@@ -52,10 +52,8 @@ function Mario:postMovementUpdate(dt)
     self:animation(dt)
     
     local x, y = self.x+self.width/2, self.y+self.height/2+2
-    self.crosshair.origin = {
-        x = x,
-        y = y,
-    }
+    self.crosshair.origin.x = x
+    self.crosshair.origin.y = y
     
     local mx, my = self.world:mouseToWorld()
     

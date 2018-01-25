@@ -171,7 +171,7 @@ end
 
 function Editor:update(dt)
     prof.push("Editor")
-    prof.push("Editor UI")
+    prof.push("UI")
     self.canvas:update(dt)
     prof.pop()
     
@@ -218,12 +218,14 @@ function Editor:update(dt)
 end
 
 function Editor:draw()
+    prof.push("Editor")
     self.level.camera:attach()
     
     local xl, yt = self.level:cameraToWorld(0, 0)
     local xr, yb = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)
     
     -- Map bounds graphics
+    prof.push("Candy")
     love.graphics.stencil(function()
         love.graphics.rectangle("fill", 0, 0, self.level.width*16, self.level.height*16)
     end)
@@ -235,7 +237,9 @@ function Editor:draw()
     love.graphics.setColor(1, 1, 1)
     
     love.graphics.setStencilTest()
+    prof.pop()
         
+    prof.push("Grid")
     if self.showGrid then
         self.gridQuad:setViewport(
             (xl)%self.level.tileSize,
@@ -251,23 +255,30 @@ function Editor:draw()
             yt
         )
     end
+    prof.pop()
     
+    prof.push("Selection")
     if self.selection then
         self.selection:draw()
     end
     
-    
     if self.floatingSelection then
         self.floatingSelection:draw()
     end
+    prof.pop()
     
+    prof.push("Tool")
     if self.tool.draw then
         self.tool:draw()
     end
+    prof.pop()
     
     self.level.camera:detach()
     
+    prof.push("UI")
     self.canvas:draw()
+    prof.pop()
+    prof.pop()
 end
 
 function Editor:changeScale(val)

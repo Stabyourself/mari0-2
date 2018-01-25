@@ -26,7 +26,7 @@ function Game:update(dt)
         self.level.marios[1].y = -1
     end
     
-    prof.push("Game UI")
+    prof.push("UI")
     if self.uiVisible then
         smb3ui:update(dt)
     end
@@ -35,10 +35,12 @@ function Game:update(dt)
 end
 
 function Game:draw()
+    prof.push("Game")
     self.level:draw()
 
     love.graphics.setColor(1, 1, 1)
     
+    prof.push("UI")
     if self.uiVisible then
         smb3ui.time = math.floor(love.timer.getFPS())--math.ceil(self.timeLeft)
         smb3ui.pMeter = self.level.marios[1].pMeter
@@ -48,6 +50,8 @@ function Game:draw()
         smb3ui.world = 1
         smb3ui:draw()
     end
+    prof.pop()
+    prof.pop()
 end
 
 function Game:resize(w, h)

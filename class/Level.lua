@@ -85,11 +85,15 @@ end
 function Level:draw()
     self.camera:attach()
     
+    prof.push("World")
     Physics3.World.draw(self)
+    prof.pop()
     
+    prof.push("Crosshairs")
     for _, v in ipairs(self.marios) do
         v.crosshair:draw()
     end
+    prof.pop()
     
     self.camera:detach()
 end

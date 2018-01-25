@@ -64,14 +64,18 @@ function Smb3Ui:update(dt)
         end
     end
     
+    prof.push("concats")
     self.element.world:setString(self:getWorldText())
     self.element.pMeter:setString(self:getPMeterText())
     self.element.coins:setString(self:getCoinsText())
     self.element.lives:setString(self:getLivesText())
     self.element.score:setString(self:getScoreText())
     self.element.time:setString(self:getTimeText())
+    prof.pop()
     
+    prof.push("canvas")
     self.canvas:update(dt)
+    prof.pop()
 end
 
 function Smb3Ui:draw()

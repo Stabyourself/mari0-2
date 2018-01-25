@@ -79,7 +79,7 @@ function Tile:draw(x, y, ghost)
 		love.graphics.setColor(1, 1, 1, 0.5)
 	end
 	
-	worldDraw(self.img, self.quad, x, y)
+	love.graphics.draw(self.img, self.quad, x, y)
 end
 
 return Tile

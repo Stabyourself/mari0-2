@@ -8,7 +8,6 @@ end
 
 function Text:setString(s)
     self.s = s
-    self.w = #self.s*8
 end
 
 function Text:draw(level)

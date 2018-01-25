@@ -42,7 +42,10 @@ function Element:resize(w, h)
     self.w = w
     self.h = h
     
-    self.childBox = {0, 0, self.w, self.h}
+    self.childBox[1] = 0
+    self.childBox[2] = 0
+    self.childBox[3] = self.w
+    self.childBox[4] = self.h
 end
 
 function Element:addChild(element)
@@ -69,7 +72,8 @@ function Element:update(dt, x, y, mouseBlocked)
         mouseBlocked = false
     end
     
-    self.mouse = {x, y}
+    self.mouse[1] = x
+    self.mouse[2] = y
     self.mouseBlocked = mouseBlocked or not self.visible
 
     local childMouseBlocked = self.mouseBlocked
@@ -96,34 +100,34 @@ function Element:update(dt, x, y, mouseBlocked)
                 siblingsBlocked = true
                 childMouseBlocked = true
             end
-
-            -- if  self.mouse[1]-self.childBox[1] >= v.x and self.mouse[1]-self.childBox[1] < v.x+v.w and
-            --     self.mouse[2]-self.childBox[2] >= v.y and self.mouse[2]-self.childBox[2] < v.y+v.h then
-            --     childMouseBlocked = true
-            -- end
         end
     end
 
     -- Update scroll bar visibility
-    self.hasScrollbar = {false, false}
+    self.hasScrollbar[1] = false
+    self.hasScrollbar[2] = false
 
-    local childrenW, childrenH = self:getChildrenSize()
-    
-    if self.scrollable[1] and childrenW > self:getInnerWidth() then
-        self.hasScrollbar[1] = true
-    end
+    local childrenW, childrenH
 
-    if self.scrollable[2] and childrenH > self:getInnerHeight() then
-        self.hasScrollbar[2] = true
+    if self.scrollable[1] or self.scrollable[2] then
+        childrenW, childrenH = self:getChildrenSize()
         
         if self.scrollable[1] and childrenW > self:getInnerWidth() then
             self.hasScrollbar[1] = true
         end
+
+        if self.scrollable[2] and childrenH > self:getInnerHeight() then
+            self.hasScrollbar[2] = true
+            
+            if self.scrollable[1] and childrenW > self:getInnerWidth() then
+                self.hasScrollbar[1] = true
+            end
+        end
+        
+        self.scrollbarSize[1] = math.max(4, (self:getInnerWidth()/childrenW)*(self.childBox[3]-self.scrollbarSpace))
+        self.scrollbarSize[2] = math.max(4, (self:getInnerHeight()/childrenH)*(self.childBox[4]-self.scrollbarSpace))
     end
     
-    self.scrollbarSize[1] = math.max(4, (self:getInnerWidth()/childrenW)*(self.childBox[3]-self.scrollbarSpace))
-    self.scrollbarSize[2] = math.max(4, (self:getInnerHeight()/childrenH)*(self.childBox[4]-self.scrollbarSpace))
- 
     if self.draggable then
         if self.dragging then
             self.x = self.parent.mouse[1]-self.parent.childBox[1]-self.dragPos[1]+self.parent.scroll[1]
@@ -168,32 +172,30 @@ function Element:update(dt, x, y, mouseBlocked)
         end
     end
 
-    local childrenW, childrenH = self:getChildrenSize()
-    
+    if (self.scrolling[1] or self.scrolling[2]) and not childrenW then
+        childrenW, childrenH = self:getChildrenSize()
+    end
+
     if self.scrolling[1] then
         local factor = ((self.mouse[1]-self.scrollingDragOffset[1]-self.childBox[1])/(self.childBox[3]-self.scrollbarSize[1]-self.scrollbarSpace))
         
         factor = math.clamp(factor, 0, 1)
         self.scroll[1] = factor*(childrenW-self:getInnerWidth())
+
+        self.scroll[1] = math.min(childrenW-self:getInnerWidth(), self.scroll[1])
+        self.scroll[1] = math.max(0, self.scroll[1])
     end
     
-    self.scroll[1] = math.min(childrenW-self:getInnerWidth(), self.scroll[1])
-    self.scroll[1] = math.max(0, self.scroll[1])
     
     if self.scrolling[2] then
         local factor = ((self.mouse[2]-self.scrollingDragOffset[2]-self.childBox[2])/(self.childBox[4]-self.scrollbarSize[2]-self.scrollbarSpace))
         
         factor = math.clamp(factor, 0, 1)
         self.scroll[2] = factor*(childrenH-self:getInnerHeight())
-    end
     
-    self.scroll[2] = math.min(childrenH-self:getInnerHeight(), self.scroll[2])
-    self.scroll[2] = math.max(0, self.scroll[2])
-
-    -- if self.title == "tiles" then
-    --     print_r(self.mouse)
-    --     print(self.mouse[1] > 0 and self.mouse[1] <= self.w and self.mouse[2] > 0 and self.mouse[2] <= self.h)
-    -- end
+        self.scroll[2] = math.min(childrenH-self:getInnerHeight(), self.scroll[2])
+        self.scroll[2] = math.max(0, self.scroll[2])
+    end
 
     return (self.noClip and siblingsBlocked) or (self.mouse[1] > 0 and self.mouse[1] <= self.w and self.mouse[2] > 0 and self.mouse[2] <= self.h)
 end
@@ -368,7 +370,8 @@ function Element:mousepressed(x, y, button)
 end
 
 function Element:mousereleased(x, y, button)
-    self.scrolling = {false, false}
+    self.scrolling[1] = false
+    self.scrolling[2] = false
 
     for _, v in ipairs(self.children) do
         if v.mousereleased then

@@ -25,11 +25,19 @@ function Box:update(dt, x, y, mouseBlocked)
     if self.draggable then
         self.sizeMin[1] = 19
         self.sizeMin[2] = 29
-        self.childBox = {3, 12, self.w-6, self.h-16}
+
+        self.childBox[1] = 3
+        self.childBox[2] = 12
+        self.childBox[3] = self.w-6
+        self.childBox[4] = self.h-16
     else
         self.sizeMin[1] = 17
         self.sizeMin[2] = 19
-        self.childBox = {2, 3, self.w-4, self.h-6}
+
+        self.childBox[1] = 2
+        self.childBox[2] = 3
+        self.childBox[3] = self.w-4
+        self.childBox[4] = self.h-6
     end
 
     return ret

@@ -17,7 +17,9 @@ function World:update(dt)
     end
     prof.pop()
 
+    prof.push("Portals")
     updateGroup(self.portals, dt)
+    prof.pop()
     
     prof.push("Objects")
     for i, obj in ipairs(self.objects) do
@@ -77,24 +79,26 @@ function World:checkPortaling(obj, oldX, oldY)
                     obj.animationDirection = -obj.animationDirection
                 end
                 
-                self.portalVectorDebugs = {}
-                table.insert(self.portalVectorDebugs, {
-                    inX = x,
-                    inY = y,
-                    inVX = velocityX,
-                    inVY = velocityY,
-                    
-                    outX = obj.x,
-                    outY = obj.y,
-                    outVX = obj.groundSpeedX,
-                    outVY = obj.speed[2],
-                    
-                    reversed = reversed
-                })
-                
+                if VAR("portalVectorDebug") then
+                    self.portalVectorDebugs = {}
+                    table.insert(self.portalVectorDebugs, {
+                        inX = x,
+                        inY = y,
+                        inVX = velocityX,
+                        inVY = velocityY,
+                        
+                        outX = obj.x,
+                        outY = obj.y,
+                        outVX = obj.groundSpeedX,
+                        outVY = obj.speed[2],
+                        
+                        reversed = reversed
+                    })
+                end
+
                 obj.x = obj.x-obj.width/2
                 obj.y = obj.y-obj.height/2
-                
+                    
                 return true
             end
         end
@@ -104,6 +108,7 @@ function World:checkPortaling(obj, oldX, oldY)
 end
 
 function World:draw()
+    prof.push("Map")
     -- Map
     local lx, ty = self:cameraToMap(0, 0)
     local rx, by = self:cameraToMap(CAMERAWIDTH, CAMERAHEIGHT)
@@ -121,20 +126,22 @@ function World:draw()
     for x = xStart, xEnd do
         for y = yStart, yEnd do
             if self:inMap(x, y) then
-                local tile = self:getTile(x, y)
-                
-                if tile then
-                    tile:draw((x-1)*self.tileSize, (y-1)*self.tileSize)
+                if self:getTile(x, y) then
+                    self:getTile(x, y):draw((x-1)*self.tileSize, (y-1)*self.tileSize)
                 end
             end
         end
     end
+    prof.pop()
 
+    prof.push("Portals Back")
     -- Portals (background)
     for _, v in ipairs(self.portals) do
         v:draw("background")
     end
+    prof.pop()
     
+    prof.push("Objects")
     -- Objects
     love.graphics.setColor(1, 1, 1)
     
@@ -216,13 +223,17 @@ function World:draw()
             love.graphics.rectangle("line", quadX, quadY, quadWidth, quadHeight)
         end
 	end
+    prof.pop()
     
+    prof.push("Portals Front")
     -- Portals (Foreground)
     for _, v in ipairs(self.portals) do
         v:draw("foreground")
     end
+    prof.pop()
     
     -- Debug
+    prof.push("Debug")
 	if VAR("physicsDebug") then
 		self:physicsDebug()
     end
@@ -234,6 +245,7 @@ function World:draw()
     if VAR("portalVectorDebug") then
         self:portalVectorDebug()
     end
+    prof.pop()
 end
 
 function drawObject(obj, x, y, r, sx, sy, cx, cy)
@@ -242,15 +254,15 @@ function drawObject(obj, x, y, r, sx, sy, cx, cy)
             if obj.palette[i] then
                 love.graphics.setColor(obj.palette[i])
             end
-            worldDraw(v, obj.quad, x, y, r, sx, sy, cx, cy)
+            love.graphics.draw(v, obj.quad, x, y, r, sx, sy, cx, cy)
             love.graphics.setColor(1, 1, 1)
         end
         
         if obj.img["static"] then
-            worldDraw(obj.img["static"], obj.quad, x, y, r, sx, sy, cx, cy)
+            love.graphics.draw(obj.img["static"], obj.quad, x, y, r, sx, sy, cx, cy)
         end
     else
-        worldDraw(obj.img, obj.quad, x, y, r, sx, sy, cx, cy)
+        love.graphics.draw(obj.img, obj.quad, x, y, r, sx, sy, cx, cy)
     end
 end
 
@@ -392,7 +404,7 @@ function World:physicsDebug()
                         
     --                     worldPolygon("line", unpack(points))
     --                 else
-    --                     worldRectangle("line", (x-1)*self.tileSize, (y-1)*self.tileSize, 1*self.tileSize, 1*self.tileSize)
+    --                     love.graphics.rectangle("line", (x-1)*self.tileSize, (y-1)*self.tileSize, 1*self.tileSize, 1*self.tileSize)
     --                 end
     --             end
     --         end
@@ -793,6 +805,17 @@ function World:doPortal(portal, x, y, angle)
     return newX, newY, r, rDiff, reversed
 end
 
+local windMill = {
+    -1, -1,
+    0, -1,
+    1, -1,
+    1,  0,
+    1,  1,
+    0,  1,
+    -1,  1,
+    -1, 0
+}
+
 local function walkSide(self, tile, tileX, tileY, side, dir)
     local nextX, nextY, angle, nextAngle, nextTileX, nextTileY, nextSide, x, y
     local first = true
@@ -904,17 +927,6 @@ local function walkSide(self, tile, tileX, tileY, side, dir)
                 
                 -- Dirty check, maybe change
                 -- Find where on the "windmill" we are
-                local windMill = {
-                    -1, -1,
-                    0, -1,
-                    1, -1,
-                    1,  0,
-                    1,  1,
-                    0,  1,
-                    -1,  1,
-                    -1, 0
-                }
-
                 local pos
                 for i = 1, #windMill, 2 do
                     if windMill[i] == moveX and windMill[i+1] == moveY then

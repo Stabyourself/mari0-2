@@ -1,8 +1,10 @@
+PROF_CAPTURE = false
+
 return {
     physicsDebug = false,
     quadDebug = false,
     stencilDebug = false,
-    inputDebug = true,
+    inputDebug = false,
     portalVectorDebug = false,
     memoryDebug = false,
 

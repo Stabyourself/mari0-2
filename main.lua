@@ -26,7 +26,7 @@ function love.load()
     Font3 = require "lib.Font3"
     require "lib.Physics3"
     require "lib.Gui3"
-    prof = require "lib.jprof"
+    prof = require "lib.jprof.jprof"
 
     require "class.CharacterState"
     require "class.Character"
@@ -38,6 +38,7 @@ function love.load()
     require "class.Enemy"
     require "class.Portal"
     require "class.PortalParticle"
+    require "class.PortalThing"
     require "class.Smb3Ui"
     require "class.Crosshair"
     require "class.EditorState"
@@ -109,6 +110,7 @@ end
 function love.update(dt)
     prof.enabled(true)
     prof.push("frame")
+    prof.push("update")
     dt = math.min(1/30, dt)
 
 	if VAR("ffKeys") then
@@ -120,8 +122,7 @@ function love.update(dt)
     end
 
     gameStateManager:event("update", dt)
-    prof.pop("frame")
-    prof.enabled(false)
+    prof.pop()
 end
 
 local function setColorBasedOn(key)
@@ -133,6 +134,7 @@ local function setColorBasedOn(key)
 end
 
 function love.draw()
+    prof.push("draw")
     if VAR("scale") ~= 1 then
         love.graphics.scale(VAR("scale"), VAR("scale"))
     end
@@ -174,6 +176,9 @@ function love.draw()
     if funkyImg then
         love.graphics.draw(funkyImg, love.graphics.getWidth(), 0, 0, 1, 1, 340)
     end
+    prof.pop()
+    prof.pop()
+    prof.enabled(false)
 end
 
 function appendCmds(cmds, t)
@@ -340,40 +345,6 @@ function love.graphics.print(s, x, y, align)
 			love.graphics.draw(fontImg, quad, (x+(i-1)*8), y, 0, 1, 1)
 		end
 	end
-end
-
-function worldDraw(...)
-    local arg = {...}
-
-    if type(arg[2]) == "number" then
-        -- arg[2] = math.round(arg[2]*VAR("scale"))/VAR("scale")
-        -- arg[3] = math.round(arg[3]*VAR("scale"))/VAR("scale")
-        
-        love.graphics.draw(arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8])
-    else
-        -- arg[3] = math.round(arg[3]*VAR("scale"))/VAR("scale")
-        -- arg[4] = math.round(arg[4]*VAR("scale"))/VAR("scale")
-        
-        love.graphics.draw(arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8], arg[9])
-    end
-end
-
-function worldLine(x1, y1, x2, y2)
-    love.graphics.line(x1, y1, x2, y2)
-end
-
-function worldRectangle(style, x, y, w, h)
-    love.graphics.rectangle(style, x, y, w, h)
-end
-
-function worldPolygon(style, ...)
-    local points = {}
-    
-    for i, v in ipairs({...}) do
-       table.insert(points, v)
-    end
-    
-    love.graphics.polygon(style, unpack(points))
 end
 
 function worldArrow(x, y, xDir, yDir)

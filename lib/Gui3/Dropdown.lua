@@ -1,7 +1,5 @@
 local Dropdown = class("Gui3.Dropdown", Gui3.Element)
 
-Dropdown.noClip = true
-
 function Dropdown:initialize(x, y, s)
     self.button = Gui3.Button:new(0, 0, s, false, 3, function() self:toggle() end)
     self.button.color.normal = {1, 1, 1, 0}

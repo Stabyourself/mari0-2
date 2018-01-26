@@ -87,7 +87,7 @@ function Element:update(dt, x, y, mouseBlocked, absX, absY)
 
     local childMouseBlocked = self.mouseBlocked
 
-    if not self.noClip then
+    if self.clip then
         if  self.mouse[1] < self.childBox[1] or self.mouse[1] >= self.childBox[1]+self:getInnerWidth() or
             self.mouse[2] < self.childBox[2] or self.mouse[2] >= self.childBox[2]+self:getInnerHeight() then
             childMouseBlocked = true
@@ -209,7 +209,7 @@ function Element:update(dt, x, y, mouseBlocked, absX, absY)
         self.scroll[2] = math.max(0, self.scroll[2])
     end
 
-    return (self.noClip and siblingsBlocked) or (self.mouse[1] > 0 and self.mouse[1] <= self.w and self.mouse[2] > 0 and self.mouse[2] <= self.h)
+    return (not self.clip and siblingsBlocked) or (self.mouse[1] > 0 and self.mouse[1] <= self.w and self.mouse[2] > 0 and self.mouse[2] <= self.h)
 end
 
 function Element:translate()
@@ -222,8 +222,10 @@ function Element:unTranslate()
 end
 
 function Element:draw()
-    local scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
-    if not self.noClip then
+    local scissorX, scissorY, scissorW, scissorH
+
+    if self.clip then
+        scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
         love.graphics.intersectScissor((self.absPos[1]+self.childBox[1])*VAR("scale"), (self.absPos[2]+self.childBox[2])*VAR("scale"), math.round(self.childBox[3]*VAR("scale")), math.round(self.childBox[4]*VAR("scale")))
     end
 
@@ -237,8 +239,10 @@ function Element:draw()
     
     love.graphics.translate(self.scroll[1]-self.childBox[1], self.scroll[2]-self.childBox[2])
 
-    love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
-    
+    if self.clip then
+        love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
+    end
+
     for i = 1, 2 do
         if self.scrollable[i] and self.hasScrollbar[i] then
             local pos = self:getScrollbarPos(i)

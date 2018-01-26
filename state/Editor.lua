@@ -59,7 +59,6 @@ function Editor:load()
     -- MENU BAR
     self.menuBar = Gui3.Canvas:new(0, 0, SCREENWIDTH, 14)
     self.menuBar.background = {1, 1, 1}
-    self.menuBar.noClip = true
     
     self.canvas:addChild(self.menuBar)
 
@@ -354,6 +353,7 @@ function Editor:newWindow(type, button)
         testWindow.scrollable = {true, true}
         testWindow.title = "Why did you press"
         testWindow.background = self.level.backgroundColor
+        testWindow.clip = true
         
         self.canvas:addChild(testWindow)
         
@@ -375,6 +375,7 @@ function Editor:newWindow(type, button)
         testWindow2.scrollable = {true, true}
         testWindow2.title = ":<"
         testWindow2.background = self.level.backgroundColor
+        testWindow2.clip = true
         
         testWindow:addChild(testWindow2)
         
@@ -388,6 +389,7 @@ function Editor:newWindow(type, button)
         tileListWindow.scrollable = {true, true}
         tileListWindow.title = "tiles"
         tileListWindow.background = checkerboardImg
+        tileListWindow.clip = true
         
         self.canvas:addChild(tileListWindow)
         

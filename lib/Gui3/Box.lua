@@ -19,8 +19,8 @@ function Box:initialize(x, y, w, h)
     self.childBox = {2, 3, self.w-4, self.h-6}
 end
 
-function Box:update(dt, x, y, mouseBlocked)
-    local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked)
+function Box:update(dt, x, y, mouseBlocked, absX, absY)
+    local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
     
     if self.draggable then
         self.sizeMin[1] = 19
@@ -71,7 +71,12 @@ function Box:draw(level)
     Gui3.drawBox(img, quad, 0, 0, self.w, self.h)
     
     if self.title then
+        local scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
+        love.graphics.intersectScissor((self.absPos[1]+3)*VAR("scale"), (self.absPos[2]+2)*VAR("scale"), (self.w-16)*VAR("scale"), 8*VAR("scale"))
+
         love.graphics.print(self.title, 3, 2)
+        
+        love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
     end
     
     if self.closeable then

@@ -13,6 +13,8 @@ function Element:initialize(x, y, w, h)
     self.y = y
     self.w = w
     self.h = h
+
+    self.absPos = {0, 0}
     
     self.scrollable = {false, false}
     self.hasScrollbar = {false, false}
@@ -65,11 +67,18 @@ function Element:removeChild(element)
     end
 end
 
-function Element:update(dt, x, y, mouseBlocked)
-    if not x then -- root element
+function Element:update(dt, x, y, mouseBlocked, absX, absY)
+    if x then -- child element
+        self.absPos[1] = absX
+        self.absPos[2] = absY
+    else -- root
         x, y = love.mouse.getPosition()
         x, y = x/VAR("scale"), y/VAR("scale")
+
         mouseBlocked = false
+
+        self.absPos[1] = self.x
+        self.absPos[2] = self.y
     end
     
     self.mouse[1] = x
@@ -94,7 +103,10 @@ function Element:update(dt, x, y, mouseBlocked)
             local childX = self.mouse[1]-self.childBox[1]-v.x+self.scroll[1]
             local childY = self.mouse[2]-self.childBox[2]-v.y+self.scroll[2]
 
-            local b = v:update(dt, childX, childY, childMouseBlocked)
+            local childAbsX = self.absPos[1]+v.x-self.scroll[1]+self.childBox[1]
+            local childAbsY = self.absPos[2]+v.y-self.scroll[2]+self.childBox[2]
+            
+            local b = v:update(dt, childX, childY, childMouseBlocked, childAbsX, childAbsY)
 
             if v.visible and b then
                 siblingsBlocked = true
@@ -210,6 +222,11 @@ function Element:unTranslate()
 end
 
 function Element:draw()
+    local scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
+    if not self.noClip then
+        love.graphics.intersectScissor((self.absPos[1]+self.childBox[1])*VAR("scale"), (self.absPos[2]+self.childBox[2])*VAR("scale"), math.round(self.childBox[3]*VAR("scale")), math.round(self.childBox[4]*VAR("scale")))
+    end
+
     love.graphics.translate(-self.scroll[1]+self.childBox[1], -self.scroll[2]+self.childBox[2])
 
     for _, v in ipairs(self.children) do
@@ -219,6 +236,8 @@ function Element:draw()
     end
     
     love.graphics.translate(self.scroll[1]-self.childBox[1], self.scroll[2]-self.childBox[2])
+
+    love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
     
     for i = 1, 2 do
         if self.scrollable[i] and self.hasScrollbar[i] then

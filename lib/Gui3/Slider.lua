@@ -36,8 +36,8 @@ function Slider:initialize(min, max, x, y, w, showValue, func)
     }
 end
 
-function Slider:update(dt, x, y, mouseBlocked)
-    local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked)
+function Slider:update(dt, x, y, mouseBlocked, absX, absY)
+    local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
     
     if self.dragging then
         local pos = (self.mouse[1]-self.dragX-self.barOffset)/(self.barWidth)

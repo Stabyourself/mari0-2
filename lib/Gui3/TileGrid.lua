@@ -16,8 +16,8 @@ function TileGrid:initialize(x, y, tileMap, func)
     self.selected = nil
 end
 
-function TileGrid:update(dt, x, y, mouseBlocked)
-    Gui3.Element.update(self, dt, x, y, mouseBlocked)
+function TileGrid:update(dt, x, y, mouseBlocked, absX, absY)
+    Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
     
     local maxWidth = self.parent:getInnerWidth()
     

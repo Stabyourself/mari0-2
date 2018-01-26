@@ -197,17 +197,20 @@ function World:draw()
         end
 
         -- Actual position
-        love.graphics.stencil(function()
-            for _, p in ipairs(self.portals) do
-                if p.open then
-                    if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
-                        objectWithinPortalRange(p, x, y) then
-                        
+        local firstStencil = true
+        for _, p in ipairs(self.portals) do
+            if p.open then
+                if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
+                    objectWithinPortalRange(p, x, y) then
+        
+                    love.graphics.stencil(function()
                         p:stencilRectangle("in")
-                    end
+                    end, "replace", 1, not firstStencil)
+
+                    firstStencil = false
                 end
             end
-        end)
+        end
 
         if VAR("stencilDebug") then
             love.graphics.setStencilTest("greater", 0)

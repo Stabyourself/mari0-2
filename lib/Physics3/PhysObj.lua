@@ -108,7 +108,7 @@ function PhysObj:leftColCheck()
 		if not self:leftCollision() then
 			self.x = colX+1
 			self.groundSpeedX = math.max(self.groundSpeedX, 0)
-			return {colX, colY}
+			return colX, colY
 		end
 	end
 	
@@ -130,7 +130,7 @@ function PhysObj:rightColCheck()
 		if not self:rightCollision() then
 			self.x = colX-self.width
 			self.groundSpeedX = math.min(self.groundSpeedX, 0)
-			return {colX, colY}
+			return colX, colY
 		end
 	end
 	
@@ -153,7 +153,7 @@ function PhysObj:topColCheck()
 			self.y = colY+1
 			self.speed[2] = math.max(self.speed[2], 0)
 			
-			return {colX, colY}
+			return colX, colY
 		end
 	end
 	
@@ -181,7 +181,7 @@ function PhysObj:bottomColCheck()
 				self.y = colY-self.height
 				self.speed[2] = math.min(self.speed[2], 0)
 				
-				return {colX, colY}
+				return colX, colY
 			end
 		end
 	end
@@ -189,31 +189,36 @@ function PhysObj:bottomColCheck()
 	return false
 end
 
+local col = {
+	left = {},
+	right = {},
+	top = {},
+	bottom = {}
+}
+
 function PhysObj:checkCollisions()
-	local collisions = {}
-	
-	collisions.left = self:leftColCheck()
-	if not collisions.left then
-		collisions.right = self:rightColCheck()
+	col.left[1], col.left[2] = self:leftColCheck()
+	if not col.left[2] then
+		col.right[1], col.right[2] = self:rightColCheck()
 	end
 	
 	if self.speed[2] > 0 then
-		collisions.bottom = self:bottomColCheck()
+		col.bottom[1], col.bottom[2] = self:bottomColCheck()
 	end
 	
-	if not collisions.bottom then
-		collisions.top = self:topColCheck()
+	if not col.bottom[1] then
+		col.top[1], col.top[2] = self:topColCheck()
 	end
 	
-	if not collisions.bottom then
+	if not col.bottom[1] then
 		if self.onGround then
 			self:startFall()
 			self.onGround = false
 		end
 	end
 	
-	if collisions.bottom then
-		local x, y = self.world:worldToMap(collisions.bottom[1], collisions.bottom[2])
+	if col.bottom[1] then
+		local x, y = self.world:worldToMap(col.bottom[1], col.bottom[2])
 		
 		local tile = self.world:getTile(x, y)
 		

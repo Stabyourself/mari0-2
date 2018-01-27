@@ -43,9 +43,7 @@ function Box:update(dt, x, y, mouseBlocked, absX, absY)
     return ret
 end
 
-function Box:draw(level)
-    Gui3.Element.translate(self)
-    
+function Box:render(level)
     if type(self.background) == "table" then
         love.graphics.setColor(self.background)
         love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
@@ -90,7 +88,7 @@ function Box:draw(level)
         love.graphics.draw(img, self.w-12, 2)
     end
     
-    Gui3.Element.draw(self, level)
+    Gui3.Element.render(self, level)
     
     if self.resizeable then
         local img = self.gui.img.boxResize
@@ -108,8 +106,6 @@ function Box:draw(level)
         
         love.graphics.draw(img, x, y)
     end
-    
-    Gui3.Element.unTranslate(self)
 end
 
 function Box:titleBarCollision(x, y)

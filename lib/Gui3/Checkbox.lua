@@ -28,9 +28,7 @@ function Checkbox:getCollision(x, y)
     return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < self.h
 end 
 
-function Checkbox:draw(level)
-    Gui3.Element.translate(self)
-    
+function Checkbox:render(level)
     love.graphics.setColor(1, 1, 1)
     
     local img = self.gui.img.checkbox
@@ -49,9 +47,7 @@ function Checkbox:draw(level)
     
     love.graphics.draw(img, self.padding, self.padding)
     
-    Gui3.Element.draw(self, level)
-    
-    Gui3.Element.unTranslate(self)
+    Gui3.Element.render(self, level)
 end
 
 function Checkbox:mousepressed(x, y, Checkbox)

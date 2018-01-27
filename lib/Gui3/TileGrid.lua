@@ -9,7 +9,7 @@ function TileGrid:initialize(x, y, tileMap, func)
     self.tiles = tileMap.tiles
     self.func = func
     
-    Gui3.Element.initialize(self, x, y, 0, 0)
+    Gui3.Element.initialize(self, x, y, 18, 18)
     
     self:updateSize()
     
@@ -28,7 +28,7 @@ end
 
 function TileGrid:updateSize()
     self.w = self.perRow*(self.size[1]+self.gutter[1])-self.gutter[1]
-    self.h = math.ceil(#self.tiles/self.perRow)*(self.size[2]+self.gutter[2])
+    self.h = math.ceil(#self.tiles/self.perRow)*(self.size[2]+self.gutter[2])-self.gutter[2]
 end
 
 function TileGrid:getCollision(x, y)
@@ -44,15 +44,17 @@ function TileGrid:getCollision(x, y)
         return false
     end
     
-    return (tileY-1)*self.perRow+tileX
+    local tile = (tileY-1)*self.perRow+tileX
+
+    if tile <= #self.tiles then
+        return tile
+    end
 end 
 
-function TileGrid:draw(level)
-    Gui3.Element.translate(self)
-    
+function TileGrid:render(level)
     local mouseTile = self:getCollision(self.mouse[1], self.mouse[2])
     
-    local topY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]))
+    local topY = math.ceil((self.parent.scroll[2]-self.y+1)/(self.size[2]+self.gutter[2]))
     local bottomY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]) + (self.parent:getInnerHeight())/(self.size[2]+self.gutter[2]))
     
     for tileY = topY, bottomY do
@@ -84,9 +86,7 @@ function TileGrid:draw(level)
         Gui3.drawBox(self.gui.img.box, Gui3.boxQuad, x-2, y-3, 20, 22)
     end
     
-    Gui3.Element.draw(self, level)
-    
-    Gui3.Element.unTranslate(self)
+    Gui3.Element.render(self, level)
 end
 
 function TileGrid:mousepressed(x, y, button)

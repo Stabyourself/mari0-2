@@ -15,7 +15,7 @@ function Element:initialize(x, y, w, h)
     self.h = h
 
     self.absPos = {0, 0}
-    
+
     self.scrollable = {false, false}
     self.hasScrollbar = {false, false}
     self.scrolling = {false, false}
@@ -26,24 +26,27 @@ function Element:initialize(x, y, w, h)
     self.posMin = {0, 0}
     self.posMax = {0, 0}
     self.sizeMin = {0, 0}
-    
+
     self.dragPos = {0, 0}
     self.resizePos = {0, 0}
-    
+
     self.mouse = {0, 0}
-    
+
     self.childBox = {0, 0, self.w, self.h}
-    
+
     self.visible = true
     self.mouseBlocked = true
-    
+
     self.children = {}
+    
+    self.canvas = love.graphics.newCanvas(self.w, self.h)
+    self.repaint = true
 end
 
 function Element:resize(w, h)
     self.w = w
     self.h = h
-    
+
     self.childBox[1] = 0
     self.childBox[2] = 0
     self.childBox[3] = self.w
@@ -55,7 +58,7 @@ function Element:addChild(element)
     element.gui = self.gui
     element.parent = self
     table.insert(self.children, element)
-    
+
     element:onAssign()
 end
 
@@ -80,7 +83,7 @@ function Element:update(dt, x, y, mouseBlocked, absX, absY)
         self.absPos[1] = self.x
         self.absPos[2] = self.y
     end
-    
+
     self.mouse[1] = x
     self.mouse[2] = y
     self.mouseBlocked = mouseBlocked or not self.visible
@@ -98,14 +101,14 @@ function Element:update(dt, x, y, mouseBlocked, absX, absY)
 
     for i = #self.children, 1, -1 do
         local v = self.children[i]
-        
+
         if v.update then
             local childX = self.mouse[1]-self.childBox[1]-v.x+self.scroll[1]
             local childY = self.mouse[2]-self.childBox[2]-v.y+self.scroll[2]
 
             local childAbsX = self.absPos[1]+v.x-self.scroll[1]+self.childBox[1]
             local childAbsY = self.absPos[2]+v.y-self.scroll[2]+self.childBox[2]
-            
+
             local b = v:update(dt, childX, childY, childMouseBlocked, childAbsX, childAbsY)
 
             if v.visible and b then
@@ -123,23 +126,23 @@ function Element:update(dt, x, y, mouseBlocked, absX, absY)
 
     if self.scrollable[1] or self.scrollable[2] then
         childrenW, childrenH = self:getChildrenSize()
-        
+
         if self.scrollable[1] and childrenW > self:getInnerWidth() then
             self.hasScrollbar[1] = true
         end
 
         if self.scrollable[2] and childrenH > self:getInnerHeight() then
             self.hasScrollbar[2] = true
-            
+
             if self.scrollable[1] and childrenW > self:getInnerWidth() then
                 self.hasScrollbar[1] = true
             end
         end
-        
+
         self.scrollbarSize[1] = math.max(4, (self:getInnerWidth()/childrenW)*(self.childBox[3]-self.scrollbarSpace))
         self.scrollbarSize[2] = math.max(4, (self:getInnerHeight()/childrenH)*(self.childBox[4]-self.scrollbarSpace))
     end
-    
+
     if self.draggable then
         if self.dragging then
             self.x = self.parent.mouse[1]-self.parent.childBox[1]-self.dragPos[1]+self.parent.scroll[1]
@@ -164,13 +167,13 @@ function Element:update(dt, x, y, mouseBlocked, absX, absY)
 
     --limit x, y, w and h
     --lower
-    
+
     self.w = math.max(self.sizeMin[1], self.w)
     self.h = math.max(self.sizeMin[2], self.h)
 
     self.x = math.max(self.posMin[1], self.x)
     self.y = math.max(self.posMin[2], self.y)
-    
+
     if self.resizeable and self.parent then
         --upper
         if not self.parent.scrollable[1] then
@@ -190,65 +193,79 @@ function Element:update(dt, x, y, mouseBlocked, absX, absY)
 
     if self.scrolling[1] then
         local factor = ((self.mouse[1]-self.scrollingDragOffset[1]-self.childBox[1])/(self.childBox[3]-self.scrollbarSize[1]-self.scrollbarSpace))
-        
+
         factor = math.clamp(factor, 0, 1)
         self.scroll[1] = factor*(childrenW-self:getInnerWidth())
 
         self.scroll[1] = math.min(childrenW-self:getInnerWidth(), self.scroll[1])
         self.scroll[1] = math.max(0, self.scroll[1])
     end
-    
-    
+
+
     if self.scrolling[2] then
         local factor = ((self.mouse[2]-self.scrollingDragOffset[2]-self.childBox[2])/(self.childBox[4]-self.scrollbarSize[2]-self.scrollbarSpace))
-        
+
         factor = math.clamp(factor, 0, 1)
         self.scroll[2] = factor*(childrenH-self:getInnerHeight())
-    
+
         self.scroll[2] = math.min(childrenH-self:getInnerHeight(), self.scroll[2])
         self.scroll[2] = math.max(0, self.scroll[2])
+    end
+
+    if self.repaint then
+        love.graphics.push()
+        love.graphics.origin()
+
+        if self.w ~= self.canvas:getWidth() or self.h ~= self.canvas:getHeight() then
+            self.canvas = love.graphics.newCanvas(self.w, self.h)
+        end
+
+        self.canvas:renderTo(function()
+            love.graphics.clear()
+            self:render()
+        end)
+        love.graphics.pop()
+
+        self.repaint = false
     end
 
     return (not self.clip and siblingsBlocked) or (self.mouse[1] > 0 and self.mouse[1] <= self.w and self.mouse[2] > 0 and self.mouse[2] <= self.h)
 end
 
-function Element:translate()
-    love.graphics.push()
-    love.graphics.translate(self.x, self.y)
-end
-
-function Element:unTranslate()
-    love.graphics.pop()
-end
-
 function Element:draw()
+
+    love.graphics.push()
+    love.graphics.translate(self.x-self.scroll[1], self.y-self.scroll[2])
+
+    love.graphics.setColor(1, 1, 1)
+    -- love.graphics.draw(self.canvas)
+
+    love.graphics.translate(self.childBox[1], self.childBox[2])
     local scissorX, scissorY, scissorW, scissorH
-
-    if self.clip then
-        scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
-        love.graphics.intersectScissor((self.absPos[1]+self.childBox[1])*VAR("scale"), (self.absPos[2]+self.childBox[2])*VAR("scale"), math.round(self.childBox[3]*VAR("scale")), math.round(self.childBox[4]*VAR("scale")))
-    end
-
-    love.graphics.translate(-self.scroll[1]+self.childBox[1], -self.scroll[2]+self.childBox[2])
-
+    -- if self.clip then
+    --     scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
+    --     love.graphics.intersectScissor((self.absPos[1]+self.childBox[1])*VAR("scale"), (self.absPos[2]+self.childBox[2])*VAR("scale"), math.round(self.childBox[3]*VAR("scale")), math.round(self.childBox[4]*VAR("scale")))
+    -- end
     for _, v in ipairs(self.children) do
         if v.visible then
             v:draw()
         end
-    end
-    
-    love.graphics.translate(self.scroll[1]-self.childBox[1], self.scroll[2]-self.childBox[2])
+    end 
 
-    if self.clip then
-        love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
-    end
+    -- if self.clip then
+    --     love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
+    -- end
 
+    love.graphics.pop()
+end
+
+function Element:render()
     for i = 1, 2 do
         if self.scrollable[i] and self.hasScrollbar[i] then
             local pos = self:getScrollbarPos(i)
-            
+
             local img = self.gui.img.scrollbar
-            
+
             if self.scrolling[i] then
                 img = self.gui.img.scrollbarActive
             elseif self:scrollCollision(i, self.mouse[1], self.mouse[2]) then
@@ -257,24 +274,25 @@ function Element:draw()
 
             if i == 1 then
                 love.graphics.draw(self.gui.img.scrollbarBack, self.childBox[1], self.childBox[2]+self.childBox[4]-4, 0, self.childBox[3], 1, 0, 4)
-                
+
                 love.graphics.draw(img, scrollbarQuad[1], pos, self.childBox[2]+self.childBox[4]-4, 0, 1, 1, 0, 4)
                 love.graphics.draw(img, scrollbarQuad[2], pos+1, self.childBox[2]+self.childBox[4]-4, 0, self.scrollbarSize[i]-2, 1, 0, 4)
                 love.graphics.draw(img, scrollbarQuad[3], pos-1+self.scrollbarSize[i], self.childBox[2]+self.childBox[4]-4, 0, 1, 1, 0, 4)
             else
                 love.graphics.draw(self.gui.img.scrollbarBack, self.childBox[1]+self.childBox[3]-4, self.childBox[2], math.pi/2, self.childBox[4], 1, 0, 4)
-        
+
                 love.graphics.draw(img, scrollbarQuad[1], self.childBox[1]+self.childBox[3]-4, pos, math.pi/2, 1, 1, 0, 4)
                 love.graphics.draw(img, scrollbarQuad[2], self.childBox[1]+self.childBox[3]-4, pos + 1, math.pi/2, self.scrollbarSize[i]-2, 1, 0, 4)
                 love.graphics.draw(img, scrollbarQuad[3], self.childBox[1]+self.childBox[3]-4, pos - 1 + self.scrollbarSize[i], math.pi/2, 1, 1, 0, 4)
             end
         end
     end
+    love.graphics.setColor(1, 1, 1)
 end
 
 function Element:scrollCollision(i, x, y)
     local pos = self:getScrollbarPos(i)
-    
+
     if i == 1 then
         return x >= pos and x < pos + self.scrollbarSize[1] and y >= self.childBox[2]+self.childBox[4]-8 and y < self.childBox[2]+self.childBox[4]
     else
@@ -284,7 +302,7 @@ end
 
 function Element:getScrollbarPos(i)
     local childrenW, childrenH = self:getChildrenSize()
-    
+
     if i == 1 then
         return (self.scroll[1]/(childrenW-self:getInnerWidth()))*(self.childBox[3]-self.scrollbarSize[1]-self.scrollbarSpace)+self.childBox[1]
     else
@@ -314,7 +332,7 @@ end
 
 function Element:mousepressed(x, y, button)
     local toReturn = false
-    
+
     if self.scrollable[1] and self.hasScrollbar[1] and self:scrollCollision(1, x, y) then
         self.scrolling[1] = true
         self.scrollingDragOffset[1] = x-self:getScrollbarPos(1)
@@ -328,10 +346,10 @@ function Element:mousepressed(x, y, button)
 
         toReturn = true
     end
-    
+
     for i = #self.children, 1, -1 do
         local v = self.children[i]
-        
+
         if v.mousepressed then
             local lx = x-self.childBox[1]-v.x+self.scroll[1]
             local ly = y-self.childBox[2]-v.y+self.scroll[2]
@@ -341,7 +359,7 @@ function Element:mousepressed(x, y, button)
             if b then
                 toReturn = true
             end
-            
+
             if lx >= 0 and lx < v.w and ly >= 0 and ly < v.h and not v.mouseBlocked then
                 -- push that element to the end
                 if v.movesToTheFront then
@@ -352,7 +370,7 @@ function Element:mousepressed(x, y, button)
             end
         end
     end
-    
+
     return toReturn
 end
 
@@ -371,28 +389,28 @@ function Element:wheelmoved(x, y)
     if not self.mouseBlocked then
         if self.hasScrollbar[2] and y ~= 0 then
             self.scroll[2] = self.scroll[2] - y*17
-            
+
             return true
         end
-        
+
         -- scroll horizontally if there's no y scrolling
         if not self.hasScrollbar[2] and self.hasScrollbar[1] and y ~= 0 then
             self.scroll[1] = self.scroll[1] - y*17
-            
+
             return true
         end
-        
+
         if self.hasScrollbar[1] and x ~= 0 then
             self.scroll[1] = self.scroll[1] - x*17
-            
+
             return true
         end
     end
-    
+
     for _, v in ipairs(self.children) do
         if v.wheelmoved then
             if  v.mouse[1] > 0 and v.mouse[1] < v.w and
-                v.mouse[2] > 0 and v.mouse[2] < v.h then 
+                v.mouse[2] > 0 and v.mouse[2] < v.h then
                 if v:wheelmoved(x, y, button) then
                     return true
                 end
@@ -404,30 +422,30 @@ end
 function Element:getChildrenSize()
     local w = 0
     local h = 0
-    
+
     for _, v in ipairs(self.children) do
         if v.x+v.w+v.posMax[1] > w then
             w = v.x+v.w+v.posMax[1]
         end
-        
+
         if v.y+v.h+v.posMax[2] > h then
             h = v.y+v.h+v.posMax[2]
         end
     end
-    
+
     return w, h
 end
 
 function Element:autoSize()
     local w, h = self:getChildrenSize()
-    
+
     self.w = self.childBox[1]*2+w
     self.h = self.childBox[2]*2+h
-    
+
     self.childBox[3] = w
     self.childBox[4] = h
 end
 
 function Element:onAssign() end
-    
+
 return Element

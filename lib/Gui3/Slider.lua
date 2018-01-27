@@ -76,10 +76,8 @@ function Slider:getPosX()
     return self.val*(self.barWidth)+self.barOffset
 end
 
-function Slider:draw(level)
-    Gui3.Element.translate(self)
-    
-    Gui3.Element.draw(self, level)
+function Slider:render(level)
+    Gui3.Element.render(self, level)
     
     love.graphics.setColor(self.color.bar)
     
@@ -100,8 +98,6 @@ function Slider:draw(level)
     love.graphics.draw(img, self:getPosX(), 0, 0, 1, 1, 4)
     
     love.graphics.setColor(1, 1, 1)
-
-    Gui3.Element.unTranslate(self)
 end
 
 function Slider:mousepressed(x, y, button)

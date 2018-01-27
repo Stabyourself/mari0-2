@@ -74,7 +74,6 @@ function Editor:load()
     self.fileDropdown:autoSize()
     
     
-    
     -- WINDOW
     
     self.newWindowDropdown = Gui3.Dropdown:new(38, 0, "window")
@@ -105,6 +104,7 @@ function Editor:load()
     
     
     
+    
     -- SCALE BAR
     local w = 50
     local fullw = w+52
@@ -123,7 +123,6 @@ function Editor:load()
     self.scaleBar:addChild(Gui3.Button:new(w+10, 2, "+", false, 1, function() self:zoom(1) end))
     
     self.scaleBar:addChild(Gui3.Button:new(w+24, 2, "1:1", false, 1, function() self:resetZoom() end))
-    
     
     
     
@@ -347,7 +346,7 @@ function Editor:newWindow(type, button)
 
     if type == "test" then
         local testWindow = Gui3.Box:new(x, y, 100, 100)
-        testWindow.draggable = true
+        testWindow:setDraggable(true)
         testWindow.resizeable = true
         testWindow.closeable = true
         testWindow.scrollable = {true, true}
@@ -369,7 +368,7 @@ function Editor:newWindow(type, button)
         
         
         local testWindow2 = Gui3.Box:new(10, 30, 100, 100)
-        testWindow2.draggable = true
+        testWindow2:setDraggable(true)
         testWindow2.resizeable = true
         testWindow2.closeable = true
         testWindow2.scrollable = {true, true}
@@ -383,7 +382,7 @@ function Editor:newWindow(type, button)
         
     elseif type == "tiles" then
         local tileListWindow = Gui3.Box:new(x, y, 8*17+15, 200)
-        tileListWindow.draggable = true
+        tileListWindow:setDraggable(true)
         tileListWindow.resizeable = true
         tileListWindow.closeable = true
         tileListWindow.scrollable = {true, true}

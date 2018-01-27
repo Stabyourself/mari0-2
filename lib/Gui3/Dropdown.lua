@@ -38,6 +38,9 @@ function Dropdown:autoSize()
     for _, v in ipairs(self.box.children) do
         v.w = self.box.childBox[3]
     end
+    
+    self.w = math.max(self.box.w, self.button.w)
+    self.h = self.box.h+self.button.h
 end
 
 return Dropdown

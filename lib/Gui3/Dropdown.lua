@@ -19,6 +19,14 @@ function Dropdown:onAssign()
     self.box.gui = self.gui
 end
 
+function Dropdown:draw(level)
+    Gui3.Element.translate(self)
+    
+    Gui3.Element.draw(self, level)
+
+    Gui3.Element.unTranslate(self)
+end
+
 function Dropdown:toggle(status)
     self.box.visible = status or not self.box.visible
 end

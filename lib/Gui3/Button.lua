@@ -66,7 +66,9 @@ function Button:getCollision(x, y)
     return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < self.h
 end 
 
-function Button:render(level)
+function Button:draw(level)
+    Gui3.Element.translate(self)
+    
     love.graphics.setColor(1, 1, 1)
     
     if self.border then
@@ -104,7 +106,7 @@ function Button:render(level)
     
     love.graphics.setColor(1, 1, 1)
     
-    Gui3.Element.render(self, level)
+    Gui3.Element.draw(self, level)
     
     if self.img then
         love.graphics.setColor(self.color.img)
@@ -112,6 +114,8 @@ function Button:render(level)
     end
     
     love.graphics.setColor(1, 1, 1)
+    
+    Gui3.Element.unTranslate(self)
 end
 
 function Button:mousepressed(x, y, button)

@@ -28,12 +28,12 @@ function Smb3Ui:initialize()
     end
     
     self.element = {}
-    self.element.world = Gui3.Text:new("     ", 1, 2)
-    self.element.pMeter = Gui3.Text:new("        ", 49, 2)
-    self.element.coins = Gui3.Text:new("   ", 121, 2)
-    self.element.lives = Gui3.Text:new("   ", 1, 10)
-    self.element.score = Gui3.Text:new("       ", 49, 10)
-    self.element.time = Gui3.Text:new("    ", 113, 10)
+    self.element.world = Gui3.Text:new("", 1, 2)
+    self.element.pMeter = Gui3.Text:new("", 49, 2)
+    self.element.coins = Gui3.Text:new("", 121, 2)
+    self.element.lives = Gui3.Text:new("", 1, 10)
+    self.element.score = Gui3.Text:new("", 49, 10)
+    self.element.time = Gui3.Text:new("", 113, 10)
     
     self.uiBox:addChild(self.element.world)
     self.uiBox:addChild(self.element.pMeter)

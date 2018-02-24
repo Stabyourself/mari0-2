@@ -15,31 +15,33 @@ function Box:initialize(x, y, w, h)
     
     self.posMax[1] = -3
     self.posMax[2] = -4
-
-    self:setDraggable(false)
+    
+    self.childBox = {2, 3, self.w-4, self.h-6}
 end
 
-function Box:setDraggable(draggable)
-    self.draggable = draggable
+function Box:update(dt, x, y, mouseBlocked, absX, absY)
+    local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
+    
     if self.draggable then
         self.sizeMin[1] = 19
         self.sizeMin[2] = 29
 
-        self.childBoxMod[1] = 3
-        self.childBoxMod[2] = 12
-        self.childBoxMod[3] = 3
-        self.childBoxMod[4] = 4
+        self.childBox[1] = 3
+        self.childBox[2] = 12
+        self.childBox[3] = self.w-6
+        self.childBox[4] = self.h-16
     else
         self.sizeMin[1] = 17
         self.sizeMin[2] = 19
 
-        self.childBoxMod[1] = 2
-        self.childBoxMod[2] = 3
-        self.childBoxMod[3] = 2
-        self.childBoxMod[4] = 3
+        self.childBox[1] = 2
+        self.childBox[2] = 3
+        self.childBox[3] = self.w-4
+        self.childBox[4] = self.h-6
     end
-end
 
+    return ret
+end
 
 function Box:render(level)
     if type(self.background) == "table" then
@@ -68,8 +70,7 @@ function Box:render(level)
     
     if self.title then
         local scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
-        
-        love.graphics.intersectScissor(3, 2, self.w-16, 8)
+        love.graphics.intersectScissor((self.absPos[1]+3)*VAR("scale"), (self.absPos[2]+2)*VAR("scale"), (self.w-16)*VAR("scale"), 8*VAR("scale"))
 
         love.graphics.print(self.title, 3, 2)
         

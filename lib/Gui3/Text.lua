@@ -12,8 +12,8 @@ function Text:setString(s)
         self.s = s
         self.text:set(self.s)
         self.w = #self.s*8
-        
-        self:doRepaint()
+
+        self.repaint = true
     end
 end
 

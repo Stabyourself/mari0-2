@@ -32,7 +32,6 @@ function Element:initialize(x, y, w, h)
 
     self.mouse = {0, 0}
 
-    self.childBoxMod = {0, 0, 0, 0}
     self.childBox = {0, 0, self.w, self.h}
 
     self.visible = true
@@ -48,10 +47,10 @@ function Element:resize(w, h)
     self.w = w
     self.h = h
 
-    self.childBox[1] = self.childBoxMod[1]
-    self.childBox[2] = self.childBoxMod[1]
-    self.childBox[3] = self.w-self.childBoxMod[1]-self.childBoxMod[3]
-    self.childBox[4] = self.h-self.childBoxMod[4]-self.childBoxMod[4]
+    self.childBox[1] = 0
+    self.childBox[2] = 0
+    self.childBox[3] = self.w
+    self.childBox[4] = self.h
 end
 
 function Element:addChild(element)
@@ -212,77 +211,52 @@ function Element:update(dt, x, y, mouseBlocked, absX, absY)
         self.scroll[2] = math.min(childrenH-self:getInnerHeight(), self.scroll[2])
         self.scroll[2] = math.max(0, self.scroll[2])
     end
-    
 
-    self.childBox[1] = self.childBoxMod[1]
-    self.childBox[2] = self.childBoxMod[2]
-    self.childBox[3] = self.w-self.childBoxMod[1]-self.childBoxMod[3]
-    self.childBox[4] = self.h-self.childBoxMod[2]-self.childBoxMod[4]
-
-    return (not self.clip and siblingsBlocked) or (self.mouse[1] > 0 and self.mouse[1] <= self.w and self.mouse[2] > 0 and self.mouse[2] <= self.h)
-end
-
-function Element:doRepaint()
-    self.repaint = true
-
-    if self.parent then
-        self.parent:doRepaint()
-    end
-end
-
-function Element:draw()
     if self.repaint then
         love.graphics.push()
         love.graphics.origin()
 
         if self.w ~= self.canvas:getWidth() or self.h ~= self.canvas:getHeight() then
-            self.canvas = love.graphics.newCanvas(math.ceil(self.w), math.ceil(self.h))
+            self.canvas = love.graphics.newCanvas(self.w, self.h)
         end
 
-        -- local scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
-        -- love.graphics.setScissor()
         self.canvas:renderTo(function()
             love.graphics.clear()
-
             self:render()
-
-            love.graphics.push()
-        
-            love.graphics.translate(self.childBox[1]-self.scroll[1], self.childBox[2]-self.scroll[2])
-
-            for _, v in ipairs(self.children) do
-                if v.visible then
-                    v:draw()
-                end
-            end 
-
-            love.graphics.pop()
         end)
-        -- love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
-
         love.graphics.pop()
-        -- self.repaint = false
+
+        self.repaint = false
     end
 
+    return (not self.clip and siblingsBlocked) or (self.mouse[1] > 0 and self.mouse[1] <= self.w and self.mouse[2] > 0 and self.mouse[2] <= self.h)
+end
+
+function Element:draw()
 
     love.graphics.push()
-    love.graphics.translate(self.x, self.y)
+    love.graphics.translate(self.x-self.scroll[1], self.y-self.scroll[2])
+
     love.graphics.setColor(1, 1, 1)
-    love.graphics.draw(self.canvas)
+    -- love.graphics.draw(self.canvas)
 
-    love.graphics.pop()
-
-    -- local scissorX, scissorY, scissorW, scissorH
+    love.graphics.translate(self.childBox[1], self.childBox[2])
+    local scissorX, scissorY, scissorW, scissorH
     -- if self.clip then
     --     scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
     --     love.graphics.intersectScissor((self.absPos[1]+self.childBox[1])*VAR("scale"), (self.absPos[2]+self.childBox[2])*VAR("scale"), math.round(self.childBox[3]*VAR("scale")), math.round(self.childBox[4]*VAR("scale")))
     -- end
-
+    for _, v in ipairs(self.children) do
+        if v.visible then
+            v:draw()
+        end
+    end 
 
     -- if self.clip then
     --     love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
     -- end
 
+    love.graphics.pop()
 end
 
 function Element:render()
@@ -464,9 +438,9 @@ end
 
 function Element:autoSize()
     local w, h = self:getChildrenSize()
-    
-    self.w = self.childBox[1]*2+w+self.childBoxMod[1]+self.childBoxMod[3]
-    self.h = self.childBox[2]*2+h+self.childBoxMod[2]+self.childBoxMod[4]
+
+    self.w = self.childBox[1]*2+w
+    self.h = self.childBox[2]*2+h
 
     self.childBox[3] = w
     self.childBox[4] = h

@@ -198,14 +198,18 @@ local col = {
 
 function PhysObj:checkCollisions()
 	col.left[1], col.left[2] = self:leftColCheck()
-	if not col.left[2] then
+
+	col.right[1] = nil
+	if not col.left[1] then
 		col.right[1], col.right[2] = self:rightColCheck()
 	end
 	
+	col.bottom[1] = nil
 	if self.speed[2] > 0 then
 		col.bottom[1], col.bottom[2] = self:bottomColCheck()
 	end
 	
+	col.top[1] = nil
 	if not col.bottom[1] then
 		col.top[1], col.top[2] = self:topColCheck()
 	end

@@ -987,7 +987,7 @@ function Character:movement(dt)
     
     -- Update gravity
     self.gravity = NORMALGRAVITY
-    if self.state.name == "fly"or self.state.name == "float" then
+    if self.state.name == "fly" or self.state.name == "float" then
         self.gravity = 0
     elseif self.state.name == "jump" then
         self.gravity = JUMPGRAVITY

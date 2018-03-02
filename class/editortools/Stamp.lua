@@ -9,56 +9,58 @@ function Stamp:initialize(editor)
 end
 
 function Stamp:draw()
-    local mouseX, mouseY = self.level:getMouse()
-    local offset = {self:getOffset()}
-    local worldX, worldY = self.level:cameraToWorld(mouseX, mouseY)
-    
-    if self.stampMap.type == "simple" then
-        worldX = worldX+offset[1]*16
-        worldY = worldY+offset[2]*16
-        local mapX, mapY = self.level:worldToMap(worldX, worldY)
+    if self.stampMap then
+        local mouseX, mouseY = self.level:getMouse()
+        local offset = {self:getOffset()}
+        local worldX, worldY = self.level:cameraToWorld(mouseX, mouseY)
+        
+        if self.stampMap.type == "simple" then
+            worldX = worldX+offset[1]*16
+            worldY = worldY+offset[2]*16
+            local mapX, mapY = self.level:worldToMap(worldX, worldY)
 
-        for x = 1, self.stampMap.width do
-            for y = 1, self.stampMap.height do
-                local tileX = (mapX+x-1)*16
-                local tileY = (mapY+y-1)*16
+            for x = 1, self.stampMap.width do
+                for y = 1, self.stampMap.height do
+                    local tileX = (mapX+x-1)*16
+                    local tileY = (mapY+y-1)*16
+                    
+                    local tile = self.stampMap.map[x] and self.stampMap.map[x][y]
+
+                    if tile then
+                        tile:draw(tileX, tileY, true)
+                    end
+                end
+            end
+            
+        elseif self.stampMap.type == "quads" then
+            local mapX, mapY = self.level:worldToMap(worldX, worldY)
+            
+            if self.dragging then
+                local startX, startY = self.dragStart[1], self.dragStart[2]
+                local w, h = mapX-startX+1, mapY-startY+1
                 
-                local tile = self.stampMap.map[x] and self.stampMap.map[x][y]
-
-                if tile then
-                    tile:draw(tileX, tileY, true)
+                if w < 1 then
+                    startX = startX + w-1
+                    w = -w+2
                 end
-            end
-        end
-        
-    elseif self.stampMap.type == "quads" then
-        local mapX, mapY = self.level:worldToMap(worldX, worldY)
-        
-        if self.dragging then
-            local startX, startY = self.dragStart[1], self.dragStart[2]
-            local w, h = mapX-startX+1, mapY-startY+1
-            
-            if w < 1 then
-                startX = startX + w-1
-                w = -w+2
-            end
-            
-            if h < 1 then
-                startY = startY + h-1
-                h = -h+2
-            end
-            
-            local quadStampMap = self:getQuadStampMap(w, h)
-            
-            for x = 1, w do
-                for y = 1, h do
-                    quadStampMap[x][y]:draw((startX+x-2)*16, (startY+y-2)*16, true)
+                
+                if h < 1 then
+                    startY = startY + h-1
+                    h = -h+2
                 end
+                
+                local quadStampMap = self:getQuadStampMap(w, h)
+                
+                for x = 1, w do
+                    for y = 1, h do
+                        quadStampMap[x][y]:draw((startX+x-2)*16, (startY+y-2)*16, true)
+                    end
+                end
+                
+            else
+                local tileX, tileY = self.level:mapToWorld(mapX-1, mapY-1)
+                self.stampMap.map[1][1]:draw(tileX, tileY, true)
             end
-            
-        else
-            local tileX, tileY = self.level:mapToWorld(mapX-1, mapY-1)
-            self.stampMap.map[1][1]:draw(tileX, tileY, true)
         end
     end
 end
@@ -74,7 +76,7 @@ function Stamp:mousepressed(x, y, button)
 end
 
 function Stamp:mousereleased(x, y, button)
-    if button == 1 and self.dragging then
+    if self.stampMap and button == 1 and self.dragging then
         if self.stampMap.type == "simple" then
             local offset = {self:getOffset()}
             local worldX, worldY = self.level:cameraToWorld(x, y)

@@ -72,7 +72,6 @@ end
 
 function DottedCrosshair:draw()
     if self.target then
-        
         local dotCount = (self.length+self.dotSize)/self.dotDistance
         for i = 0, dotCount do
             local factor = 1/dotCount*(i+self.t%1)

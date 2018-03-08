@@ -28,12 +28,14 @@ function love.load()
     require "lib.Gui3"
     prof = require "lib.jprof.jprof"
 
-    require "class.CharacterState"
+    require "class.ActorState"
     require "class.Character"
     require "enemyLoader"
+    require "componentLoader"
+    require "actorTemplateLoader"
 
     require "class.Level"
-    require "class.Mario"
+    require "class.Actor"
     require "class.BlockBounce"
     require "class.Enemy"
     require "class.Portal"
@@ -80,7 +82,7 @@ function love.load()
     game = Game:new()
 
     gameStateManager:loadState(game)
-    gameStateManager:addState(Editor:new(game.level))
+    --gameStateManager:addState(Editor:new(game.level))
 end
 
 function love.update(dt)
@@ -117,7 +119,7 @@ function love.draw()
     
     gameStateManager:event("draw")
     
-    if VAR("characterStateDebug") then
+    if VAR("actorStateDebug") then
         love.graphics.print(game.level.marios[1].state.name, 8, 8)
     end
     

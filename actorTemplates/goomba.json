@@ -1,0 +1,15 @@
+{
+    "width": 12,
+    "height": 12,
+
+    "centerX": 8,
+    "centerY": 9,
+
+    "components": [
+        "mirror",
+        "truffleShuffle",
+        "unrotate"
+    ],
+
+    "img": "goomba.png"
+}

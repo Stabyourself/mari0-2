@@ -8,7 +8,6 @@ function PhysObj:initialize(world, x, y, width, height)
 	self.world = world
 	
 	self.speed = {0, 0}
-	self.groundSpeedX = 0
 	
 	self.gravityDirection = math.pi*.5
 	
@@ -107,7 +106,7 @@ function PhysObj:leftColCheck()
 	if colX then --Left collision
 		if not self:leftCollision() then
 			self.x = colX+1
-			self.groundSpeedX = math.max(self.groundSpeedX, 0)
+			self.speed[1] = math.max(self.speed[1], 0)
 			return colX, colY
 		end
 	end
@@ -129,7 +128,7 @@ function PhysObj:rightColCheck()
 	if colX then --Right collision
 		if not self:rightCollision() then
 			self.x = colX-self.width
-			self.groundSpeedX = math.min(self.groundSpeedX, 0)
+			self.speed[1] = math.min(self.speed[1], 0)
 			return colX, colY
 		end
 	end

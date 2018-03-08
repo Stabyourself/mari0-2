@@ -1,0 +1,14 @@
+{
+    "width": 12,
+    "height": 12,
+    
+    "components": [
+        "smb3_animation",
+        "smb3_movement",
+        "smb3_jumping",
+        "fly",
+        "crosshair",
+        "portalGun",
+        "unrotate"
+    ]
+}

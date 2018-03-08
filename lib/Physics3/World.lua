@@ -28,7 +28,7 @@ function World:update(dt)
         prof.pop()
 		
 		-- Add gravity
-        obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * 0.5 * dt
+        obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * dt
         -- Cap speed[2]
         obj.speed[2] = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed[2])
         
@@ -46,11 +46,6 @@ function World:update(dt)
         prof.pop()
         
         self:checkPortaling(obj, oldX, oldY)
-        
-		-- Add gravity again
-        obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * 0.5 * dt
-        -- Cap speed[2]
-        obj.speed[2] = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed[2])
     end
     prof.pop()
 end
@@ -61,7 +56,7 @@ function World:checkPortaling(obj, oldX, oldY)
             local iX, iY = linesIntersect(oldX+obj.width/2, oldY+obj.height/2, obj.x+obj.width/2, obj.y+obj.height/2, p.x1, p.y1, p.x2, p.y2)
             
             if iX then
-                local x, y, velocityX, velocityY = obj.x+obj.width/2, obj.y+obj.height/2, obj.groundSpeedX, obj.speed[2]
+                local x, y, velocityX, velocityY = obj.x+obj.width/2, obj.y+obj.height/2, obj.speed[1], obj.speed[2]
                 local angle = math.atan2(velocityY, velocityX)
                 local speed = math.sqrt(velocityX^2+velocityY^2)
                 
@@ -70,7 +65,7 @@ function World:checkPortaling(obj, oldX, oldY)
                 obj.x = outX
                 obj.y = outY
                 
-                obj.groundSpeedX = math.cos(outAngle)*speed
+                obj.speed[1] = math.cos(outAngle)*speed
                 obj.speed[2] = math.sin(outAngle)*speed
                 
                 obj.angle = obj.angle + angleDiff
@@ -89,7 +84,7 @@ function World:checkPortaling(obj, oldX, oldY)
                         
                         outX = obj.x,
                         outY = obj.y,
-                        outVX = obj.groundSpeedX,
+                        outVX = obj.speed[1],
                         outVY = obj.speed[2],
                         
                         reversed = reversed
@@ -155,12 +150,14 @@ function World:draw()
         local quadWidth = obj.sizeX
         local quadHeight = obj.sizeY
 
+        love.graphics.stencil(function() end, "replace")
+
         -- Portal duplication
         for _, p in ipairs(self.portals) do
             if p.open then
                 if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
                     objectWithinPortalRange(p, x, y) then
-                    local angle = math.atan2(obj.speed[2], obj.groundSpeedX)
+                    local angle = math.atan2(obj.speed[2], obj.speed[1])
                     local cX, cY, cAngle, angleDiff, reversed = self:doPortal(p, obj.x+obj.width/2, obj.y+obj.height/2, obj.angle)
                     
                     local xScale = 1
@@ -228,6 +225,8 @@ function World:draw()
         if VAR("quadDebug") then
             love.graphics.rectangle("line", quadX, quadY, quadWidth, quadHeight)
         end
+
+        obj:draw()
 	end
     prof.pop()
     
@@ -255,6 +254,8 @@ function World:draw()
 end
 
 function drawObject(obj, x, y, r, sx, sy, cx, cy)
+    love.graphics.setColor(1, 1, 1)
+
     if type(obj.img) == "table" then
         for i, v in ipairs(obj.img) do
             if obj.palette[i] then
@@ -267,8 +268,10 @@ function drawObject(obj, x, y, r, sx, sy, cx, cy)
         if obj.img["static"] then
             love.graphics.draw(obj.img["static"], obj.quad, x, y, r, sx, sy, cx, cy)
         end
-    else
+    elseif obj.quad then
         love.graphics.draw(obj.img, obj.quad, x, y, r, sx, sy, cx, cy)
+    else
+        love.graphics.draw(obj.img, x, y, r, sx, sy, cx, cy)
     end
 end
 

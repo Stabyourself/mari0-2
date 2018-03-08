@@ -50,12 +50,17 @@ function Level:loadMap(data)
 
     table.sort(self.spawnList, function(a, b) return a.x<b.x end)
 
+    self.actors = {} -- todo: this is meh
     self.marios = {}
 
     local x, y = self:mapToWorld(self.spawnX-.5, self.spawnY)
     
-    table.insert(self.marios, Smb3Mario:new(self, x, y, "raccoon"))
-
+    local mario1 = Actor:new(self, x, y, actorTemplates.mario)
+    table.insert(self.marios, mario1)
+    table.insert(self.actors, mario1)
+    
+    table.insert(self.actors, Actor:new(self, 100, 100, actorTemplates.goomba))
+    
     self:spawnEnemies(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end
 
@@ -70,8 +75,8 @@ function Level:update(dt)
     
     prof.push("Post Movement")
     for _, obj in ipairs(self.objects) do
-        if obj.postMovementUpdate then
-            obj:postMovementUpdate(dt)
+        if obj.postUpdate then
+            obj:postUpdate(dt)
         end
     end
     prof.pop()
@@ -89,31 +94,24 @@ function Level:draw()
     Physics3.World.draw(self)
     prof.pop()
     
-    prof.push("Crosshairs")
-    for _, v in ipairs(self.marios) do
-        v.crosshair:draw()
-    end
-    prof.pop()
-    
     self.camera:detach()
 end
 
 function Level:cmdpressed(cmds)
     if cmds["jump"] then
-        self.marios[1]:jump()
+        self.marios[1]:event("jump")
     end
     
     if cmds["closePortals"] then
-        self.marios[1]:closePortals()
+        self.marios[1]:event("closePortals")
     end
     
     if cmds["run"] then
-        self.marios[1]:spin()
-        self.marios[1]:shoot()
+        self.marios[1]:event("action")
     end
     
     if cmds["star"] then
-        self.marios[1]:star()
+        self.marios[1]:event("star")
     end
 end
 

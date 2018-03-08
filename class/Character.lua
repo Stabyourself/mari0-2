@@ -6,7 +6,7 @@ function CharacterModel:initialize(path)
         print = print,
         print_r = print_r,
         VAR = VAR,
-        CharacterState = CharacterState,
+        ActorState = ActorState,
     }})
     
 end

@@ -1030,7 +1030,7 @@ function World:checkPortalSurface(tileX, tileY, side, worldX, worldY, ignoreP)
         
     for _, p in ipairs(self.portals) do
         if p ~= ignoreP then
-            if math.abs(p.angle - angle) < 0.0001 then -- angle is the same!
+            if math.abs(p.angle - angle) < 0.00001 or p.angle + angle < 0.00001 then -- angle is the same!
                 local onLine = pointOnLine(p.x1, p.y1, p.x2, p.y2, worldX, worldY)
                 if onLine then -- surface is the same! (or at least on the same line which is good enough)
                     if onLine >= 0 then -- Check on which side of the same surface portal we are

@@ -3,12 +3,12 @@ return {
     scale = 1,
     volume = 1,
 
-    tileSize = 16,
-    uiHeight = 38,
+    tileSize = 16, -- Not fully implemented because typing tileSize a lot is too much work
+    uiHeight = 38, -- Move these to SMB3UI?
     uiLineHeight = 1,
 
     gravity = 1125,
-    gravityjumping = 480, --gravity while jumping (Only for mario)
+    gravityJumping = 225, --gravity while jumping (Only for mario)
     maxYSpeed = 10000, --258.75
 
     rotationSpeed = 14, --only a visual effect
@@ -17,7 +17,6 @@ return {
 
     blockBounceTime = 0.2,
     blockBounceHeight = 0.4,
-    jumpLeeway = 6/16,
     blockHitForce = 2,
 
     enemiesSpawnAhead = 0,
@@ -25,9 +24,11 @@ return {
     portalSize = 32,
     portalReverseRange = math.pi/4+.001,
 
+    -- Move to smb3mario?
     pMeterTicks = 7,
     pMeterBlinkTime = 8/60,
     
+    -- These are all from the center of the screen and towards the center of the player
     cameraScrollLeftBorder = -85,
     cameraScrollRightBorder = 85,
     cameraScrollUpBorder = -53,

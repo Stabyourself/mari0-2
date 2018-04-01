@@ -1,0 +1,105 @@
+{
+    "width": 12,
+    "height": 24,
+    
+    "centerX": 23,
+    "centerY": 24,
+    
+    "img": {
+        "static": "characters/smb3-mario/graphics/raccoon-static.png",
+        "1": "characters/smb3-mario/graphics/raccoon-1.png",
+        "2": "characters/smb3-mario/graphics/raccoon-2.png",
+        "3": "characters/smb3-mario/graphics/raccoon-3.png"
+    },
+    
+    "components": {
+        "smb3_animation": {
+            "quadWidth": 40,
+            "quadHeight": 40,
+            "centerX": 23,
+            "centerY": 24,
+
+            "frames": [
+                "idle",
+            
+                "run",
+                "run",
+                "run",
+                "run",
+                
+                "sprint",
+                "sprint",
+                "sprint",
+                "sprint",
+                
+                "skid",
+                
+                "jump",
+                
+                "fall",
+                
+                "fly",
+                "fly",
+                "fly",
+                
+                "float",
+                "float",
+                "float",
+                
+                "die",
+                
+                "duck",
+                
+                "buttSlide",
+                
+                "swim",
+                "swim",
+                "swim",
+                "swim",
+                
+                "swimUp",
+                "swimUp",
+                "swimUp",
+                
+                "spin",
+                "spin",
+                "spin",
+                "spin",
+                
+                "spinAir",
+                "spinAir",
+                "spinAir",
+                "spinAir",
+                
+                "holdIdle",
+                
+                "holdRun",
+                "holdRun",
+                "holdRun",
+                "holdRun",
+                
+                "kick",
+                
+                "climb",
+                "climb",
+                
+                "somerSault",
+                "somerSault",
+                "somerSault",
+                "somerSault",
+                "somerSault",
+                "somerSault",
+                "somerSault",
+                "somerSault"
+            ]
+        },
+        "smb3_movement": {},
+        "smb3_jumping": {},
+        "smb3_flying": {},
+        "smb3_ducking": {},
+        "smb3_floating": {},
+        "unrotate": {},
+        "crosshair": {},
+        "portalGun": {}
+    }
+}

@@ -5,9 +5,6 @@ function Game:load()
 
     self.timeLeft = 400
     
-    SmbMario = require("characters.smb-mario.code")
-    Smb3Mario = require("characters.smb3-mario.code")
-    
     self.level = Level:new("levels/smb3test.json")
     
     smb3ui = Smb3Ui:new()

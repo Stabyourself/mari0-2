@@ -5,12 +5,12 @@ local MIRRORTIME = 0.2
 function component.setup(actor)
     actor.img = actor.actorTemplate.img
 
-    if actor.actorTemplate.sizeX then
-        actor.centerX = actor.actorTemplate.sizeX
-        actor.centerY = actor.actorTemplate.sizeY
+    if actor.actorTemplate.quadWidth then
+        actor.centerX = actor.actorTemplate.quadWidth
+        actor.centerY = actor.actorTemplate.quadHeight
     else
-        actor.sizeX = actor.img:getWidth()
-        actor.sizeY = actor.img:getHeight()
+        actor.quadWidth = actor.img:getWidth()
+        actor.quadHeight = actor.img:getHeight()
     end
 
     if actor.actorTemplate.centerX then

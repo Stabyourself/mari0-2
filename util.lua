@@ -378,3 +378,11 @@ function getTileBorders(tiles, offsetX, offsetY)
 
     return borders
 end
+
+function convertPalette(palette)
+    for _, v in ipairs(palette) do
+        for i, w in ipairs(v) do
+            v[i] = w/255
+        end
+    end
+end

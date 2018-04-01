@@ -1,7 +1,5 @@
 local component = {}
 
-
-
 local MAXSPEEDS = {90, 150, 210}
 
 local FLYANIMATIONTIME = 4/60
@@ -32,567 +30,55 @@ local STARPALETTES = {
     },
     
     {
-        {252/255/255, 188/255, 176/255},
-        {  0/255/255,   0/255,   0/255},
-        {252/255/255, 152/255,  56/255},
+        {252/255, 188/255, 176/255},
+        {  0/255,   0/255,   0/255},
+        {252/255, 152/255,  56/255},
     }
 }
 
-local powerUpStates = {
-    small = {
-        colors = {
-            {252/255, 188/255, 176/255},
-            {216/255,  40/255,   0/255},
-            {  0/255,   0/255,   0/255},
-        },
-        width = 24,
-        height = 24,
-        centerX = 12,
-        centerY = 15,
-        frames = {
-            "idle",
-            
-            "run",
-            "run",
-            
-            "sprint",
-            "sprint",
-            
-            "skid",
-            
-            "jump",
-            
-            "fall",
-            
-            "fly",
-            
-            "die",
-            
-            "buttSlide",
-            
-            "swim",
-            "swim",
-            "swim",
-            "swim",
-            
-            "pipe",
-            
-            "holdIdle",
-            
-            "holdRun",
-            "holdRun",
-            
-            "kick",
-            
-            "climb",
-            "climb",
-        },
-    },
+function component.setup(actor, dt, actorEvent, args)
+    actor.img = actor.actorTemplate.img
+    actor.quadWidth = args["quadWidth"]
+    actor.quadHeight = args["quadWidth"]
     
-    big = {
-        colors = {
-            {252/255, 188/255, 176/255},
-            {216/255,  40/255,   0/255},
-            {  0/255,   0/255,   0/255},
-        },
-        width = 40,
-        height = 40,
-        centerX = 23,
-        centerY = 24,
-        canDuck = true,
-        frames = {
-            "idle",
-            
-            "run",
-            "run",
-            "run",
-            "run",
-            
-            "sprint",
-            "sprint",
-            "sprint",
-            "sprint",
-            
-            "skid",
-            
-            "jump",
-            
-            "fall",
-            
-            "fly",
-            
-            "die",
-            
-            "duck",
-            
-            "buttSlide",
-            
-            "swim",
-            "swim",
-            "swim",
-            "swim",
-            
-            "swimUp",
-            "swimUp",
-            "swimUp",
-            
-            "pipe",
-            "useless",
-            
-            "holdIdle",
-            
-            "holdRun",
-            "holdRun",
-            "holdRun",
-            "holdRun",
-            
-            "kick",
-            
-            "climb",
-            "climb",
-            
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            
-            "shoot",
-            "shoot",
-            "shoot",
-            
-            "shootAir",
-            "shootAir",
-            "shootAir",
-        },
-    },
-    
-    fire = {
-        colors = {
-            {252/255, 188/255, 176/255},
-            {252/255, 152/255,  56/255},
-            {216/255,  40/255,   0/255},
-        },
-        width = 40,
-        height = 40,
-        centerX = 23,
-        centerY = 24,
-        canDuck = true,
-        canShoot = true,
-        frames = {
-            "idle",
-            
-            "run",
-            "run",
-            "run",
-            "run",
-            
-            "sprint",
-            "sprint",
-            "sprint",
-            "sprint",
-            
-            "skid",
-            
-            "jump",
-            
-            "fall",
-            
-            "fly",
-            
-            "die",
-            
-            "duck",
-            
-            "buttSlide",
-            
-            "swim",
-            "swim",
-            "swim",
-            "swim",
-            
-            "swimUp",
-            "swimUp",
-            "swimUp",
-            
-            "pipe",
-            "useless",
-            
-            "holdIdle",
-            
-            "holdRun",
-            "holdRun",
-            "holdRun",
-            "holdRun",
-            
-            "kick",
-            
-            "climb",
-            "climb",
-            
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            
-            "shoot",
-            "shoot",
-            "shoot",
-            
-            "shootAir",
-            "shootAir",
-            "shootAir",
-        },
-    },
-    
-    hammer = {
-        colors = {
-            {252/255, 188/255, 176/255},
-            {216/255,  40/255,   0/255},
-            {  0/255,   0/255,   0/255},
-        },
-        width = 40,
-        height = 40,
-        centerX = 23,
-        centerY = 24,
-        canDuck = true,
-        canShoot = true,
-        frames = {
-            "idle",
-            
-            "run",
-            "run",
-            "run",
-            "run",
-            
-            "sprint",
-            "sprint",
-            "sprint",
-            "sprint",
-            
-            "skid",
-            
-            "jump",
-            
-            "fall",
-            
-            "fly",
-            
-            "die",
-            
-            "duck",
-            
-            "buttSlide",
-            
-            "swim",
-            "swim",
-            "swim",
-            "swim",
-            
-            "swimUp",
-            "swimUp",
-            "swimUp",
-            
-            "pipe",
-            "useless",
-            
-            "holdIdle",
-            
-            "holdRun",
-            "holdRun",
-            "holdRun",
-            "holdRun",
-            
-            "kick",
-            
-            "climb",
-            "climb",
-            
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            
-            "shoot",
-            "shoot",
-            "shoot",
-            
-            "shootAir",
-            "shootAir",
-            "shootAir",
-        },
-    },
-    
-    raccoon = {
-        colors = {
-            {252/255, 188/255, 176/255},
-            {216/255,  40/255,   0/255},
-            {  0/255,   0/255,   0/255},
-        },
-        width = 40,
-        height = 40,
-        centerX = 23,
-        centerY = 24,
-        canSpin = true,
-        canFly = true,
-        canFloat = true,
-        canDuck = true,
-        frames = {
-            "idle",
-            
-            "run",
-            "run",
-            "run",
-            "run",
-            
-            "sprint",
-            "sprint",
-            "sprint",
-            "sprint",
-            
-            "skid",
-            
-            "jump",
-            
-            "fall",
-            
-            "fly",
-            "fly",
-            "fly",
-            
-            "float",
-            "float",
-            "float",
-            
-            "die",
-            
-            "duck",
-            
-            "buttSlide",
-            
-            "swim",
-            "swim",
-            "swim",
-            "swim",
-            
-            "swimUp",
-            "swimUp",
-            "swimUp",
-            
-            "spin",
-            "spin",
-            "spin",
-            "spin",
-            
-            "spinAir",
-            "spinAir",
-            "spinAir",
-            "spinAir",
-            
-            "holdIdle",
-            
-            "holdRun",
-            "holdRun",
-            "holdRun",
-            "holdRun",
-            
-            "kick",
-            
-            "climb",
-            "climb",
-            
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-        },
-    },
-    
-    tanooki = {
-        colors = {
-            {252/255, 188/255, 176},
-            {200/255,  76/255,  12},
-            {  0/255,   0/255,   0},
-        },
-        width = 40,
-        height = 40,
-        centerX = 23,
-        centerY = 24,
-        canSpin = true,
-        canFly = true,
-        canFloat = true,
-        canDuck = true,
-        frames = {
-            "idle",
-            
-            "run",
-            "run",
-            "run",
-            "run",
-            
-            "sprint",
-            "sprint",
-            "sprint",
-            "sprint",
-            
-            "skid",
-            
-            "jump",
-            
-            "fall",
-            
-            "fly",
-            "fly",
-            "fly",
-            
-            "float",
-            "float",
-            "float",
-            
-            "die",
-            
-            "duck",
-            
-            "buttSlide",
-            
-            "swim",
-            "swim",
-            "swim",
-            "swim",
-            
-            "swimUp",
-            "swimUp",
-            "swimUp",
-            
-            "spin",
-            "spin",
-            "spin",
-            "spin",
-            
-            "spinAir",
-            "spinAir",
-            "spinAir",
-            "spinAir",
-            
-            "holdIdle",
-            
-            "holdRun",
-            "holdRun",
-            "holdRun",
-            "holdRun",
-            
-            "kick",
-            
-            "climb",
-            "climb",
-            
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            "somerSault",
-            
-            "statue",
-        },
+    actor.standardPalette = args["color"] or {
+        {252, 188, 176},
+        {216,  40,   0},
+        {  0,   0,   0},
     }
-}
 
-local graphics = {}
+    convertPalette(actor.standardPalette)
+    
+    actor.palette = actor.standardPalette
+    
+    actor.quadList = {}
+    actor.frames = args["frames"]
+    actor.frameCounts = {}
 
-local function getPath(i, j)
-    return "characters/smb3-mario/graphics/" .. i .. "-" .. j .. ".png"
-end
-
-for i, v in pairs(powerUpStates) do
-    graphics[i] = {}
-    local char = graphics[i]
-    
-    for j, w in pairs(v) do
-        char[j] = w
-    end
-    
-    char.img = {}
-    local imgWidth, imgHeight
-    
-    local j = 1
-    local fileInfo = love.filesystem.getInfo(getPath(i, j))
-    
-    while fileInfo and fileInfo.type == "file" do
-        char.img[j] = love.graphics.newImage(getPath(i, j))
-        
-        imgWidth = char.img[j]:getWidth()
-        imgHeight = char.img[j]:getHeight()
-        
-        j = j + 1
-        fileInfo = love.filesystem.getInfo(getPath(i, j))
-    end
-    
-    local fileInfo = love.filesystem.getInfo(getPath(i, "static"))
-    if fileInfo and fileInfo.type == "file" then
-        char.img["static"] = love.graphics.newImage(getPath(i, "static"))
-        
-        imgWidth = char.img["static"]:getWidth()
-        imgHeight = char.img["static"]:getHeight()
-    end
-    
-    assert(imgWidth, "I couldn't load a single image for powerUpState \"" .. i .. "\", this is illegal and you're going to jail")
-    
-    char.quad = {}
-    char.frames = {}
-    
     for y = 1, 5 do
-        char.quad[y] = {}
+        actor.quadList[y] = {}
         local x = 0
         
-        for _, name in ipairs(v.frames) do
-            local quad = love.graphics.newQuad(x*v.width, (y-1)*v.height, v.width, v.height, imgWidth, imgHeight)
+        for _, name in ipairs(actor.frames) do
+            local quad = love.graphics.newQuad(x*actor.quadWidth, (y-1)*actor.quadHeight, actor.quadWidth, actor.quadHeight, actor.img[1]:getWidth(), actor.img[1]:getHeight())
             
-            if char.quad[y][name] then
-                if type(char.quad[y][name]) ~= "table" then
-                    char.quad[y][name] = {char.quad[y][name]}
+            if actor.quadList[y][name] then
+                if type(actor.quadList[y][name]) ~= "table" then
+                    actor.quadList[y][name] = {actor.quadList[y][name]}
                 end
                 
-                table.insert(char.quad[y][name], quad)
-                char.frames[name] = char.frames[name] + 1
+                table.insert(actor.quadList[y][name], quad)
+                actor.frameCounts[name] = actor.frameCounts[name] + 1
             else
-                char.quad[y][name] = quad
-                char.frames[name] = 1
+                actor.quadList[y][name] = quad
+                actor.frameCounts[name] = 1
             end
                 
             x = x + 1
         end
     end
-end
-
-function component.setup(actor)
-    actor.img = graphics["small"].img
-    actor.quad = graphics["small"].quad[3].idle
     
-    actor.sizeX = graphics["small"].width
-    actor.sizeY = graphics["small"].height
-    
-    actor.centerX = graphics["small"].centerX
-    actor.centerY = graphics["small"].centerY
-    
-    actor.standardPalette = graphics["small"].colors
+    actor.quad = actor.quadList[3].idle
 end
 
 function component.postUpdate(actor, dt)
@@ -639,7 +125,7 @@ function animation(actor, dt)
         actor.animationDirection = actor.spinDirection
         
         -- calculate spin frame from spinTimer
-        frame = math.ceil(math.fmod(actor.spinTimer, graphics["small"].frames.spin*SPINFRAMETIME)/SPINFRAMETIME)
+        frame = math.ceil(math.fmod(actor.spinTimer, actor.frameCounts.spin*SPINFRAMETIME)/SPINFRAMETIME)
 
     elseif actor.shooting and (not actor.starMan or (actor.state.name ~= "jump" and actor.state.name ~= "fall")) then
         if actor.onGround then
@@ -648,7 +134,7 @@ function animation(actor, dt)
             actor.animationState = "shootAir"
         end
         
-        frame = math.ceil(actor.shootTimer/SHOOTTIME*graphics["small"].frames.shoot)
+        frame = math.ceil(actor.shootTimer/SHOOTTIME*actor.frameCounts.shoot)
 
     elseif actor.ducking then
         actor.animationState = "duck"
@@ -672,7 +158,7 @@ function animation(actor, dt)
     elseif actor.state.name == "buttSlide" then
         actor.animationState = "buttSlide"
         
-    elseif actor.starMan and graphics["small"].frames.somerSault then
+    elseif actor.starMan and actor.frameCounts.somerSault then
         actor.animationState = "somerSault"
         frame = actor.somerSaultFrame
         
@@ -680,9 +166,9 @@ function animation(actor, dt)
         actor.animationState = "float"
         
     elseif actor.state.name == "jump" or actor.state.name == "fall" then
-        if not graphics["small"].canFly and actor.pMeter == VAR("pMeterTicks") then
+        if not actor.quadList.canFly and actor.pMeter == VAR("pMeterTicks") then
             actor.animationState = "fly"
-        elseif (not graphics["small"].canFly and actor.maxSpeedJump == MAXSPEEDS[3]) or actor.flying then
+        elseif (not actor.quadList.canFly and actor.maxSpeedJump == MAXSPEEDS[3]) or actor.flying then
             actor.animationState = "fly"
         else
             if actor.speed[2] < 0 then
@@ -702,7 +188,7 @@ function animation(actor, dt)
             actor.runAnimationTimer = actor.runAnimationTimer - RUNANIMATIONTIME
             actor.runAnimationFrame = actor.runAnimationFrame + 1
             
-            local runFrames = graphics["small"].frames.run
+            local runFrames = actor.frameCounts.run
 
             if actor.runAnimationFrame > runFrames then
                 actor.runAnimationFrame = actor.runAnimationFrame - runFrames
@@ -714,7 +200,7 @@ function animation(actor, dt)
     
     -- Flying animation
     if actor.animationState == "fly" then
-        local flyFrames = graphics["small"].frames.fly
+        local flyFrames = actor.frameCounts.fly
         
         if flyFrames > 1 then
             if actor.state.name == "fall" then
@@ -742,7 +228,7 @@ function animation(actor, dt)
             actor.floatAnimationTimer = actor.floatAnimationTimer - FLYANIMATIONTIME
             actor.floatAnimationFrame = actor.floatAnimationFrame + 1
 
-            local floatFrames = graphics["small"].frames.float
+            local floatFrames = actor.frameCounts.float
             if actor.floatAnimationFrame > floatFrames then
                 actor.floatAnimationFrame = floatFrames -- don't reset to the start
             end
@@ -753,9 +239,9 @@ function animation(actor, dt)
     
     -- Make sure to properly use the tables if it's an animationState with frames
     if frame then
-        actor.quad = graphics["small"].quad[getAngleFrame(actor)][actor.animationState][frame]
+        actor.quad = actor.quadList[getAngleFrame(actor)][actor.animationState][frame]
     else
-        actor.quad = graphics["small"].quad[getAngleFrame(actor)][actor.animationState]
+        actor.quad = actor.quadList[getAngleFrame(actor)][actor.animationState]
     end
     
     assert(type(actor.quad) == "userdata", "The state \"" .. actor.animationState .. "\" seems to not be have a quad set up correctly.")

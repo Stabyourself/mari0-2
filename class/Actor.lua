@@ -6,21 +6,27 @@ function Actor:initialize(world, x, y, actorTemplate)
     local width = self.actorTemplate.width
     local height = self.actorTemplate.height
     
+    self.centerX = self.actorTemplate.centerX or width/2
+    self.centerY = self.actorTemplate.centerY or height/2
+    
     Physics3.PhysObj.initialize(self, world, x-width/2, y-height, width, height)
 
     self.states = {}
-
     self.components = self.actorTemplate.components
 
     self:event("setup")
 end
 
 function Actor:event(eventName, dt)
+    local actorEvent = ActorEvent:new(self, eventName)
+
     for _, v in ipairs(self.components) do
-        if v[eventName] then
-            v[eventName](self, dt)
+        if v.component[eventName] then
+            v.component[eventName](self, dt, actorEvent, v.args)
         end
     end
+
+    actorEvent:finish()
 end
 
 function Actor:update(dt)

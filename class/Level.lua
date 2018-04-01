@@ -55,11 +55,11 @@ function Level:loadMap(data)
 
     local x, y = self:mapToWorld(self.spawnX-.5, self.spawnY)
     
-    local mario1 = Actor:new(self, x, y, actorTemplates.mario)
-    table.insert(self.marios, mario1)
-    table.insert(self.actors, mario1)
+    local mario = Actor(self, x, y, actorTemplates.smb3_raccoon)
+    table.insert(self.marios, mario)
+    table.insert(self.actors, mario)
     
-    table.insert(self.actors, Actor:new(self, 100, 100, actorTemplates.goomba))
+    -- table.insert(self.actors, Actor(self, 100, 100, actorTemplates.goomba))
     
     self:spawnEnemies(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end
@@ -156,10 +156,11 @@ end
 function Level:updateCamera(dt)
     if self.camera.target then
         local target = self.camera.target
+        
+        -- Horizontal
         local pX = target.x + target.width/2
         local pXr = pX - self.camera.x
         
-        -- Horizontal
         if pXr > RIGHTSCROLLBORDER then
             self.camera.x = self.camera.x + VAR("cameraScrollRate")*dt
             

@@ -5,11 +5,11 @@
     "centerX": 8,
     "centerY": 9,
 
-    "components": [
-        "mirror",
-        "truffleShuffle",
-        "unrotate"
-    ],
+    "img": "img/goomba.png",
 
-    "img": "goomba.png"
+    "components": {
+        "mirror": {},
+        "truffleShuffle": {"acceleration": 200, "maxSpeed": 40},
+        "unrotate": {}
+    }
 }

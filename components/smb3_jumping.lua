@@ -18,18 +18,19 @@ function component.setup(actor)
     end)
 end
 
-function component.update(actor)
+function component.update(actor, dt, actorEvent)
     if actor.state.name == "jump" then
-        actor.gravity = JUMPGRAVITY
+        actorEvent:setValue("gravity", VAR("gravityJumping"), 10)
     end
 end
 
-function component.jump(actor)
+function component.jump(actor, dt, actorEvent)
     if actor.onGround then
-        actor.onGround = false
-        actor.jumping = true
+        actorEvent:bind("after", function(actor)
+            actor.onGround = false
+        end)
 
-        actor.gravity = VAR("gravityjumping")
+        actor.jumping = true
         
         -- Adjust jumpforce according to speed
         for i = 1, #JUMPTABLE do

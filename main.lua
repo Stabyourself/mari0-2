@@ -36,8 +36,9 @@ function love.load()
 
     require "class.Level"
     require "class.Actor"
+    require "class.ActorEvent"
     require "class.BlockBounce"
-    require "class.Enemy"
+    -- require "class.Enemy"
     require "class.Portal"
     require "class.PortalParticle"
     require "class.PortalThing"

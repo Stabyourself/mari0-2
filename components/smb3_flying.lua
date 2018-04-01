@@ -22,19 +22,19 @@ function component.setup(actor)
 end
 
 function component.jump(actor)
-    if not actor.wasOnGround then
+    if not actor.onGround then
         if actor.flying then
             actor.state:switch("fly")
         end
+    end
 
-        if actor.pMeter == VAR("pMeterTicks") and not actor.flying then
-            actor.flyTimer = 0
-            actor.flying = true
-        end
+    if actor.pMeter == VAR("pMeterTicks") and not actor.flying then
+        actor.flyTimer = 0
+        actor.flying = true
     end
 end
 
-function component.update(actor, dt)
+function component.update(actor, dt, actorEvent)
     if actor.flying then
         actor.flyTimer = actor.flyTimer + dt
         
@@ -59,7 +59,7 @@ function component.update(actor, dt)
 
         actor.speed[2] = FLYINGASCENSION
 
-        actor.gravity = 0
+        actorEvent:setValue("gravity", 0, 10)
     end
 end
 

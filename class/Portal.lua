@@ -53,12 +53,12 @@ function Portal:initialize(world, x1, y1, x2, y2, color)
     end
 end
 
-function Portal:updatePosition()
+function Portal:updatePosition() -- from points
     self.angle = math.atan2(self.y2-self.y1, self.x2-self.x1)
     self.size = math.sqrt((self.x1-self.x2)^2 + (self.y1-self.y2)^2)
 end
 
-function Portal:backwardsUpdatePosition()
+function Portal:backwardsUpdatePosition() -- from angle
     local cX = (self.x2+self.x1)/2
     local cY = (self.y2+self.y1)/2
     

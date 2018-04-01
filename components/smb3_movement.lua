@@ -2,7 +2,6 @@ local component = {}
 
 local ACCELERATION = 196.875 -- acceleration on ground
 
-local NORMALGRAVITY = 1125
 local JUMPGRAVITYUNTIL = -120
 local BUTTACCELERATION = 225 -- this is per 1/8*pi of downhill slope
 
@@ -66,8 +65,6 @@ function component.setup(actor)
     actor.shooting = false
     actor.shootTimer = 0
     
-    actor.palette = actor.standardPalette
-
     actor:registerState("idle", function(actor)
         if cmdDown("right") or cmdDown("left") then
             return "run"
@@ -140,13 +137,13 @@ function component.setup(actor)
     actor.state = ActorState:new(actor, "idle", actor.states.idle) -- maybe change this
 end
 
-function component.update(actor, dt)
+function component.update(actor, dt, actorEvent)
     if actor.world.controlsEnabled then
-        movement(actor, dt)
+        movement(actor, dt, actorEvent)
     end
 end
 
-function movement(actor, dt)
+function movement(actor, dt, actorEvent)
     -- if not friction then
     --     if somethingIce then -- todo
     --         friction = FRICTIONICE
@@ -294,9 +291,7 @@ function movement(actor, dt)
         actor.pMeterTime = PMETERTIMEMARGIN
     end
     
-    if actor.flying then -- stuck pMeter to full
-        
-    else
+    if not actor.flying then
         while actor.pMeterTimer >= actor.pMeterTime do
             actor.pMeterTimer = actor.pMeterTimer - actor.pMeterTime
             
@@ -326,6 +321,7 @@ function movement(actor, dt)
     -- Ducking
     if actor.onGround then
         if cmdDown("down") and not cmdDown("left") and not cmdDown("right") and actor.state.name ~= "buttSlide" then
+            
             if actor.surfaceAngle ~= 0 then -- check if buttslide
                 actor.state:switch("buttSlide")
                 
@@ -370,10 +366,7 @@ function movement(actor, dt)
 
     
     -- Update gravity
-    actor.gravity = NORMALGRAVITY
-    if actor.state.name == "float" then
-        actor.gravity = 0
-    end
+    actorEvent:setValue("gravity", VAR("gravity"), 0)
 end
 
 function component.bottomCollision(actor)

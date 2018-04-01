@@ -147,8 +147,8 @@ function World:draw()
         
         local quadX = obj.x+obj.width/2-obj.centerX
         local quadY = obj.y+obj.height/2-obj.centerY
-        local quadWidth = obj.sizeX
-        local quadHeight = obj.sizeY
+        local quadWidth = obj.quadWidth
+        local quadHeight = obj.quadHeight
 
         love.graphics.stencil(function() end, "replace")
 

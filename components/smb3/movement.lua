@@ -3,14 +3,11 @@ local component = {}
 local ACCELERATION = 196.875 -- acceleration on ground
 
 local JUMPGRAVITYUNTIL = -120
-local BUTTACCELERATION = 225 -- this is per 1/8*pi of downhill slope
 
 local MAXSPEEDS = {90, 150, 210}
-local MAXSPEEDFLY = 86.25
 
 local FRICTION = 140.625 -- amount of speed that is substracted when not pushing buttons
 local FRICTIONICE = 42.1875 -- duh
-local FRICTIONBUTT = 277+7/9
 local FRICTIONFLYSMALL = 56.25
 local FRICTIONFLYBIG = 225
 
@@ -24,16 +21,11 @@ local PMETERTIMEMARGIN = 16/60
 
 local DOWNHILLWALKBONUS = 7.5
 
-local FLOATASCENSION = 60
-
-local FLOATTIME = 16/60
-
 local state = {}
 
 
 function component.setup(actor)
     actor.jumping = false
-    actor.ducking = false
     
 
     actor.animationState = "idle"
@@ -44,17 +36,11 @@ function component.setup(actor)
     actor.pMeterTimer = 0
     actor.pMeterTime = 8/60
     
-    actor.flyTimer = FLYTIME
-    actor.flying = false
-    
     actor.runAnimationFrame = 1
     actor.runAnimationTimer = 0
     
     actor.flyAnimationFrame = 1
     actor.flyAnimationTimer = 0
-    
-    actor.floatAnimationFrame = 1
-    actor.floatAnimationFrame = 0
     
     actor.somerSaultFrame = 2
     actor.somerSaultFrameTimer = 0
@@ -120,20 +106,6 @@ function component.setup(actor)
         -- handled by bottomCollision
     end)
 
-
-    actor:registerState("buttSlide", function(actor)
-        if cmdDown("right") or cmdDown("left") or (actor.speed[1] == 0 and actor.surfaceAngle == 0) then
-            return "idle"
-        end
-    end)
-
-
-    actor:registerState("float", function(actor, actorState)
-        if actorState.timer >= FLOATTIME then
-            return "fall"
-        end
-    end)
-    
     actor.state = ActorState:new(actor, "idle", actor.states.idle) -- maybe change this
 end
 
@@ -190,9 +162,6 @@ function movement(actor, dt, actorEvent)
             actor.spinning = false
         end
     end
-        
-    if actor.flying then
-    end
     
     if actor.state.name == "idle" then
         
@@ -237,41 +206,6 @@ function movement(actor, dt, actorEvent)
         accelerate(dt, actor, ACCELERATION, actor.maxSpeedJump or MAXSPEEDS[1])
         skid(dt, actor, FRICTIONSKID)
     end
-    
-    if actor.state.name == "buttSlide" then
-        local buttAcceleration = BUTTACCELERATION * (actor.surfaceAngle/(math.pi/8))
-        
-        actor.speed[1] = actor.speed[1] + buttAcceleration*dt
-        
-        if actor.surfaceAngle == 0 then
-            actor:friction(dt, FRICTIONBUTT)
-        end
-    end
-    
-    if (actor.flying and (actor.state.name == "jump" or actor.state.name == "fall")) or actor.state.name == "float" then
-        if math.abs(actor.speed[1]) > MAXSPEEDFLY then
-            if  actor.speed[1] > 0 and cmdDown("right") or
-                actor.speed[1] < 0 and cmdDown("left") then
-                actor:friction(dt, FRICTIONFLYSMALL, MAXSPEEDFLY)
-            else
-                actor:friction(dt, FRICTIONFLYBIG, MAXSPEEDFLY)
-            end
-        end
-        
-        if actor.flying or actor.state.name == "float" then
-            accelerate(dt, actor, ACCELERATION, MAXSPEEDFLY)
-        else
-            local maxSpeed = math.min(MAXSPEEDS[2], actor.maxSpeedJump)
-            
-            accelerate(dt, actor, ACCELERATION, maxSpeed)
-        end
-        
-        skid(dt, actor, FRICTIONSKIDFLY)
-    end
-    
-    if actor.state.name == "float" then
-        actor.speed[2] = FLOATASCENSION
-    end 
     
     -- P meter
     actor.pMeterTimer = actor.pMeterTimer + dt
@@ -318,32 +252,6 @@ function movement(actor, dt, actorEvent)
         actor.flyTimer = 0
     end
     
-    -- Ducking
-    if actor.onGround then
-        if cmdDown("down") and not cmdDown("left") and not cmdDown("right") and actor.state.name ~= "buttSlide" then
-            
-            if actor.surfaceAngle ~= 0 then -- check if buttslide
-                actor.state:switch("buttSlide")
-                
-                if actor.surfaceAngle > 0 then
-                    actor.speed[1] = math.max(0, actor.speed[1])
-                else
-                    actor.speed[1] = math.min(0, actor.speed[1])
-                end
-            elseif actor.canDuck then
-                actor.ducking = true
-                
-                -- Stop spinning if was spinning
-                if actor.canSpin then
-                    actor.spinning = false
-                    actor.spinTimer = SPINTIME
-                end
-            end
-        else
-            actor.ducking = false
-        end
-    end
-    
     
     -- actor.speed[1] = actor.groundSpeedX
     
@@ -370,7 +278,7 @@ function movement(actor, dt, actorEvent)
 end
 
 function component.bottomCollision(actor)
-    if actor.state.name == "jump" or actor.state.name == "fall" or actor.state.name == "float" then
+    if actor.state.name == "jump" or actor.state.name == "fall" then
         actor.state:switch("idle")
     end
 end

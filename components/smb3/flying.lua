@@ -3,6 +3,7 @@ local component = {}
 local FLYINGUPTIME = 16/60
 local FLYTIME = 4.25
 local MAXSPEEDFLY = 86.25
+local MAXSPEEDS = {90, 150, 210}
 local FLYINGASCENSION = -90
 local ACCELERATION = 196.875
 local FRICTIONFLYSMALL = 56.25
@@ -10,6 +11,9 @@ local FRICTIONFLYBIG = 225
 local FRICTIONSKIDFLY = 675 -- turnaround speed while flying
 
 function component.setup(actor)
+    actor.flyTimer = FLYTIME
+    actor.flying = false
+
     actor:registerState("fly", function(actor, actorState)
         if not actor.flying then
             return "fall"
@@ -22,10 +26,9 @@ function component.setup(actor)
 end
 
 function component.jump(actor)
-    if not actor.onGround then
-        if actor.flying then
-            actor.state:switch("fly")
-        end
+    if not actor.onGround and actor.flying then
+        actor.state:switch("fly")
+        actor.flyAnimationFrame = 1
     end
 
     if actor.pMeter == VAR("pMeterTicks") and not actor.flying then
@@ -44,7 +47,8 @@ function component.update(actor, dt, actorEvent)
         end
     end
 
-    if actor.state.name == "fly" then
+    if  (actor.flying and (actor.state.name == "jump" or actor.state.name == "fall")) or
+        actor.state.name == "fly" then
         if math.abs(actor.speed[1]) > MAXSPEEDFLY then
             if  actor.speed[1] > 0 and cmdDown("right") or
                 actor.speed[1] < 0 and cmdDown("left") then
@@ -54,12 +58,17 @@ function component.update(actor, dt, actorEvent)
             end
         end
         
-        accelerate(dt, actor, ACCELERATION, MAXSPEEDFLY)
+        if actor.state.name == "fly" then
+            accelerate(dt, actor, ACCELERATION, MAXSPEEDFLY)
+            actor.speed[2] = FLYINGASCENSION
+            actorEvent:setValue("gravity", 0, 10)
+        else
+            local maxSpeed = math.min(MAXSPEEDS[2], actor.maxSpeedJump)
+            
+            accelerate(dt, actor, ACCELERATION, maxSpeed)
+        end
+
         skid(dt, actor, FRICTIONSKIDFLY)
-
-        actor.speed[2] = FLYINGASCENSION
-
-        actorEvent:setValue("gravity", 0, 10)
     end
 end
 

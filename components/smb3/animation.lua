@@ -210,7 +210,7 @@ function animation(actor, dt)
                 while actor.flyAnimationTimer > FLYANIMATIONTIME do
                     actor.flyAnimationTimer = actor.flyAnimationTimer - FLYANIMATIONTIME
                     actor.flyAnimationFrame = actor.flyAnimationFrame + 1
-
+                    print(actor.flyAnimationFrame)
                     if actor.flyAnimationFrame > flyFrames then
                         actor.flyAnimationFrame = flyFrames -- don't reset to the start
                     end

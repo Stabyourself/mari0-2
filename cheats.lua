@@ -1,4 +1,4 @@
 CHEATENABLED = {}
 
 CHEATENABLED.tumble = false
-CHEATENABLED.infinitePMeter = false
+CHEATENABLED.infinitePMeter = true

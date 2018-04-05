@@ -386,3 +386,25 @@ function convertPalette(palette)
         end
     end
 end
+
+function recursiveEnumerate(folder, files) -- What's with all the recursion in this project? smh
+    if not files then
+        files = {}
+    end
+
+    local filesTable = love.filesystem.getDirectoryItems(folder)
+    
+	for i,v in ipairs(filesTable) do
+        local file = folder.."/"..v
+        
+        local fileInfo = love.filesystem.getInfo(file)
+
+		if fileInfo.type == "file" then
+			table.insert(files, file)
+		elseif fileInfo.type == "directory" then
+			recursiveEnumerate(file, files)
+		end
+    end
+    
+	return files
+end

@@ -13,7 +13,7 @@
     },
     
     "components": {
-        "smb3_animation": {
+        "smb3.animation": {
             "quadWidth": 40,
             "quadHeight": 40,
             "centerX": 23,
@@ -93,13 +93,13 @@
                 "somerSault"
             ]
         },
-        "smb3_movement": {},
-        "smb3_jumping": {},
-        "smb3_flying": {},
-        "smb3_ducking": {},
-        "smb3_floating": {},
-        "unrotate": {},
-        "crosshair": {},
-        "portalGun": {}
+        "smb3.movement": {},
+        "smb3.jumping": {},
+        "smb3.flying": {},
+        "smb3.ducking": {},
+        "smb3.floating": {},
+        "misc.unrotate": {},
+        "misc.crosshair": {},
+        "misc.portalGun": {}
     }
 }

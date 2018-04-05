@@ -1,13 +1,15 @@
 components = {}
 
-local dir = "components."
+toLoad = recursiveEnumerate("components")
 
-local files = love.filesystem.getDirectoryItems(dir)
-
-for _, file in ipairs(files) do
-    if string.sub(file, -3) == "lua" then
-        local name = string.sub(file, 1, -5)
-
-        components[name] = require(dir .. name)
+for _, path in ipairs(toLoad) do
+    if path:sub(-3) == "lua" then
+        -- clean up the string
+    
+        path = path:gsub("/", ".") -- replace / with .
+        path = path:sub(1, -5) -- remove .lua
+        name = path:sub(12) -- really?
+        
+        components[name] = require(path)
     end
 end

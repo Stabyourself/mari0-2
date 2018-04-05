@@ -12,7 +12,7 @@
     },
     
     "components": {
-        "smb3_animation": {
+        "smb3.animation": {
             "quadWidth": 24,
             "quadHeight": 24,
             "centerX": 12,
@@ -57,10 +57,10 @@
             "climb"
             ]
         },
-        "smb3_movement": {},
-        "smb3_jumping": {},
-        "crosshair": {},
-        "portalGun": {},
-        "unrotate": {}
+        "smb3.movement": {},
+        "smb3.jumping": {},
+        "misc.crosshair": {},
+        "misc.portalGun": {},
+        "misc.unrotate": {}
     }
 }

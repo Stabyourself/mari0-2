@@ -8,8 +8,8 @@
     "img": "img/goomba.png",
 
     "components": {
-        "mirror": {},
-        "truffleShuffle": {"acceleration": 200, "maxSpeed": 40},
-        "unrotate": {}
+        "animation.mirror": {},
+        "movement.truffleShuffle": {"acceleration": 200, "maxSpeed": 40},
+        "misc.unrotate": {}
     }
 }

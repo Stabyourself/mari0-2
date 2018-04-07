@@ -8,7 +8,6 @@ local FLOATANIMATIONTIME = 4/60
 local SPINTIME = 19/60
 local SPINFRAMETIME = 4/60
 
-local STARTIME = 7.5
 local STARFRAMETIME = 4/60
 local SOMERSAULTTIME = 2/60
 
@@ -87,7 +86,7 @@ end
 
 function animation(actor, dt)
     -- Image updating for star
-    if actor.starMan then
+    if actor.starred then
         -- get frame
         local palette = math.ceil(math.fmod(actor.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
         
@@ -115,7 +114,7 @@ function animation(actor, dt)
     
     local frame = false
     
-    if actor.spinning and (not actor.starMan or (actor.state.name ~= "jump" and actor.state.name ~= "fall"))  then
+    if actor.spinning and (not actor.starred or (actor.state.name ~= "jump" and actor.state.name ~= "fall"))  then
         if actor.onGround then
             actor.animationState = "spin"
         else
@@ -127,7 +126,7 @@ function animation(actor, dt)
         -- calculate spin frame from spinTimer
         frame = math.ceil(math.fmod(actor.spinTimer, actor.frameCounts.spin*SPINFRAMETIME)/SPINFRAMETIME)
 
-    elseif actor.shooting and (not actor.starMan or (actor.state.name ~= "jump" and actor.state.name ~= "fall")) then
+    elseif actor.shooting and (not actor.starred or (actor.state.name ~= "jump" and actor.state.name ~= "fall")) then
         if actor.onGround then
             actor.animationState = "shoot"
         else
@@ -158,9 +157,8 @@ function animation(actor, dt)
     elseif actor.state.name == "buttSlide" then
         actor.animationState = "buttSlide"
         
-    elseif actor.starMan and actor.frameCounts.somerSault then
+    elseif actor.starred and actor.frameCounts.somerSault then
         actor.animationState = "somerSault"
-        frame = actor.somerSaultFrame
         
     elseif actor.state.name == "float" then
         actor.animationState = "float"
@@ -210,7 +208,7 @@ function animation(actor, dt)
                 while actor.flyAnimationTimer > FLYANIMATIONTIME do
                     actor.flyAnimationTimer = actor.flyAnimationTimer - FLYANIMATIONTIME
                     actor.flyAnimationFrame = actor.flyAnimationFrame + 1
-                    print(actor.flyAnimationFrame)
+                    
                     if actor.flyAnimationFrame > flyFrames then
                         actor.flyAnimationFrame = flyFrames -- don't reset to the start
                     end
@@ -236,6 +234,26 @@ function animation(actor, dt)
         
         frame = actor.floatAnimationFrame
     end
+
+    -- Somersault animation
+    if actor.starred and (actor.state.name == "jump" or actor.state.name == "fall") then
+        local somersaultFrames = actor.frameCounts.somerSault
+
+        actor.somerSaultFrameTimer = actor.somerSaultFrameTimer + dt
+        
+        while actor.somerSaultFrameTimer > SOMERSAULTTIME do
+            actor.somerSaultFrameTimer = actor.somerSaultFrameTimer - SOMERSAULTTIME
+            
+            actor.somerSaultFrame = actor.somerSaultFrame + 1
+            if actor.somerSaultFrame > somersaultFrames then
+                actor.somerSaultFrame = 1
+            end
+        end
+
+        frame = actor.somerSaultFrame
+    end
+
+    print(frame)
     
     -- Make sure to properly use the tables if it's an animationState with frames
     if frame then

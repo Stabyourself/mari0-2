@@ -49,21 +49,17 @@ function Actor:registerState(name, func)
     self.states[name] = func
 end
 
--- function Actor:jump()
---     self.wasOnGround = self.onGround
-    
---     -- if self.canFloat and self.speed[2] > 0 and (self.state.name == "jump" or self.state.name == "float" or self.state.name == "fall") then
---     --     self.state:switch("float")
---     --     self.floatAnimationTimer = 0
---     --     self.floatAnimationFrame = 1
---     -- end
+function Actor:addComponent(component, args)
+    table.insert(self.components, {component=component, args=args})
 
---     for _, v in ipairs(self.components) do
---         if v.jump then 
---             v.jump(self, dt)
---         end
---     end
--- end
+    if component.setup then
+        local actorEvent = ActorEvent:new(self, "setup")
+
+        component.setup(self, dt, actorEvent, args)
+
+        actorEvent:finish()
+    end
+end
 
 function Actor:ceilCollision(obj2)
     if obj2:isInstanceOf(Block) then

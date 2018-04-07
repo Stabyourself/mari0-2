@@ -16,7 +16,6 @@ end
 function component.update(actor, dt)
     if actor.onGround then
         if cmdDown("down") and not cmdDown("left") and not cmdDown("right") and actor.state.name ~= "buttSlide" then
-            
             if actor.surfaceAngle ~= 0 then -- check if buttslide
                 actor.state:switch("buttSlide")
                 
@@ -28,11 +27,9 @@ function component.update(actor, dt)
             else
                 actor.ducking = true
                 
-                -- Stop spinning if was spinning
-                if actor.canSpin then
-                    actor.spinning = false
-                    actor.spinTimer = SPINTIME
-                end
+                -- Stop spinning in case
+                actor.spinning = false
+                actor.spinTimer = SPINTIME
             end
         else
             actor.ducking = false

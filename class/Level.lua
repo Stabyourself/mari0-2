@@ -23,7 +23,6 @@ function Level:loadMap(data)
     self.camera = Camera.new(CAMERAWIDTH/2, CAMERAHEIGHT/2, CAMERAWIDTH, CAMERAHEIGHT)
     
     self.camera.rot = 0
-    self.controlsEnabled = true
     self.spawnLine = 0
     self.spawnI = 1
 
@@ -102,16 +101,17 @@ function Level:cmdpressed(cmds)
         self.marios[1]:event("jump")
     end
     
-    if cmds["closePortals"] then
-        self.marios[1]:event("closePortals")
-    end
-    
     if cmds["run"] then
         self.marios[1]:event("action")
     end
     
-    if cmds["star"] then
-        self.marios[1]:event("star")
+    if cmds["closePortals"] then
+        self.marios[1]:event("closePortals")
+    end
+    
+    if cmds["debug.star"] then -- debug
+        print("!")
+        self.marios[1]:addComponent(components["smb3.star"])
     end
 end
 

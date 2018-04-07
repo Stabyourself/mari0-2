@@ -39,14 +39,8 @@ function component.setup(actor)
     actor.runAnimationFrame = 1
     actor.runAnimationTimer = 0
     
-    actor.flyAnimationFrame = 1
-    actor.flyAnimationTimer = 0
-    
     actor.somerSaultFrame = 2
     actor.somerSaultFrameTimer = 0
-    
-    actor.spinning = false
-    actor.spinTimer = SPINTIME
     
     actor.shooting = false
     actor.shootTimer = 0
@@ -61,7 +55,6 @@ function component.setup(actor)
         end
     end)
 
-
     actor:registerState("stop", function(actor)
         if cmdDown("right") or cmdDown("left") then
             return "run"
@@ -71,7 +64,6 @@ function component.setup(actor)
             return "idle"
         end
     end)
-
 
     actor:registerState("run", function(actor)
         if not cmdDown("right") and not cmdDown("left") then
@@ -83,7 +75,6 @@ function component.setup(actor)
             return "skid"
         end
     end)
-
 
     actor:registerState("skid", function(actor)
         if actor.speed[1] == 0 then
@@ -98,73 +89,23 @@ function component.setup(actor)
         end
     end)
 
-
     actor:registerState("fall", function(actor)
         if cmdDown("jump") and actor.speed[2] < JUMPGRAVITYUNTIL then
             return "jump"
         end
-        -- handled by bottomCollision
+        -- otherwise handled by bottomCollision
     end)
 
     actor.state = ActorState:new(actor, "idle", actor.states.idle) -- maybe change this
 end
 
 function component.update(actor, dt, actorEvent)
-    if actor.world.controlsEnabled then
-        movement(actor, dt, actorEvent)
-    end
-end
-
-function movement(actor, dt, actorEvent)
-    -- if not friction then
-    --     if somethingIce then -- todo
-    --         friction = FRICTIONICE
-    --     else
-    --         friction = FRICTION
-    --     end
-    -- end
-
-    if actor.starMan then
-        actor.starTimer = actor.starTimer + dt
-        
-        if actor.starTimer >= STARTIME then
-            actor.starMan = false
-            actor.img = actor.graphics["small"].img
-            actor.palette = actor.standardPalette
-        end
-        
-        if actor.graphics["small"].frames.somerSault then
-            actor.somerSaultFrameTimer = actor.somerSaultFrameTimer + dt
-            
-            while actor.somerSaultFrameTimer > SOMERSAULTTIME do
-                actor.somerSaultFrameTimer = actor.somerSaultFrameTimer - SOMERSAULTTIME
-                
-                actor.somerSaultFrame = actor.somerSaultFrame + 1
-                if actor.somerSaultFrame > actor.graphics["small"].frames.somerSault then
-                    actor.somerSaultFrame = 1
-                end
-            end
-        end
-    end
-    
     if actor.shooting then
         actor.shootTimer = actor.shootTimer + dt
         
         if actor.shootTimer >= SHOOTTIME then
             actor.shooting = false
         end
-    end
-    
-    if actor.spinning then
-        actor.spinTimer = actor.spinTimer + dt
-        
-        if actor.spinTimer >= SPINTIME then
-            actor.spinning = false
-        end
-    end
-    
-    if actor.state.name == "idle" then
-        
     end
     
     if actor.state.name == "stop" then
@@ -271,9 +212,7 @@ function movement(actor, dt, actorEvent)
     --         end
     --     end
     -- end
-
     
-    -- Update gravity
     actorEvent:setValue("gravity", VAR("gravity"), 0)
 end
 

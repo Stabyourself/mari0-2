@@ -11,5 +11,7 @@ for _, path in ipairs(toLoad) do
         name = path:sub(12) -- really?
         
         components[name] = require(path)
+
+        assert(type(components[name]) == "table", "Component \"" .. path .. "\" didn't return a table.")
     end
 end

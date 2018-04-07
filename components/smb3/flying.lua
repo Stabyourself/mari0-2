@@ -13,6 +13,9 @@ local FRICTIONSKIDFLY = 675 -- turnaround speed while flying
 function component.setup(actor)
     actor.flyTimer = FLYTIME
     actor.flying = false
+    
+    actor.flyAnimationFrame = 1
+    actor.flyAnimationTimer = 0
 
     actor:registerState("fly", function(actor, actorState)
         if not actor.flying then

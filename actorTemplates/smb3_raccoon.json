@@ -98,6 +98,7 @@
         "smb3.flying": {},
         "smb3.ducking": {},
         "smb3.floating": {},
+        "smb3.spinning": {},
         "misc.unrotate": {},
         "misc.crosshair": {},
         "misc.portalGun": {}

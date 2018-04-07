@@ -56,12 +56,6 @@ function component.jump(actor, dt, actorEvent)
         
         actor.maxSpeedJump = maxSpeedJump
         
-        -- Reset starJump animation
-        if actor.starMan then
-            actor.somerSaultFrame = 2
-            actor.somerSaultFrameTimer = 0
-        end
-        
         actor.state:switch("jump")
     end
 end

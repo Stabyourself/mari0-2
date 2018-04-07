@@ -1,7 +1,9 @@
 local tiles = {}
 
+local templates = VAR("tileTemplates")
+
 tiles[1] = {
-    collision = VAR("tileTemplates").cube,
+    collision = templates.cube,
     img = "coinblock1.png",
     delays = {8/60}
 }

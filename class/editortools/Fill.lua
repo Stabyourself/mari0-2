@@ -47,7 +47,8 @@ function Fill:mousereleased(x, y, button)
                 end
             end
             
-            local tiles = self.level:getFloodArea(x, y)
+            -- local tiles = self.level:getFloodArea(x, y)
+            local tiles = self.level:getFloodAreaScanline(x, y)
             
             self:fillTiles(tiles, self.editor.tools.paint.tile)
             self.editor:saveState()

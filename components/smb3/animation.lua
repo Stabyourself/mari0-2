@@ -1,6 +1,7 @@
 local component = {}
 
 local MAXSPEEDS = {90, 150, 210}
+local ANIMATIONSPEEDS = {1/4*60, 1/3*60, 1/2*60, 1*60}
 
 local FLYANIMATIONTIME = 4/60
 local FLOATANIMATIONTIME = 4/60
@@ -12,8 +13,6 @@ local STARFRAMETIME = 4/60
 local SOMERSAULTTIME = 2/60
 
 local SHOOTTIME = 12/60
-
-local RUNANIMATIONTIME = 1.2
 
 local STARPALETTES = {
     {
@@ -181,9 +180,22 @@ function animation(actor, dt)
     
     -- Running animation
     if (actor.animationState == "run" or actor.animationState == "sprint") then
-        actor.runAnimationTimer = actor.runAnimationTimer + (math.abs(actor.speed[1])+50)/8*dt
-        while actor.runAnimationTimer > RUNANIMATIONTIME do
-            actor.runAnimationTimer = actor.runAnimationTimer - RUNANIMATIONTIME
+        local animationspeed
+
+        if math.abs(actor.speed[1]) >= MAXSPEEDS[3] then -- sprint speed
+            animationspeed = ANIMATIONSPEEDS[4]
+        elseif math.abs(actor.speed[1]) > MAXSPEEDS[2] then -- sprint speed
+            animationspeed = ANIMATIONSPEEDS[3]
+        elseif math.abs(actor.speed[1]) > MAXSPEEDS[1] then -- sprint speed
+            animationspeed = ANIMATIONSPEEDS[2]
+        else
+            animationspeed = ANIMATIONSPEEDS[1]
+        end
+        
+        actor.runAnimationTimer = actor.runAnimationTimer + animationspeed*dt
+        print(animationspeed)
+        while actor.runAnimationTimer > 1 do
+            actor.runAnimationTimer = actor.runAnimationTimer - 1
             actor.runAnimationFrame = actor.runAnimationFrame + 1
             
             local runFrames = actor.frameCounts.run
@@ -192,7 +204,7 @@ function animation(actor, dt)
                 actor.runAnimationFrame = actor.runAnimationFrame - runFrames
             end
         end
-        
+            
         frame = actor.runAnimationFrame
     end
     
@@ -252,8 +264,6 @@ function animation(actor, dt)
 
         frame = actor.somerSaultFrame
     end
-
-    print(frame)
     
     -- Make sure to properly use the tables if it's an animationState with frames
     if frame then

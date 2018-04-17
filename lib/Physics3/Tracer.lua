@@ -13,8 +13,23 @@ function Tracer:trace()
 	local x, y, col
 	
 	for i = 0, self.distance-1 do
-		x = self.physObj:getX() + self.xOff + i*self.xDir
-		y = self.physObj:getY() + self.yOff + i*self.yDir
+		local objX = self.physObj:getX()
+		local objY = self.physObj:getY()
+
+		if self.xDir > 0 then
+			objX = math.ceil(objX)
+		elseif self.xDir < 0 then
+			objX = math.floor(objX)
+		end
+
+		if self.yDir > 0 then
+			objY = math.ceil(objY)
+		elseif self.yDir < 0 then
+			objY = math.floor(objY)
+		end
+
+		x = objX + self.xOff + i*self.xDir
+		y = objY + self.yOff + i*self.yDir
 		
 		col = self.physObj.World:checkMapCollision(x, y, self.physObj)
 		if col then

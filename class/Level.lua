@@ -110,7 +110,6 @@ function Level:cmdpressed(cmds)
     end
     
     if cmds["debug.star"] then -- debug
-        print("!")
         self.marios[1]:addComponent(components["smb3.star"])
     end
 end

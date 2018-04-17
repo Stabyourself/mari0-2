@@ -83,7 +83,7 @@ function love.load()
     game = Game:new()
 
     gameStateManager:loadState(game)
-    --gameStateManager:addState(Editor:new(game.level))
+    gameStateManager:addState(Editor:new(game.level))
 end
 
 function love.update(dt)

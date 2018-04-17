@@ -167,7 +167,7 @@ function Editor:load()
     self.pastePos = {1, 1}
     
     self:toggleGrid(false)
-    self:toggleFreeCam(true)
+    self:toggleFreeCam(false)
 end
 
 function Editor:update(dt)

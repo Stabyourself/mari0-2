@@ -232,11 +232,11 @@ function PhysObj:checkCollisions()
 end
 
 function PhysObj:getX()
-	return math.round(self.x)
+	return self.x
 end
 
 function PhysObj:getY()
-	return math.round(self.y)
+	return self.y
 end
 
 function PhysObj:debugDraw(xOff, yOff)

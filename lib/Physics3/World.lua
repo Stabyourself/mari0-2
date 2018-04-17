@@ -1056,6 +1056,7 @@ function World:checkPortalSurface(tileX, tileY, side, worldX, worldY, ignoreP)
 end
 
 function World:getFloodArea(x, y)
+    local t = love.timer.getTime()
     local targetTile = self:getTile(x, y)
     local tileLookupTable = {}
     
@@ -1068,9 +1069,10 @@ function World:getFloodArea(x, y)
     repeat
         cur = table.remove(stack, 1)
         
-        if  self:inMap(cur[1], cur[2]) and 
+        if  self:inMap(cur[1], cur[2]) and
             not tileLookupTable[cur[1]][cur[2]] and
-            self:getTile(cur[1], cur[2]) == targetTile then
+            self:getTile(cur[1], cur[2]) == targetTile
+            then
                 
             tileLookupTable[cur[1]][cur[2]] = true
             
@@ -1091,6 +1093,62 @@ function World:getFloodArea(x, y)
         end
     end
     
+    print(string.format("%.5f milliseconds for 4-way fill", (love.timer.getTime()-t)*1000))
+    return tileTable
+end
+
+function World:getFloodAreaScanline(x, y) -- Based off https://github.com/Yonaba/FloodFill/blob/master/floodfill/floodstackscanline.lua (which seems to be based off lodev?)
+    local t = love.timer.getTime()
+    local targetTile = self:getTile(x, y)
+
+    local tileLookupTable = {}
+    for x = 1, self.width do
+        tileLookupTable[x] = {}
+    end
+
+	local spanLeft, spanRight
+
+    local tileTable = {}
+    stack = {{x, y}}
+    
+    while #stack > 0 do
+        local p = table.remove(stack)
+        
+		local x, y = p[1], p[2]
+
+		while ((y >= 1) and self:getTile(x, y) == targetTile) do -- go to the highest possible point
+			y = y - 1
+		end
+		y = y + 1
+		spanLeft, spanRight = false, false
+
+        while (y <= self.height and self:getTile(x, y) == targetTile) do -- walk vertically down
+            table.insert(tileTable, {x, y})
+            tileLookupTable[x][y] = true
+
+            if x > 1 then -- see if we wanna check out that sweet, sexy, vertical line to the left
+                if (not spanLeft and self:getTile(x-1, y) == targetTile) and not tileLookupTable[x-1][y] then
+                    table.insert(stack, {x-1, y})
+                    spanLeft = true
+                elseif (spanLeft and self:getTile(x-1, y) ~= targetTile)then
+                    spanLeft = false
+                end
+            end
+
+            if x < self.width then -- and same with right
+                if (not spanRight and self:getTile(x+1, y) == targetTile) and not tileLookupTable[x+1][y] then
+                    table.insert(stack, {x+1, y})
+                    spanRight = true
+                elseif (spanRight and self:getTile(x+1, y) ~= targetTile) then
+                    spanRight = false
+                end
+            end
+
+			y = y + 1
+		end
+	end
+    
+    print(string.format("%.5f milliseconds for scanline fill", (love.timer.getTime()-t)*1000))
     return tileTable
 end
 

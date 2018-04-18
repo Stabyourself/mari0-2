@@ -70,7 +70,7 @@ function love.load()
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")
     debugCandyImg:setWrap("repeat")
 
-    if love.math.random() > 0.9 then
+    if love.math.random() > 0.99 then
         funkyImg = love.graphics.newImage("img/funky.png")
     end
     
@@ -83,10 +83,12 @@ function love.load()
     game = Game:new()
 
     gameStateManager:loadState(game)
-    gameStateManager:addState(Editor:new(game.level))
+    -- gameStateManager:addState(Editor:new(game.level))
 end
 
 function love.update(dt)
+    require("lib/lovebird").update()
+
     prof.enabled(true)
     prof.push("frame")
     prof.push("update")
@@ -120,12 +122,8 @@ function love.draw()
     
     gameStateManager:event("draw")
     
-    if VAR("actorStateDebug") then
-        love.graphics.print(game.level.marios[1].state.name, 8, 8)
-    end
-    
     -- For the stream
-    if VAR("inputDebug") then
+    if VAR("debug").input then
         setColorBasedOn("up")
         love.graphics.rectangle("fill", 16, SCREENHEIGHT-32, 8, 8)
         setColorBasedOn("left")

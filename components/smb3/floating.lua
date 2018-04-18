@@ -41,7 +41,7 @@ end
 
 function component.jump(actor)
     if not actor.flying and not actor.onGround and actor.speed[2] > 0 then
-        actor.state:switch("float")
+        actor:switchState("float")
         actor.floatAnimationTimer = 0
         actor.floatAnimationFrame = 1
     end
@@ -49,7 +49,7 @@ end
 
 function component.bottomCollision(actor)
     if actor.state.name == "float" then
-        actor.state:switch("idle")
+        actor:switchState("idle")
     end
 end
 

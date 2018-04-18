@@ -1,7 +1,7 @@
 PROF_CAPTURE = false
 
 return {
-    physicsDebug = false,
+    hitBoxDebug = false,
     quadDebug = false,
     stencilDebug = false,
     inputDebug = false,

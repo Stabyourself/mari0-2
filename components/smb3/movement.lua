@@ -218,12 +218,12 @@ end
 
 function component.bottomCollision(actor)
     if actor.state.name == "jump" or actor.state.name == "fall" then
-        actor.state:switch("idle")
+        actor:switchState("idle")
     end
 end
 
 function component.startFall(actor)
-    actor.state:switch("fall")
+    actor:switchState("fall")
 end
 
 function skid(dt, actor, friction)

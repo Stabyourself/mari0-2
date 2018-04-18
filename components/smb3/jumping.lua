@@ -56,7 +56,7 @@ function component.jump(actor, dt, actorEvent)
         
         actor.maxSpeedJump = maxSpeedJump
         
-        actor.state:switch("jump")
+        actor:switchState("jump")
     end
 end
 

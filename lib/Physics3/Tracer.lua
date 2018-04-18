@@ -1,4 +1,4 @@
-local Tracer = class("Physics3.Tracer")
+local Tracer = class("Physics3.Tracer") -- The cavalry is here
 
 function Tracer:initialize(physObj, xOff, yOff, xDir, yDir, distance)
 	self.physObj = physObj

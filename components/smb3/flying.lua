@@ -30,7 +30,7 @@ end
 
 function component.jump(actor)
     if not actor.onGround and actor.flying then
-        actor.state:switch("fly")
+        actor:switchState("fly")
         actor.flyAnimationFrame = 1
     end
 

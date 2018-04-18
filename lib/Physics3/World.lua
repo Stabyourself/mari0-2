@@ -74,7 +74,7 @@ function World:checkPortaling(obj, oldX, oldY)
                     obj.animationDirection = -obj.animationDirection
                 end
                 
-                if VAR("portalVectorDebug") then
+                if VAR("debug").portalVector then
                     self.portalVectorDebugs = {}
                     table.insert(self.portalVectorDebugs, {
                         inX = x,
@@ -153,63 +153,60 @@ function World:draw()
         love.graphics.stencil(function() end, "replace")
 
         -- Portal duplication
+        local inPortals = {}
+
         for _, p in ipairs(self.portals) do
             if p.open then
-                if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
-                    objectWithinPortalRange(p, x, y) then
-                    local angle = math.atan2(obj.speed[2], obj.speed[1])
-                    local cX, cY, cAngle, angleDiff, reversed = self:doPortal(p, obj.x+obj.width/2, obj.y+obj.height/2, obj.angle)
-                    
-                    local xScale = 1
-                    if reversed then
-                        xScale = -1
-                    end
-                    
-                    love.graphics.stencil(function() p.connectsTo:stencilRectangle("out") end, "replace")
-                    love.graphics.setStencilTest("greater", 0)
-
-                    if VAR("stencilDebug") then
-                        love.graphics.setColor(0, 1, 0)
-                        love.graphics.draw(debugCandyImg, debugCandyQuad, self.camera:worldCoords(0, 0))
-                        love.graphics.setColor(1, 1, 1)
-                    end
-
-                    local a = angleDiff
-                    
-                    if reversed then
-                        a = a - (obj.angle or 0)
-                    else
-                        a = a + (obj.angle or 0)
-                    end
-                    
-                    drawObject(obj, cX, cY, a, (obj.animationDirection or 1)*xScale, 1, obj.centerX, obj.centerY)
-                    
-                    love.graphics.setStencilTest()
-                    
-                    if VAR("doPortalDebug") then
-                        love.graphics.rectangle("fill", cX-.5, cY-.5, 1, 1)
-                    end
+                if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and objectWithinPortalRange(p, x, y) then
+                    table.insert(inPortals, p)
                 end
+            end
+        end
+
+        for _, p in ipairs(inPortals) do
+            local angle = math.atan2(obj.speed[2], obj.speed[1])
+            local cX, cY, cAngle, angleDiff, reversed = self:doPortal(p, obj.x+obj.width/2, obj.y+obj.height/2, obj.angle)
+            
+            local xScale = 1
+            if reversed then
+                xScale = -1
+            end
+            
+            love.graphics.stencil(function() p.connectsTo:stencilRectangle("out") end, "replace")
+            love.graphics.setStencilTest("greater", 0)
+
+            if VAR("debug").portalStencils then
+                love.graphics.setColor(0, 1, 0)
+                love.graphics.draw(debugCandyImg, debugCandyQuad, self.camera:worldCoords(0, 0))
+                love.graphics.setColor(1, 1, 1)
+            end
+
+            local a = angleDiff
+            
+            if reversed then
+                a = a - (obj.angle or 0)
+            else
+                a = a + (obj.angle or 0)
+            end
+            
+            drawObject(obj, cX, cY, a, (obj.animationDirection or 1)*xScale, 1, obj.centerX, obj.centerY)
+            
+            love.graphics.setStencilTest()
+            
+            if VAR("debug").portalStencils then
+                love.graphics.rectangle("fill", cX-.5, cY-.5, 1, 1)
             end
         end
 
         -- Actual position
-        local firstStencil = true
-        for _, p in ipairs(self.portals) do
-            if p.open then
-                if  rectangleOnLine(quadX, quadY, quadWidth, quadHeight, p.x1, p.y1, p.x2, p.y2) and 
-                    objectWithinPortalRange(p, x, y) then
-        
-                    love.graphics.stencil(function()
-                        p:stencilRectangle("in")
-                    end, "replace", 1, not firstStencil)
-
-                    firstStencil = false
-                end
-            end
+        love.graphics.stencil(function() end, "replace", 0, false)
+        for _, p in ipairs(inPortals) do
+            love.graphics.stencil(function()
+                p:stencilRectangle("in")
+            end, "replace", 1, true)
         end
 
-        if VAR("stencilDebug") then
+        if VAR("debug").portalStencils then
             love.graphics.setStencilTest("greater", 0)
             love.graphics.setColor(1, 0, 0)
             love.graphics.draw(debugCandyImg, debugCandyQuad, self.camera:worldCoords(0, 0))
@@ -222,7 +219,7 @@ function World:draw()
         
         love.graphics.setStencilTest()
         
-        if VAR("quadDebug") then
+        if VAR("debug").actorQuad then
             love.graphics.rectangle("line", quadX, quadY, quadWidth, quadHeight)
         end
 
@@ -239,15 +236,11 @@ function World:draw()
     
     -- Debug
     prof.push("Debug")
-	if VAR("physicsDebug") then
-		self:physicsDebug()
-    end
-    
-	if VAR("advancedPhysicsDebug") then
+	if VAR("debug").physicsAdvanced then
 		self:advancedPhysicsDebug()
     end
     
-    if VAR("portalVectorDebug") then
+    if VAR("debug").portalVector then
         self:portalVectorDebug()
     end
     prof.pop()
@@ -393,36 +386,6 @@ function World:saveMap(outPath)
     local outJson = JSON:encode(out)
     
     love.filesystem.write(outPath, outJson)
-end
-
-function World:physicsDebug()
-    love.graphics.setColor(1, 1, 1)
-
-	-- for x = 1, #self.map do
-    --     for y = 1, #self.map[x] do
-    --         if self:objVisible((x-1)*self.tileSize, (y-1)*self.tileSize, 16, 16) then
-    --             local tile = self:getTile(x, y)
-                
-    --             if tile and tile.collision then
-    --                 if tile.collision ~= VAR("tileTemplates").cube then -- optimization for cubes
-    --                     local points = {}
-    --                     for i = 1, #tile.collision, 2 do
-    --                         table.insert(points, tile.collision[i]+(x-1)*self.tileSize)
-    --                         table.insert(points, tile.collision[i+1]+(y-1)*self.tileSize)
-    --                     end
-                        
-    --                     worldPolygon("line", unpack(points))
-    --                 else
-    --                     love.graphics.rectangle("line", (x-1)*self.tileSize, (y-1)*self.tileSize, 1*self.tileSize, 1*self.tileSize)
-    --                 end
-    --             end
-    --         end
-    --     end
-    -- end
-    
-	for i, v in ipairs(self.objects) do
-		v:debugDraw()
-	end
 end
 
 function World:advancedPhysicsDebug()

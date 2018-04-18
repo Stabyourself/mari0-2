@@ -193,7 +193,7 @@ function animation(actor, dt)
         end
         
         actor.runAnimationTimer = actor.runAnimationTimer + animationspeed*dt
-        print(animationspeed)
+        
         while actor.runAnimationTimer > 1 do
             actor.runAnimationTimer = actor.runAnimationTimer - 1
             actor.runAnimationFrame = actor.runAnimationFrame + 1

@@ -17,7 +17,7 @@ function component.update(actor, dt)
     if actor.onGround then
         if cmdDown("down") and not cmdDown("left") and not cmdDown("right") and actor.state.name ~= "buttSlide" then
             if actor.surfaceAngle ~= 0 then -- check if buttslide
-                actor.state:switch("buttSlide")
+                actor:switchState("buttSlide")
                 
                 if actor.surfaceAngle > 0 then
                     actor.speed[1] = math.max(0, actor.speed[1])

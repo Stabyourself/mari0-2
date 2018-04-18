@@ -14,6 +14,11 @@ function Actor:initialize(world, x, y, actorTemplate)
     self.states = {}
     self.components = self.actorTemplate.components
 
+    self.debug = {
+        actorState = VAR("debug").actorState,
+        hitBox = VAR("debug").actorHitBox,
+    }
+
     self:event("setup")
 end
 
@@ -43,6 +48,7 @@ end
 
 function Actor:draw()
     self:event("draw")
+    self:debugDraw()
 end
 
 function Actor:registerState(name, func)
@@ -122,5 +128,31 @@ function Actor:accelerateTo(dt, target, acceleration)
         self.speed[1] = math.max(target, self.speed[1] - acceleration*dt)
     elseif self.speed[1] < target then
         self.speed[1] = math.min(target, self.speed[1] + acceleration*dt)
+    end
+end
+
+function Actor:switchState(stateName)
+    if stateName then
+        assert(self.states[stateName], "Tried to switch to nonexistent ActorState \"" .. stateName .. "\" on \"" .. tostring(self) .. "\" and that's bad.")
+        self.state = ActorState:new(self, stateName, self.states[stateName])
+
+        self.state:checkExit()
+    end
+end
+
+function Actor:debugDraw()
+    love.graphics.setColor(1, 1, 1)
+    if self.debug.actorState then
+        local s = "nil"
+
+        if self.state then
+            s = self.state.name
+        end
+
+        love.graphics.printf(s, self.x+self.width/2-500, self.y+self.height+2, 1000, "center")
+    end
+
+    if self.debug.hitBox then
+        Physics3.PhysObj.debugDraw(self)
     end
 end

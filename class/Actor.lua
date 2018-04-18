@@ -6,9 +6,6 @@ function Actor:initialize(world, x, y, actorTemplate)
     local width = self.actorTemplate.width
     local height = self.actorTemplate.height
     
-    self.centerX = self.actorTemplate.centerX or width/2
-    self.centerY = self.actorTemplate.centerY or height/2
-    
     Physics3.PhysObj.initialize(self, world, x-width/2, y-height, width, height)
     
     self.states = {}
@@ -162,15 +159,14 @@ function Actor:debugDraw()
     if self.debug.components then
         local mx, my = self.world:mouseToWorld()
 
-        if mx >= self.x and mx < self.x+self.width and
-        my >= self.y and my < self.y+self.height then
-            local font = love.graphics.getFont()
+        love.graphics.scale(1/VAR("scale"), 1/VAR("scale"))
+        local font = love.graphics.getFont()
 
-            for _, component in ipairs(self.components) do
-                
-            end
-
-            love.graphics.setFont(font)
+        for i, component in ipairs(self.components) do
+            love.graphics.print(component.name, (self.x+self.width+2)*VAR("scale"), (self.y+self.height)*VAR("scale") - 9 - #self.components*10+i*10)
         end
+
+        love.graphics.scale(VAR("scale"), VAR("scale"))
+        love.graphics.setFont(font)
     end
 end

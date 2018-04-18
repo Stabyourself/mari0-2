@@ -12,7 +12,7 @@ for _, path in ipairs(toLoad) do
         components[name] = {}
 
         components[name].code = require(path)
-        components[name].name = path
+        components[name].name = name
 
         assert(type(components[name]) == "table", "Component \"" .. path .. "\" didn't return a table.")
     end

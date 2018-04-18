@@ -36,8 +36,11 @@ local STARPALETTES = {
 
 function component.setup(actor, dt, actorEvent, args)
     actor.img = actor.actorTemplate.img
-    actor.quadWidth = args["quadWidth"]
-    actor.quadHeight = args["quadWidth"]
+    actor.quadWidth = args.quadWidth
+    actor.quadHeight = args.quadWidth
+
+    actor.centerX = args.centerX
+    actor.centerY = args.centerY
     
     actor.standardPalette = args["color"] or {
         {252, 188, 176},

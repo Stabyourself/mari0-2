@@ -2,13 +2,14 @@
     "width": 12,
     "height": 12,
 
-    "centerX": 8,
-    "centerY": 9,
 
     "img": "img/goomba.png",
 
     "components": {
-        "animation.mirror": {},
+        "animation.mirror": {
+            "centerX": 8,
+            "centerY": 9
+        },
         "movement.truffleShuffle": {"acceleration": 200, "maxSpeed": 40},
         "misc.unrotate": {}
     }

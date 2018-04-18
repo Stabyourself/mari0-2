@@ -2,9 +2,6 @@
     "width": 12,
     "height": 24,
     
-    "centerX": 23,
-    "centerY": 24,
-    
     "img": {
         "static": "characters/smb3-mario/graphics/raccoon-static.png",
         "1": "characters/smb3-mario/graphics/raccoon-1.png",
@@ -16,6 +13,7 @@
         "smb3.animation": {
             "quadWidth": 40,
             "quadHeight": 40,
+
             "centerX": 23,
             "centerY": 24,
 

@@ -9,11 +9,12 @@ local advanceFrame = false
 
 function FrameDebug3.update(dt)
     if not playing then
-        dt = 0
-
         if advanceFrame then
-            dt = advanceDT
             advanceFrame = false
+
+            return advanceDT
+        else
+            return false
         end
     end
 

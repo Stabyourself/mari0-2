@@ -97,6 +97,11 @@ function love.update(dt)
 
     dt = FrameDebug3.update(dt)
 
+    if not dt then
+        prof.pop()
+        return
+    end
+
 	if VAR("ffKeys") then
         for _, ffKey in ipairs(VAR("ffKeys")) do
 			if love.keyboard.isDown(ffKey.key) then

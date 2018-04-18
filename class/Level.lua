@@ -59,7 +59,7 @@ function Level:loadMap(data)
     table.insert(self.marios, mario)
     table.insert(self.actors, mario)
     
-    -- table.insert(self.actors, Actor(self, 100, 100, actorTemplates.goomba))
+    table.insert(self.actors, Actor(self, 100, 100, actorTemplates.goomba))
     
     self:spawnEnemies(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end

@@ -2,24 +2,14 @@ local component = {}
 
 local MIRRORTIME = 0.2
 
-function component.setup(actor)
+function component.setup(actor, dt, actorEvent, args)
     actor.img = actor.actorTemplate.img
 
-    if actor.actorTemplate.quadWidth then
-        actor.centerX = actor.actorTemplate.quadWidth
-        actor.centerY = actor.actorTemplate.quadHeight
-    else
-        actor.quadWidth = actor.img:getWidth()
-        actor.quadHeight = actor.img:getHeight()
-    end
-
-    if actor.actorTemplate.centerX then
-        actor.centerX = actor.actorTemplate.centerX
-        actor.centerY = actor.actorTemplate.centerY
-    else
-        actor.centerX = actor.img:getWidth()/2
-        actor.centerY = actor.img:getHeight()/2
-    end
+    actor.quadWidth = actor.img:getWidth()
+    actor.quadHeight = actor.img:getHeight()
+    
+    actor.centerX = args.centerX
+    actor.centerY = args.centerY
 
     actor.mirrorTimer = 0
     actor.animationDirection = 1

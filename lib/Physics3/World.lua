@@ -73,8 +73,6 @@ function World:checkPortaling(obj, oldX, oldY)
                 if reversed then
                     obj.animationDirection = -obj.animationDirection
                 end
-
-                print(obj.angle)
                 
                 if VAR("debug").portalVector then
                     self.portalVectorDebugs = {}
@@ -152,6 +150,10 @@ function World:draw()
         local quadWidth = obj.quadWidth
         local quadHeight = obj.quadHeight
 
+        if obj.animationDirection == -1 then
+            quadX = quadX + obj.centerX*2-obj.quadWidth
+        end
+
         love.graphics.stencil(function() end, "replace")
 
         -- Portal duplication
@@ -222,7 +224,7 @@ function World:draw()
         love.graphics.setStencilTest()
         
         if VAR("debug").actorQuad then
-            love.graphics.rectangle("line", quadX, quadY, quadWidth, quadHeight)
+            love.graphics.rectangle("line", quadX-.5, quadY-.5, quadWidth+1, quadHeight+1)
         end
 
         obj:draw()
@@ -303,10 +305,7 @@ function World:loadMap(data)
             if mapTile ~= 0 then
                 local tile = self.tileLookup[mapTile]
                 
-                if not tile then
-                    print("Couldn't load real tile for \"" .. mapTile .. "\"")
-                    error("Wew that map didn't load so well, did it")
-                end
+                assert(tile, "Couldn't load real tile at " .. x .. ", " .. y .. " for \"" .. mapTile .. "\"")
                 
                 local realY = self.height-y+1
                 self.map[x][realY] = tile

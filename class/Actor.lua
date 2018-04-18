@@ -10,24 +10,27 @@ function Actor:initialize(world, x, y, actorTemplate)
     self.centerY = self.actorTemplate.centerY or height/2
     
     Physics3.PhysObj.initialize(self, world, x-width/2, y-height, width, height)
-
+    
     self.states = {}
-    self.components = self.actorTemplate.components
+
+    self.components = {}
+    for name, args in pairs(self.actorTemplate.components) do
+        self:addComponent(components[name], args)
+    end
 
     self.debug = {
         actorState = VAR("debug").actorState,
         hitBox = VAR("debug").actorHitBox,
+        components = VAR("debug").actorComponents,
     }
-
-    self:event("setup")
 end
 
 function Actor:event(eventName, dt)
     local actorEvent = ActorEvent:new(self, eventName)
 
-    for _, v in ipairs(self.components) do
-        if v.component[eventName] then
-            v.component[eventName](self, dt, actorEvent, v.args)
+    for _, component in ipairs(self.components) do
+        if component.code[eventName] then
+            component.code[eventName](self, dt, actorEvent, component.args)
         end
     end
 
@@ -56,12 +59,12 @@ function Actor:registerState(name, func)
 end
 
 function Actor:addComponent(component, args)
-    table.insert(self.components, {component=component, args=args})
+    table.insert(self.components, {name = component.name, code=component.code, args=args})
 
-    if component.setup then
+    if component.code.setup then
         local actorEvent = ActorEvent:new(self, "setup")
 
-        component.setup(self, dt, actorEvent, args)
+        component.code.setup(self, dt, actorEvent, args)
 
         actorEvent:finish()
     end
@@ -154,5 +157,20 @@ function Actor:debugDraw()
 
     if self.debug.hitBox then
         Physics3.PhysObj.debugDraw(self)
+    end
+
+    if self.debug.components then
+        local mx, my = self.world:mouseToWorld()
+
+        if mx >= self.x and mx < self.x+self.width and
+        my >= self.y and my < self.y+self.height then
+            local font = love.graphics.getFont()
+
+            for _, component in ipairs(self.components) do
+                
+            end
+
+            love.graphics.setFont(font)
+        end
     end
 end

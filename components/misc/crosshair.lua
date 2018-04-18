@@ -5,7 +5,7 @@ function component.setup(actor)
 end
 
 function component.postUpdate(actor, dt)
-    local x, y = actor.x+actor.width/2, actor.y+actor.height/2+2
+    local x, y = actor.x+actor.width/2, actor.y+actor.height/2
     actor.crosshair.origin.x = x
     actor.crosshair.origin.y = y
     

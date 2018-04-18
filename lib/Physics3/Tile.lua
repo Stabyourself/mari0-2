@@ -64,7 +64,7 @@ function Tile:checkCollision(x, y)
 	if self.collision == VAR("tileTemplates").cube then -- optimization for cubes
 		return true
 	else
-		for _, points in ipairs(self.collisionTriangulated) do
+		for _, points in ipairs(self.collisionTriangulated) do -- TODO: This could be cached in a 16x16 matrix
 			if pointInTriangle(x, y, points) then
 				return true
 			end

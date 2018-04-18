@@ -60,8 +60,8 @@ function Element:addChild(element)
 end
 
 function Element:removeChild(element)
-    for i, v in ipairs(self.children) do
-        if v == element then
+    for i, child in ipairs(self.children) do
+        if child == element then
             table.remove(self.children, i)
         end
     end
@@ -231,9 +231,9 @@ function Element:draw()
 
     love.graphics.translate(-self.scroll[1]+self.childBox[1], -self.scroll[2]+self.childBox[2])
 
-    for _, v in ipairs(self.children) do
-        if v.visible then
-            v:draw()
+    for _, child in ipairs(self.children) do
+        if child.visible then
+            child:draw()
         end
     end
     
@@ -360,9 +360,9 @@ function Element:mousereleased(x, y, button)
     self.scrolling[1] = false
     self.scrolling[2] = false
 
-    for _, v in ipairs(self.children) do
-        if v.mousereleased then
-            v:mousereleased(x-self.childBox[1]-v.x+self.scroll[1], y-self.childBox[2]-v.y+self.scroll[2], button)
+    for _, child in ipairs(self.children) do
+        if child.mousereleased then
+            child:mousereleased(x-self.childBox[1]-child.x+self.scroll[1], y-self.childBox[2]-child.y+self.scroll[2], button)
         end
     end
 end
@@ -389,11 +389,11 @@ function Element:wheelmoved(x, y)
         end
     end
     
-    for _, v in ipairs(self.children) do
-        if v.wheelmoved then
-            if  v.mouse[1] > 0 and v.mouse[1] < v.w and
-                v.mouse[2] > 0 and v.mouse[2] < v.h then 
-                if v:wheelmoved(x, y, button) then
+    for _, child in ipairs(self.children) do
+        if child.wheelmoved then
+            if  child.mouse[1] > 0 and child.mouse[1] < child.w and
+                child.mouse[2] > 0 and child.mouse[2] < child.h then 
+                if child:wheelmoved(x, y, button) then
                     return true
                 end
             end
@@ -405,13 +405,13 @@ function Element:getChildrenSize()
     local w = 0
     local h = 0
     
-    for _, v in ipairs(self.children) do
-        if v.x+v.w+v.posMax[1] > w then
-            w = v.x+v.w+v.posMax[1]
+    for _, child in ipairs(self.children) do
+        if child.x+child.w+child.posMax[1] > w then
+            w = child.x+child.w+child.posMax[1]
         end
         
-        if v.y+v.h+v.posMax[2] > h then
-            h = v.y+v.h+v.posMax[2]
+        if child.y+child.h+child.posMax[2] > h then
+            h = child.y+child.h+child.posMax[2]
         end
     end
     

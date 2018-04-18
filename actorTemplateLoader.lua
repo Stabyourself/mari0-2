@@ -9,26 +9,19 @@ for _, file in ipairs(files) do
         local name = string.sub(file, 1, -6)
         local template = JSON:decode(love.filesystem.read(dir .. file))
 
-        local componentsLinked = {}
-        -- Link the components to our components table
-        for i, v in pairs(template.components) do
-            table.insert(componentsLinked, {component = components[i], args = v})
-        end
-        template.components = componentsLinked
-
         -- Load images
         if template.img then
             if type(template.img) == "table" then
                 local imgLoaded = {}
 
-                for i, v in pairs(template.img) do
+                for i, path in pairs(template.img) do
                     local loadAs = i
 
                     if tonumber(loadAs) then
                         loadAs = tonumber(loadAs)
                     end
 
-                    imgLoaded[loadAs] = love.graphics.newImage(v)
+                    imgLoaded[loadAs] = love.graphics.newImage(path)
                 end
 
                 template.img = imgLoaded

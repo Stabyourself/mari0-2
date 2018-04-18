@@ -1,29 +1,35 @@
 PROF_CAPTURE = false
 
 return {
-    hitBoxDebug = false,
-    quadDebug = false,
-    stencilDebug = false,
-    inputDebug = false,
-    portalVectorDebug = false,
-    memoryDebug = false,
+    debug = {
+        actorHitBox = false,
+        actorQuad = false,
+        actorState = false,
 
+        physicsAdvanced = false,
+
+        portalVector = false,
+        portalStencils = false,
+        
+        input = false,
+    },
+    
     noEnemies = false,
-    musicDisabled = false,
+    musicDisabled = true,
     volume = 1,
     scale = 3,
-
     vsync = true,
+    msaa = 0,
 
     ffKeys = {
         {
             key="+",
-            val=30
+            val=3
         },
 
         {
             key="-",
             val=0.1
         }
-    },
+    }
 }

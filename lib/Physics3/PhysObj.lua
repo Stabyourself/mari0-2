@@ -95,8 +95,8 @@ end
 function PhysObj:leftColCheck()
 	local colX, colY
 
-	for i, v in ipairs(self.tracers.left) do
-		local currentTraceX, currentTraceY = v:trace()
+	for _, tracer in ipairs(self.tracers.left) do
+		local currentTraceX, currentTraceY = tracer:trace()
 		
 		if currentTraceX and (not col or currentTraceX > col) then
 			colX, colY = currentTraceX, currentTraceY
@@ -117,8 +117,8 @@ end
 function PhysObj:rightColCheck()
 	local colX, colY
 
-	for i, v in ipairs(self.tracers.right) do
-		local currentTraceX, currentTraceY = v:trace()
+	for _, tracer in ipairs(self.tracers.right) do
+		local currentTraceX, currentTraceY = tracer:trace()
 		
 		if currentTraceX and (not col or currentTraceX < col) then
 			colX, colY = currentTraceX, currentTraceY
@@ -139,8 +139,8 @@ end
 function PhysObj:topColCheck()
 	local colX, colY
 	
-	for i, v in ipairs(self.tracers.up) do
-		local currentTraceX, currentTraceY = v:trace()
+	for _, tracer in ipairs(self.tracers.up) do
+		local currentTraceX, currentTraceY = tracer:trace()
 		
 		if currentTraceX and (not colX or currentTraceY > colY) then
 			colX, colY = currentTraceX, currentTraceY
@@ -162,8 +162,8 @@ end
 function PhysObj:bottomColCheck()
 	local colX, colY
 	
-	for i, v in ipairs(self.tracers.down) do
-		local currentTraceX, currentTraceY = v:trace()
+	for _, tracer in ipairs(self.tracers.down) do
+		local currentTraceX, currentTraceY = tracer:trace()
 		
 		if currentTraceX and (not colX or currentTraceY < colY) then
 			colX, colY = currentTraceX, currentTraceY
@@ -208,13 +208,10 @@ function PhysObj:checkCollisions()
 		col.bottom[1], col.bottom[2] = self:bottomColCheck()
 	end
 	
-	col.top[1] = nil
 	if not col.bottom[1] then
 		col.top[1], col.top[2] = self:topColCheck()
-	end
-	
-	if not col.bottom[1] then
-		if self.onGround then
+		
+		if self.onGround and self.speed[2] > 0 then
 			self:startFall()
 			self.onGround = false
 		end
@@ -231,17 +228,9 @@ function PhysObj:checkCollisions()
 	end
 end
 
-function PhysObj:getX()
-	return self.x
-end
-
-function PhysObj:getY()
-	return self.y
-end
-
 function PhysObj:debugDraw(xOff, yOff)
 	love.graphics.setColor(1, 0, 0)
-	love.graphics.rectangle("line", self:getX()+.5, self:getY()+.5, self.width-1, self.height-1)
+	love.graphics.rectangle("line", self.x+.5, self.y+.5, self.width-1, self.height-1)
 	
 	love.graphics.setColor(0, 1, 0, 0.5)
 	for j, w in ipairs(self.tracers.right) do

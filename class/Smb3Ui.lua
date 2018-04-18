@@ -20,11 +20,11 @@ function Smb3Ui:initialize()
     self.uiBox.background = self.skyColor
     self.canvas:addChild(self.uiBox)
     
-    self.cardBox = {}
+    self.cardBoxes = {}
     for i = 1, 3 do
-        self.cardBox[i] = Gui3.Box:new(150+i*28, 3, 22, 26)
-        self.cardBox[i].background = self.skyColor
-        self.canvas:addChild(self.cardBox[i])
+        self.cardBoxes[i] = Gui3.Box:new(150+i*28, 3, 22, 26)
+        self.cardBoxes[i].background = self.skyColor
+        self.canvas:addChild(self.cardBoxes[i])
     end
     
     self.element = {}
@@ -50,8 +50,8 @@ function Smb3Ui:resize()
     self.canvas.y = SCREENHEIGHT-VAR("uiHeight")
     
     self.uiBox.x = (SCREENWIDTH-256)/2+13
-    for i, v in ipairs(self.cardBox) do
-        v.x = (SCREENWIDTH-256)/2+i*24+149
+    for i, cardBox in ipairs(self.cardBoxes) do
+        cardBox.x = (SCREENWIDTH-256)/2+i*24+149
     end
 end
 

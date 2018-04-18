@@ -39,8 +39,8 @@ end
 
 function ActorEvent:fire(name)
     if self.binds[name] then
-        for _, v in ipairs(self.binds[name]) do
-            v(self.actor)
+        for _, func in ipairs(self.binds[name]) do
+            func(self.actor)
         end
     end
 end

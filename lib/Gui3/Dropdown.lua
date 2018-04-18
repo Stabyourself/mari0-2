@@ -43,8 +43,8 @@ end
 function Dropdown:autoSize()
     self.box:autoSize()
     
-    for _, v in ipairs(self.box.children) do
-        v.w = self.box.childBox[3]
+    for _, child in ipairs(self.box.children) do
+        child.w = self.box.childBox[3]
     end
 end
 

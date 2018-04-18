@@ -26,8 +26,8 @@ function Selection:update(dt)
 end
 
 function Selection:draw()
-    for _, v in ipairs(self.borders) do
-        love.graphics.draw(borderImg, self.quad, v[1], v[2], v[3])
+    for _, border in ipairs(self.borders) do
+        love.graphics.draw(borderImg, self.quad, border[1], border[2], border[3])
     end
 end
 
@@ -36,32 +36,32 @@ function Selection:replace(tiles)
     self:updateBorders()
 end
 
-function Selection:add(tiles)
-    for _, v in ipairs(tiles) do
+function Selection:add(bTiles)
+    for _, bTile in ipairs(bTiles) do
         local found = false
         
-        for _, w in ipairs(self.tiles) do
-            if w[1] == v[1] and w[2] == v[2] then
+        for _, aTile in ipairs(self.tiles) do
+            if aTile[1] == bTile[1] and aTile[2] == bTile[2] then
                 found = true
                 break
             end
         end
-        
+        print(found)
         if not found then
-            table.insert(self.tiles, v)
+            table.insert(self.tiles, bTile)
         end
     end
     self:updateBorders()
 end
     
-function Selection:subtract(tiles)
+function Selection:subtract(bTiles)
     local toDelete = {}
     
-    for i, v in ipairs(self.tiles) do
+    for i, aTile in ipairs(self.tiles) do
         local found = false
         
-        for _, w in ipairs(tiles) do
-            if w[1] == v[1] and w[2] == v[2] then
+        for _, bTile in ipairs(bTiles) do
+            if bTile[1] == aTile[1] and bTile[2] == aTile[2] then
                 found = true
                 break
             end
@@ -79,21 +79,21 @@ function Selection:subtract(tiles)
     self:updateBorders()
 end
 
-function Selection:intersect(tiles)
+function Selection:intersect(bTiles)
     local newSelection = {}
     
-    for _, v in ipairs(tiles) do
+    for _, bTile in ipairs(bTiles) do
         local found = false
         
-        for _, w in ipairs(self.tiles) do
-            if w[1] == v[1] and w[2] == v[2] then
+        for _, aTile in ipairs(self.tiles) do
+            if bTile[1] == aTile[1] and bTile[2] == aTile[2] then
                 found = true
                 break
             end
         end
         
         if found then
-            table.insert(newSelection, v)
+            table.insert(newSelection, bTile)
         end
     end
     
@@ -117,8 +117,8 @@ function Selection:collision(x, y)
         local tile = self.level:getTile(mapX, mapY)
 
         if tile then
-            for _, v in ipairs(self.tiles) do
-                if mapX == v[1] and mapY == v[2] then
+            for _, tile in ipairs(self.tiles) do
+                if mapX == tile[1] and mapY == tile[2] then
                     return true
                 end
             end
@@ -136,8 +136,8 @@ function Selection:mousereleased(x, y, button)
 end
 
 function Selection:delete()
-    for _, v in ipairs(self.tiles) do
-        self.level:setMap(v[1], v[2], nil)
+    for _, tile in ipairs(self.tiles) do
+        self.level:setMap(tile[1], tile[2], nil)
     end
 end
 

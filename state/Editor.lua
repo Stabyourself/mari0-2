@@ -3,8 +3,8 @@ Editor = class("Editor")
 Editor.toolbarOrder = {"entity", "paint", "erase", "move", "select", "wand", "fill", "stamp"}
 Editor.toolbarImg = {}
 
-for _, v in ipairs(Editor.toolbarOrder) do
-    table.insert(Editor.toolbarImg, love.graphics.newImage("img/editor/" .. v .. ".png"))
+for _, toolName in ipairs(Editor.toolbarOrder) do
+    table.insert(Editor.toolbarImg, love.graphics.newImage("img/editor/" .. toolName .. ".png"))
 end
 
 local checkerboardImg = love.graphics.newImage("img/editor/checkerboard.png")
@@ -47,8 +47,8 @@ function Editor:load()
     
     self.tools = {}
     
-    for i, v in pairs(self.toolClasses) do
-        self.tools[i] = v:new(self)
+    for toolName, toolClass in pairs(self.toolClasses) do
+        self.tools[toolName] = toolClass:new(self)
     end
     
     self.canvas = Gui3.Canvas:new(0, 0, SCREENWIDTH, SCREENHEIGHT)
@@ -135,10 +135,10 @@ function Editor:load()
     self.toolButtons = {}
     
     local y = 1
-    for i, v in ipairs(self.toolbarOrder) do
-        local button = Gui3.Button:new(1, y, self.toolbarImg[i], false, 1, function(button) self:selectTool(v) end)
+    for i, tool in ipairs(self.toolbarOrder) do
+        local button = Gui3.Button:new(1, y, self.toolbarImg[i], false, 1, function(button) self:selectTool(tool) end)
         
-        self.toolButtons[v] = button
+        self.toolButtons[tool] = button
         
         button.color.img = {0, 0, 0}
         self.toolbar:addChild(button)
@@ -332,8 +332,8 @@ function Editor:selectTool(toolName)
         self.tool:select()
     end
     
-    for _, v in pairs(self.toolButtons) do
-        v.color.background = {1, 1, 1}
+    for _, toolButton in pairs(self.toolButtons) do
+        toolButton.color.background = {1, 1, 1}
     end
     
     self.toolButtons[toolName].color.background = {0.75, 0.75, 0.75}
@@ -639,14 +639,14 @@ function Editor:expandMapTo(x, y)
     local moveMapX, moveMapY, moveWorldX, moveWorldY = self.level:expandMapTo(x, y)
     
     if self.selection then
-        for _, v in ipairs(self.selection.tiles) do
-            v[1] = v[1] + moveMapX
-            v[2] = v[2] + moveMapY
+        for _, tile in ipairs(self.selection.tiles) do
+            tile[1] = tile[1] + moveMapX
+            tile[2] = tile[2] + moveMapY
         end
 
-        for _, v in ipairs(self.selection.borders) do
-            v[1] = v[1] + moveWorldX
-            v[2] = v[2] + moveWorldY
+        for _, border in ipairs(self.selection.borders) do
+            border[1] = border[1] + moveWorldX
+            border[2] = border[2] + moveWorldY
         end
     end
 end

@@ -1,6 +1,6 @@
 -- Physics libary thing with pixel collisions. Feel free to use it, MIT License
 
-Physics3 = {}
+local Physics3 = {}
 
 Physics3.TRACER_BOTTOM_SPACING = 1--8 -- How far apart the downwards tracers are
 Physics3.TRACER_BOTTOM_EXTEND = 8 -- How far down below the hitbox the downtracers go, for smoothly walking down slopes
@@ -18,3 +18,5 @@ Physics3.PhysObj = require(current_folder .. ".PhysObj")
 Physics3.Tile = require(current_folder .. ".Tile")
 Physics3.TileMap = require(current_folder .. ".TileMap")
 Physics3.Tracer = require(current_folder .. ".Tracer")
+
+return Physics3

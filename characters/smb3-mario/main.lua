@@ -28,8 +28,8 @@ function love.draw()
     love.graphics.print(files[currentFile] .. " - Arrows to change image, mouse to select colors, R to reset, enter to process current image")
     
     love.graphics.rectangle("fill", 0, 20, #colors*20, 20)
-    for i, v in ipairs(colors) do
-        love.graphics.setColor(v)
+    for i, color in ipairs(colors) do
+        love.graphics.setColor(color)
         love.graphics.rectangle("fill", (i-1)*20+1, 21, 18, 18)
     end
     
@@ -95,8 +95,8 @@ function love.mousepressed(x, y, button)
     
     if r then
         local found = false
-        for _, v in ipairs(colors) do
-            if v[1] == r and v[2] == g and v[3] == b then
+        for _, color in ipairs(colors) do
+            if color[1] == r and color[2] == g and color[3] == b then
                 found = true
                 break
             end
@@ -115,9 +115,9 @@ function processImage(name, imgData, colors)
         love.filesystem.createDirectory("graphics")
     end
     
-    for i, v in ipairs(colors) do
+    for i, color in ipairs(colors) do
         local filename = "graphics/" .. name .. "-" .. i .. ".png"
-        separateColor(imgData, v):encode("png", filename)
+        separateColor(imgData, color):encode("png", filename)
     end
     
     local filename = "graphics/" .. name .. "-static.png"
@@ -148,8 +148,8 @@ function separateNotColors(imgData, colors)
             local r, g, b, a = imgData:getPixel(x, y)
             
             local found = false
-            for _, v in ipairs(colors) do
-                if v[1] == r and v[2] == g and v[3] == b then
+            for _, color in ipairs(colors) do
+                if color[1] == r and color[2] == g and color[3] == b then
                     found = true
                 end
             end

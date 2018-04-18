@@ -123,7 +123,7 @@ function animation(actor, dt)
         actor.animationDirection = actor.spinDirection
         
         -- calculate spin frame from spinTimer
-        frame = math.ceil(math.fmod(actor.spinTimer, actor.frameCounts.spin*SPINFRAMETIME)/SPINFRAMETIME)
+        frame = 1+math.floor(math.fmod(actor.spinTimer, actor.frameCounts.spin*SPINFRAMETIME)/SPINFRAMETIME)
 
     elseif actor.shooting and (not actor.starred or (actor.state.name ~= "jump" and actor.state.name ~= "fall")) then
         if actor.onGround then
@@ -272,7 +272,7 @@ function animation(actor, dt)
         actor.quad = actor.quadList[getAngleFrame(actor)][actor.animationState]
     end
     
-    assert(type(actor.quad) == "userdata", "The state \"" .. actor.animationState .. "\" seems to not be have a quad set up correctly.")
+    assert(type(actor.quad) == "userdata", "The state \"" .. actor.animationState .. "\" seems to not be have a quad set up correctly. (attempted frame was \"" .. tostring(frame) .. "\")")
 end
 
 function getAngleFrame(actor)

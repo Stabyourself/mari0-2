@@ -1,4 +1,5 @@
 -- Font thing for Mari3. Feel free to use it, MIT License
+-- Also actually not used anymore because imagefonts, while not supporting &stuff; perform better
 
 local Font3 = class("Font3")
     

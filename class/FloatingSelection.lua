@@ -74,8 +74,8 @@ function FloatingSelection:draw()
 
     love.graphics.setColor(1, 1, 1)
     
-    for _, v in ipairs(self.borders) do
-        love.graphics.draw(borderImg, self.quad, v[1]+(self.pos[1]-1)*16, v[2]+(self.pos[2]-1)*16, v[3])
+    for _, border in ipairs(self.borders) do
+        love.graphics.draw(borderImg, self.quad, border[1]+(self.pos[1]-1)*16, border[2]+(self.pos[2]-1)*16, border[3])
     end
 end
 

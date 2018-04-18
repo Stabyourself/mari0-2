@@ -33,8 +33,8 @@ function Fill:mousereleased(x, y, button)
             if self.editor.selection and #self.editor.selection.tiles > 0 then
                 local found = false
                 
-                for _, v in ipairs(self.editor.selection.tiles) do
-                    if v[1] == x and v[2] == y then
+                for _, tile in ipairs(self.editor.selection.tiles) do
+                    if tile[1] == x and tile[2] == y then
                         found = true
                         break
                     end
@@ -58,9 +58,9 @@ function Fill:mousereleased(x, y, button)
     self.pressing = false
 end
 
-function Fill:fillTiles(tiles, tile)
-    for _, v in ipairs(tiles) do
-        self.level:setMap(v[1], v[2], tile)
+function Fill:fillTiles(tiles, fillWith)
+    for _, tile in ipairs(tiles) do
+        self.level:setMap(tile[1], tile[2], fillWith)
     end
 end
 

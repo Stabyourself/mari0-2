@@ -32,18 +32,18 @@ function Level:loadMap(data)
     
     self.spawnList = {}
     -- Parse entities
-    for _, v in ipairs(self.data.entities) do
-        local enemy = self.enemyList[v.type]
+    for _, entity in ipairs(self.data.entities) do
+        local enemy = self.enemyList[entity.type]
 
         if enemy and not VAR("noEnemies") then -- is enemy
             table.insert(self.spawnList, {
                 enemy = enemy,
-                x = v.x,
-                y = v.y,
+                x = entity.x,
+                y = entity.y,
             })
-        elseif v.type == "spawn" then
-            self.spawnX = v.x
-            self.spawnY = v.y
+        elseif entity.type == "spawn" then
+            self.spawnX = entity.x
+            self.spawnY = entity.y
         end
     end
 
@@ -59,7 +59,7 @@ function Level:loadMap(data)
     table.insert(self.marios, mario)
     table.insert(self.actors, mario)
     
-    table.insert(self.actors, Actor(self, 100, 100, actorTemplates.goomba))
+    -- table.insert(self.actors, Actor(self, 100, 100, actorTemplates.goomba))
     
     self:spawnEnemies(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end

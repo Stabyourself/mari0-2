@@ -12,8 +12,8 @@ end
 
 function World:update(dt)
     prof.push("Tiles")
-    for _, v in pairs(self.tileMaps) do
-        v:update(dt)
+    for _, tileMap in pairs(self.tileMaps) do
+        tileMap:update(dt)
     end
     prof.pop()
 
@@ -68,11 +68,13 @@ function World:checkPortaling(obj, oldX, oldY)
                 obj.speed[1] = math.cos(outAngle)*speed
                 obj.speed[2] = math.sin(outAngle)*speed
                 
-                obj.angle = obj.angle + angleDiff
+                obj.angle = normalizeAngle(obj.angle + angleDiff)
                 
                 if reversed then
                     obj.animationDirection = -obj.animationDirection
                 end
+
+                print(obj.angle)
                 
                 if VAR("debug").portalVector then
                     self.portalVectorDebugs = {}
@@ -133,8 +135,8 @@ function World:draw()
 
     prof.push("Portals Back")
     -- Portals (background)
-    for _, v in ipairs(self.portals) do
-        v:draw("background")
+    for _, portal in ipairs(self.portals) do
+        portal:draw("background")
     end
     prof.pop()
     
@@ -229,14 +231,15 @@ function World:draw()
     
     prof.push("Portals Front")
     -- Portals (Foreground)
-    for _, v in ipairs(self.portals) do
-        v:draw("foreground")
+    for _, portal in ipairs(self.portals) do
+        portal:draw("foreground")
     end
     prof.pop()
     
     -- Debug
     prof.push("Debug")
-	if VAR("debug").physicsAdvanced then
+    if VAR("debug").physicsAdvanced then
+        love.graphics.setColor(1, 1, 1)
 		self:advancedPhysicsDebug()
     end
     
@@ -250,11 +253,11 @@ function drawObject(obj, x, y, r, sx, sy, cx, cy)
     love.graphics.setColor(1, 1, 1)
 
     if type(obj.img) == "table" then
-        for i, v in ipairs(obj.img) do
+        for i, img in ipairs(obj.img) do
             if obj.palette[i] then
                 love.graphics.setColor(obj.palette[i])
             end
-            love.graphics.draw(v, obj.quad, x, y, r, sx, sy, cx, cy)
+            love.graphics.draw(img, obj.quad, x, y, r, sx, sy, cx, cy)
             love.graphics.setColor(1, 1, 1)
         end
         
@@ -280,11 +283,11 @@ function World:loadMap(data)
     self.tileMaps = {}
     self.tileLookup = {}
     
-    for i, v in pairs(data.tileMaps) do
+    for i, tileMap in pairs(data.tileMaps) do
         self.tileMaps[i] = Physics3.TileMap:new("tilemaps/" .. i, i)
         
-        for j, w in pairs(v) do
-            self.tileLookup[tonumber(j)] = self.tileMaps[i].tiles[w]
+        for j, tile in pairs(tileMap) do
+            self.tileLookup[tonumber(j)] = self.tileMaps[i].tiles[tile]
         end
     end
     
@@ -326,8 +329,8 @@ function World:saveMap(outPath)
                 -- See if the tile is already in the table
                 local found = false
                 
-                for i, v in ipairs(lookUp) do
-                    if v.tileNum == tile.num and v.tileMap == tile.tileMap then
+                for i, lookUpTile in ipairs(lookUp) do
+                    if lookUpTile.tileNum == tile.num and lookUpTile.tileMap == tile.tileMap then
                         found = i
                         break
                     end
@@ -409,15 +412,15 @@ function World:advancedPhysicsDebug()
 end
 
 function World:portalVectorDebug()
-    for _, v in ipairs(self.portalVectorDebugs) do
-        if not v.reversed then
+    for _, portalVectorDebug in ipairs(self.portalVectorDebugs) do
+        if not portalVectorDebug.reversed then
             love.graphics.setColor(1, 1, 0)
         else
             love.graphics.setColor(1, 0, 0)
         end
         
-        worldArrow(v.inX, v.inY, v.inVX, v.inVY)
-        worldArrow(v.outX, v.outY, v.outVX, v.outVY)
+        worldArrow(portalVectorDebug.inX, portalVectorDebug.inY, portalVectorDebug.inVX, portalVectorDebug.inVY)
+        worldArrow(portalVectorDebug.outX, portalVectorDebug.outY, portalVectorDebug.outVX, portalVectorDebug.outVY)
     end
 end
 
@@ -425,23 +428,23 @@ function World:checkMapCollision(x, y, obj)
     if obj then
         -- Portal hijacking
         for _, p in ipairs(self.portals) do
-            if p.open and objectWithinPortalRange(p, obj.x+obj.width/2, obj.y+obj.height/2) then
+            -- TODO: objectWithinPortalRange could be cached
+            if p.open and objectWithinPortalRange(p, obj.x+obj.width/2, obj.y+obj.height/2) then -- only if the player is "in front" of the portal 
                 -- check if pixel is inside portal wallspace
                 -- rotate x, y around portal origin
-                local nx, ny = pointAroundPoint(x, y, p.x1, p.y1, -p.angle)
-
-                nx, ny = math.round(nx), math.round(ny)
+                local nx, ny = pointAroundPoint(x+.5, y+.5, p.x1, p.y1, -p.angle)
                 
-                if ny > p.y1-1 then
-                    if  ny > p.y1-1 and
-                        nx >= p.x1+1 and nx <= p.x1+p.size then
+                nx, ny = math.ceil(nx), math.ceil(ny)
+
+                -- comments use an up-pointing portal as example
+                if ny > p.y1-1 then -- point is low enough
+                    if nx > p.x1 and nx < p.x1+p.size+1 then -- point is horizontally within the portal
                         return false
                         
-                    elseif
-                        (nx < p.x1+1 or nx > p.x1+p.size) then
-                        if ny <= p.y1+1 then
+                    else
+                        if ny > p.y1 and ny <= p.y1+2 then -- point is "on" the line of the portal
                             return true
-                        else
+                        elseif ny > p.y1 then
                             return false
                         end
                     end
@@ -464,7 +467,7 @@ function World:checkMapCollision(x, y, obj)
         
         return tile:checkCollision(inTileX, inTileY)
     else
-        return col
+        return false
     end
 end
 
@@ -606,10 +609,11 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
             end
 
             return mapX, mapY, absX, absY, side
+
         elseif polyCol then
-            
             return mapX, mapY, absX, absY, side
         end
+
         -- jump to next map square, OR in x-direction, OR in y-direction
         if sideDistX < sideDistY then
             sideDistX = sideDistX + deltaDistX
@@ -1169,9 +1173,9 @@ function World:expandMapTo(x, y)
     self.camera.x = self.camera.x+moveStuff[1]*16
     self.camera.y = self.camera.y+moveStuff[2]*16
         
-    for _, v in ipairs(self.objects) do
-        v.x = v.x + moveStuff[1]*16
-        v.y = v.y + moveStuff[2]*16
+    for _, object in ipairs(self.objects) do
+        object.x = object.x + moveStuff[1]*16
+        object.y = object.y + moveStuff[2]*16
     end
 
     return moveStuff[1], moveStuff[2], moveStuff[1]*16, moveStuff[2]*16

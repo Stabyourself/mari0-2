@@ -96,8 +96,8 @@ function Portal:update(dt)
     
     local a = math.fmod(self.timer, PORTALANIMATIONTIME)/PORTALANIMATIONTIME*math.pi*2
     
-    for _, v in ipairs(self.portalThings) do
-        v:update(dt, a)
+    for _, portalThing in ipairs(self.portalThings) do
+        portalThing:update(dt, a)
     end
 end
 
@@ -119,8 +119,8 @@ function Portal:draw(side)
         end
         
     else
-        for _, v in ipairs(self.particles) do
-            v:draw()
+        for _, particle in ipairs(self.particles) do
+            particle:draw()
         end
         
         love.graphics.setColor(self.color:rgb())
@@ -129,8 +129,8 @@ function Portal:draw(side)
     
     local mult = (self.size/2*self.openProgress - 2)
 
-    for _, v in ipairs(self.portalThings) do
-        v:draw(side, self.color, mult)
+    for _, portalThing in ipairs(self.portalThings) do
+        portalThing:draw(side, self.color, mult)
     end
     
     love.graphics.pop()

@@ -214,11 +214,11 @@ end
 function paletteSwap(imgData, swaps)
     for y = 0, imgData:getHeight()-1 do
         for x = 0, imgData:getWidth()-1 do
-            for _, v in ipairs(swaps) do
+            for _, swap in ipairs(swaps) do
                 local r, g, b, a = imgData:getPixel(x, y)
                 
-                if r == v[1][1] and g == v[1][2] and b == v[1][3] then
-                    imgData:setPixel(x, y, v[2][1], v[2][2], v[2][3], a)
+                if r == swap[1][1] and g == swap[1][2] and b == swap[1][3] then
+                    imgData:setPixel(x, y, swap[2][1], swap[2][2], swap[2][3], a)
                     
                     break
                 end
@@ -314,8 +314,8 @@ function getTileBorders(tiles, offsetX, offsetY)
     local borders = {}
     local SBL = {} -- selectionBordersLookup
     
-    for _, v in ipairs(tiles) do
-        local x, y = v[1], v[2]
+    for _, tile in ipairs(tiles) do
+        local x, y = tile[1], tile[2]
         
         if SBL[x-1] and SBL[x-1][y] and SBL[x-1][y].right then
             SBL[x-1][y].right = false
@@ -355,8 +355,8 @@ function getTileBorders(tiles, offsetX, offsetY)
         end
     end
     
-    for _, v in ipairs(tiles) do
-        local x, y = v[1], v[2]
+    for _, tile in ipairs(tiles) do
+        local x, y = tile[1], tile[2]
         local wx, wy = (x-1+offsetX)*16, (y-1+offsetY)*16
         
         if SBL[x][y].top then
@@ -380,9 +380,9 @@ function getTileBorders(tiles, offsetX, offsetY)
 end
 
 function convertPalette(palette)
-    for _, v in ipairs(palette) do
-        for i, w in ipairs(v) do
-            v[i] = w/255
+    for _, color in ipairs(palette) do
+        for i, channel in ipairs(color) do
+            color[i] = channel/255
         end
     end
 end

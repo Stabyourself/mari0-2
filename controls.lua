@@ -37,4 +37,7 @@ return {
     ["t"] = "editor.tool.stamp",
     
     ["p"] = "debug.star",
+
+    ["pause"] = "debug.pausePlay",
+    ["#"] = "debug.frameAdvance"
 }

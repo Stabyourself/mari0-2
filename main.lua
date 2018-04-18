@@ -24,9 +24,10 @@ function love.load()
     Easing = require "lib.Easing"
     GameStateManager = require "lib.GameStateManager"
     Font3 = require "lib.Font3"
-    require "lib.Physics3"
+    Physics3 = require "lib.Physics3"
     require "lib.Gui3"
     prof = require "lib.jprof.jprof"
+    FrameDebug3 = require "lib.FrameDebug3"
 
     require "class.ActorState"
     require "class.Character"
@@ -94,10 +95,12 @@ function love.update(dt)
     prof.push("update")
     dt = math.min(1/30, dt)
 
+    dt = FrameDebug3.update(dt)
+
 	if VAR("ffKeys") then
-        for _, v in ipairs(VAR("ffKeys")) do
-			if love.keyboard.isDown(v.key) then
-				dt = dt * v.val
+        for _, ffKey in ipairs(VAR("ffKeys")) do
+			if love.keyboard.isDown(ffKey.key) then
+				dt = dt * ffKey.val
 			end
 		end
     end
@@ -207,6 +210,15 @@ function love.keypressed(key)
     if cmds["quit"] then
         love.event.quit()
         return
+    end
+
+    -- debug
+    if cmds["debug.pausePlay"] then
+        FrameDebug3.pausePlay()
+    end
+
+    if cmds["debug.frameAdvance"] then
+        FrameDebug3.frameAdvance()
     end
 
     if sendCmds then

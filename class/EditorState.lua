@@ -27,8 +27,8 @@ function EditorState:serialize()
         state.selection = {}
         state.selection.tiles = {}
         
-        for _, v in ipairs(selection.tiles) do
-            table.insert(state.selection.tiles, {v[1], v[2]})
+        for _, tile in ipairs(selection.tiles) do
+            table.insert(state.selection.tiles, {tile[1], tile[2]})
         end
     end
 
@@ -62,8 +62,8 @@ function EditorState:load()
     
     if state.selection then
         local tiles = {}
-        for _, v in ipairs(state.selection.tiles) do
-            table.insert(tiles, {v[1], v[2]})
+        for _, tile in ipairs(state.selection.tiles) do
+            table.insert(tiles, {tile[1], tile[2]})
         end
         
         local selection = Selection:new(self.editor, tiles)

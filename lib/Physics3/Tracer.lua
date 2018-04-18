@@ -13,8 +13,8 @@ function Tracer:trace()
 	local x, y, col
 	
 	for i = 0, self.distance-1 do
-		local objX = self.physObj:getX()
-		local objY = self.physObj:getY()
+		local objX = self.physObj.x
+		local objY = self.physObj.y
 
 		if self.xDir > 0 then
 			objX = math.ceil(objX)
@@ -56,7 +56,7 @@ function Tracer:debugDraw()
 		yWidth = 1
 	end
 
-	love.graphics.rectangle("fill", self.physObj:getX() + xOff, self.physObj:getY() + yOff, xWidth, yWidth)
+	love.graphics.rectangle("fill", self.physObj.x + xOff, self.physObj.y + yOff, xWidth, yWidth)
 end
 
 return Tracer

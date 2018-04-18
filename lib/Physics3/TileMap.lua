@@ -32,9 +32,9 @@ function TileMap:initialize(path, name)
 	self.stampMaps = {}
 
 	if self.data.stampMaps then
-		for _, v in ipairs(self.data.stampMaps) do
-			local w = #v.map[1]
-			local h = #v.map
+		for _, stampMap in ipairs(self.data.stampMaps) do
+			local w = #stampMap.map[1]
+			local h = #stampMap.map
 
 			local map = {}
 
@@ -42,23 +42,23 @@ function TileMap:initialize(path, name)
 				map[x] = {}
 
 				for y = 1, h do
-					map[x][y] = self.tiles[v.map[y][x]]
+					map[x][y] = self.tiles[stampMap.map[y][x]]
 				end
 			end
 			
-			local stampMap = StampMap:new(map, w, h) 
-			stampMap.type = v.type or "simple"
-			stampMap.name = v.name or ""
-			stampMap.paddings = v.paddings or {}
+			local newStampMap = StampMap:new(map, w, h) 
+			newStampMap.type = stampMap.type or "simple"
+			newStampMap.name = stampMap.name or ""
+			newStampMap.paddings = stampMap.paddings or {}
 			
-			table.insert(self.stampMaps, stampMap)
+			table.insert(self.stampMaps, newStampMap)
 		end
 	end
 end
 
 function TileMap:update(dt)
-	for _, v in ipairs(self.updateTiles) do
-		v:update(dt)
+	for _, updateTile in ipairs(self.updateTiles) do
+		updateTile:update(dt)
 	end
 end
 

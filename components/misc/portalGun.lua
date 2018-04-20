@@ -7,9 +7,9 @@ function component.setup(actor)
     actor.portalGunAngle = 0
     
     actor.portalColor = {
-        Color.fromHSV(200/360, 0.76, 0.99),
-        Color.fromHSV(30/360, 0.87, 0.91),
-        Color.fromHSV(30/360, 0.87, 0.91),
+        Color3.fromHSV(200/360, 0.76, 0.99),
+        Color3.fromHSV(30/360, 0.87, 0.91),
+        Color3.fromHSV(30/360, 0.87, 0.91),
     }
 end
 

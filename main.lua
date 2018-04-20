@@ -16,20 +16,21 @@ function love.load()
     love.window.setIcon(love.image.newImageData("img/icon.png"))
     
     love.graphics.setDefaultFilter("nearest", "nearest")
-    
+
+    class = require "lib.middleclass"
     sandbox = require "lib.sandbox"
     JSON = require "lib.JSON"
-    class = require "lib.middleclass"
     Camera = require "lib.Camera"
-    Color = require "lib.Color"
     Easing = require "lib.Easing"
     GameStateManager = require "lib.GameStateManager"
+    prof = require "lib.jprof.jprof"
+    paletteShader = require "lib.paletteShader"
+    
+    Color3 = require "lib.Color3"
     Font3 = require "lib.Font3"
     Physics3 = require "lib.Physics3"
     require "lib.Gui3"
-    prof = require "lib.jprof.jprof"
     FrameDebug3 = require "lib.FrameDebug3"
-    paletteShader = require "lib.paletteShader"
 
     require "class.ActorState"
     require "class.Character"

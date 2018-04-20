@@ -15,23 +15,23 @@ local SOMERSAULTTIME = 2/60
 local SHOOTTIME = 12/60
 
 local STARPALETTES = {
-    {
-        {252/255, 252/255, 252/255},
-        {  0/255,   0/255,   0/255},
-        {216/255,  40/255,   0/255},
-    },
+    convertPalette({
+        {252, 252, 252},
+        {  0,   0,   0},
+        {216,  40,   0},
+    }),
     
-    {
-        {252/255, 252/255, 252/255},
-        {  0/255,   0/255,   0/255},
-        { 76/255, 220/255,  72/255},
-    },
+    convertPalette({
+        {252, 252, 252},
+        {  0,   0,   0},
+        { 76, 220,  72},
+    }),
     
-    {
-        {252/255, 188/255, 176/255},
-        {  0/255,   0/255,   0/255},
-        {252/255, 152/255,  56/255},
-    }
+    convertPalette({
+        {252, 188, 176},
+        {  0,   0,   0},
+        {252, 152,  56},
+    })
 }
 
 function component.setup(actor, dt, actorEvent, args)
@@ -42,16 +42,6 @@ function component.setup(actor, dt, actorEvent, args)
     actor.centerX = args.centerX
     actor.centerY = args.centerY
     
-    actor.standardPalette = args["color"] or {
-        {252, 188, 176},
-        {216,  40,   0},
-        {  0,   0,   0},
-    }
-
-    convertPalette(actor.standardPalette)
-    
-    actor.palette = actor.standardPalette
-    
     actor.quadList = {}
     actor.frames = args["frames"]
     actor.frameCounts = {}
@@ -61,7 +51,7 @@ function component.setup(actor, dt, actorEvent, args)
         local x = 0
         
         for _, name in ipairs(actor.frames) do
-            local quad = love.graphics.newQuad(x*actor.quadWidth, (y-1)*actor.quadHeight, actor.quadWidth, actor.quadHeight, actor.img[1]:getWidth(), actor.img[1]:getHeight())
+            local quad = love.graphics.newQuad(x*actor.quadWidth, (y-1)*actor.quadHeight, actor.quadWidth, actor.quadHeight, actor.img:getWidth(), actor.img:getHeight())
             
             if actor.quadList[y][name] then
                 if type(actor.quadList[y][name]) ~= "table" then
@@ -93,7 +83,7 @@ function animation(actor, dt)
         local palette = math.ceil(math.fmod(actor.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
         
         if palette == 4 then
-            actor.palette = actor.standardPalette
+            actor.palette = actor.defaultPalette
         else
             actor.palette = STARPALETTES[palette]
         end
@@ -275,7 +265,7 @@ function animation(actor, dt)
         actor.quad = actor.quadList[getAngleFrame(actor)][actor.animationState]
     end
     
-    assert(type(actor.quad) == "userdata", "The state \"" .. actor.animationState .. "\" seems to not be have a quad set up correctly. (attempted frame was \"" .. tostring(frame) .. "\")")
+    assert(type(actor.quad) == "userdata", string.format("The state \"%s\" on actorTemplate %s seems to not be have a quad set up correctly. (attempted frame was \"%s\")", actor.animationState, actor.actorTemplate.name, tostring(frame)))
 end
 
 function getAngleFrame(actor)

@@ -13,9 +13,14 @@ function component.setup(actor, dt, actorEvent, args)
 
     actor.mirrorTimer = 0
     actor.animationDirection = 1
+
+    actor.disco = 0
 end
 
 function component.update(actor, dt)
+    actor.disco = actor.disco + dt
+    actor.palette = {Color.fromHSV(actor.disco, 1, 1):table()}
+
     actor.mirrorTimer = actor.mirrorTimer + dt
 
     while actor.mirrorTimer > MIRRORTIME do

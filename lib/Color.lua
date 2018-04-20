@@ -21,6 +21,10 @@ function Color:rgb()
     return self.r, self.g, self.b, self.a
 end
 
+function Color:table()
+    return {self.r, self.g, self.b, self.a}
+end
+
 function Color:darken(i)
     local h, s, v, a = Color.RGBtoHSV(self.r, self.g, self.b, self.a)
     

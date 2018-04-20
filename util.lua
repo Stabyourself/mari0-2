@@ -380,11 +380,21 @@ function getTileBorders(tiles, offsetX, offsetY)
 end
 
 function convertPalette(palette)
-    for _, color in ipairs(palette) do
-        for i, channel in ipairs(color) do
-            color[i] = channel/255
+    local out = {}
+
+    for i, color in ipairs(palette) do
+        out[i] = {}
+
+        for j, channel in ipairs(color) do
+            out[i][j] = channel/255
+        end
+
+        if not out[i][j] then
+            out[i][4] = 1
         end
     end
+
+    return out
 end
 
 function recursiveEnumerate(folder, files) -- What's with all the recursion in this project? smh

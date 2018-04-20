@@ -254,22 +254,18 @@ end
 function drawObject(obj, x, y, r, sx, sy, cx, cy)
     love.graphics.setColor(1, 1, 1)
 
-    if type(obj.img) == "table" then
-        for i, img in ipairs(obj.img) do
-            if obj.palette[i] then
-                love.graphics.setColor(obj.palette[i])
-            end
-            love.graphics.draw(img, obj.quad, x, y, r, sx, sy, cx, cy)
-            love.graphics.setColor(1, 1, 1)
-        end
-        
-        if obj.img["static"] then
-            love.graphics.draw(obj.img["static"], obj.quad, x, y, r, sx, sy, cx, cy)
-        end
-    elseif obj.quad then
+    if obj.imgPalette and obj.palette then
+        paletteShader.on(obj.imgPalette, obj.palette)
+    end
+
+    if obj.quad then
         love.graphics.draw(obj.img, obj.quad, x, y, r, sx, sy, cx, cy)
     else
         love.graphics.draw(obj.img, x, y, r, sx, sy, cx, cy)
+    end
+
+    if obj.imgPalette and obj.palette then
+        paletteShader.off()
     end
 end
 
@@ -305,7 +301,7 @@ function World:loadMap(data)
             if mapTile ~= 0 then
                 local tile = self.tileLookup[mapTile]
                 
-                assert(tile, "Couldn't load real tile at " .. x .. ", " .. y .. " for \"" .. mapTile .. "\"")
+                assert(tile, string.format("Couldn't load real tile at x=%s, y=%s for requested shortcut \"%s\". This may mean that the map is corrupted.", x, y, mapTile))
                 
                 local realY = self.height-y+1
                 self.map[x][realY] = tile

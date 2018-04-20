@@ -12,7 +12,8 @@ function love.load()
         minheight = 165*VAR("scale"),
     })
 
-    love.window.setTitle("Definitely not Mari0 2")
+    love.window.setTitle("Mari0 2")
+    love.window.setIcon(love.image.newImageData("img/icon.png"))
     
     love.graphics.setDefaultFilter("nearest", "nearest")
     
@@ -28,6 +29,7 @@ function love.load()
     require "lib.Gui3"
     prof = require "lib.jprof.jprof"
     FrameDebug3 = require "lib.FrameDebug3"
+    paletteShader = require "lib.paletteShader"
 
     require "class.ActorState"
     require "class.Character"
@@ -39,7 +41,6 @@ function love.load()
     require "class.Actor"
     require "class.ActorEvent"
     require "class.BlockBounce"
-    -- require "class.Enemy"
     require "class.Portal"
     require "class.PortalParticle"
     require "class.PortalThing"
@@ -57,16 +58,6 @@ function love.load()
     
     fontOutlined = love.graphics.newImageFont("img/font-outlined.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$.,:;!?_-<>=+*\\/'%^~")
     love.graphics.setFont(fontOutlined)
-
-    -- font = Font3:new(love.graphics.newImage("img/font.png"), [[
-    --     ABCDEFGHIJKLMNOPQRSTUVWXYZ
-    --     abcdefghijklmnopqrstuvwxyz
-    --     0123456789
-    --     &Space;
-    --     .;:;!?_-<>=+*/\'%
-    --     &Intersect;
-    --     &Move;
-    -- ]])
 
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")
     debugCandyImg:setWrap("repeat")

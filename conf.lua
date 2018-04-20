@@ -1,4 +1,4 @@
 function love.conf(t)
     t.window = false
-    t.identity = "mari3"
+    t.identity = "mari0_2"
 end

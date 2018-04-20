@@ -9,6 +9,8 @@ for _, file in ipairs(files) do
         local name = string.sub(file, 1, -6)
         local template = JSON:decode(love.filesystem.read(dir .. file))
 
+        template.name = name
+
         -- Load images
         if template.img then
             if type(template.img) == "table" then

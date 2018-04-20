@@ -12,6 +12,8 @@ function Actor:initialize(world, x, y, actorTemplate)
 
     self.components = {}
     for name, args in pairs(self.actorTemplate.components) do
+        assert(components[name], string.format("Unable to load component \"%s\" requested by actorTemplate \"%s\".", name, actorTemplate.name))
+
         self:addComponent(components[name], args)
     end
 
@@ -133,7 +135,7 @@ end
 
 function Actor:switchState(stateName)
     if stateName then
-        assert(self.states[stateName], "Tried to switch to nonexistent ActorState \"" .. stateName .. "\" on \"" .. tostring(self) .. "\" and that's bad.")
+        assert(self.states[stateName], string.format("Tried to switch to nonexistent ActorState \"%s\" on %s.", stateName, self.actorTemplate.name))
         self.state = ActorState:new(self, stateName, self.states[stateName])
 
         self.state:checkExit()

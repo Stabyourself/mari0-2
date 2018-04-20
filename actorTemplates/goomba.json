@@ -2,10 +2,19 @@
     "width": 12,
     "height": 12,
 
-
     "img": "img/goomba.png",
 
     "components": {
+        "misc.palettable": {
+            "imgPalette": [
+                [252, 152, 56]
+            ],
+
+            "defaultPalette": [
+                [252, 152, 56]
+            ]
+        },
+
         "animation.mirror": {
             "centerX": 8,
             "centerY": 9

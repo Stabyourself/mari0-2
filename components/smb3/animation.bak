@@ -592,7 +592,7 @@ function component.setup(actor)
     actor.centerX = graphics["small"].centerX
     actor.centerY = graphics["small"].centerY
     
-    actor.standardPalette = graphics["small"].colors
+    actor.defaultPalette = graphics["small"].colors
 end
 
 function component.postUpdate(actor, dt)
@@ -606,7 +606,7 @@ function animation(actor, dt)
         local palette = math.ceil(math.fmod(actor.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
         
         if palette == 4 then
-            actor.palette = actor.standardPalette
+            actor.palette = actor.defaultPalette
         else
             actor.palette = STARPALETTES[palette]
         end

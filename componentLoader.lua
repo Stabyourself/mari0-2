@@ -13,7 +13,7 @@ for _, path in ipairs(toLoad) do
 
         components[name].code = require(path)
         components[name].name = name
-
-        assert(type(components[name]) == "table", "Component \"" .. path .. "\" didn't return a table.")
+        
+        assert(type(components[name].code) == "table", string.format("Component \"%s\" didn't return a table.", name))
     end
 end

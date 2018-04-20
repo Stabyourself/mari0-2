@@ -13,7 +13,7 @@ function component.update(actor, dt, actorEvent)
     actor.starTimer = actor.starTimer + dt
     
     if actor.starTimer >= STARTIME then
-        actor.palette = actor.standardPalette
+        actor.palette = actor.defaultPalette
         actor.starred = false
     end
 end

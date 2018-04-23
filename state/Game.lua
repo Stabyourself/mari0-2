@@ -19,7 +19,7 @@ function Game:update(dt)
     
     self.level:update(dt)
     
-    if self.level.marios[1].y > self.level.height*self.level.tileSize+.5 then
+    if self.level.marios[1].y > self.level:getYEnd()*self.level.tileSize+.5 then
         self.level.marios[1].y = -1
     end
     

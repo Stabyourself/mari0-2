@@ -10,20 +10,22 @@ end
 
 function Paint:update(dt)
     if self.penDown then
-        local x, y = self.level:cameraToMap(getWorldMouse())
-        
-        if not self.level:inMap(x, y) then
-            self.editor:expandMapTo(x, y)
+        local x, y = self.level:cameraToCoordinate(getWorldMouse())
+        local layer = self.editor.activeLayer
+
+        if not layer:inMap(x, y) then
+            layer:expandTo(x, y)
         end
         
-        self.level:setMap(x, y, self.tile)
+        layer:setCoordinate(x, y, self.tile)
+        layer:optimize()
     end
 end
 
 function Paint:draw()
     local mouseX, mouseY = getWorldMouse()
-    local mapX, mapY = self.level:cameraToMap(mouseX, mouseY)
-    local worldX, worldY = self.level:mapToWorld(mapX-1, mapY-1)
+    local coordX, coordY = self.level:cameraToCoordinate(mouseX, mouseY)
+    local worldX, worldY = self.level:coordinateToWorld(coordX-1, coordY-1)
     
     self.tile:draw(worldX, worldY, true)
 end
@@ -49,10 +51,11 @@ function Paint:mousereleased(x, y, button)
 end
 
 function Paint:pipette(x, y)
-    local mapX, mapY = self.level:mouseToMap()
-    
-    if self.level:inMap(mapX, mapY) then
-        local tile = self.level:getTile(mapX, mapY)
+    local coordX, coordY = self.level:mouseToCoordinate()
+    local layer = self.editor.activeLayer
+
+    if layer:inMap(coordX, coordY) then
+        local tile = layer:getTile(coordX, coordY)
         
         if tile then
             self.tile = tile

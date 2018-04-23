@@ -1,3 +1,5 @@
+-- Mostly taken from https://love2d.org/forums/viewtopic.php?p=211460&sid=0837416402b7c478107097dd083f7f90#p211460
+
 local paletteShader = {}
 
 local sh_swap_colors = love.filesystem.read("lib/paletteShader.glsl")

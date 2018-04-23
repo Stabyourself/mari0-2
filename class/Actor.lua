@@ -69,6 +69,28 @@ function Actor:addComponent(component, args)
     end
 end
 
+function Actor:removeComponent(component)
+    for i = #self.components, 1, -1 do
+        local v = self.components[i]
+
+        if v.code == component or v.code == component.code then -- so it works for both raw components and "loaded" components
+            table.remove(self.components, i)
+        end
+    end
+end
+
+function Actor:hasComponent(component)
+    for i = #self.components, 1, -1 do
+        local v = self.components[i]
+
+        if v.code == component or v.code == component.code then
+            return true
+        end
+    end
+
+    return false
+end
+
 function Actor:ceilCollision(obj2)
     if obj2:isInstanceOf(Block) then
         -- See if there's a better matching block (because Actor jumped near the edge of a block)

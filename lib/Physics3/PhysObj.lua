@@ -96,10 +96,10 @@ function PhysObj:leftColCheck()
 	local colX, colY
 
 	for _, tracer in ipairs(self.tracers.left) do
-		local currentTraceX, currentTraceY = tracer:trace()
+		local traceX, traceY, traceObj = tracer:trace()
 		
-		if currentTraceX and (not col or currentTraceX > col) then
-			colX, colY = currentTraceX, currentTraceY
+		if traceX and (not col or traceY > col) then
+			colX, colY, colObj = traceX, traceY, traceObj
 		end
 	end
 	
@@ -107,7 +107,7 @@ function PhysObj:leftColCheck()
 		if not self:leftCollision() then
 			self.x = colX+1
 			self.speed[1] = math.max(self.speed[1], 0)
-			return colX, colY
+			return colX, colY, colObj
 		end
 	end
 	
@@ -118,10 +118,10 @@ function PhysObj:rightColCheck()
 	local colX, colY
 
 	for _, tracer in ipairs(self.tracers.right) do
-		local currentTraceX, currentTraceY = tracer:trace()
+		local traceX, traceY, traceObj = tracer:trace()
 		
-		if currentTraceX and (not col or currentTraceX < col) then
-			colX, colY = currentTraceX, currentTraceY
+		if traceX and (not col or traceY < col) then
+			colX, colY, colObj = traceX, traceY, traceObj
 		end
 	end
 	
@@ -129,7 +129,7 @@ function PhysObj:rightColCheck()
 		if not self:rightCollision() then
 			self.x = colX-self.width
 			self.speed[1] = math.min(self.speed[1], 0)
-			return colX, colY
+			return colX, colY, colObj
 		end
 	end
 	
@@ -140,10 +140,10 @@ function PhysObj:topColCheck()
 	local colX, colY
 	
 	for _, tracer in ipairs(self.tracers.up) do
-		local currentTraceX, currentTraceY = tracer:trace()
+		local traceX, traceY, traceObj = tracer:trace()
 		
-		if currentTraceX and (not colX or currentTraceY > colY) then
-			colX, colY = currentTraceX, currentTraceY
+		if traceX and (not colX or traceY > colY) then
+			colX, colY, colObj = traceX, traceY, traceObj
 		end
 	end
 	
@@ -152,7 +152,7 @@ function PhysObj:topColCheck()
 			self.y = colY+1
 			self.speed[2] = math.max(self.speed[2], 0)
 			
-			return colX, colY
+			return colX, colY, colObj
 		end
 	end
 	
@@ -163,10 +163,10 @@ function PhysObj:bottomColCheck()
 	local colX, colY
 	
 	for _, tracer in ipairs(self.tracers.down) do
-		local currentTraceX, currentTraceY = tracer:trace()
+		local traceX, traceY, traceObj = tracer:trace()
 		
-		if currentTraceX and (not colX or currentTraceY < colY) then
-			colX, colY = currentTraceX, currentTraceY
+		if traceX and (not colX or traceY < colY) then
+			colX, colY, colObj = traceX, traceY, traceObj
 		end
 	end
 	
@@ -180,7 +180,7 @@ function PhysObj:bottomColCheck()
 				self.y = colY-self.height
 				self.speed[2] = math.min(self.speed[2], 0)
 				
-				return colX, colY
+				return colX, colY, colObj
 			end
 		end
 	end
@@ -196,20 +196,20 @@ local col = {
 }
 
 function PhysObj:checkCollisions()
-	col.left[1], col.left[2] = self:leftColCheck()
+	col.left[1], col.left[2], col.left[3] = self:leftColCheck()
 
 	col.right[1] = nil
 	if not col.left[1] then
-		col.right[1], col.right[2] = self:rightColCheck()
+		col.right[1], col.right[2], col.right[3] = self:rightColCheck()
 	end
 	
 	col.bottom[1] = nil
 	if self.speed[2] > 0 then
-		col.bottom[1], col.bottom[2] = self:bottomColCheck()
+		col.bottom[1], col.bottom[2], col.bottom[3] = self:bottomColCheck()
 	end
 	
 	if not col.bottom[1] then
-		col.top[1], col.top[2] = self:topColCheck()
+		col.top[1], col.top[2], col.top[3] = self:topColCheck()
 		
 		if self.onGround and self.speed[2] > 0 then
 			self:startFall()
@@ -217,14 +217,8 @@ function PhysObj:checkCollisions()
 		end
 	end
 	
-	if col.bottom[1] then
-		local x, y = self.world:worldToMap(col.bottom[1], col.bottom[2])
-		
-		local tile = self.world:getTile(x, y)
-		
-		if tile then
-			self.surfaceAngle = tile.angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
-		end
+	if type(col.bottom[3]) == "table" and col.bottom[3]:isInstanceOf(Physics3.Tile) then
+		self.surfaceAngle = col.bottom[3].angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
 	end
 end
 

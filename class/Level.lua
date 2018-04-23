@@ -3,16 +3,16 @@ Level = class("Level", Physics3.World)
 function Level:initialize(path)
     local data = JSON:decode(love.filesystem.read(path))
     
-    self:loadMap(data)
+    self:loadLevel(data)
     
     self.camera.target = self.marios[1]
 end
 
-function Level:loadMap(data)
+function Level:loadLevel(data)
     self.data = data
     
     Physics3.World.initialize(self)
-    Physics3.World.loadMap(self, self.data)
+    Physics3.World.loadLevel(self, self.data)
     
     self.backgroundColor = self.data.backgroundColor or {156, 252, 240}
     self.backgroundColor[1] = self.backgroundColor[1]/255
@@ -52,7 +52,7 @@ function Level:loadMap(data)
     self.actors = {} -- todo: this is meh
     self.marios = {}
 
-    local x, y = self:mapToWorld(self.spawnX-.5, self.spawnY)
+    local x, y = self:coordinateToWorld(self.spawnX-.5, self.spawnY)
     
     local mario = Actor(self, x, y, actorTemplates.smb3_raccoon)
 
@@ -111,6 +111,7 @@ function Level:cmdpressed(cmds)
     end
     
     if cmds["debug.star"] then -- debug
+        self.marios[1]:removeComponent(components["smb3.star"])
         self.marios[1]:addComponent(components["smb3.star"])
     end
 end
@@ -119,20 +120,22 @@ function Level:mousepressed(x, y, button)
     if button == 1 or button == 2 then
         local mario = self.marios[1]
         
-        local portal = self:attemptPortal(mario.crosshair.target.tileX, mario.crosshair.target.tileY, mario.crosshair.target.blockSide, mario.crosshair.target.worldX, mario.crosshair.target.worldY, mario.portalColor[button], mario.portals[button])
-        
-        if portal then
-            if mario.portals[button] then
-                mario.portals[button].deleteMe = true
-            end
+        if mario.crosshair.target.valid then
+            local portal = self:attemptPortal(mario.crosshair.target.layer, mario.crosshair.target.tileX, mario.crosshair.target.tileY, mario.crosshair.target.blockSide, mario.crosshair.target.worldX, mario.crosshair.target.worldY, mario.portalColor[button], mario.portals[button])
             
-            mario.portals[button] = portal
-                    
-            if mario.portals[1] and mario.portals[2] then
-                mario.portals[1]:connectTo(mario.portals[2])
-                mario.portals[2]:connectTo(mario.portals[1])
+            if portal then
+                if mario.portals[button] then
+                    mario.portals[button].deleteMe = true
+                end
+                
+                mario.portals[button] = portal
+                        
+                if mario.portals[1] and mario.portals[2] then
+                    mario.portals[1]:connectTo(mario.portals[2])
+                    mario.portals[2]:connectTo(mario.portals[1])
 
-                mario.portals[button].timer = mario.portals[button].connectsTo.timer
+                    mario.portals[button].timer = mario.portals[button].connectsTo.timer
+                end
             end
         end
     end
@@ -141,7 +144,7 @@ end
 function Level:spawnEnemies(untilX)
     while self.spawnI <= #self.spawnList and untilX > self.spawnList[self.spawnI].x do -- Spawn next enemy
         toSpawn = self.spawnList[self.spawnI]
-        local x, y = self:mapToWorld(toSpawn.x-.5, toSpawn.y)
+        local x, y = self:coordinateToWorld(toSpawn.x-.5, toSpawn.y)
         Enemy:new(self, x, y, toSpawn.enemy.json, toSpawn.enemy.img, toSpawn.enemy.quad)
 
         self.spawnI = self.spawnI + 1
@@ -189,7 +192,7 @@ function Level:updateCamera(dt)
         end
             
         -- Only scroll up in flight mode
-        if target.flying or self.camera.y < self.height*self.tileSize-CAMERAHEIGHT then
+        if target.flying or self.camera.y < self:getYEnd()*self.tileSize-CAMERAHEIGHT then -- ?
             if pYr < UPSCROLLBORDER then
                 self.camera.y = self.camera.y - VAR("cameraScrollRate")*dt
             
@@ -199,11 +202,11 @@ function Level:updateCamera(dt)
             end
         end
         
-        -- -- And clamp it to map boundaries
-        self.camera.x = math.min(self.camera.x, self.width*self.tileSize-CAMERAWIDTH/2)
+        -- -- And clamp it to level boundaries
+        self.camera.x = math.min(self.camera.x, self:getXEnd()*self.tileSize-CAMERAWIDTH/2)
         self.camera.x = math.max(self.camera.x, CAMERAWIDTH/2)
         
-        self.camera.y = math.min(self.camera.y, self.height*self.tileSize-CAMERAHEIGHT/2)
+        self.camera.y = math.min(self.camera.y, self:getYEnd()*self.tileSize-CAMERAHEIGHT/2)
         self.camera.y = math.max(self.camera.y, CAMERAHEIGHT/2)
     end
 end
@@ -216,7 +219,7 @@ function Level:bumpBlock(x, y)
         table.insert(self.blockBounces, blockBounce)
 
         if Tile.coinBlock then
-            self:setMap(x, y, 113)
+            self:setCoordinate(x, y, 113)
         end
     end
 end

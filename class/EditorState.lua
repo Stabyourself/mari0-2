@@ -6,21 +6,33 @@ function EditorState:initialize(editor)
     self.state = self:serialize()
 end
 
-function EditorState:serialize()
+function EditorState:serialize() -- Todo: have to rewrite this to support layers lol
+    local world = self.editor.level
     local state = {}
 
-    state.map = {}
-    state.width = self.editor.level.width
-    state.height = self.editor.level.height
+    -- Layers
+    state.layers = {}
 
-    for x = 1, state.width do
-        state.map[x] = {}
+    for i, layer in ipairs(world.layers) do
+        state.layers[i] = {}
 
-        for y = 1, state.height do
-            state.map[x][y] = self.editor.level.map[x][y]
+        state.layers[i].x = layer.x
+        state.layers[i].y = layer.y
+        state.layers[i].width = layer.width
+        state.layers[i].height = layer.height
+
+        state.layers[i].map = {}
+
+        for x = 1, layer.width do
+            state.layers[i].map[x] = {}
+
+            for y = 1, layer.height do
+                state.layers[i].map[x][y] = layer.map[x][y]
+            end
         end
     end
-    
+
+    -- Selection
     local selection = self.editor.selection
     
     if selection then
@@ -32,6 +44,7 @@ function EditorState:serialize()
         end
     end
 
+    -- Selection but in red
     local floatingSelection = self.editor.floatingSelection
 
     if floatingSelection then
@@ -44,15 +57,25 @@ end
 
 function EditorState:load()
     local state = self.state
-    self.editor.level.map = {}
-    
-    for x = 1, state.width do
-        self.editor.level.map[x] = {}
+    local world = self.editor.level
 
-        for y = 1, state.height do
-            self.editor.level.map[x][y] = state.map[x][y]
+    world.layers = {}
+    
+    for i, layer in ipairs(state.layers) do
+        local map = {}
+
+        for x = 1, layer.width do
+            map[x] = {}
+
+            for y = 1, layer.height do
+                map[x][y] = layer.map[x][y]
+            end
         end
+
+        world.layers[i] = Layer:new(layer.x, layer.y, layer.width, layer.height, map)
     end
+
+    self.editor.activeLayer = self.editor.level.layers[1]
     
     self.editor.level.width = state.width
     self.editor.level.height = state.height

@@ -7,7 +7,7 @@ local fileInfo = love.filesystem.getInfo("environment.lua")
 
 if fileInfo and fileInfo.type == "file" then
     local envTemp = require "environment"
-    
+
     for i, v in pairs(envTemp) do
         VARIABLES[i] = v
     end
@@ -91,7 +91,7 @@ end
 
 function math.round(i, decimals)
     local factor = math.pow(10, decimals or 0)
-    
+
     if i >= 0 then
         return math.floor(i*factor+.5)/factor
     else
@@ -152,7 +152,7 @@ function pointOnLine(lx1, ly1, lx2, ly2, px, py) -- Credits to https://stackover
     local dist1P = math.sqrt((lx1-px)^2+(ly1-py)^2)
     local dist2P = math.sqrt((lx2-px)^2+(ly2-py)^2)
     local dist12 = math.sqrt((lx1-lx2)^2+(ly1-ly2)^2)
-    
+
     if math.abs(math.abs(dist2P - dist1P) - dist12) < 0.0000001 or
         math.abs(math.abs(dist2P + dist1P) - dist12) < 0.0000001 then
         return dist1P - dist2P
@@ -164,17 +164,17 @@ end
 --     if l1x == px then 
 --         return l2x == px 
 --     end
-    
+
 --     if l1y == py then
 --         return l2y == py 
 --     end
-    
+
 --     return math.abs((l1x - px)*(l1y - py) - (px - l2x)*(py - l2y)) < 0.000001
 -- end
 
 function objectWithinPortalRange(p, x, y)
     local nX, nY = pointAroundPoint(x, y, p.x1, p.y1, -p.angle)
-    
+
     return nX-p.x1 > 0 and nX-p.x1 < p.size and nY < p.y1
 end
 
@@ -216,29 +216,29 @@ function paletteSwap(imgData, swaps)
         for x = 0, imgData:getWidth()-1 do
             for _, swap in ipairs(swaps) do
                 local r, g, b, a = imgData:getPixel(x, y)
-                
+
                 if r == swap[1][1] and g == swap[1][2] and b == swap[1][3] then
                     imgData:setPixel(x, y, swap[2][1], swap[2][2], swap[2][3], a)
-                    
+
                     break
                 end
             end
         end
     end
-    
+
     return imgData
 end
 
 function normalizeAngle(a)
 	a = math.fmod(a+math.pi, math.pi*2)-math.pi
     a = math.fmod(a-math.pi, math.pi*2)+math.pi
-    
+
     return a
 end
     
 local function combineTableCall(var, t) -- basically makes var["some.dot.separated.string"] into var.some.dot.separated.string
     local ct = table.remove(t, 1)
-    
+
     if #t == 0 then
         return var[ct]
     else
@@ -269,10 +269,10 @@ end
 -- ^ctrl !alt +shift
 function cmdDown(cmd)
     local keys = CMDTABLE[cmd]
-    
+
     for _, key in ipairs(keys) do
         local pass = true
-        
+
         local firstChar = string.sub(key, 1, 1)
         if firstChar == "^" then
             if not love.keyboard.isDown({"lctrl", "rctrl"}) then
@@ -280,7 +280,7 @@ function cmdDown(cmd)
             end
             key = string.sub(key, 2, -1)
         end
-        
+
         local firstChar = string.sub(key, 1, 1)
         if firstChar == "!" then
             if not love.keyboard.isDown({"lalt", "ralt"}) then
@@ -288,7 +288,7 @@ function cmdDown(cmd)
             end
             key = string.sub(key, 2, -1)
         end
-        
+
         local firstChar = string.sub(key, 1, 1)
         if firstChar == "+" then
             if not love.keyboard.isDown({"lshift", "rshift"}) then
@@ -296,14 +296,14 @@ function cmdDown(cmd)
             end
             key = string.sub(key, 2, -1)
         end
-        
+
         if pass then
             if love.keyboard.isDown(key) then
                 return true
             end
         end
     end
-    
+
     return false
 end
 
@@ -313,10 +313,10 @@ function getTileBorders(tiles, offsetX, offsetY)
 
     local borders = {}
     local SBL = {} -- selectionBordersLookup
-    
+
     for _, tile in ipairs(tiles) do
         local x, y = tile[1], tile[2]
-        
+
         if SBL[x-1] and SBL[x-1][y] and SBL[x-1][y].right then
             SBL[x-1][y].right = false
         end
@@ -329,18 +329,18 @@ function getTileBorders(tiles, offsetX, offsetY)
         if SBL[x] and SBL[x][y+1] and SBL[x][y+1].top then
             SBL[x][y+1].top = false
         end
-        
+
         if not SBL[x] then
             SBL[x] = {}
         end
-        
+
         SBL[x][y] = {
             top = true,
             left = true,
             right = true,
             bottom = true
         }
-        
+
         if SBL[x-1] and SBL[x-1][y] then
             SBL[x][y].left = false
         end
@@ -354,23 +354,23 @@ function getTileBorders(tiles, offsetX, offsetY)
             SBL[x][y].bottom = false
         end
     end
-    
+
     for _, tile in ipairs(tiles) do
         local x, y = tile[1], tile[2]
         local wx, wy = (x-1+offsetX)*16, (y-1+offsetY)*16
-        
+
         if SBL[x][y].top then
             table.insert(borders, {wx, wy, 0})
         end
-        
+
         if SBL[x][y].right then
             table.insert(borders, {wx+16, wy, math.pi*.5})
         end
-        
+
         if SBL[x][y].bottom then
             table.insert(borders, {wx+16, wy+16, math.pi})
         end
-        
+
         if SBL[x][y].left then
             table.insert(borders, {wx, wy+16, -math.pi*.5})
         end

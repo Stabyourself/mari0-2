@@ -9,30 +9,9 @@ local FLOATANIMATIONTIME = 4/60
 local SPINTIME = 19/60
 local SPINFRAMETIME = 4/60
 
-local STARFRAMETIME = 4/60
 local SOMERSAULTTIME = 2/60
 
 local SHOOTTIME = 12/60
-
-local STARPALETTES = {
-    convertPalette({
-        {252, 252, 252},
-        {  0,   0,   0},
-        {216,  40,   0},
-    }),
-    
-    convertPalette({
-        {252, 252, 252},
-        {  0,   0,   0},
-        { 76, 220,  72},
-    }),
-    
-    convertPalette({
-        {252, 188, 176},
-        {  0,   0,   0},
-        {252, 152,  56},
-    })
-}
 
 function component.setup(actor, dt, actorEvent, args)
     actor.img = actor.actorTemplate.img
@@ -77,18 +56,6 @@ function component.postUpdate(actor, dt)
 end
 
 function animation(actor, dt)
-    -- Image updating for star
-    if actor.starred then
-        -- get frame
-        local palette = math.ceil(math.fmod(actor.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
-        
-        if palette == 4 then
-            actor.palette = actor.defaultPalette
-        else
-            actor.palette = STARPALETTES[palette]
-        end
-    end
-    
     if actor.hasPortalGun then -- look towards portalGunAngle
         if math.abs(actor.portalGunAngle-actor.angle) <= math.pi*.5 then
             actor.animationDirection = 1
@@ -241,7 +208,7 @@ function animation(actor, dt)
     end
 
     -- Somersault animation
-    if actor.starred and (actor.state.name == "jump" or actor.state.name == "fall") then
+    if actor.starred and (actor.state.name == "jump" or actor.state.name == "fall" or actor.state.name == "float") then
         local somersaultFrames = actor.frameCounts.somerSault
 
         actor.somerSaultFrameTimer = actor.somerSaultFrameTimer + dt

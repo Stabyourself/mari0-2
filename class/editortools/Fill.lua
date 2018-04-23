@@ -8,7 +8,7 @@ end
 
 function Fill:mousepressed(x, y, button)
     if button == 1 then
-        self.pressingPos = {self.level:cameraToMap(x, y)}
+        self.pressingPos = {self.level:cameraToCoordinate(x, y)}
         self.pressing = true
     elseif button == 3 then
         self.editor.tools.paint:pipette(x, y)
@@ -19,15 +19,15 @@ end
 
 function Fill:draw()
     local mouseX, mouseY = getWorldMouse()
-    local mapX, mapY = self.level:cameraToMap(mouseX, mouseY)
-    local worldX, worldY = self.level:mapToWorld(mapX-1, mapY-1)
+    local coordX, coordY = self.level:cameraToCoordinate(mouseX, mouseY)
+    local worldX, worldY = self.level:coordinateToWorld(coordX-1, coordY-1)
     
     self.editor.tools.paint.tile:draw(worldX, worldY, true)
 end
 
 function Fill:mousereleased(x, y, button)
     if button == 1 and self.pressing then
-        x, y = self.level:cameraToMap(x, y)
+        x, y = self.level:cameraToCoordinate(x, y)
         
         if x == self.pressingPos[1] and y == self.pressingPos[2] then
             if self.editor.selection and #self.editor.selection.tiles > 0 then
@@ -47,8 +47,7 @@ function Fill:mousereleased(x, y, button)
                 end
             end
             
-            -- local tiles = self.level:getFloodArea(x, y)
-            local tiles = self.level:getFloodAreaScanline(x, y)
+            local tiles = self.editor.activeLayer:getFloodArea(x, y, self.editor.activeLayer)
             
             self:fillTiles(tiles, self.editor.tools.paint.tile)
             self.editor:saveState()
@@ -60,7 +59,7 @@ end
 
 function Fill:fillTiles(tiles, fillWith)
     for _, tile in ipairs(tiles) do
-        self.level:setMap(tile[1], tile[2], fillWith)
+        self.editor.activeLayer:setCoordinate(tile[1], tile[2], fillWith)
     end
 end
 

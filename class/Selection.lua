@@ -46,7 +46,7 @@ function Selection:add(bTiles)
                 break
             end
         end
-        print(found)
+        
         if not found then
             table.insert(self.tiles, bTile)
         end
@@ -111,14 +111,14 @@ function Selection:getFloatingSelection()
 end
 
 function Selection:collision(x, y)
-    local mapX, mapY = self.level:cameraToMap(x, y)
+    local coordX, coordY = self.level:cameraToCoordinate(x, y)
 
-    if self.level:inMap(mapX, mapY) then
-        local tile = self.level:getTile(mapX, mapY)
+    if self.editor.activeLayer:inMap(coordX, coordY) then
+        local tile = self.editor.activeLayer:getTile(coordX, coordY)
 
         if tile then
             for _, tile in ipairs(self.tiles) do
-                if mapX == tile[1] and mapY == tile[2] then
+                if coordX == tile[1] and coordY == tile[2] then
                     return true
                 end
             end
@@ -136,9 +136,15 @@ function Selection:mousereleased(x, y, button)
 end
 
 function Selection:delete()
+    local layer = self.editor.activeLayer
+
     for _, tile in ipairs(self.tiles) do
-        self.level:setMap(tile[1], tile[2], nil)
+        if layer:inMap(tile[1], tile[2]) then
+            layer:setCoordinate(tile[1], tile[2], false)
+        end
     end
+    
+    layer:optimize()
 end
 
 function Selection:getStampMap()

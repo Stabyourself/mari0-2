@@ -8,7 +8,7 @@ function StampMap.fromSelection(editor, selection)
     for i = 1, #tiles do
         local x, y = tiles[i][1], tiles[i][2]
 
-        if editor.level:inMap(x, y) and editor.level:getTile(x, y) then
+        if editor.activeLayer:inMap(x, y) and editor.activeLayer:getTile(x, y) then
             if x < xl then
                 xl = x
             end
@@ -39,8 +39,8 @@ function StampMap.fromSelection(editor, selection)
     for _, tile in ipairs(tiles) do
         local x, y = tile[1], tile[2]
 
-        if editor.level:inMap(x, y) and editor.level:getTile(x, y) then
-            stampMap[x-xl+1][y-yt+1] = editor.level.map[x][y]
+        if editor.activeLayer:inMap(x, y) and editor.activeLayer:getTile(x, y) then
+            stampMap[x-xl+1][y-yt+1] = editor.activeLayer:getTile(x, y)
         end
     end
 

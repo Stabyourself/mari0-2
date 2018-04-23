@@ -8,17 +8,21 @@ end
 
 function Erase:draw()
     local mouseX, mouseY = getWorldMouse()
-    local mapX, mapY = self.level:cameraToMap(mouseX, mouseY)
-    local worldX, worldY = self.level:mapToWorld(mapX-1, mapY-1)
+    local coordX, coordY = self.level:cameraToCoordinate(mouseX, mouseY)
+    local worldX, worldY = self.level:coordinateToWorld(coordX-1, coordY-1)
     
     Gui3.drawBox(self.editor.selectImg, self.editor.selectQuad, worldX, worldY, 16, 16)
 end
 
 function Erase:update(dt)
     if self.penDown then
-        local x, y = self.level:cameraToMap(getWorldMouse())
-            
-        self.level:setMap(x, y, nil)
+        local x, y = self.level:cameraToCoordinate(getWorldMouse())
+        local layer = self.editor.activeLayer
+        
+        if layer:inMap(x, y) then
+            layer:setCoordinate(x, y, false)
+            layer:optimize()
+        end
     end
 end
 
@@ -42,10 +46,11 @@ function Erase:mousereleased(x, y, button)
 end
 
 function Erase:pipette(x, y)
-    local mapX, mapY = self.level:mouseToMap()
+    local coordX, coordY = self.level:mouseToCoordinate()
+    local layer = self.editor.activeLayer
     
-    if self.level:inMap(mapX, mapY) then
-        local tile = self.level.map[mapX][mapY]
+    if layer:inMap(coordX, coordY) then
+        local tile = layer:getTile(coordX, coordY)
         
         if tile then
             self.editor:selectTool("paint")

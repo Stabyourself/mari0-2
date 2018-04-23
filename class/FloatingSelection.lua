@@ -10,8 +10,8 @@ function FloatingSelection.fromSelection(editor, selection)
         for y = 1, stampMap.height do
             local absX, absY = x+xl-1, y+yt-1
             
-            if stampMap.map[x][y] and editor.level:inMap(absX, absY) and editor.level:getTile(absX, absY) then
-                editor.level:setMap(absX, absY, nil)
+            if stampMap.map[x][y] and editor.activeLayer:inMap(absX, absY) and editor.activeLayer:getTile(absX, absY) then
+                editor.activeLayer:setCoordinate(absX, absY, false)
             end
         end
     end
@@ -60,7 +60,7 @@ function FloatingSelection:draw()
             local tile = self.map[x][y]
             
             if tile then
-                worldX, worldY = self.level:mapToWorld(x+self.pos[1]-2, y+self.pos[2]-2)
+                worldX, worldY = self.level:coordinateToWorld(x+self.pos[1]-2, y+self.pos[2]-2)
                 tile:draw(worldX, worldY, true)
             end
         end
@@ -89,25 +89,25 @@ function FloatingSelection:reset()
 end
 
 function FloatingSelection:unFloat()
-    if self.pos[1] < 0 or self.pos[2] < 0 then
-        local moveX, moveY = self.level:expandMapTo(self.pos[1], self.pos[2])
-        self.pos[1] = self.pos[1] + moveX
-        self.pos[2] = self.pos[2] + moveY
+    local layer = self.editor.activeLayer
+
+    if self.pos[1] < layer:getXStart() or self.pos[2] < layer:getYStart() then
+        layer:expandTo(self.pos[1], self.pos[2])
     end
     
-    if self.pos[1]+self.width-1 > self.level.width or self.pos[2]+self.height-1 > self.level.height then
-        self.level:expandMapTo(self.pos[1]+self.width-1, self.pos[2]+self.height-1)
+    if self.pos[1]+self.width-1 > layer:getXEnd() or self.pos[2]+self.height-1 > layer:getYEnd() then
+        layer:expandTo(self.pos[1]+self.width-1, self.pos[2]+self.height-1)
     end
     
     for x = 1, self.width do
         for y = 1, self.height do
             if self.map[x][y] then
-                self.level:setMap(self.pos[1]+x-1, self.pos[2]+y-1, self.map[x][y])
+                layer:setCoordinate(self.pos[1]+x-1, self.pos[2]+y-1, self.map[x][y])
             end
         end
     end
-    
-    self.totalOffset = {0, 0}
+
+    layer:optimize()
 end
 
 function FloatingSelection:startDrag(x, y)
@@ -131,9 +131,9 @@ function FloatingSelection:updateBorders()
 end
 
 function FloatingSelection:collision(x, y)
-    local mapX, mapY = self.level:cameraToMap(x, y)
-    local floatMapX = mapX-self.pos[1]+1
-    local floatMapY = mapY-self.pos[2]+1
+    local coordX, coordY = self.level:cameraToCoordinate(x, y)
+    local floatMapX = coordX-self.pos[1]+1
+    local floatMapY = coordY-self.pos[2]+1
 
     if floatMapX < 1 or floatMapX > self.width or floatMapY < 1 or floatMapY > self.height then
         return false

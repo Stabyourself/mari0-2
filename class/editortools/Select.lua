@@ -10,10 +10,10 @@ end
 function Select:draw()
     local mouseX, mouseY = self.level:getMouse()
     local worldX, worldY = self.level:mouseToWorld()
-    local mapX, mapY = self.level:mouseToMap()
+    local coordX, coordY = self.level:mouseToCoordinate()
     
     if self.pressing then
-        local lx, rx, ty, by = self.level:getMapRectangle(self.selectionStart[1], self.selectionStart[2], worldX-self.selectionStart[1], worldY-self.selectionStart[2])
+        local lx, rx, ty, by = self.level:getCoordinateRectangle(self.selectionStart[1], self.selectionStart[2], worldX-self.selectionStart[1], worldY-self.selectionStart[2])
         local x = (lx-1)*self.level.tileSize
         local y = (ty-1)*self.level.tileSize
         local w = (rx-lx+1)*self.level.tileSize
@@ -108,11 +108,11 @@ function Select:getTiles(x, y, w, h)
     local dirtySelect = false
     
     if math.abs(w) < 3 and math.abs(h) < 3 then
-        lx, ty = self.level:worldToMap(x, y)
+        lx, ty = self.level:worldToCoordinate(x, y)
         rx, by = lx, ty
         dirtySelect = true
     else
-        lx, rx, ty, by = self.level:getMapRectangle(x, y, w, h, true)
+        lx, rx, ty, by = self.level:getCoordinateRectangle(x, y, w, h, true)
     end
     
     local ret = {}

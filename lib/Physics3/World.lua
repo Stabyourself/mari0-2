@@ -3,7 +3,7 @@ local World = class("Physics3.World")
 function World:initialize()
     self.tileSize = 16 --lol hardcode
     
-    self.map = {}
+    self.layers = {}
 	
 	self.objects = {}
     self.portals = {}
@@ -103,32 +103,31 @@ function World:checkPortaling(obj, oldX, oldY)
 end
 
 function World:draw()
-    prof.push("Map")
-    -- Map
-    local lx, ty = self:cameraToMap(0, 0)
-    local rx, by = self:cameraToMap(CAMERAWIDTH, CAMERAHEIGHT)
+    prof.push("Layers")
+    -- Layers
+    local lx, ty = self:cameraToCoordinate(0, 0)
+    local rx, by = self:cameraToCoordinate(CAMERAWIDTH, CAMERAHEIGHT)
     local xStart = lx-1
     local xEnd = rx
 
     local yStart = ty-1
     local yEnd = by
     
-    xStart = math.clamp(xStart, 1, self.width)
-    yStart = math.clamp(yStart, 1, self.height)
-    xEnd = math.clamp(xEnd, 1, self.width)
-    yEnd = math.clamp(yEnd, 1, self.height)
+    xStart = math.clamp(xStart, self:getXStart(), self:getXEnd())
+    yStart = math.clamp(yStart, self:getYStart(), self:getYEnd())
+    xEnd = math.clamp(xEnd, self:getXStart(), self:getXEnd())
+    yEnd = math.clamp(yEnd, self:getYStart(), self:getYEnd())
 
-    for x = xStart, xEnd do
-        for y = yStart, yEnd do
-            if self:inMap(x, y) then
-                local tile = self:getTile(x, y)
-                
-                if tile then
-                    tile:draw((x-1)*self.tileSize, (y-1)*self.tileSize)
-                end
-            end
+    for _, layer in ipairs(self.layers) do
+        layer:draw(xStart, yStart, xEnd, yEnd)
+    end
+
+    if VAR("debug").layers then
+        for _, layer in ipairs(self.layers) do
+            layer:debugDraw()
         end
     end
+
     prof.pop()
 
     prof.push("Portals Back")
@@ -252,8 +251,6 @@ function World:draw()
 end
 
 function drawObject(obj, x, y, r, sx, sy, cx, cy)
-    love.graphics.setColor(1, 1, 1)
-
     if obj.imgPalette and obj.palette then
         paletteShader.on(obj.imgPalette, obj.palette)
     end
@@ -274,8 +271,8 @@ function World:addObject(PhysObj)
 	PhysObj.World = self
 end
 
-function World:loadMap(data)
-    self.map = {}
+function World:loadLevel(data)
+    self.layers = {}
     
     -- load any used tilemaps
     self.tileMaps = {}
@@ -289,57 +286,74 @@ function World:loadMap(data)
         end
     end
     
+    for i = 1, #data.layers do
+        local dataLayer = data.layers[i]
     
-    self.width = #data.map
-	self.height = #data.map[1]
-    
-    for x = 1, #data.map do
-        self.map[x] = {}
-        for y = 1, #data.map[1] do
-            local mapTile = data.map[x][y]
+        local layerX = dataLayer.x or 0
+        local layerY = dataLayer.y or 0
+
+        local width = #dataLayer.map
+        local height = 0
+
+        local map = {}
+
+        for x = 1, #dataLayer.map do
+            map[x] = {}
+
+            height = math.max(height, #dataLayer.map[x])
             
-            if mapTile ~= 0 then
-                local tile = self.tileLookup[mapTile]
+            for y = 1, #dataLayer.map[1] do
+                local unresolvedTile = dataLayer.map[x][y]
+                local realY = height-y+1
                 
-                assert(tile, string.format("Couldn't load real tile at x=%s, y=%s for requested shortcut \"%s\". This may mean that the map is corrupted.", x, y, mapTile))
-                
-                local realY = self.height-y+1
-                self.map[x][realY] = tile
+                if unresolvedTile ~= 0 then
+                    local tile = self.tileLookup[unresolvedTile] -- convert from the saved file's specific tile lookup to the actual tileMap's number
+                    
+                    assert(tile, string.format("Couldn't load real tile at x=%s, y=%s for requested lookup \"%s\". This may mean that the map is corrupted.", x, y, mapTile))
+                    
+                    map[x][realY] = tile
+                else
+                    map[x][realY] = false
+                end
             end
         end
+
+        self.layers[i] = Layer:new(layerX, layerY, width, height, map)
     end
 end
 
-function World:saveMap(outPath)
+function World:saveLevel(outPath)
     local out = {}
     
     -- build the lookup table
     local lookUp = {}
     
-    for y = 1, self.height do
-        for x = 1, self.width do
-            local tile = self:getTile(x, y)
-            
-            if tile then
-                -- See if the tile is already in the table
-                local found = false
+    for _, layer in ipairs(self.layers) do
+        for y = 1, layer.height do
+            for x = 1, layer.width do
+                local tile = layer:getTile(x, y)
                 
-                for i, lookUpTile in ipairs(lookUp) do
-                    if lookUpTile.tileNum == tile.num and lookUpTile.tileMap == tile.tileMap then
-                        found = i
-                        break
+                if tile then
+                    -- See if the tile is already in the table
+                    local found = false
+                    
+                    for i, lookUpTile in ipairs(lookUp) do
+                        if lookUpTile.tileNum == tile.num and lookUpTile.tileMap == tile.tileMap then
+                            found = i
+                            break
+                        end
                     end
-                end
-                
-                if found then
-                    lookUp[found].count = lookUp[found].count + 1
-                else
-                    table.insert(lookUp, {tileMap = tile.tileMap, tileNum = tile.num, count = 1})
+                    
+                    if found then
+                        lookUp[found].count = lookUp[found].count + 1
+                    else
+                        table.insert(lookUp, {tileMap = tile.tileMap, tileNum = tile.num, count = 1})
+                    end
                 end
             end
         end
     end
-    
+
     out.tileMaps = {}
     local tileMapLookUp = {}
     
@@ -356,22 +370,26 @@ function World:saveMap(outPath)
     end
     
     -- build map based on lookup
-    out.map = {}
+    out.layers = {}
     
-    for x = 1, self.width do
-        out.map[x] = {}
-        
-        for y = 1, self.height do
-            local tile = self:getTile(x, y)
-            if tile then
-                local tileMap = tile.tileMap.name
-                local tileNum = tile.num
-                
-                local found = false
-                
-                out.map[x][self.height-y+1] = tileMapLookUp[tileMap][tileNum]
-            else
-                out.map[x][self.height-y+1] = 0
+    for i, v in ipairs(self.layers) do
+        out.layers[i] = Layer:new()
+
+        for x = 1, self.width do
+            out.layers[i][x] = {}
+            
+            for y = 1, self.height do
+                local tile = self:getTile(x, y)
+                if tile then
+                    local tileMap = tile.tileMap.name
+                    local tileNum = tile.num
+                    
+                    local found = false
+                    
+                    out.layers[i][x][self.height-y+1] = tileMapLookUp[tileMap][tileNum]
+                else
+                    out.layers[i][x][self.height-y+1] = 0
+                end
             end
         end
     end
@@ -394,7 +412,7 @@ function World:advancedPhysicsDebug()
             for y = 0, CAMERAHEIGHT-1 do
                 local worldX = math.round(self.camera.x-CAMERAWIDTH/2+x)
                 local worldY = math.round(self.camera.y-CAMERAHEIGHT/2+y)
-                if self:checkMapCollision(worldX, worldY, self.marios[1]) then
+                if self:checkCollision(worldX, worldY, self.marios[1]) then
                     self.advancedPhysicsDebugImgData:setPixel(x, y, 1, 1, 1, 1)
                 end
             end
@@ -419,7 +437,7 @@ function World:portalVectorDebug()
     end
 end
 
-function World:checkMapCollision(x, y, obj)
+function World:checkCollision(x, y, obj)
     if obj then
         -- Portal hijacking
         for _, p in ipairs(self.portals) do
@@ -448,41 +466,69 @@ function World:checkMapCollision(x, y, obj)
         end
     end
     
-    local tileX, tileY = self:worldToMap(x, y)
-	
-	if not self:inMap(tileX, tileY) then
-		return false
-    end
+    local tileX, tileY = self:worldToCoordinate(x, y)
     
-    local tile = self:getTile(tileX, tileY)
+    for _, layer in ipairs(self.layers) do
+        if layer:inMap(tileX, tileY) then
+            local tile = layer:getTile(tileX, tileY)
+            
+            if tile then
+                local inTileX = math.fmod(x, self.tileSize)
+                local inTileY = math.fmod(y, self.tileSize)
+                
+                if tile:checkCollision(inTileX, inTileY) then
+                    return tile
+                end
+            end
+        end
+    end
+
+    return false
+end
+
+function World:getXStart()
+    local x = math.huge
+
+    for _, layer in ipairs(self.layers) do
+        x = math.min(x, layer:getXStart())
+    end
+
+    return x
+end
+
+function World:getYStart()
+    local y = math.huge
+
+    for _, layer in ipairs(self.layers) do
+        y = math.min(y, layer:getYStart())
+    end
+
+    return y
+end
+
+function World:getXEnd()
+    local x = -math.huge
     
-    if tile then
-        local inTileX = math.fmod(x, self.tileSize)
-        local inTileY = math.fmod(y, self.tileSize)
-        
-        return tile:checkCollision(inTileX, inTileY)
-    else
-        return false
+    for _, layer in ipairs(self.layers) do
+        x = math.max(layer:getXEnd(), x)
     end
+
+    return x
 end
 
-function World:setMap(x, y, i)
-    if self:inMap(x, y) then
-        self.map[x][y] = i
+function World:getYEnd()
+    local y = -math.huge
+    
+    for _, layer in ipairs(self.layers) do
+        y = math.max(layer:getYEnd(), y)
     end
-end
 
-function World:getTile(x, y)
-    return self.map[x][y]
-end
-
-function World:inMap(x, y)
-    return x > 0 and x <= self.width and y > 0 and y <= self.height
+    return y
 end
 
 function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/raycasting.html , thanks man
-    -- Todo: limit how far offscreen this goes?
-    -- Todo: allow offscreen as long as it'll return to inscreen
+    -- Todo: limit how far offmap this goes?
+    -- Todo: allow offmap as long as it'll return to inscreen
     local rayPosX = x+1
     local rayPosY = y+1
     local rayDirX = math.cos(dir)
@@ -490,6 +536,27 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
     
     local mapX = math.floor(rayPosX)
     local mapY = math.floor(rayPosY)
+
+    -- Check if the start position is outside the map
+    local startedOutOfMap = false
+    local wasInMap = false
+
+    if not self:inMap(mapX, mapY) then
+        -- Check if the ray will return inMap
+        local xStart = self:getXStart()
+        local yStart = self:getYStart()
+        local xEnd = self:getXEnd()
+        local yEnd = self:getYEnd()
+
+        local rayPos2X = rayPosX + rayDirX*1000000000000
+        local rayPos2Y = rayPosY + rayDirY*1000000000000 -- GOOD CODE (todo? may be fine)
+
+        if not rectangleOnLine(xStart, yStart, xEnd-xStart+1, yEnd-yStart+1, rayPosX, rayPosY, rayPos2X, rayPos2Y) then
+            return false
+        end
+        
+        startedOutOfMap = true
+    end
 
     -- length of ray from one x or y-side to next x or y-side
     local deltaDistX = math.sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX))
@@ -520,93 +587,100 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
     -- perform DDA
     while not hit do
         -- Check if ray has hit something (or went outside the map)
-        local cubeCol = false
-        
-        if not self:inMap(mapX, mapY) then
-            cubeCol = true
-        else
-            local tile = self:getTile(mapX, mapY)
-            if tile and tile.collision then
-                if tile.collision == VAR("tileTemplates").cube then
+        for i, layer in ipairs(self.layers) do
+            local cubeCol = false
+            
+            if not self:inMap(mapX, mapY) then
+                if not startedOutOfMap or wasInMap then
                     cubeCol = true
-                else
-                
-                    -- complicated polygon stuff
-                    local col
+                end
+            else
+                wasInMap = true
+                if layer:inMap(mapX, mapY) then
+                    local tile = layer:getTile(mapX, mapY)
+                    if tile and tile.collision then
+                        if tile.collision == VAR("tileTemplates").cube then
+                            cubeCol = true
+                        else
                         
-                    -- Trace line
-                    local t1x, t1y = x, y
-                    local t2x, t2y = x+math.cos(dir)*100000, y+math.sin(dir)*100000 --todo find a better way for this
-                    
-                    for i = 1, #tile.collision, 2 do
-                        local nextI = i + 2
-                        
-                        if nextI > #tile.collision then
-                            nextI = 1
-                        end
-                        
-                        -- Polygon edge line
-                        local p1x, p1y = tile.collision[i]/self.tileSize+mapX-1, tile.collision[i+1]/self.tileSize+mapY-1
-                        local p2x, p2y = tile.collision[nextI]/self.tileSize+mapX-1, tile.collision[nextI+1]/self.tileSize+mapY-1
-                        
-                        local interX, interY = linesIntersect(p1x, p1y, p2x, p2y, t1x, t1y, t2x, t2y)
-                        if interX then
-                            local dist = math.sqrt((t1x-interX)^2 + (t1y-interY)^2)
+                            -- complicated polygon stuff
+                            local col
+                                
+                            -- Trace line
+                            local t1x, t1y = x, y
+                            local t2x, t2y = x+math.cos(dir)*100000, y+math.sin(dir)*100000 --todo find a better way for this
                             
-                            if not col or dist < col.dist then
-                                col = {
-                                    dist = dist,
-                                    x = interX,
-                                    y = interY,
-                                    side = (i+1)/2
-                                }
+                            for i = 1, #tile.collision, 2 do
+                                local nextI = i + 2
+                                
+                                if nextI > #tile.collision then
+                                    nextI = 1
+                                end
+                                
+                                -- Polygon edge line
+                                local p1x, p1y = tile.collision[i]/self.tileSize+mapX-1, tile.collision[i+1]/self.tileSize+mapY-1
+                                local p2x, p2y = tile.collision[nextI]/self.tileSize+mapX-1, tile.collision[nextI+1]/self.tileSize+mapY-1
+                                
+                                local interX, interY = linesIntersect(p1x, p1y, p2x, p2y, t1x, t1y, t2x, t2y)
+                                if interX then
+                                    local dist = math.sqrt((t1x-interX)^2 + (t1y-interY)^2)
+                                    
+                                    if not col or dist < col.dist then
+                                        col = {
+                                            dist = dist,
+                                            x = interX,
+                                            y = interY,
+                                            side = (i+1)/2
+                                        }
+                                    end
+                                end
+                            end
+                            
+                            if col then
+                                return layer, mapX, mapY, col.x, col.y, col.side
                             end
                         end
                     end
-                    
-                    if col then
-                        return mapX, mapY, col.x, col.y, col.side
+                end
+            end
+            
+            if cubeCol then
+                local absX = mapX-1
+                local absY = mapY-1
+
+                if side == "ver" then
+                    local dist = (mapX - rayPosX + (1 - stepX) / 2) / rayDirX;
+                    hitDist = rayPosY + dist * rayDirY - math.floor(mapY)
+
+                    absY = absY + hitDist
+                else
+                    local dist = (mapY - rayPosY + (1 - stepY) / 2) / rayDirY;
+                    hitDist = rayPosX + dist * rayDirX - math.floor(mapX)
+
+                    absX = absX + hitDist
+                end
+
+                if side == "ver" then
+                    if stepX > 0 then
+                        side = 4
+                    else
+                        side = 2
+                        absX = absX + 1
+                    end
+                else
+                    if stepY > 0 then
+                        side = 1
+                    else
+                        side = 3
+                        absY = absY + 1
                     end
                 end
+
+                return layer, mapX, mapY, absX, absY, side
+
+            elseif polyCol then
+                return layer, mapX, mapY, absX, absY, side
             end
-        end
-        
-        if cubeCol then
-            local absX = mapX-1
-            local absY = mapY-1
-
-            if side == "ver" then
-                local dist = (mapX - rayPosX + (1 - stepX) / 2) / rayDirX;
-                hitDist = rayPosY + dist * rayDirY - math.floor(mapY)
-
-                absY = absY + hitDist
-            else
-                local dist = (mapY - rayPosY + (1 - stepY) / 2) / rayDirY;
-                hitDist = rayPosX + dist * rayDirX - math.floor(mapX)
-
-                absX = absX + hitDist
-            end
-
-            if side == "ver" then
-                if stepX > 0 then
-                    side = 4
-                else
-                    side = 2
-                    absX = absX + 1
-                end
-            else
-                if stepY > 0 then
-                    side = 1
-                else
-                    side = 3
-                    absY = absY + 1
-                end
-            end
-
-            return mapX, mapY, absX, absY, side
-
-        elseif polyCol then
-            return mapX, mapY, absX, absY, side
         end
 
         -- jump to next map square, OR in x-direction, OR in y-direction
@@ -622,21 +696,26 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
     end
 end
 
-function World:mapToWorld(x, y)
+function World:inMap(x, y)
+    return  x >= self:getXStart() and x <= self:getXEnd() and
+            y >= self:getYStart() and y <= self:getYEnd()
+end
+
+function World:coordinateToWorld(x, y)
     return x*self.tileSize, y*self.tileSize
 end
 
-function World:mapToCamera(x, y)
-    local x, y = self:mapToWorld(x, y)
+function World:coordinateToCamera(x, y)
+    local x, y = self:coordinateToWorld(x, y)
     return self.camera:cameraCoords(x, y)
 end
 
-function World:worldToMap(x, y)
+function World:worldToCoordinate(x, y)
     return math.floor(x/self.tileSize)+1, math.floor(y/self.tileSize)+1
 end
 
-function World:cameraToMap(x, y)
-    return self:worldToMap(self:cameraToWorld(x, y))
+function World:cameraToCoordinate(x, y)
+    return self:worldToCoordinate(self:cameraToWorld(x, y))
 end
 
 function World:cameraToWorld(x, y)
@@ -649,10 +728,10 @@ function World:mouseToWorld()
     return self.camera:worldCoords(x, y)
 end
 
-function World:mouseToMap()
+function World:mouseToCoordinate()
     local x, y = self:getMouse()
     
-    return self:cameraToMap(x, y)
+    return self:cameraToCoordinate(x, y)
 end
 
 function World:getMouse()
@@ -660,7 +739,7 @@ function World:getMouse()
     return x/VAR("scale"), y/VAR("scale")
 end
 
-function World:getMapRectangle(x, y, w, h, clamp)
+function World:getCoordinateRectangle(x, y, w, h, clamp) -- todo: add layer parameter
     local lx, rx, ty, by
     
     if w < 0 then
@@ -673,25 +752,25 @@ function World:getMapRectangle(x, y, w, h, clamp)
         h = -h
     end
     
-    lx, ty = self:worldToMap(x+8, y+8)
-    rx, by = self:worldToMap(x+w-8, y+h-8)
+    lx, ty = self:worldToCoordinate(x+8, y+8)
+    rx, by = self:worldToCoordinate(x+w-8, y+h-8)
     
     if clamp then
-        if lx > self.width or rx < 1 or ty > self.height or by < 1 then -- selection is completely outside map
+        if lx > self:getXEnd() or rx < 1 or ty > self:getYEnd() or by < 1 then -- selection is completely outside layer
             return {}
         end
         
         lx = math.max(lx, 1)
-        rx = math.min(rx, self.width)
+        rx = math.min(rx, self:getXEnd())
         ty = math.max(ty, 1)
-        by = math.min(by, self.height)
+        by = math.min(by, self:getYEnd())
     end
     
     return lx, rx, ty, by
 end
 
-function World:attemptPortal(tileX, tileY, side, x, y, color, ignoreP)
-    local x1, y1, x2, y2 = self:checkPortalSurface(tileX, tileY, side, x, y, ignoreP)
+function World:attemptPortal(layer, tileX, tileY, side, x, y, color, ignoreP)
+    local x1, y1, x2, y2 = self:checkPortalSurface(layer, tileX, tileY, side, x, y, ignoreP)
     
     if x1 then
         -- make sure that the surface is big enough to hold a portal
@@ -787,7 +866,7 @@ local windMill = {
     -1, 0
 }
 
-local function walkSide(self, tile, tileX, tileY, side, dir)
+local function walkSide(self, layer, tile, tileX, tileY, side, dir)
     local nextX, nextY, angle, nextAngle, nextTileX, nextTileY, nextSide, x, y
     local first = true
     
@@ -926,8 +1005,8 @@ local function walkSide(self, tile, tileX, tileY, side, dir)
                 
                 local checkTile
                 
-                if self:inMap(checkTileX, checkTileY) then
-                    checkTile = self:getTile(checkTileX, checkTileY)
+                if layer:inMap(checkTileX, checkTileY) then
+                    checkTile = layer:getTile(checkTileX, checkTileY)
                 end
                 
                 nextTileX = tileX + moveX
@@ -941,8 +1020,8 @@ local function walkSide(self, tile, tileX, tileY, side, dir)
                 
                 if not checkTile or not checkTile.collision then
                     --check if next tile has a point on the same spot as nextX/nextY
-                    if self:inMap(tileX, tileY) then
-                        local nextTile = self:getTile(tileX, tileY)
+                    if layer:inMap(tileX, tileY) then
+                        local nextTile = layer:getTile(tileX, tileY)
                         if nextTile and nextTile.collision then
                             local points = nextTile.collision
                             
@@ -969,22 +1048,22 @@ local function walkSide(self, tile, tileX, tileY, side, dir)
     return tileX+x/self.tileSize-1, tileY+y/self.tileSize-1
 end
 
-function World:checkPortalSurface(tileX, tileY, side, worldX, worldY, ignoreP)
-    if not self:inMap(tileX, tileY) then
+function World:checkPortalSurface(layer, tileX, tileY, side, worldX, worldY, ignoreP)
+    if not layer:inMap(tileX, tileY) then
+        return false
+    end
+
+    local tile = layer:getTile(tileX, tileY)
+
+    if not tile or not tile.collision then -- Not sure if this should ever happen
         return false
     end
     
-    local tile = self:getTile(tileX, tileY)
+    local startX, startY = walkSide(self, layer, tile, tileX, tileY, side, "anticlockwise")
+    local endX, endY = walkSide(self, layer, tile, tileX, tileY, side, "clockwise")
     
-    if not tile or not tile.collision then
-        return false
-    end
-    
-    local startX, startY = walkSide(self, tile, tileX, tileY, side, "anticlockwise")
-    local endX, endY = walkSide(self, tile, tileX, tileY, side, "clockwise")
-    
-    startX, startY = self:mapToWorld(startX, startY)
-    endX, endY = self:mapToWorld(endX, endY)
+    startX, startY = self:coordinateToWorld(startX, startY)
+    endX, endY = self:coordinateToWorld(endX, endY)
     
         
     -- Do some magic to determine whether there's portals blocking off sections of our portal surface
@@ -992,7 +1071,7 @@ function World:checkPortalSurface(tileX, tileY, side, worldX, worldY, ignoreP)
         
     for _, p in ipairs(self.portals) do
         if p ~= ignoreP then
-            if math.abs(p.angle - angle) < 0.00001 or p.angle + angle < 0.00001 then -- angle is the same!
+            if math.abs(p.angle - angle) < 0.00001 or p.angle + angle < 0.00001 then -- angle is the same! (also good code on that 0.00001)
                 local onLine = pointOnLine(p.x1, p.y1, p.x2, p.y2, worldX, worldY)
                 if onLine then -- surface is the same! (or at least on the same line which is good enough)
                     if onLine >= 0 then -- Check on which side of the same surface portal we are
@@ -1015,165 +1094,6 @@ function World:checkPortalSurface(tileX, tileY, side, worldX, worldY, ignoreP)
     end
 
     return startX, startY, endX, endY, angle
-end
-
-function World:getFloodArea(x, y)
-    local t = love.timer.getTime()
-    local targetTile = self:getTile(x, y)
-    local tileLookupTable = {}
-    
-    for x = 1, self.width do
-        tileLookupTable[x] = {}
-    end
-    
-    stack = {{x, y}}
-    
-    repeat
-        cur = table.remove(stack, 1)
-        
-        if  self:inMap(cur[1], cur[2]) and
-            not tileLookupTable[cur[1]][cur[2]] and
-            self:getTile(cur[1], cur[2]) == targetTile
-            then
-                
-            tileLookupTable[cur[1]][cur[2]] = true
-            
-            table.insert(stack, {cur[1]-1, cur[2]})
-            table.insert(stack, {cur[1]+1, cur[2]})
-            table.insert(stack, {cur[1], cur[2]-1})
-            table.insert(stack, {cur[1], cur[2]+1})
-        end
-    until #stack == 0
-    
-    local tileTable = {}
-    
-    for y = 1, self.height do
-        for x = 1, self.width do
-            if tileLookupTable[x][y] then
-                table.insert(tileTable, {x, y})
-            end
-        end
-    end
-    
-    print(string.format("%.5f milliseconds for 4-way fill", (love.timer.getTime()-t)*1000))
-    return tileTable
-end
-
-function World:getFloodAreaScanline(x, y) -- Based off https://github.com/Yonaba/FloodFill/blob/master/floodfill/floodstackscanline.lua (which seems to be based off lodev?)
-    local t = love.timer.getTime()
-    local targetTile = self:getTile(x, y)
-
-    local tileLookupTable = {}
-    for x = 1, self.width do
-        tileLookupTable[x] = {}
-    end
-
-	local spanLeft, spanRight
-
-    local tileTable = {}
-    stack = {{x, y}}
-    
-    while #stack > 0 do
-        local p = table.remove(stack)
-        
-		local x, y = p[1], p[2]
-
-		while ((y >= 1) and self:getTile(x, y) == targetTile) do -- go to the highest possible point
-			y = y - 1
-		end
-		y = y + 1
-		spanLeft, spanRight = false, false
-
-        while (y <= self.height and self:getTile(x, y) == targetTile) do -- walk vertically down
-            table.insert(tileTable, {x, y})
-            tileLookupTable[x][y] = true
-
-            if x > 1 then -- see if we wanna check out that sweet, sexy, vertical line to the left
-                if (not spanLeft and self:getTile(x-1, y) == targetTile) and not tileLookupTable[x-1][y] then
-                    table.insert(stack, {x-1, y})
-                    spanLeft = true
-                elseif (spanLeft and self:getTile(x-1, y) ~= targetTile)then
-                    spanLeft = false
-                end
-            end
-
-            if x < self.width then -- and same with right
-                if (not spanRight and self:getTile(x+1, y) == targetTile) and not tileLookupTable[x+1][y] then
-                    table.insert(stack, {x+1, y})
-                    spanRight = true
-                elseif (spanRight and self:getTile(x+1, y) ~= targetTile) then
-                    spanRight = false
-                end
-            end
-
-			y = y + 1
-		end
-	end
-    
-    print(string.format("%.5f milliseconds for scanline fill", (love.timer.getTime()-t)*1000))
-    return tileTable
-end
-
-function World:expandMapTo(x, y)
-    local moveStuff = {0, 0}
-    
-    if x > self.width then
-        for newX = self.width+1, x do
-            self.map[newX] = {}
-        end
-        
-        self.width = x
-    end
-    
-    if x <= 0 then
-        local newColumns = -x+1
-        
-        self.width = self.width+newColumns
-        
-        for newX = self.width, newColumns+1, -1 do
-            self.map[newX] = self.map[newX-newColumns]
-        end
-        
-        for newX = 1, newColumns do
-            self.map[newX] = {}
-        end
-        
-        moveStuff[1] = newColumns
-    end
-    
-    if y > self.height then
-        self.height = y
-    end
-    
-    if y <= 0 then
-        local newRows = -y+1
-        
-        self.height = self.height+newRows
-        
-        for newY = self.height, newRows+1, -1 do
-            for lx = 1, self.width do
-                self.map[lx][newY] = self.map[lx][newY-newRows]
-            end
-        end
-        
-        for newY = 1, newRows do
-            for lx = 1, self.width do
-                self.map[lx][newY] = nil
-            end
-        end
-        
-        moveStuff[2] = newRows
-    end
-    
-    self.camera.x = self.camera.x+moveStuff[1]*16
-    self.camera.y = self.camera.y+moveStuff[2]*16
-        
-    for _, object in ipairs(self.objects) do
-        object.x = object.x + moveStuff[1]*16
-        object.y = object.y + moveStuff[2]*16
-    end
-
-    return moveStuff[1], moveStuff[2], moveStuff[1]*16, moveStuff[2]*16
 end
 
 return World

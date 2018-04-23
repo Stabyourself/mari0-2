@@ -3,7 +3,7 @@ require "loop"
 
 function love.load()
     require "util"
-    
+
     love.window.setMode(400*VAR("scale"), 224*VAR("scale"), {
         vsync = VAR("vsync"),
         resizable = true,
@@ -14,7 +14,7 @@ function love.load()
 
     love.window.setTitle("Mari0 2")
     love.window.setIcon(love.image.newImageData("img/icon.png"))
-    
+
     love.graphics.setDefaultFilter("nearest", "nearest")
 
     class = require "lib.middleclass"
@@ -25,7 +25,7 @@ function love.load()
     GameStateManager = require "lib.GameStateManager"
     prof = require "lib.jprof.jprof"
     paletteShader = require "lib.paletteShader"
-    
+
     Color3 = require "lib.Color3"
     Font3 = require "lib.Font3"
     Physics3 = require "lib.Physics3"
@@ -51,12 +51,12 @@ function love.load()
     require "class.Selection"
     require "class.FloatingSelection"
     require "class.StampMap"
-    
+
     require "cheats"
-    
+
     require "state.Game"
     require "state.Editor"
-    
+
     fontOutlined = love.graphics.newImageFont("img/font-outlined.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$.,:;!?_-<>=+*\\/'%^~")
     love.graphics.setFont(fontOutlined)
 
@@ -66,17 +66,17 @@ function love.load()
     if love.math.random() > 0.99 then
         funkyImg = love.graphics.newImage("img/funky.png")
     end
-    
+
     defaultUI = Gui3:new("img/gui/default")
-    
+
     gameStateManager = GameStateManager:new()
-    
+
     love.resize(400*VAR("scale"), 224*VAR("scale"))
 
     game = Game:new()
 
     gameStateManager:loadState(game)
-    -- gameStateManager:addState(Editor:new(game.level))
+    gameStateManager:addState(Editor:new(game.level))
 end
 
 function love.update(dt)
@@ -119,9 +119,9 @@ function love.draw()
     if VAR("scale") ~= 1 then
         love.graphics.scale(VAR("scale"), VAR("scale"))
     end
-    
+
     gameStateManager:event("draw")
-    
+
     -- For the stream
     if VAR("debug").input then
         setColorBasedOn("up")
@@ -132,13 +132,13 @@ function love.draw()
         love.graphics.rectangle("fill", 24, SCREENHEIGHT-24, 8, 8)
         setColorBasedOn("down")
         love.graphics.rectangle("fill", 16, SCREENHEIGHT-16, 8, 8)
-        
+
         setColorBasedOn("run")
         love.graphics.rectangle("fill", 60, SCREENHEIGHT-20, 8, 8)
         setColorBasedOn("jump")
         love.graphics.rectangle("fill", 72, SCREENHEIGHT-20, 8, 8)
-        
-        
+
+
         love.graphics.setColor(1, 1, 1)
     end
 
@@ -171,7 +171,7 @@ end
 function love.keypressed(key)
     -- Convert the key to its binding
     -- ^ctrl !alt +shift
-    
+
     local cmds = {}
     local sendCmds = false
     if CONTROLS(key) then

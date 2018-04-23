@@ -17,12 +17,12 @@ function Stamp:draw()
         if self.stampMap.type == "simple" then
             worldX = worldX+offset[1]*16
             worldY = worldY+offset[2]*16
-            local mapX, mapY = self.level:worldToMap(worldX, worldY)
+            local coordX, coordY = self.level:worldToCoordinate(worldX, worldY)
 
             for x = 1, self.stampMap.width do
                 for y = 1, self.stampMap.height do
-                    local tileX = (mapX+x-1)*16
-                    local tileY = (mapY+y-1)*16
+                    local tileX = (coordX+x-1)*16
+                    local tileY = (coordY+y-1)*16
                     
                     local tile = self.stampMap.map[x] and self.stampMap.map[x][y]
 
@@ -33,11 +33,11 @@ function Stamp:draw()
             end
             
         elseif self.stampMap.type == "quads" then
-            local mapX, mapY = self.level:worldToMap(worldX, worldY)
+            local coordX, coordY = self.level:worldToCoordinate(worldX, worldY)
             
             if self.dragging then
                 local startX, startY = self.dragStart[1], self.dragStart[2]
-                local w, h = mapX-startX+1, mapY-startY+1
+                local w, h = coordX-startX+1, coordY-startY+1
                 
                 if w < 1 then
                     startX = startX + w-1
@@ -58,7 +58,7 @@ function Stamp:draw()
                 end
                 
             else
-                local tileX, tileY = self.level:mapToWorld(mapX-1, mapY-1)
+                local tileX, tileY = self.level:coordinateToWorld(coordX-1, coordY-1)
                 self.stampMap.map[1][1]:draw(tileX, tileY, true)
             end
         end
@@ -69,9 +69,9 @@ function Stamp:mousepressed(x, y, button)
     if button == 1 then
         self.dragging = true
         
-        local mapX, mapY = self.level:cameraToMap(x, y)
+        local coordX, coordY = self.level:cameraToCoordinate(x, y)
         
-        self.dragStart = {mapX, mapY}
+        self.dragStart = {coordX, coordY}
     end
 end
 
@@ -82,24 +82,24 @@ function Stamp:mousereleased(x, y, button)
             local worldX, worldY = self.level:cameraToWorld(x, y)
             worldX = worldX+offset[1]*16
             worldY = worldY+offset[2]*16
-            local mapX, mapY = self.level:worldToMap(worldX, worldY)
+            local coordX, coordY = self.level:worldToCoordinate(worldX, worldY)
             
-            self:stamp(mapX, mapY)
+            self:stamp(coordX, coordY)
         
         elseif self.stampMap.type == "quads" then
-            local mapX, mapY = self.level:cameraToMap(x, y)
+            local coordX, coordY = self.level:cameraToCoordinate(x, y)
             
-            self:quadStamp(self.dragStart[1], self.dragStart[2], mapX-self.dragStart[1]+1, mapY-self.dragStart[2]+1)
+            self:quadStamp(self.dragStart[1], self.dragStart[2], coordX-self.dragStart[1]+1, coordY-self.dragStart[2]+1)
         end
         
         self.dragging = false
     end
 end
 
-function Stamp:stamp(mapX, mapY)
+function Stamp:stamp(coordX, coordY)
     for x = 1, self.stampMap.width do
         for y = 1, self.stampMap.height do
-            self.level:setMap(mapX+x, mapY+y, self.stampMap.map[x][y])
+            self.level:setCoordinate(coordX+x, coordY+y, self.stampMap.map[x][y])
         end
     end
 
@@ -223,10 +223,15 @@ function Stamp:quadStamp(x, y, w, h)
     end
     
     local quadStampMap = self:getQuadStampMap(w, h)
-    
+
+    -- expand the layer as necessary
+    local layer = self.editor.activeLayer
+    layer:expandTo(x, y)
+    layer:expandTo(x+w-1, y+h-1)
+
     for lx = 1, w do
         for ly = 1, h do
-            self.level:setMap(x+lx-1, y+ly-1, quadStampMap[lx][ly])
+            layer:setCoordinate(x+lx-1, y+ly-1, quadStampMap[lx][ly])
         end
     end
     

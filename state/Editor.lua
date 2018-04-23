@@ -43,7 +43,7 @@ function Editor:initialize(level)
 end
 
 function Editor:load()
-    self.tileMap = self.level.tileMaps["smb3-general"]
+    self.tileMap = self.level.tileMaps["smb3-grass"]
     
     self.tools = {}
     
@@ -69,7 +69,7 @@ function Editor:load()
     self.menuBar:addChild(self.fileDropdown)
     
     self.fileDropdown.box:addChild(Gui3.Button:new(0, 0, "save", false, 1, function(button) self:saveMap() end))
-    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadMap("test.json") end))
+    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("test.json") end))
     
     self.fileDropdown:autoSize()
     
@@ -165,6 +165,8 @@ function Editor:load()
     end
 
     self.pastePos = {1, 1}
+
+    self.activeLayer = self.level.layers[2]
     
     self:toggleGrid(false)
     self:toggleFreeCam(false)
@@ -203,8 +205,8 @@ function Editor:update(dt)
     end
     
     -- Limit camera position so you can't lose the level
-    self.level.camera.x = math.clamp(self.level.camera.x, 0, self.level.width*16)
-    self.level.camera.y = math.clamp(self.level.camera.y, 0, self.level.height*16)
+    self.level.camera.x = math.clamp(self.level.camera.x, self.level:getXStart()*16, self.level:getXEnd()*16)
+    self.level.camera.y = math.clamp(self.level.camera.y, self.level:getYStart()*16, self.level:getYEnd()*16)
     
     prof.push("Selection")
     if self.selection then
@@ -228,7 +230,13 @@ function Editor:draw()
     -- Map bounds graphics
     prof.push("Candy")
     love.graphics.stencil(function()
-        love.graphics.rectangle("fill", 0, 0, self.level.width*16, self.level.height*16)
+        local xStart = (self.level:getXStart()-1)*16
+        local yStart = (self.level:getYStart()-1)*16
+
+        local xEnd = (self.level:getXEnd())*16
+        local yEnd = (self.level:getYEnd())*16
+
+        love.graphics.rectangle("fill", xStart, yStart, xEnd-xStart, yEnd-yStart)
     end)
     love.graphics.setStencilTest("notequal", 1)
     
@@ -424,9 +432,7 @@ function Editor:cmdpressed(cmd)
     
     if cmd["editor.delete"] then
         if self.selection then
-            if self.selection:delete() then
-                self:clearSelection()
-            end
+            self.selection:delete()
             
             self:saveState()
         end
@@ -476,7 +482,7 @@ function Editor:cmdpressed(cmd)
         self:saveMap()
         
     elseif cmd["editor.load"] then
-        self:loadMap("test.json")
+        self:loadLevel("test.json")
         
     elseif cmd["editor.select.clear"] then
         if self.selection then
@@ -600,11 +606,11 @@ function Editor:saveMap()
     self.level:saveMap("test.json")
 end
 
-function Editor:loadMap(path)
+function Editor:loadLevel(path)
     self.fileDropdown:toggle(false)
     
     local data = JSON:decode(love.filesystem.read(path))
-    self.level:loadMap(data)
+    self.level:loadLevel(data)
 end
 
 function Editor:clearSelection()
@@ -632,22 +638,6 @@ end
 function Editor:intersectSelection(selection)
     if self.selection then
         self.selection:intersect(selection)
-    end
-end
-
-function Editor:expandMapTo(x, y)
-    local moveMapX, moveMapY, moveWorldX, moveWorldY = self.level:expandMapTo(x, y)
-    
-    if self.selection then
-        for _, tile in ipairs(self.selection.tiles) do
-            tile[1] = tile[1] + moveMapX
-            tile[2] = tile[2] + moveMapY
-        end
-
-        for _, border in ipairs(self.selection.borders) do
-            border[1] = border[1] + moveWorldX
-            border[2] = border[2] + moveWorldY
-        end
     end
 end
 

@@ -66,7 +66,7 @@ function component.update(actor, dt, actorEvent)
             actor.speed[2] = FLYINGASCENSION
             actorEvent:setValue("gravity", 0, 10)
         else
-            local maxSpeed = math.min(MAXSPEEDS[2], actor.maxSpeedJump)
+            local maxSpeed = math.min(MAXSPEEDS[2], actor.maxSpeedJump or MAXSPEEDS[1])
             
             accelerate(dt, actor, ACCELERATION, maxSpeed)
         end

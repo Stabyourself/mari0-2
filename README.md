@@ -9,4 +9,4 @@ Credits
 -------
 * Nintendo - Super Mario Bros 3 assets
 * Maurice Guégan - Everything not listed somewhere else
-* HansAgain - Mario sprites, title logo
+* Hans Cárdenas - Mario sprites, title logo

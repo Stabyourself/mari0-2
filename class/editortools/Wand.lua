@@ -31,7 +31,7 @@ end
 
 function Wand:mousepressed(x, y, button)
     if button == 1 then
-        self.pressingPos = {self.level:cameraToMap(x, y)}
+        self.pressingPos = {self.level:cameraToCoordinate(x, y)}
         self.pressing = true
     end
     
@@ -40,7 +40,7 @@ end
 
 function Wand:mousereleased(x, y, button)
     if button == 1 and self.pressing then
-        mx, my = self.level:cameraToMap(x, y)
+        mx, my = self.level:cameraToCoordinate(x, y)
         
         if mx == self.pressingPos[1] and my == self.pressingPos[2] then
             local tiles
@@ -59,7 +59,7 @@ function Wand:mousereleased(x, y, button)
                     end
                 end
             else
-                tiles = self.level:getFloodArea(mx, my)
+                tiles = self.editor.activeLayer:getFloodArea(mx, my)
             end
             
             if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then

@@ -9,7 +9,7 @@ return {
 
     gravity = 1125,
     gravityJumping = 225, --gravity while jumping (Only for mario)
-    maxYSpeed = 10000, --258.75
+    maxYSpeed = 1000, --258.75
 
     rotationSpeed = 14, --only a visual effect
 

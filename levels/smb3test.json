@@ -1,6 +1,6 @@
 {
     "entities": [
-        {"type": "spawn", "x": 10, "y": -2}
+        {"type": "spawn", "x": 10, "y": 10}
     ],
     
     "tileMaps": {

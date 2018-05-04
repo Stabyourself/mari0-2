@@ -24,12 +24,12 @@ function Actor:initialize(world, x, y, actorTemplate)
     }
 end
 
-function Actor:event(eventName, dt)
+function Actor:event(eventName, dt, ...)
     local actorEvent = ActorEvent:new(self, eventName)
 
     for _, component in ipairs(self.components) do
         if component.code[eventName] then
-            component.code[eventName](self, dt, actorEvent, component.args)
+            component.code[eventName](self, dt, actorEvent, component.args, ...)
         end
     end
 

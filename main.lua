@@ -116,9 +116,7 @@ end
 
 function love.draw()
     prof.push("draw")
-    if VAR("scale") ~= 1 then
-        love.graphics.scale(VAR("scale"), VAR("scale"))
-    end
+    love.graphics.scale(VAR("scale"), VAR("scale"))
 
     gameStateManager:event("draw")
 
@@ -142,13 +140,7 @@ function love.draw()
         love.graphics.setColor(1, 1, 1)
     end
 
-    if VAR("memoryDebug") then
-        love.graphics.print(tostring(collectgarbage("count")*1024), 10, 10)
-    end
-
-    if VAR("scale") ~= 1 then
-        love.graphics.scale(1/VAR("scale"), 1/VAR("scale"))
-    end
+    love.graphics.scale(1/VAR("scale"), 1/VAR("scale"))
 
     if funkyImg then
         love.graphics.draw(funkyImg, love.graphics.getWidth(), 0, 0, 1, 1, 340)

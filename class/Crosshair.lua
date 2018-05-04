@@ -1,7 +1,7 @@
 Crosshair = class("Crosshair")
 
-function Crosshair:initialize(mario)
-    self.mario = mario
+function Crosshair:initialize(obj)
+    self.obj = obj
     self.target = {}
     self.origin = {}
     self.valid = false
@@ -13,11 +13,11 @@ function Crosshair:update(dt)
     self.t = self.t + dt
     
     prof.push("Raycast")
-    local layer, tileX, tileY, worldX, worldY, blockSide = self.mario.world:rayCast(self.origin.x/self.mario.world.tileSize, self.origin.y/self.mario.world.tileSize, self.angle)
+    local layer, tileX, tileY, worldX, worldY, blockSide = self.obj.world:rayCast(self.origin.x/self.obj.world.tileSize, self.origin.y/self.obj.world.tileSize, self.angle)
     prof.pop()
 
     if layer then
-        worldX, worldY = self.mario.world:coordinateToWorld(worldX, worldY)
+        worldX, worldY = self.obj.world:coordinateToWorld(worldX, worldY)
         
         self.target.valid = true
         self.target.layer = layer
@@ -32,7 +32,7 @@ function Crosshair:update(dt)
         self.target.portalPossible = false
         
         prof.push("CheckPortalSurface")
-        local x1, y1, x2, y2, angle = self.mario.world:checkPortalSurface(self.target.layer, self.target.tileX, self.target.tileY, self.target.blockSide, self.target.worldX, self.target.worldY)
+        local x1, y1, x2, y2, angle = self.obj.world:checkPortalSurface(self.target.layer, self.target.tileX, self.target.tileY, self.target.blockSide, self.target.worldX, self.target.worldY)
         prof.pop()
         
         

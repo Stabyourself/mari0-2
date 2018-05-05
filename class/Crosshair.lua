@@ -89,10 +89,11 @@ end
 function DottedCrosshair:draw()
     if self.target.valid then
         local dotCount = (self.length+self.dotSize)/self.dotDistance
+        
         for i = 0, dotCount do
             local factor = 1/dotCount*(i+self.t%1)
             
-            if factor <= 1 then
+            if factor <= 1 - (self.dotSize/2)/self.length then
                 local x = self.origin.x+(self.target.worldX-self.origin.x)*factor
                 local y = self.origin.y+(self.target.worldY-self.origin.y)*factor
                 

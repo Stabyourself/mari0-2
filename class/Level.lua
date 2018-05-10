@@ -185,10 +185,10 @@ function Level:updateCamera(dt)
         
         -- -- And clamp it to level boundaries
         self.camera.x = math.min(self.camera.x, self:getXEnd()*self.tileSize-CAMERAWIDTH/2)
-        self.camera.x = math.max(self.camera.x, CAMERAWIDTH/2)
+        self.camera.x = math.max(self.camera.x, (self:getXStart()-1)*self.tileSize+CAMERAWIDTH/2)
         
         self.camera.y = math.min(self.camera.y, self:getYEnd()*self.tileSize-CAMERAHEIGHT/2)
-        self.camera.y = math.max(self.camera.y, CAMERAHEIGHT/2)
+        self.camera.y = math.max(self.camera.y, (self:getYStart()-1)*self.tileSize+CAMERAHEIGHT/2)
     end
 end
 

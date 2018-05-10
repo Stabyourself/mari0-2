@@ -10,7 +10,7 @@ end
 local checkerboardImg = love.graphics.newImage("img/editor/checkerboard.png")
 
 Editor.toolClasses = {
-    entity = require("class.editortools.entity"),
+    entity = require("class.editortools.Entity"),
     paint = require("class.editortools.Paint"),
     select = require("class.editortools.Select"),
     move = require("class.editortools.Move"),

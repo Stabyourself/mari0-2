@@ -203,10 +203,7 @@ function PhysObj:checkCollisions()
 		col.right[1], col.right[2], col.right[3] = self:rightColCheck()
 	end
 	
-	col.bottom[1] = nil
-	if self.speed[2] > 0 then
-		col.bottom[1], col.bottom[2], col.bottom[3] = self:bottomColCheck()
-	end
+	col.bottom[1], col.bottom[2], col.bottom[3] = self:bottomColCheck()
 	
 	if not col.bottom[1] then
 		col.top[1], col.top[2], col.top[3] = self:topColCheck()

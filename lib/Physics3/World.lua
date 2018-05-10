@@ -11,9 +11,15 @@ function World:initialize()
 end
 
 function World:update(dt)
-    prof.push("Tiles")
+    prof.push("TileMaps")
     for _, tileMap in pairs(self.tileMaps) do
         tileMap:update(dt)
+    end
+    prof.pop()
+
+    prof.push("Layers")
+    for _, layer in pairs(self.layers) do
+        layer:update(dt)
     end
     prof.pop()
 
@@ -105,21 +111,8 @@ end
 function World:draw()
     prof.push("Layers")
     -- Layers
-    local lx, ty = self:cameraToCoordinate(0, 0)
-    local rx, by = self:cameraToCoordinate(CAMERAWIDTH, CAMERAHEIGHT)
-    local xStart = lx-1
-    local xEnd = rx
-
-    local yStart = ty-1
-    local yEnd = by
-    
-    xStart = math.clamp(xStart, self:getXStart(), self:getXEnd())
-    yStart = math.clamp(yStart, self:getYStart(), self:getYEnd())
-    xEnd = math.clamp(xEnd, self:getXStart(), self:getXEnd())
-    yEnd = math.clamp(yEnd, self:getYStart(), self:getYEnd())
-
     for _, layer in ipairs(self.layers) do
-        layer:draw(xStart, yStart, xEnd, yEnd)
+        layer:draw()
     end
 
     if VAR("debug").layers then
@@ -318,8 +311,10 @@ function World:loadLevel(data)
             end
         end
 
-        self.layers[i] = Layer:new(layerX, layerY, width, height, map)
+        self.layers[i] = Layer:new(self, layerX, layerY, width, height, map)
     end
+
+    self.layers[2].movement = "sinethefuckout" -- removeme
 end
 
 function World:saveLevel(outPath)
@@ -466,20 +461,12 @@ function World:checkCollision(x, y, obj)
         end
     end
     
-    local tileX, tileY = self:worldToCoordinate(x, y)
     
     for _, layer in ipairs(self.layers) do
-        if layer:inMap(tileX, tileY) then
-            local tile = layer:getTile(tileX, tileY)
-            
-            if tile then
-                local inTileX = math.fmod(x, self.tileSize)
-                local inTileY = math.fmod(y, self.tileSize)
-                
-                if tile:checkCollision(inTileX, inTileY) then
-                    return tile
-                end
-            end
+        local tile = layer:checkCollision(x, y)
+
+        if tile then
+            return tile
         end
     end
 
@@ -584,102 +571,109 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
         sideDistY = (mapY + 1.0 - rayPosY) * deltaDistY
     end
 
+    local firstCheck = true
+
     -- perform DDA
     while not hit do
         -- Check if ray has hit something (or went outside the map)
         for i, layer in ipairs(self.layers) do
-            local cubeCol = false
-            
-            if not self:inMap(mapX, mapY) then
-                if not startedOutOfMap or wasInMap then
-                    cubeCol = true
-                end
-            else
-                wasInMap = true
-                if layer:inMap(mapX, mapY) then
-                    local tile = layer:getTile(mapX, mapY)
-                    if tile and tile.collision then
-                        if tile.collision == VAR("tileTemplates").cube then
-                            cubeCol = true
-                        else
-                        
-                            -- complicated polygon stuff
-                            local col
-                                
-                            -- Trace line
-                            local t1x, t1y = x, y
-                            local t2x, t2y = x+math.cos(dir)*100000, y+math.sin(dir)*100000 --todo find a better way for this
+            if not layer.movement then
+                local cubeCol = false
+                
+                if not self:inMap(mapX, mapY) then
+                    if not startedOutOfMap or wasInMap then
+                        cubeCol = true
+                    end
+                else
+                    wasInMap = true
+                    if layer:inMap(mapX, mapY) then
+                        local tile = layer:getTile(mapX, mapY)
+                        if tile and tile.collision then
+                            if tile.collision == VAR("tileTemplates").cube then
+                                cubeCol = true
+                            else
                             
-                            for i = 1, #tile.collision, 2 do
-                                local nextI = i + 2
-                                
-                                if nextI > #tile.collision then
-                                    nextI = 1
-                                end
-                                
-                                -- Polygon edge line
-                                local p1x, p1y = tile.collision[i]/self.tileSize+mapX-1, tile.collision[i+1]/self.tileSize+mapY-1
-                                local p2x, p2y = tile.collision[nextI]/self.tileSize+mapX-1, tile.collision[nextI+1]/self.tileSize+mapY-1
-                                
-                                local interX, interY = linesIntersect(p1x, p1y, p2x, p2y, t1x, t1y, t2x, t2y)
-                                if interX then
-                                    local dist = math.sqrt((t1x-interX)^2 + (t1y-interY)^2)
+                                -- complicated polygon stuff
+                                local col
                                     
-                                    if not col or dist < col.dist then
-                                        col = {
-                                            dist = dist,
-                                            x = interX,
-                                            y = interY,
-                                            side = (i+1)/2
-                                        }
+                                -- Trace line
+                                local t1x, t1y = x, y
+                                local t2x, t2y = x+math.cos(dir)*100000, y+math.sin(dir)*100000 --todo find a better way for this
+                                
+                                for i = 1, #tile.collision, 2 do
+                                    local nextI = i + 2
+                                    
+                                    if nextI > #tile.collision then
+                                        nextI = 1
+                                    end
+                                    
+                                    -- Polygon edge line
+                                    local p1x, p1y = tile.collision[i]/self.tileSize+mapX-1, tile.collision[i+1]/self.tileSize+mapY-1
+                                    local p2x, p2y = tile.collision[nextI]/self.tileSize+mapX-1, tile.collision[nextI+1]/self.tileSize+mapY-1
+                                    
+                                    local interX, interY = linesIntersect(p1x, p1y, p2x, p2y, t1x, t1y, t2x, t2y)
+                                    if interX then
+                                        local dist = math.sqrt((t1x-interX)^2 + (t1y-interY)^2)
+                                        
+                                        if not col or dist < col.dist then
+                                            col = {
+                                                dist = dist,
+                                                x = interX,
+                                                y = interY,
+                                                side = (i+1)/2
+                                            }
+                                        end
                                     end
                                 end
-                            end
-                            
-                            if col then
-                                return layer, mapX, mapY, col.x, col.y, col.side
+                                
+                                if col then
+                                    return layer, mapX, mapY, col.x, col.y, col.side
+                                end
                             end
                         end
                     end
                 end
-            end
-            
-            if cubeCol then
-                local absX = mapX-1
-                local absY = mapY-1
-
-                if side == "ver" then
-                    local dist = (mapX - rayPosX + (1 - stepX) / 2) / rayDirX;
-                    hitDist = rayPosY + dist * rayDirY - math.floor(mapY)
-
-                    absY = absY + hitDist
-                else
-                    local dist = (mapY - rayPosY + (1 - stepY) / 2) / rayDirY;
-                    hitDist = rayPosX + dist * rayDirX - math.floor(mapX)
-
-                    absX = absX + hitDist
-                end
-
-                if side == "ver" then
-                    if stepX > 0 then
-                        side = 4
-                    else
-                        side = 2
-                        absX = absX + 1
-                    end
-                else
-                    if stepY > 0 then
-                        side = 1
-                    else
-                        side = 3
-                        absY = absY + 1
+                
+                if firstCheck then
+                    if cubeCol then
+                        return false
                     end
                 end
+                
+                if cubeCol then
+                    local absX = mapX-1
+                    local absY = mapY-1
 
-                return layer, mapX, mapY, absX, absY, side
+                    if side == "ver" then
+                        local dist = (mapX - rayPosX + (1 - stepX) / 2) / rayDirX;
+                        hitDist = rayPosY + dist * rayDirY - math.floor(mapY)
 
-            elseif polyCol then
-                return layer, mapX, mapY, absX, absY, side
+                        absY = absY + hitDist
+                    else
+                        local dist = (mapY - rayPosY + (1 - stepY) / 2) / rayDirY;
+                        hitDist = rayPosX + dist * rayDirX - math.floor(mapX)
+
+                        absX = absX + hitDist
+                    end
+
+                    if side == "ver" then
+                        if stepX > 0 then
+                            side = 4
+                        else
+                            side = 2
+                            absX = absX + 1
+                        end
+                    else
+                        if stepY > 0 then
+                            side = 1
+                        else
+                            side = 3
+                            absY = absY + 1
+                        end
+                    end
+                    
+                    return layer, mapX, mapY, absX, absY, side
+                end
             end
         end
 
@@ -693,6 +687,8 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
             mapY = mapY + stepY
             side = "hor"
         end
+
+        firstCheck = false
     end
 end
 

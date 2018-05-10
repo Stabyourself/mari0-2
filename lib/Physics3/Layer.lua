@@ -1,24 +1,70 @@
 Layer = class("Layer")
 
-function Layer:initialize(x, y, width, height, map)
+function Layer:initialize(world, x, y, width, height, map)
+    self.world = world
     self.x = x
     self.y = y
     self.width = width
     self.height = height
     self.map = map or {}
 
-    -- self.debugColor = Color3:fromHSV(love.math.random(), 1, 1):table()
+    self.xOffset = 0
+    self.yOffset = 0
+
+    self.movement = false
+    self.movementTimer = 0
 end
 
-function Layer:draw(xStart, yStart, xEnd, yEnd)
+function Layer:update(dt)
+    if self.movement == "sinethefuckout" then
+        self.movementTimer = self.movementTimer + dt
+
+        self.yOffset = math.sin(self.movementTimer)*32
+    end
+end
+
+function Layer:draw()
+    local lx, ty = self.world:cameraToCoordinate(0, 0)
+    local rx, by = self.world:cameraToCoordinate(CAMERAWIDTH, CAMERAHEIGHT)
+    local xStart = lx-1
+    local xEnd = rx
+
+    local yStart = ty-1
+    local yEnd = by
+    
+    xStart = math.clamp(xStart, self:getXStart(), self:getXEnd())
+    yStart = math.clamp(yStart, self:getYStart(), self:getYEnd())
+    xEnd = math.clamp(xEnd, self:getXStart(), self:getXEnd())
+    yEnd = math.clamp(yEnd, self:getYStart(), self:getYEnd())
+
     for x = xStart, xEnd do
         for y = yStart, yEnd do
             if self:inMap(x, y) then
                 local tile = self:getTile(x, y)
                 
                 if tile then
-                    tile:draw((x-1)*16, (y-1)*16)
+                    tile:draw((x-1)*16+math.ceil(self.xOffset), (y-1)*16+math.ceil(self.yOffset))
                 end
+            end
+        end
+    end
+end
+
+function Layer:checkCollision(x, y)
+    x = x - self.xOffset
+    y = y - self.yOffset
+
+    local tileX, tileY = self.world:worldToCoordinate(x, y)
+
+    if self:inMap(tileX, tileY) then
+        local tile = self:getTile(tileX, tileY)
+        
+        if tile then
+            local inTileX = math.fmod(x, 16)
+            local inTileY = math.fmod(y, 16)
+            
+            if tile:checkCollision(inTileX, inTileY) then
+                return tile
             end
         end
     end
@@ -42,7 +88,7 @@ end
 
 function Layer:debugDraw()
     love.graphics.setColor(1, 0, 0)
-    love.graphics.rectangle("line", self.x*16-.5, self.y*16-.5, self.width*16+1, self.height*16+1)
+    love.graphics.rectangle("line", self.x*16-.5+math.ceil(self.xOffset), self.y*16-.5+math.ceil(self.yOffset), self.width*16+1, self.height*16+1)
     love.graphics.setColor(1, 1, 1)
 end
 
@@ -52,7 +98,7 @@ end
 
 function Layer:setCoordinate(x, y, tile)
     assert(self:inMap(x, y), string.format("Tried to set out-of-bounds coordinate %s, %s. Stop that.", x, y))
-        
+    
     self.map[x-self.x][y-self.y] = tile
 end
 

@@ -26,7 +26,14 @@ function FloatingSelection:initialize(editor, stampMap, pos)
     self.level = self.editor.level
 
     self.borderTimer = 0
-    self.quad = love.graphics.newQuad(0, 0, 16, 2, 4, 1)
+
+    self.quad = {}
+    for i = 0, 3 do
+        local r = math.pi*0.5*(i-1)
+    
+        self.quad[r] = love.graphics.newQuad(0, 0, 16, 2, 4, 1)
+    end
+
     self.map = stampMap.map
     self.width = stampMap.width
     self.height = stampMap.height
@@ -38,12 +45,12 @@ end
 
 function FloatingSelection:update(dt)
     self.borderTimer = self.borderTimer + dt*8
-    
-    while self.borderTimer >= 4 do
-        self.borderTimer = self.borderTimer - 4
+
+    for i = 0, 3 do
+        local r = math.pi*0.5*(i-1)
+        
+        self.quad[r]:setViewport(math.floor(self.borderTimer-i*2)%4+1, 0, 16, 2)
     end
-    
-    self.quad:setViewport(math.floor(self.borderTimer), 0, 16, 2)
     
     if self.dragging then
         local x, y = self.level:mouseToWorld()
@@ -75,7 +82,7 @@ function FloatingSelection:draw()
     love.graphics.setColor(1, 1, 1)
     
     for _, border in ipairs(self.borders) do
-        love.graphics.draw(borderImg, self.quad, border[1]+(self.pos[1]-1)*16, border[2]+(self.pos[2]-1)*16, border[3])
+        love.graphics.draw(borderImg, self.quad[border[3]], border[1]+(self.pos[1]-1)*16, border[2]+(self.pos[2]-1)*16, border[3])
     end
 end
 

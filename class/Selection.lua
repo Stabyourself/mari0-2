@@ -10,7 +10,13 @@ function Selection:initialize(editor, tiles)
     self.tiles = tiles or {}
     self.borders = {}
     self.borderTimer = 0
-    self.quad = love.graphics.newQuad(0, 0, 16, 1, 4, 1)
+    
+    self.quad = {}
+    for i = 0, 3 do
+        local r = math.pi*0.5*(i-1)
+
+        self.quad[r] = love.graphics.newQuad(0, 0, 16, 1, 4, 1)
+    end
     
     self:updateBorders()
 end
@@ -18,16 +24,16 @@ end
 function Selection:update(dt)
     self.borderTimer = self.borderTimer + dt*8
     
-    while self.borderTimer >= 4 do
-        self.borderTimer = self.borderTimer - 4
+    for i = 0, 3 do
+        local r = math.pi*0.5*(i-1)
+        
+        self.quad[r]:setViewport(math.floor(self.borderTimer-i)%4+1, 0, 16, 1)
     end
-    
-    self.quad:setViewport(math.floor(self.borderTimer), 0, 16, 1)
 end
 
 function Selection:draw()
     for _, border in ipairs(self.borders) do
-        love.graphics.draw(borderImg, self.quad, border[1], border[2], border[3])
+        love.graphics.draw(borderImg, self.quad[border[3]], border[1], border[2], border[3])
     end
 end
 

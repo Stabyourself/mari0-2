@@ -1,4 +1,4 @@
--- Debug thing for Mari3. Feel free to use it, MIT License
+-- Debug thing for Mari0 2. Feel free to use it, MIT License
 
 local FrameDebug3 = {}
 

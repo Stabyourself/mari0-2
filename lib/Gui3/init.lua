@@ -1,4 +1,4 @@
--- GUI library thing for Mari3. Feel free to use it, MIT License
+-- GUI library thing for Mari0 2. Feel free to use it, MIT License
 
 Gui3 = class("Gui3")
 

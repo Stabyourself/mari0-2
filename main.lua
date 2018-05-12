@@ -1,4 +1,4 @@
---Mari3 - MIT License.
+--Mari0 2 - MIT License.
 require "loop"
 
 function love.load()
@@ -17,6 +17,7 @@ function love.load()
 
     love.graphics.setDefaultFilter("nearest", "nearest")
 
+    -- Libs
     class = require "lib.middleclass"
     sandbox = require "lib.sandbox"
     JSON = require "lib.JSON"
@@ -26,19 +27,21 @@ function love.load()
     prof = require "lib.jprof.jprof"
     paletteShader = require "lib.paletteShader"
 
+    -- Self written libs
     Color3 = require "lib.Color3"
-    Font3 = require "lib.Font3"
+    -- Font3 = require "lib.Font3"
     Physics3 = require "lib.Physics3"
     require "lib.Gui3"
     FrameDebug3 = require "lib.FrameDebug3"
 
-    require "class.ActorState"
-    require "class.Character"
+    -- Loaders
     require "componentLoader"
     require "actorTemplateLoader"
 
+    -- Classes
     require "class.Level"
     require "class.Actor"
+    require "class.ActorState"
     require "class.ActorEvent"
     require "class.BlockBounce"
     require "class.Portal"
@@ -46,13 +49,17 @@ function love.load()
     require "class.PortalThing"
     require "class.Smb3Ui"
     require "class.Crosshair"
-    require "class.EditorState"
-    require "class.Selection"
-    require "class.FloatingSelection"
-    require "class.StampMap"
 
+    -- Editor
+    require "class.editor.EditorState"
+    require "class.editor.Selection"
+    require "class.editor.FloatingSelection"
+    require "class.editor.StampMap"
+
+    -- Misc
     require "cheats"
 
+    -- States
     require "state.Game"
     require "state.Editor"
 
@@ -75,7 +82,7 @@ function love.load()
     game = Game:new()
 
     gameStateManager:loadState(game)
-    gameStateManager:addState(Editor:new(game.level))
+    -- gameStateManager:addState(Editor:new(game.level))
 end
 
 function love.update(dt)

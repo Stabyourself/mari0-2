@@ -1,4 +1,4 @@
--- Color library thing for Mari0 2 - MIT License.
+-- Color library thing for Mari0 2. Feel free to use it, MIT License
 
 local Color = class("Color")
 

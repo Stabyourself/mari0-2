@@ -10,14 +10,14 @@ end
 local checkerboardImg = love.graphics.newImage("img/editor/checkerboard.png")
 
 Editor.toolClasses = {
-    entity = require("class.editortools.Entity"),
-    paint = require("class.editortools.Paint"),
-    select = require("class.editortools.Select"),
-    move = require("class.editortools.Move"),
-    fill = require("class.editortools.Fill"),
-    stamp = require("class.editortools.Stamp"),
-    wand = require("class.editortools.Wand"),
-    erase = require("class.editortools.Erase"),
+    entity = require("class.editor.tools.Entity"),
+    paint = require("class.editor.tools.Paint"),
+    select = require("class.editor.tools.Select"),
+    move = require("class.editor.tools.Move"),
+    fill = require("class.editor.tools.Fill"),
+    stamp = require("class.editor.tools.Stamp"),
+    wand = require("class.editor.tools.Wand"),
+    erase = require("class.editor.tools.Erase"),
 }
 
 Editor.scaleMin = 0.1/VAR("scale")

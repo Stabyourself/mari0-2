@@ -513,9 +513,7 @@ function World:getYEnd()
     return y
 end
 
-function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/raycasting.html , thanks man
-    -- Todo: limit how far offmap this goes?
-    -- Todo: allow offmap as long as it'll return to inscreen
+function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/raycasting.html - thanks!
     local rayPosX = x+1
     local rayPosY = y+1
     local rayDirX = math.cos(dir)

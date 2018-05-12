@@ -26,18 +26,16 @@ function Level:loadLevel(data)
     self.spawnLine = 0
     self.spawnI = 1
 
-    self.enemyList = loadEnemies()
-    
     self.blockBounces = {}
     
     self.spawnList = {}
     -- Parse entities
     for _, entity in ipairs(self.data.entities) do
-        local enemy = self.enemyList[entity.type]
+        local actorTemplate = actorTemplates[entity.type]
 
-        if enemy and not VAR("noEnemies") then -- is enemy
+        if actorTemplate and not VAR("noEnemies") then -- is enemy
             table.insert(self.spawnList, {
-                enemy = enemy,
+                actorTemplate = actorTemplate,
                 x = entity.x,
                 y = entity.y,
             })
@@ -54,14 +52,13 @@ function Level:loadLevel(data)
 
     local x, y = self:coordinateToWorld(self.spawnX-.5, self.spawnY)
     
-    local mario = Actor(self, x, y, actorTemplates.smb3_raccoon)
+    local mario = Actor:new(self, x, y, actorTemplates.smb3_raccoon)
 
     table.insert(self.marios, mario)
     table.insert(self.actors, mario)
     
-    table.insert(self.actors, Actor(self, 100, 100, actorTemplates.goomba))
     
-    self:spawnEnemies(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
+    self:spawnActors(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end
 
 function Level:update(dt)
@@ -83,7 +80,7 @@ function Level:update(dt)
 
     local newSpawnLine = self.camera.x/self.tileSize+WIDTH+VAR("enemiesSpawnAhead")+2
     if newSpawnLine > self.spawnLine then
-        self:spawnEnemies(newSpawnLine)
+        self:spawnActors(newSpawnLine)
     end
 end
 
@@ -122,11 +119,13 @@ function Level:mousepressed(x, y, button)
     end
 end
 
-function Level:spawnEnemies(untilX)
+function Level:spawnActors(untilX)
     while self.spawnI <= #self.spawnList and untilX > self.spawnList[self.spawnI].x do -- Spawn next enemy
         toSpawn = self.spawnList[self.spawnI]
         local x, y = self:coordinateToWorld(toSpawn.x-.5, toSpawn.y)
-        Enemy:new(self, x, y, toSpawn.enemy.json, toSpawn.enemy.img, toSpawn.enemy.quad)
+        local actor = Actor:new(self, x, y, toSpawn.actorTemplate)
+        
+        table.insert(self.actors, actor)
 
         self.spawnI = self.spawnI + 1
 

@@ -34,7 +34,6 @@ function love.load()
 
     require "class.ActorState"
     require "class.Character"
-    require "enemyLoader"
     require "componentLoader"
     require "actorTemplateLoader"
 

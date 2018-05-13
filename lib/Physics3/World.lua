@@ -48,7 +48,7 @@ function World:update(dt)
         local oldX, oldY = obj.x, obj.y
         
         prof.push("Collisions")
-        obj:checkCollisions()
+        obj:resolveCollisions()
         prof.pop()
         
         self:checkPortaling(obj, oldX, oldY)
@@ -99,6 +99,9 @@ function World:checkPortaling(obj, oldX, oldY)
 
                 obj.x = obj.x-obj.width/2
                 obj.y = obj.y-obj.height/2
+
+
+                print(obj:checkCollisions())
                     
                 return true
             end
@@ -145,8 +148,6 @@ function World:draw()
         if obj.animationDirection == -1 then
             quadX = quadX + obj.centerX*2-obj.quadWidth
         end
-
-        love.graphics.stencil(function() end, "replace")
 
         -- Portal duplication
         local inPortals = {}
@@ -195,11 +196,12 @@ function World:draw()
         end
 
         -- Actual position
-        love.graphics.stencil(function() end, "replace", 0, false)
+        local first = true
+
         for _, p in ipairs(inPortals) do
-            love.graphics.stencil(function()
-                p:stencilRectangle("in")
-            end, "replace", 1, true)
+            love.graphics.stencil(function() p:stencilRectangle("in") end, "replace", 1, not first)
+
+            first = false
         end
 
         if VAR("debug").portalStencils then

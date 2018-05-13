@@ -12,10 +12,8 @@ function Tile:initialize(tileMap, img, x, y, num, props, path)
 	self.angle = self.props.angle or 0
 
 	self.collision = self.props.collision or false
-	if self.collision and type(self.collision) == "table" then
-		self.collisionTriangulated = love.math.triangulate(self.collision)
-	end
 
+	self:cacheCollisions()
 	
 	if self.props.img then
 		self.img = love.graphics.newImage(self.path .. self.props.img)
@@ -56,6 +54,35 @@ function Tile:update(dt)
 	end
 end
 
+function Tile:cacheCollisions()
+	if not self.collision or self.collision == VAR("tileTemplates").cube then
+		-- don't need to calculate collisions for this
+		return
+	end
+
+	if self.collision and type(self.collision) == "table" then
+		self.collisionTriangulated = love.math.triangulate(self.collision)
+	end
+
+	self.collisionCache = {}
+
+	for x = 0, 15 do
+		self.collisionCache[x] = {}
+		for y = 0, 15 do
+			local col = false
+
+			for _, points in ipairs(self.collisionTriangulated) do -- TODO: This could be cached in a 16x16 matrix
+				if pointInTriangle(x, y, points) then
+					col = true
+					break
+				end
+			end
+
+			self.collisionCache[x][y] = col
+		end
+	end
+end
+
 function Tile:checkCollision(x, y)
 	if not self.collision then
 		return false
@@ -64,13 +91,10 @@ function Tile:checkCollision(x, y)
 	if self.collision == VAR("tileTemplates").cube then -- optimization for cubes
 		return true
 	else
-		for _, points in ipairs(self.collisionTriangulated) do -- TODO: This could be cached in a 16x16 matrix
-			if pointInTriangle(x, y, points) then
-				return true
-			end
-		end
-		
-		return false
+		x = math.floor(x)
+		y = math.floor(y)
+
+		return self.collisionCache[x][y]
 	end
 end
 

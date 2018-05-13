@@ -98,20 +98,19 @@ function PhysObj:leftColCheck()
 	for _, tracer in ipairs(self.tracers.left) do
 		local traceX, traceY, traceObj = tracer:trace()
 		
-		if traceX and (not col or traceY > col) then
+		if traceX and (not colX or traceX < colX) then
 			colX, colY, colObj = traceX, traceY, traceObj
 		end
 	end
-	
-	if colX then --Left collision
-		if not self:leftCollision() then
-			self.x = colX+1
-			self.speed[1] = math.max(self.speed[1], 0)
-			return colX, colY, colObj
-		end
+
+	return colX, colY, colObj
+end
+
+function PhysObj:leftColResolve(x, y, obj)
+	if not self:leftCollision(obj) then
+		self.x = x+1
+		self.speed[1] = math.max(self.speed[1], 0)
 	end
-	
-	return false
 end
 
 function PhysObj:rightColCheck()
@@ -120,20 +119,19 @@ function PhysObj:rightColCheck()
 	for _, tracer in ipairs(self.tracers.right) do
 		local traceX, traceY, traceObj = tracer:trace()
 		
-		if traceX and (not col or traceY < col) then
+		if traceX and (not colX or traceX > colX) then
 			colX, colY, colObj = traceX, traceY, traceObj
 		end
 	end
 	
-	if colX then --Right collision
-		if not self:rightCollision() then
-			self.x = colX-self.width
-			self.speed[1] = math.min(self.speed[1], 0)
-			return colX, colY, colObj
-		end
+	return colX, colY, colObj
+end
+
+function PhysObj:rightColResolve(x, y, obj)
+	if not self:rightCollision(obj) then
+		self.x = x-self.width
+		self.speed[1] = math.min(self.speed[1], 0)
 	end
-	
-	return false
 end
 
 function PhysObj:topColCheck()
@@ -142,21 +140,19 @@ function PhysObj:topColCheck()
 	for _, tracer in ipairs(self.tracers.up) do
 		local traceX, traceY, traceObj = tracer:trace()
 		
-		if traceX and (not colX or traceY > colY) then
+		if traceX and (not colX or traceY < colY) then
 			colX, colY, colObj = traceX, traceY, traceObj
 		end
 	end
 	
-	if colY then --Top collision
-		if not self:topCollision() then
-			self.y = colY+1
-			self.speed[2] = math.max(self.speed[2], 0)
-			
-			return colX, colY, colObj
-		end
+	return colX, colY, colObj
+end
+
+function PhysObj:topColResolve(x, y, obj)
+	if not self:topCollision(obj) then
+		self.y = y+1
+		self.speed[2] = math.max(self.speed[2], 0)
 	end
-	
-	return false
 end
 
 function PhysObj:bottomColCheck()
@@ -170,22 +166,20 @@ function PhysObj:bottomColCheck()
 		end
 	end
 	
-	if colY then --Ground collision
-		if self.onGround or colY <= self.y + self.height then
-			if not self:bottomCollision(nil) then
-				if not self.onGround then
-					self.onGround = true
-				end
-				
-				self.y = colY-self.height
-				self.speed[2] = math.min(self.speed[2], 0)
-				
-				return colX, colY, colObj
+	return colX, colY, colObj
+end
+
+function PhysObj:bottomColResolve(x, y, obj)
+	if self.onGround or y <= self.y + self.height then
+		if not self:bottomCollision(obj) then
+			if not self.onGround then
+				self.onGround = true
 			end
+			
+			self.y = y-self.height
+			self.speed[2] = math.min(self.speed[2], 0)
 		end
 	end
-	
-	return false
 end
 
 local col = {
@@ -196,26 +190,44 @@ local col = {
 }
 
 function PhysObj:checkCollisions()
-	col.left[1], col.left[2], col.left[3] = self:leftColCheck()
+	return	self:leftColCheck() or
+			self:rightColCheck() or
+			self:bottomColCheck() or
+			self:topColCheck()
+end
 
-	col.right[1] = nil
-	if not col.left[1] then
-		col.right[1], col.right[2], col.right[3] = self:rightColCheck()
-	end
-	
-	col.bottom[1], col.bottom[2], col.bottom[3] = self:bottomColCheck()
-	
-	if not col.bottom[1] then
-		col.top[1], col.top[2], col.top[3] = self:topColCheck()
-		
-		if self.onGround and self.speed[2] > 0 then
-			self:startFall()
-			self.onGround = false
+function PhysObj:resolveCollisions()
+	local x, y, obj = self:leftColCheck()
+
+	if x then -- resolve the left collision
+		self:leftColResolve(x, y, obj)
+	else -- see if we got a right collision
+		x, y, obj = self:rightColCheck()
+
+		if x then -- resolve the right collision
+			self:rightColResolve(x, y, obj)
 		end
 	end
 	
-	if type(col.bottom[3]) == "table" and col.bottom[3]:isInstanceOf(Physics3.Tile) then
-		self.surfaceAngle = col.bottom[3].angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
+	x, y, obj = self:bottomColCheck()
+
+	if x then
+		self:bottomColResolve(x, y, obj)
+	
+		if type(obj) == "table" and obj:isInstanceOf(Physics3.Tile) then
+			self.surfaceAngle = obj.angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
+		end
+	else
+		if self.onGround and self.speed[2] > 0 then -- start falling maybe
+			self:startFall()
+			self.onGround = false
+		end
+		
+		x, y, obj = self:topColCheck()
+
+		if x then -- resolve the right collision
+			self:topColResolve(x, y, obj)
+		end
 	end
 end
 

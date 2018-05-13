@@ -418,3 +418,9 @@ function recursiveEnumerate(folder, files) -- What's with all the recursion in t
     
 	return files
 end
+
+function clearTable(t)
+    for k in pairs (t) do
+        t[k] = nil
+    end
+end

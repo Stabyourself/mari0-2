@@ -1,10 +1,15 @@
 ActorEvent = class("ActorEvent")
 
-function ActorEvent:initialize(actor, name)
+function ActorEvent:initialize(actor)
     self.actor = actor
-    self.name = name
     self.binds = {}
     self.values = {}
+end
+
+function ActorEvent:clear(name)
+    self.name = name
+    clearTable(self.binds)
+    clearTable(self.values)
 end
 
 function ActorEvent:finish()

@@ -17,6 +17,8 @@ function Actor:initialize(world, x, y, actorTemplate)
         self:addComponent(components[name], args)
     end
 
+    self.actorEvent = ActorEvent:new(self)
+
     self.debug = {
         actorState = VAR("debug").actorState,
         hitBox = VAR("debug").actorHitBox,
@@ -25,15 +27,15 @@ function Actor:initialize(world, x, y, actorTemplate)
 end
 
 function Actor:event(eventName, dt, ...)
-    local actorEvent = ActorEvent:new(self, eventName)
+    self.actorEvent:clear(eventName)
 
     for _, component in ipairs(self.components) do
         if component.code[eventName] then
-            component.code[eventName](self, dt, actorEvent, component.args, ...)
+            component.code[eventName](self, dt, self.actorEvent, component.args, ...)
         end
     end
 
-    actorEvent:finish()
+    self.actorEvent:finish()
 end
 
 function Actor:update(dt)

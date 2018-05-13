@@ -72,7 +72,7 @@ function EditorState:load()
             end
         end
 
-        world.layers[i] = Layer:new(layer.x, layer.y, layer.width, layer.height, map)
+        world.layers[i] = Layer:new(world, layer.x, layer.y, layer.width, layer.height, map)
     end
 
     self.editor.activeLayer = self.editor.level.layers[1]

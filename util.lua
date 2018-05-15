@@ -99,7 +99,7 @@ function math.round(i, decimals)
     end
 end
 
-function getRequiredSpeed(height, gravity)
+function getRequiredSpeed(height, gravity) -- I don't think this is working right
     return math.sqrt(2*(gravity or VAR("gravity"))*height)
 end
 
@@ -423,4 +423,8 @@ function clearTable(t)
     for k in pairs (t) do
         t[k] = nil
     end
+end
+
+function pointInRectangle(x, y, rx, ry, rw, rh)
+    return x >= rx and y >= ry and x < rx+rw and y < ry+rh
 end

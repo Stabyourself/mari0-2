@@ -28,15 +28,21 @@ function World:update(dt)
     prof.pop()
     
     prof.push("Objects")
-    for i, obj in ipairs(self.objects) do
+    for _, obj in ipairs(self.objects) do
+        obj:preMovement()
+    end
+
+    for _, obj in ipairs(self.objects) do
         prof.push("Think")
 		obj:update(dt)
         prof.pop()
+        
+        obj.frameMovementX = obj.speed[1] * dt
+        obj.frameMovementY = obj.speed[2] * dt
 		
 		-- Add gravity
         obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * dt
-        -- Cap speed[2]
-        obj.speed[2] = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed[2])
+        obj.speed[2] = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed[2]) -- Cap speed[2]
         
         local oldX, oldY = obj.x, obj.y
         
@@ -52,6 +58,10 @@ function World:update(dt)
         prof.pop()
         
         self:checkPortaling(obj, oldX, oldY)
+    end
+
+    for _, obj in ipairs(self.objects) do
+        obj:postMovement()
     end
     prof.pop()
 end
@@ -100,9 +110,14 @@ function World:checkPortaling(obj, oldX, oldY)
                 obj.x = obj.x-obj.width/2
                 obj.y = obj.y-obj.height/2
 
+                if obj:checkCollisions() then
+                    print("Hey, object " .. tostring(obj) .. " ended up in a wall after portalling. This should be resolved in the future.")
+                end
 
-                print(obj:checkCollisions())
-                    
+                if obj.portalled then
+                    obj:portalled()
+                end
+
                 return true
             end
         end
@@ -241,6 +256,12 @@ function World:draw()
     
     if VAR("debug").portalVector then
         self:portalVectorDebug()
+    end
+    
+    if VAR("debug").standingOn then
+        for _, obj in ipairs(self.objects) do
+            obj:standingOnDebugDraw()
+        end
     end
     prof.pop()
 end
@@ -438,7 +459,7 @@ function World:checkCollision(x, y, obj)
     if obj then
         -- Portal hijacking
         for _, p in ipairs(self.portals) do
-            -- TODO: objectWithinPortalRange could be cached
+            -- TODO: objectWithinPortalRange could be cached (definitely do this)
             if p.open and objectWithinPortalRange(p, obj.x+obj.width/2, obj.y+obj.height/2) then -- only if the player is "in front" of the portal 
                 -- check if pixel is inside portal wallspace
                 -- rotate x, y around portal origin
@@ -453,7 +474,7 @@ function World:checkCollision(x, y, obj)
                         
                     else
                         if ny > p.y1 and ny <= p.y1+2 then -- point is "on" the line of the portal
-                            return true
+                            return portalWallInstance
                         elseif ny > p.y1 then
                             return false
                         end
@@ -463,12 +484,23 @@ function World:checkCollision(x, y, obj)
         end
     end
     
-    
+    -- World
     for _, layer in ipairs(self.layers) do
         local tile = layer:checkCollision(x, y)
 
         if tile then
             return tile
+        end
+    end
+
+    -- Actors
+    -- todo: quad tree magic
+
+    for _, obj2 in ipairs(self.objects) do
+        if obj ~= obj2 then
+            if pointInRectangle(x, y, obj2.x, obj2.y, obj2.width, obj2.height) then
+                return obj2
+            end
         end
     end
 

@@ -13,7 +13,7 @@ return {
 
     rotationSpeed = 14, --only a visual effect
 
-    enemyBounceHeight = 14,
+    enemyBounceHeight = 28,
 
     blockBounceTime = 0.2,
     blockBounceHeight = 0.4,

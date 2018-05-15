@@ -27,15 +27,17 @@ function Actor:initialize(world, x, y, actorTemplate)
 end
 
 function Actor:event(eventName, dt, ...)
-    self.actorEvent:clear(eventName)
-
+    local actorEvent = ActorEvent:new(self, eventName) -- todo: bad for memory!
+    
     for _, component in ipairs(self.components) do
         if component.code[eventName] then
-            component.code[eventName](self, dt, self.actorEvent, component.args, ...)
+            component.code[eventName](self, dt, actorEvent, component.args, ...)
         end
     end
 
-    self.actorEvent:finish()
+    actorEvent:finish()
+
+    return actorEvent.returns
 end
 
 function Actor:update(dt)
@@ -117,28 +119,28 @@ function Actor:ceilCollision(obj2)
     -- self.speed[2] = VAR("blockHitForce")
     
     -- game.level:bumpBlock(x, y)
-    self:event("ceilCollision")
+    self:event("ceilCollision", 0, obj2)
 end
 
 function Actor:bottomCollision(obj2)
-    -- if obj2 and obj2.stompable then
-    --     obj2:stomp()
-    --     self.speed[2] = -getRequiredSpeed(VAR("enemyBounceHeight"))
-    -- end
-
-    self:event("bottomCollision")
+    return self:event("bottomCollision", 0, obj2)
 end
 
 function Actor:leftCollision(obj2)
-    self:event("leftCollision")
+    return self:event("leftCollision", 0, obj2)
 end
 
 function Actor:rightCollision(obj2)
-    self:event("rightCollision")
+    return self:event("rightCollision", 0, obj2)
 end
 
 function Actor:startFall()
     self:event("startFall")
+end
+
+function Actor:portalled()
+    self:event("portalled")
+    Physics3.PhysObj.portalled(self)
 end
 
 function Actor:friction(dt, friction, min)

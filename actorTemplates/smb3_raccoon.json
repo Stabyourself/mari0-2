@@ -102,6 +102,7 @@
         "smb3.spinning": {},
         "misc.unrotate": {},
         "misc.crosshair": {},
-        "misc.portalGun": {}
+        "misc.portalGun": {},
+        "misc.stomps": {}
     }
 }

@@ -45,6 +45,7 @@ function love.load()
     require "class.ActorEvent"
     require "class.BlockBounce"
     require "class.Portal"
+    require "class.PortalWall"
     require "class.PortalParticle"
     require "class.PortalThing"
     require "class.Smb3Ui"

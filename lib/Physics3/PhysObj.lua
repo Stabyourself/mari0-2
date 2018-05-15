@@ -15,6 +15,8 @@ function PhysObj:initialize(world, x, y, width, height)
 	
     self.surfaceAngle = 0
 	self.onGround = false
+
+	self.isGroundFor = {}
 	
 	self.tracers = {}
 	self.tracers.left = {}
@@ -170,16 +172,18 @@ function PhysObj:bottomColCheck()
 end
 
 function PhysObj:bottomColResolve(x, y, obj)
-	if self.onGround or y <= self.y + self.height then
-		if not self:bottomCollision(obj) then
-			if not self.onGround then
-				self.onGround = true
-			end
-			
-			self.y = y-self.height
-			self.speed[2] = math.min(self.speed[2], 0)
+	if not self:bottomCollision(obj) then
+		if not self.onGround then
+			self.onGround = true
 		end
+		
+		self.y = y-self.height
+		self.speed[2] = math.min(self.speed[2], 0)
+
+		return true
 	end
+	
+	return false
 end
 
 local col = {
@@ -197,25 +201,39 @@ function PhysObj:checkCollisions()
 end
 
 function PhysObj:resolveCollisions()
-	local x, y, obj = self:leftColCheck()
+	local x, y, obj
+
+	if self.speed[1] <= 0 then
+		x, y, obj = self:leftColCheck()
+	end
 
 	if x then -- resolve the left collision
 		self:leftColResolve(x, y, obj)
-	else -- see if we got a right collision
+	elseif self.speed[1] >= 0 then -- see if we got a right collision
 		x, y, obj = self:rightColCheck()
 
 		if x then -- resolve the right collision
 			self:rightColResolve(x, y, obj)
 		end
 	end
-	
+
 	x, y, obj = self:bottomColCheck()
 
 	if x then
-		self:bottomColResolve(x, y, obj)
+		if self.onGround or y <= self.y + self.height then
+			if self:bottomColResolve(x, y, obj) then
+				self.standingOn = obj
+
+				if obj.class:isSubclassOf(PhysObj) then
+					obj:getStoodOn(self)
+				end
+			end
 	
-		if type(obj) == "table" and obj:isInstanceOf(Physics3.Tile) then
-			self.surfaceAngle = obj.angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
+			if type(obj) == "table" and obj:isInstanceOf(Physics3.Tile) then -- update the object's surfaceAngle
+				self.surfaceAngle = obj.angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
+			else
+				self.surfaceAngle = 0
+			end
 		end
 	else
 		if self.onGround and self.speed[2] > 0 then -- start falling maybe
@@ -229,6 +247,52 @@ function PhysObj:resolveCollisions()
 			self:topColResolve(x, y, obj)
 		end
 	end
+end
+
+function PhysObj:preMovement()
+	self.standingOn = nil
+	clearTable(self.isGroundFor)
+end
+
+function PhysObj:postMovement()
+	if self.standingOn and self.standingOn.class:isSubclassOf(PhysObj) then
+		local mx, my = recursivelyGetFrameMovement(self)
+
+		self.x = self.x + mx
+		self.y = self.y + my
+	end
+end
+
+function PhysObj:portalled()
+	-- throw off anyone riding us
+	for _, obj in ipairs(self.isGroundFor) do
+		obj.standingOn = nil
+	end
+	
+	clearTable(self.isGroundFor)
+end
+
+function recursivelyGetFrameMovement(obj, x, y) -- god I hate recursion
+    if not x then
+        x = 0
+        y = 0
+    end
+
+    x = x + obj.frameMovementX
+    y = y + obj.frameMovementY
+
+    if obj.standingOn and obj.standingOn.frameMovementX then
+        local mx, my = recursivelyGetFrameMovement(obj.standingOn)
+
+        x = x + mx
+        y = y + my
+    end
+
+    return x, y
+end
+
+function PhysObj:getStoodOn(obj)
+	table.insert(self.isGroundFor, obj)
 end
 
 function PhysObj:debugDraw(xOff, yOff)
@@ -256,6 +320,10 @@ function PhysObj:debugDraw(xOff, yOff)
 	end
 	
 	love.graphics.setColor(1, 1, 1)
+end
+
+function PhysObj:standingOnDebugDraw()
+	love.graphics.print(tostring(self.standingOn), self.x+self.width, self.y)
 end
 
 function PhysObj:leftCollision() end

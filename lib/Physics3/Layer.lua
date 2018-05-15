@@ -19,7 +19,7 @@ function Layer:update(dt)
     if self.movement == "sinethefuckout" then
         self.movementTimer = self.movementTimer + dt
 
-        self.yOffset = math.sin(self.movementTimer)*32
+        self.yOffset = math.sin(self.movementTimer)*8
     end
 end
 

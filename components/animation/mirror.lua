@@ -4,6 +4,7 @@ local MIRRORTIME = 0.2
 
 function component.setup(actor, dt, actorEvent, args)
     actor.img = actor.actorTemplate.img
+    -- todo for tomorrow: define a frame to mirror. All actors must use frames!
 
     actor.quadWidth = actor.img:getWidth()
     actor.quadHeight = actor.img:getHeight()

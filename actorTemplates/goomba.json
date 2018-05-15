@@ -17,7 +17,7 @@
             "centerX": 8,
             "centerY": 9
         },
-        "movement.truffleShuffle": {"acceleration": 200, "maxSpeed": 40},
-        "misc.unrotate": {}
+        "misc.unrotate": {},
+        "misc.stompable": {}
     }
 }

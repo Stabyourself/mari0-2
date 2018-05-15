@@ -7,6 +7,12 @@ function ActorEvent:initialize(actor, name)
     self.values = {}
 end
 
+function ActorEvent:clear(name)
+    self.name = name
+    clearTable(self.binds)
+    clearTable(self.values)
+end
+
 function ActorEvent:finish()
     -- Fire any delayed code
     self:fire("after")

@@ -47,7 +47,7 @@ function Level:loadLevel(data)
 
     table.sort(self.spawnList, function(a, b) return a.x<b.x end)
 
-    self.actors = {} -- todo: this is meh
+    self.actors = {}
     self.marios = {}
 
     local x, y = self:coordinateToWorld(self.spawnX-.5, self.spawnY)
@@ -70,7 +70,7 @@ function Level:update(dt)
 
     self:updateCamera(dt)
     
-    prof.push("Post Movement")
+    prof.push("Post Update")
     for _, obj in ipairs(self.objects) do
         if obj.postUpdate then
             obj:postUpdate(dt)

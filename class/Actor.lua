@@ -17,7 +17,7 @@ function Actor:initialize(world, x, y, actorTemplate)
         self:addComponent(components[name], args)
     end
 
-    self.actorEvent = ActorEvent:new(self)
+    self.actorEvent = {}
 
     self.debug = {
         actorState = VAR("debug").actorState,
@@ -27,17 +27,21 @@ function Actor:initialize(world, x, y, actorTemplate)
 end
 
 function Actor:event(eventName, dt, ...)
-    local actorEvent = ActorEvent:new(self, eventName) -- todo: bad for memory!
-    
+    if not self.actorEvent[eventName] then
+        self.actorEvent[eventName] = ActorEvent:new(self, eventName)
+    else
+        self.actorEvent[eventName]:clear(eventName)
+    end
+
     for _, component in ipairs(self.components) do
         if component.code[eventName] then
-            component.code[eventName](self, dt, actorEvent, component.args, ...)
+            component.code[eventName](self, dt, self.actorEvent[eventName], component.args, ...)
         end
     end
 
-    actorEvent:finish()
+    self.actorEvent[eventName]:finish()
 
-    return actorEvent.returns
+    return self.actorEvent[eventName].returns
 end
 
 function Actor:update(dt)

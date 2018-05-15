@@ -71,7 +71,7 @@ function Tile:cacheCollisions()
 		for y = 0, 15 do
 			local col = false
 
-			for _, points in ipairs(self.collisionTriangulated) do -- TODO: This could be cached in a 16x16 matrix
+			for _, points in ipairs(self.collisionTriangulated) do
 				if pointInTriangle(x, y, points) then
 					col = true
 					break

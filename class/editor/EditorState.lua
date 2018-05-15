@@ -6,7 +6,7 @@ function EditorState:initialize(editor)
     self.state = self:serialize()
 end
 
-function EditorState:serialize() -- Todo: have to rewrite this to support layers lol
+function EditorState:serialize()
     local world = self.editor.level
     local state = {}
 

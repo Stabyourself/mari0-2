@@ -643,7 +643,7 @@ end
 
 function Editor:saveState()
     for i = 1, self.editorState-1 do
-        table.remove(self.editorStates, 1) -- Todo: Garbage collection doesn't seem to find the state
+        table.remove(self.editorStates, 1)
     end
     
     table.insert(self.editorStates, 1, EditorState:new(self))

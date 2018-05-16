@@ -13,22 +13,25 @@ for _, file in ipairs(files) do
 
         -- Load images
         if template.img then
-            if type(template.img) == "table" then
-                local imgLoaded = {}
+            template.img = love.graphics.newImage(template.img) -- todo: replace with some smart-ass directory thing
 
-                for i, path in pairs(template.img) do
-                    local loadAs = i
+            if not template.dontAutoQuad then
+                -- create quads
+                -- Check if image can be nicely divided into quadWidth/Height sized quads
+                template.quads = {}
 
-                    if tonumber(loadAs) then
-                        loadAs = tonumber(loadAs)
+                for y = 1, template.img:getHeight()/template.quadHeight do
+                    for x = 1, template.img:getWidth()/template.quadWidth do
+                        table.insert(template.quads, love.graphics.newQuad(
+                            (x-1)*template.quadWidth,
+                            (y-1)*template.quadHeight,
+                            template.quadWidth,
+                            template.quadHeight,
+                            template.img:getWidth(),
+                            template.img:getHeight()
+                        ))
                     end
-
-                    imgLoaded[loadAs] = love.graphics.newImage(path)
                 end
-
-                template.img = imgLoaded
-            else   
-                template.img = love.graphics.newImage(template.img) -- todo: replace with some smart-ass directory thing
             end
         end
 

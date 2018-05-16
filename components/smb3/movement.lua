@@ -1,4 +1,4 @@
-local component = {}
+local movement = class("smb3.movement")
 
 local ACCELERATION = 196.875 -- acceleration on ground
 
@@ -23,96 +23,101 @@ local DOWNHILLWALKBONUS = 7.5
 
 local state = {}
 
+function movement:initialize(actor, args)
+    self.actor = actor
+    self.args = args
 
-function component.setup(actor)
-    actor.jumping = false
-    
+    self:setup()
+end
 
-    actor.animationState = "idle"
+function movement:setup()
+    self.actor.jumping = false
+
+    self.actor.animationState = "idle"
     
-    actor.animationDirection = 1
+    self.actor.animationDirection = 1
     
-    actor.pMeter = 0
-    actor.pMeterTimer = 0
-    actor.pMeterTime = 8/60
+    self.actor.pMeter = 0
+    self.actor.pMeterTimer = 0
+    self.actor.pMeterTime = 8/60
     
-    actor.runAnimationFrame = 1
-    actor.runAnimationTimer = 0
+    self.actor.runAnimationFrame = 1
+    self.actor.runAnimationTimer = 0
     
-    actor.somerSaultFrame = 2
-    actor.somerSaultFrameTimer = 0
+    self.actor.somerSaultFrame = 2
+    self.actor.somerSaultFrameTimer = 0
     
-    actor.shooting = false
-    actor.shootTimer = 0
+    self.actor.shooting = false
+    self.actor.shootTimer = 0
     
-    actor:registerState("idle", function(actor)
+    self.actor:registerState("idle", function(actor)
         if cmdDown("right") or cmdDown("left") then
             return "run"
         end
         
-        if actor.speed[1] ~= 0 then
+        if self.actor.speed[1] ~= 0 then
             return "stop"
         end
     end)
 
-    actor:registerState("stop", function(actor)
+    self.actor:registerState("stop", function(actor)
         if cmdDown("right") or cmdDown("left") then
             return "run"
         end
         
-        if actor.speed[1] == 0 then
+        if self.actor.speed[1] == 0 then
             return "idle"
         end
     end)
 
-    actor:registerState("run", function(actor)
+    self.actor:registerState("run", function(actor)
         if not cmdDown("right") and not cmdDown("left") then
             return "stop"
         end
         
-        if  actor.speed[1] > 0 and cmdDown("left") or
-            actor.speed[1] < 0 and cmdDown("right") then
+        if  self.actor.speed[1] > 0 and cmdDown("left") or
+            self.actor.speed[1] < 0 and cmdDown("right") then
             return "skid"
         end
     end)
 
-    actor:registerState("skid", function(actor)
-        if actor.speed[1] == 0 then
+    self.actor:registerState("skid", function(actor)
+        if self.actor.speed[1] == 0 then
             return "idle"
         end
         
-        if  (actor.speed[1] < 0 and cmdDown("left") and not cmdDown("right")) or
-            (actor.speed[1] > 0 and cmdDown("right") and not cmdDown("right")) or
-            (actor.speed[1] > 0 and not cmdDown("left")) or
-            (actor.speed[1] < 0 and not cmdDown("right")) then
+        if  (self.actor.speed[1] < 0 and cmdDown("left") and not cmdDown("right")) or
+            (self.actor.speed[1] > 0 and cmdDown("right") and not cmdDown("right")) or
+            (self.actor.speed[1] > 0 and not cmdDown("left")) or
+            (self.actor.speed[1] < 0 and not cmdDown("right")) then
             return "run"
         end
     end)
 
-    actor:registerState("fall", function(actor)
-        if cmdDown("jump") and actor.speed[2] < JUMPGRAVITYUNTIL then
+    self.actor:registerState("fall", function(actor)
+        if cmdDown("jump") and self.actor.speed[2] < JUMPGRAVITYUNTIL then
             return "jump"
         end
         -- otherwise handled by bottomCollision
     end)
 
-    actor.state = ActorState:new(actor, "idle", actor.states.idle) -- maybe change this
+    self.actor.state = ActorState:new(self.actor, "idle", self.actor.states.idle) -- maybe change this
 end
 
-function component.update(actor, dt, actorEvent)
-    if actor.shooting then
-        actor.shootTimer = actor.shootTimer + dt
+function movement:update(dt, actorEvent)
+    if self.actor.shooting then
+        self.actor.shootTimer = self.actor.shootTimer + dt
         
-        if actor.shootTimer >= SHOOTTIME then
-            actor.shooting = false
+        if self.actor.shootTimer >= SHOOTTIME then
+            self.actor.shooting = false
         end
     end
     
-    if actor.state.name == "stop" then
-        actor:friction(dt, FRICTION)
+    if self.actor.state.name == "stop" then
+        self.actor:friction(dt, FRICTION)
     end
     
-    if actor.state.name == "run" then
+    if self.actor.state.name == "run" then
         local maxSpeed = 0
         
         if cmdDown("left") or cmdDown("right") then
@@ -123,65 +128,65 @@ function component.update(actor, dt, actorEvent)
             maxSpeed = MAXSPEEDS[2]
         end
         
-        if actor.pMeter == VAR("pMeterTicks") and cmdDown("run") then
+        if self.actor.pMeter == VAR("pMeterTicks") and cmdDown("run") then
             maxSpeed = MAXSPEEDS[3]
         end
         
-        if not actor.onGround then
-            maxSpeed = actor.maxSpeedJump or MAXSPEEDS[1]
+        if not self.actor.onGround then
+            maxSpeed = self.actor.maxSpeedJump or MAXSPEEDS[1]
         end
     
         -- Normal left/right acceleration
-        accelerate(dt, actor, ACCELERATION, maxSpeed)
+        accelerate(dt, self.actor, ACCELERATION, maxSpeed)
         
-        if math.abs(actor.speed[1]) > maxSpeed then
-            actor:friction(dt, FRICTION)
+        if math.abs(self.actor.speed[1]) > maxSpeed then
+            self.actor:friction(dt, FRICTION)
         end
     end
     
-    if actor.state.name == "skid" then
-        skid(dt, actor, FRICTIONSKID)
+    if self.actor.state.name == "skid" then
+        skid(dt, self.actor, FRICTIONSKID)
     end
     
-    if not actor.flying and (actor.state.name == "jump" or actor.state.name == "fall") then
-        accelerate(dt, actor, ACCELERATION, actor.maxSpeedJump or MAXSPEEDS[1])
-        skid(dt, actor, FRICTIONSKID)
+    if not self.actor.flying and (self.actor.state.name == "jump" or self.actor.state.name == "fall") then
+        accelerate(dt, self.actor, ACCELERATION, self.actor.maxSpeedJump or MAXSPEEDS[1])
+        skid(dt, self.actor, FRICTIONSKID)
     end
     
     -- P meter
-    actor.pMeterTimer = actor.pMeterTimer + dt
+    self.actor.pMeterTimer = self.actor.pMeterTimer + dt
     
-    if actor.speed[1] == MAXSPEEDS[2] and actor.pMeter == 0 then
-        actor.pMeterTime = PMETERTIMEUP
-        actor.pMeterTimer = PMETERTIMEUP
+    if self.actor.speed[1] == MAXSPEEDS[2] and self.actor.pMeter == 0 then
+        self.actor.pMeterTime = PMETERTIMEUP
+        self.actor.pMeterTimer = PMETERTIMEUP
     end
     
     -- Maintain fullspeed when pMeter full
-    if actor.pMeter == VAR("pMeterTicks") and
-        (not actor.onGround or 
-        (math.abs(actor.speed[1]) >= MAXSPEEDS[2] and
+    if self.actor.pMeter == VAR("pMeterTicks") and
+        (not self.actor.onGround or 
+        (math.abs(self.actor.speed[1]) >= MAXSPEEDS[2] and
         cmdDown("run") and 
-        ((actor.speed[1] > 0 and cmdDown("right")) or (actor.speed[1] < 0 and cmdDown("left"))))) then
-        actor.pMeterTimer = 0
-        actor.pMeterTime = PMETERTIMEMARGIN
+        ((self.actor.speed[1] > 0 and cmdDown("right")) or (self.actor.speed[1] < 0 and cmdDown("left"))))) then
+        self.actor.pMeterTimer = 0
+        self.actor.pMeterTime = PMETERTIMEMARGIN
     end
     
-    if not actor.flying then
-        while actor.pMeterTimer >= actor.pMeterTime do
-            actor.pMeterTimer = actor.pMeterTimer - actor.pMeterTime
+    if not self.actor.flying then
+        while self.actor.pMeterTimer >= self.actor.pMeterTime do
+            self.actor.pMeterTimer = self.actor.pMeterTimer - self.actor.pMeterTime
             
-            if actor.onGround and math.abs(actor.speed[1]) >= MAXSPEEDS[2] then
-                if actor.pMeter < VAR("pMeterTicks") then
-                    actor.pMeterTime = PMETERTIMEUP
-                    actor.pMeter = actor.pMeter + 1
+            if self.actor.onGround and math.abs(self.actor.speed[1]) >= MAXSPEEDS[2] then
+                if self.actor.pMeter < VAR("pMeterTicks") then
+                    self.actor.pMeterTime = PMETERTIMEUP
+                    self.actor.pMeter = self.actor.pMeter + 1
                 end
             else
-                if actor.pMeter > 0 then
-                    actor.pMeterTime = PMETERTIMEDOWN
-                    actor.pMeter = actor.pMeter - 1
+                if self.actor.pMeter > 0 then
+                    self.actor.pMeterTime = PMETERTIMEDOWN
+                    self.actor.pMeter = self.actor.pMeter - 1
                     
-                    if actor.pMeter == 0 then
-                        actor.pMeterTime = PMETERTIMEUP
+                    if self.actor.pMeter == 0 then
+                        self.actor.pMeterTime = PMETERTIMEUP
                     end
                 end
             end
@@ -189,26 +194,26 @@ function component.update(actor, dt, actorEvent)
     end
 
     if CHEAT("infinitePMeter") then
-        actor.pMeter = VAR("pMeterTicks")
-        actor.flyTimer = 0
+        self.actor.pMeter = VAR("pMeterTicks")
+        self.actor.flyTimer = 0
     end
     
     
-    -- actor.speed[1] = actor.groundSpeedX
+    -- self.actor.speed[1] = self.actor.groundSpeedX
     
     -- Adjust speed[1] if going downhill or uphill
-    -- if actor.onGround then
-    --     if actor.surfaceAngle > 0 then
-    --         if actor.groundSpeedX > 0 then
-    --             actor.speed[1] = actor.speed[1] + DOWNHILLWALKBONUS
+    -- if self.actor.onGround then
+    --     if self.actor.surfaceAngle > 0 then
+    --         if self.actor.groundSpeedX > 0 then
+    --             self.actor.speed[1] = self.actor.speed[1] + DOWNHILLWALKBONUS
     --         else
-    --             actor.speed[1] = actor.speed[1] * math.cos(actor.surfaceAngle)
+    --             self.actor.speed[1] = self.actor.speed[1] * math.cos(self.actor.surfaceAngle)
     --         end
-    --     elseif actor.surfaceAngle < 0 then
-    --         if actor.groundSpeedX < 0 then
-    --             actor.speed[1] = actor.speed[1] - DOWNHILLWALKBONUS
+    --     elseif self.actor.surfaceAngle < 0 then
+    --         if self.actor.groundSpeedX < 0 then
+    --             self.actor.speed[1] = self.actor.speed[1] - DOWNHILLWALKBONUS
     --         else
-    --             actor.speed[1] = actor.speed[1] * math.cos(-actor.surfaceAngle)
+    --             self.actor.speed[1] = self.actor.speed[1] * math.cos(-self.actor.surfaceAngle)
     --         end
     --     end
     -- end
@@ -216,14 +221,14 @@ function component.update(actor, dt, actorEvent)
     actorEvent:setValue("gravity", VAR("gravity"), 0)
 end
 
-function component.bottomCollision(actor)
-    if actor.state.name == "jump" or actor.state.name == "fall" then
-        actor:switchState("idle")
+function movement:bottomCollision()
+    if self.actor.state.name == "jump" or self.actor.state.name == "fall" then
+        self.actor:switchState("idle")
     end
 end
 
-function component.startFall(actor)
-    actor:switchState("fall")
+function movement:startFall()
+    self.actor:switchState("fall")
 end
 
 function skid(dt, actor, friction)
@@ -248,4 +253,4 @@ function accelerate(dt, actor, acceleration, maxSpeed)
     end
 end
 
-return component
+return movement

@@ -3,6 +3,12 @@
     "height": 24,
     
     "img": "characters/smb3-mario/raccoon.png",
+    "quadWidth": 40,
+    "quadHeight": 40,
+    "centerX": 23,
+    "centerY": 24,
+
+    "dontAutoQuad": true,
     
     "components": {
         "misc.palettable": {
@@ -14,9 +20,6 @@
         },
 
         "smb3.animation": {
-            "quadWidth": 40,
-            "quadHeight": 40,
-
             "centerX": 23,
             "centerY": 24,
 
@@ -103,6 +106,9 @@
         "misc.unrotate": {},
         "misc.crosshair": {},
         "misc.portalGun": {},
-        "misc.stomps": {}
+        "misc.stomps": {},
+        "misc.stompable": {
+            "loadActorTemplate": "goomba"
+        }
     }
 }

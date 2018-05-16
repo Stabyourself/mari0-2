@@ -1,4 +1,4 @@
-local component = {}
+local animation = class("smb3.animation")
 
 local MAXSPEEDS = {90, 150, 210}
 local ANIMATIONSPEEDS = {1/4*60, 1/3*60, 1/2*60, 1*60}
@@ -13,125 +13,121 @@ local SOMERSAULTTIME = 2/60
 
 local SHOOTTIME = 12/60
 
-function component.setup(actor, dt, actorEvent, args)
-    actor.img = actor.actorTemplate.img
-    actor.quadWidth = args.quadWidth
-    actor.quadHeight = args.quadWidth
+function animation:initialize(actor, args)
+    self.actor = actor
+    self.args = args
 
-    actor.centerX = args.centerX
-    actor.centerY = args.centerY
-    
-    actor.quadList = {}
-    actor.frames = args["frames"]
-    actor.frameCounts = {}
+    self:setup()
+end
+
+function animation:setup()
+    self.actor.quadList = {}
+    self.actor.frames = self.args["frames"]
+    self.actor.frameCounts = {}
 
     for y = 1, 5 do
-        actor.quadList[y] = {}
+        self.actor.quadList[y] = {}
         local x = 0
         
-        for _, name in ipairs(actor.frames) do
-            local quad = love.graphics.newQuad(x*actor.quadWidth, (y-1)*actor.quadHeight, actor.quadWidth, actor.quadHeight, actor.img:getWidth(), actor.img:getHeight())
+        for _, name in ipairs(self.actor.frames) do
+            local quad = love.graphics.newQuad(x*self.actor.quadWidth, (y-1)*self.actor.quadHeight, self.actor.quadWidth, self.actor.quadHeight, self.actor.img:getWidth(), self.actor.img:getHeight())
             
-            if actor.quadList[y][name] then
-                if type(actor.quadList[y][name]) ~= "table" then
-                    actor.quadList[y][name] = {actor.quadList[y][name]}
+            if self.actor.quadList[y][name] then
+                if type(self.actor.quadList[y][name]) ~= "table" then
+                    self.actor.quadList[y][name] = {self.actor.quadList[y][name]}
                 end
                 
-                table.insert(actor.quadList[y][name], quad)
-                actor.frameCounts[name] = actor.frameCounts[name] + 1
+                table.insert(self.actor.quadList[y][name], quad)
+                self.actor.frameCounts[name] = self.actor.frameCounts[name] + 1
             else
-                actor.quadList[y][name] = quad
-                actor.frameCounts[name] = 1
+                self.actor.quadList[y][name] = quad
+                self.actor.frameCounts[name] = 1
             end
                 
             x = x + 1
         end
     end
     
-    actor.quad = actor.quadList[3].idle
+    self.actor.quad = self.actor.quadList[3].idle
 end
 
-function component.postUpdate(actor, dt)
-    animation(actor, dt)
-end
-
-function animation(actor, dt)
-    if actor.hasPortalGun then -- look towards portalGunAngle
-        if math.abs(actor.portalGunAngle-actor.angle) <= math.pi*.5 then
-            actor.animationDirection = 1
+function animation:postUpdate(dt)
+    if self.actor.hasPortalGun then -- look towards portalGunAngle
+        if math.abs(self.actor.portalGunAngle-self.actor.angle) <= math.pi*.5 then
+            self.actor.animationDirection = 1
         else
-            actor.animationDirection = -1
+            self.actor.animationDirection = -1
         end
         
     else -- look towards last pressed direction
         if cmdDown("left") then
-            actor.animationDirection = -1
+            self.actor.animationDirection = -1
         elseif cmdDown("right") then
-            actor.animationDirection = 1
+            self.actor.animationDirection = 1
         end
     end
     
     local frame = false
     
-    if actor.spinning and (not actor.starred or (actor.state.name ~= "jump" and actor.state.name ~= "fall"))  then
-        if actor.onGround then
-            actor.animationState = "spin"
+    if self.actor.spinning and (not self.actor.starred or (self.actor.state.name ~= "jump" and self.actor.state.name ~= "fall"))  then
+        if self.actor.onGround then
+            self.actor.animationState = "spin"
         else
-            actor.animationState = "spinAir"
+            self.actor.animationState = "spinAir"
         end
         
-        actor.animationDirection = actor.spinDirection
+        self.actor.animationDirection = self.actor.spinDirection
         
         -- calculate spin frame from spinTimer
-        frame = 1+math.floor(math.fmod(actor.spinTimer, actor.frameCounts.spin*SPINFRAMETIME)/SPINFRAMETIME)
+        frame = 1+math.floor(math.fmod(self.actor.spinTimer, self.actor.frameCounts.spin*SPINFRAMETIME)/SPINFRAMETIME)
 
-    elseif actor.shooting and (not actor.starred or (actor.state.name ~= "jump" and actor.state.name ~= "fall")) then
-        if actor.onGround then
-            actor.animationState = "shoot"
+    elseif self.actor.shooting and (not self.actor.starred or (self.actor.state.name ~= "jump" and self.actor.state.name ~= "fall")) then
+        if self.actor.onGround then
+            self.actor.animationState = "shoot"
         else
-            actor.animationState = "shootAir"
+            self.actor.animationState = "shootAir"
         end
         
-        frame = math.ceil(actor.shootTimer/SHOOTTIME*actor.frameCounts.shoot)
+        frame = math.ceil(self.actor.shootTimer/SHOOTTIME*self.actor.frameCounts.shoot)
 
-    elseif actor.ducking then
-        actor.animationState = "duck"
+    elseif self.actor.ducking then
+        self.actor.animationState = "duck"
         
-    elseif actor.state.name == "idle" then
-        actor.animationState = "idle"
+    elseif not self.actor.state or self.actor.state.name == "idle" then
+        self.actor.animationState = "idle"
         
-    elseif actor.state.name == "skid" then
-        actor.animationState = "skid"
+    elseif self.actor.state.name == "skid" then
+        self.actor.animationState = "skid"
         
-    elseif actor.state.name == "stop" or actor.state.name == "run" then
-        if math.abs(actor.speed[1]) >= MAXSPEEDS[3] then
-            actor.animationState = "sprint"
+    elseif self.actor.state.name == "stop" or self.actor.state.name == "run" then
+        if math.abs(self.actor.speed[1]) >= MAXSPEEDS[3] then
+            self.actor.animationState = "sprint"
         else
-            actor.animationState = "run"
+            self.actor.animationState = "run"
         end
         
-    elseif actor.flying and (actor.state.name == "jump" or actor.state.name == "fly" or actor.state.name == "fall") then
-        actor.animationState = "fly"
+    elseif self.actor.flying and (self.actor.state.name == "jump" or self.actor.state.name == "fly" or self.actor.state.name == "fall") then
+        self.actor.animationState = "fly"
     
-    elseif actor.state.name == "buttSlide" then
-        actor.animationState = "buttSlide"
+    elseif self.actor.state.name == "buttSlide" then
+        self.actor.animationState = "buttSlide"
         
-    elseif actor.starred and actor.frameCounts.somerSault then
-        actor.animationState = "somerSault"
+    elseif self.actor.starred and self.actor.frameCounts.somerSault then
+        self.actor.animationState = "somerSault"
         
-    elseif actor.state.name == "float" then
-        actor.animationState = "float"
+    elseif self.actor.state.name == "float" then
+        self.actor.animationState = "float"
         
-    elseif actor.state.name == "jump" or actor.state.name == "fall" then
-        if not actor.quadList.canFly and actor.pMeter == VAR("pMeterTicks") then
-            actor.animationState = "fly"
-        elseif (not actor.quadList.canFly and actor.maxSpeedJump == MAXSPEEDS[3]) or actor.flying then
-            actor.animationState = "fly"
+    elseif self.actor.state.name == "jump" or self.actor.state.name == "fall" then
+        if not self.actor.quadList.canFly and self.actor.pMeter == VAR("pMeterTicks") then
+            self.actor.animationState = "fly"
+        elseif (not self.actor.quadList.canFly and self.actor.maxSpeedJump == MAXSPEEDS[3]) or self.actor.flying then
+            self.actor.animationState = "fly"
         else
-            if actor.speed[2] < 0 then
-                actor.animationState = "jump"
+            if self.actor.speed[2] < 0 then
+                self.actor.animationState = "jump"
             else
-                actor.animationState = "fall"
+                self.actor.animationState = "fall"
             end
         end
         
@@ -139,100 +135,100 @@ function animation(actor, dt)
 
     
     -- Running animation
-    if (actor.animationState == "run" or actor.animationState == "sprint") then
+    if (self.actor.animationState == "run" or self.actor.animationState == "sprint") then
         local animationspeed
 
-        if math.abs(actor.speed[1]) >= MAXSPEEDS[3] then -- sprint speed
+        if math.abs(self.actor.speed[1]) >= MAXSPEEDS[3] then -- sprint speed
             animationspeed = ANIMATIONSPEEDS[4]
-        elseif math.abs(actor.speed[1]) > MAXSPEEDS[2] then -- sprint speed
+        elseif math.abs(self.actor.speed[1]) > MAXSPEEDS[2] then -- sprint speed
             animationspeed = ANIMATIONSPEEDS[3]
-        elseif math.abs(actor.speed[1]) > MAXSPEEDS[1] then -- sprint speed
+        elseif math.abs(self.actor.speed[1]) > MAXSPEEDS[1] then -- sprint speed
             animationspeed = ANIMATIONSPEEDS[2]
         else
             animationspeed = ANIMATIONSPEEDS[1]
         end
         
-        actor.runAnimationTimer = actor.runAnimationTimer + animationspeed*dt
+        self.actor.runAnimationTimer = self.actor.runAnimationTimer + animationspeed*dt
         
-        while actor.runAnimationTimer > 1 do
-            actor.runAnimationTimer = actor.runAnimationTimer - 1
-            actor.runAnimationFrame = actor.runAnimationFrame + 1
+        while self.actor.runAnimationTimer > 1 do
+            self.actor.runAnimationTimer = self.actor.runAnimationTimer - 1
+            self.actor.runAnimationFrame = self.actor.runAnimationFrame + 1
             
-            local runFrames = actor.frameCounts.run
+            local runFrames = self.actor.frameCounts.run
 
-            if actor.runAnimationFrame > runFrames then
-                actor.runAnimationFrame = actor.runAnimationFrame - runFrames
+            if self.actor.runAnimationFrame > runFrames then
+                self.actor.runAnimationFrame = self.actor.runAnimationFrame - runFrames
             end
         end
             
-        frame = actor.runAnimationFrame
+        frame = self.actor.runAnimationFrame
     end
     
     -- Flying animation
-    if actor.animationState == "fly" then
-        local flyFrames = actor.frameCounts.fly
+    if self.actor.animationState == "fly" then
+        local flyFrames = self.actor.frameCounts.fly
         
         if flyFrames > 1 then
-            if actor.state.name == "fall" then
-                actor.flyAnimationFrame = 2
+            if self.actor.state.name == "fall" then
+                self.actor.flyAnimationFrame = 2
             else
-                actor.flyAnimationTimer = actor.flyAnimationTimer + dt
-                while actor.flyAnimationTimer > FLYANIMATIONTIME do
-                    actor.flyAnimationTimer = actor.flyAnimationTimer - FLYANIMATIONTIME
-                    actor.flyAnimationFrame = actor.flyAnimationFrame + 1
+                self.actor.flyAnimationTimer = self.actor.flyAnimationTimer + dt
+                while self.actor.flyAnimationTimer > FLYANIMATIONTIME do
+                    self.actor.flyAnimationTimer = self.actor.flyAnimationTimer - FLYANIMATIONTIME
+                    self.actor.flyAnimationFrame = self.actor.flyAnimationFrame + 1
                     
-                    if actor.flyAnimationFrame > flyFrames then
-                        actor.flyAnimationFrame = flyFrames -- don't reset to the start
+                    if self.actor.flyAnimationFrame > flyFrames then
+                        self.actor.flyAnimationFrame = flyFrames -- don't reset to the start
                     end
                 end
             end
             
-            frame = actor.flyAnimationFrame
+            frame = self.actor.flyAnimationFrame
         end
     end
     
     -- Float animation
-    if actor.animationState == "float" then
-        actor.floatAnimationTimer = actor.floatAnimationTimer + dt
-        while actor.floatAnimationTimer > FLYANIMATIONTIME do
-            actor.floatAnimationTimer = actor.floatAnimationTimer - FLYANIMATIONTIME
-            actor.floatAnimationFrame = actor.floatAnimationFrame + 1
+    if self.actor.animationState == "float" then
+        self.actor.floatAnimationTimer = self.actor.floatAnimationTimer + dt
+        while self.actor.floatAnimationTimer > FLYANIMATIONTIME do
+            self.actor.floatAnimationTimer = self.actor.floatAnimationTimer - FLYANIMATIONTIME
+            self.actor.floatAnimationFrame = self.actor.floatAnimationFrame + 1
 
-            local floatFrames = actor.frameCounts.float
-            if actor.floatAnimationFrame > floatFrames then
-                actor.floatAnimationFrame = floatFrames -- don't reset to the start
+            local floatFrames = self.actor.frameCounts.float
+            if self.actor.floatAnimationFrame > floatFrames then
+                self.actor.floatAnimationFrame = floatFrames -- don't reset to the start
             end
         end
         
-        frame = actor.floatAnimationFrame
+        frame = self.actor.floatAnimationFrame
     end
 
     -- Somersault animation
-    if actor.starred and (actor.state.name == "jump" or actor.state.name == "fall" or actor.state.name == "float") then
-        local somersaultFrames = actor.frameCounts.somerSault
+    if self.actor.starred and (self.actor.state.name == "jump" or self.actor.state.name == "fall" or self.actor.state.name == "float") then
+        local somersaultFrames = self.actor.frameCounts.somerSault
 
-        actor.somerSaultFrameTimer = actor.somerSaultFrameTimer + dt
+        self.actor.somerSaultFrameTimer = self.actor.somerSaultFrameTimer + dt
         
-        while actor.somerSaultFrameTimer > SOMERSAULTTIME do
-            actor.somerSaultFrameTimer = actor.somerSaultFrameTimer - SOMERSAULTTIME
+        while self.actor.somerSaultFrameTimer > SOMERSAULTTIME do
+            self.actor.somerSaultFrameTimer = self.actor.somerSaultFrameTimer - SOMERSAULTTIME
             
-            actor.somerSaultFrame = actor.somerSaultFrame + 1
-            if actor.somerSaultFrame > somersaultFrames then
-                actor.somerSaultFrame = 1
+            self.actor.somerSaultFrame = self.actor.somerSaultFrame + 1
+            if self.actor.somerSaultFrame > somersaultFrames then
+                self.actor.somerSaultFrame = 1
             end
         end
 
-        frame = actor.somerSaultFrame
+        frame = self.actor.somerSaultFrame
     end
     
     -- Make sure to properly use the tables if it's an animationState with frames
     if frame then
-        actor.quad = actor.quadList[getAngleFrame(actor)][actor.animationState][frame]
+        self.actor.quad = self.actor.quadList[getAngleFrame(self.actor)][self.actor.animationState][frame]
     else
-        actor.quad = actor.quadList[getAngleFrame(actor)][actor.animationState]
+        self.actor.quad = self.actor.quadList[getAngleFrame(self.actor)][self.actor.animationState]
     end
     
-    assert(type(actor.quad) == "userdata", string.format("The state \"%s\" on actorTemplate %s seems to not be have a quad set up correctly. (attempted frame was \"%s\")", actor.animationState, actor.actorTemplate.name, tostring(frame)))
+    assert(type(self.actor.quad) == "userdata", string.format("The state \"%s\" on actorTemplate %s seems to not be have a quad set up correctly. (attempted frame was \"%s\")", self.actor.animationState, self.actor.actorTemplate.name, tostring(frame)))
 end
 
 function getAngleFrame(actor)
@@ -261,4 +257,4 @@ function getAngleFrame(actor)
     end
 end
 
-return component
+return animation

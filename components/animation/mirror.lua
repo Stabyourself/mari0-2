@@ -1,29 +1,27 @@
-local component = {}
+local mirror = class("animation.mirror")
 
 local MIRRORTIME = 0.2
 
-function component.setup(actor, dt, actorEvent, args)
-    actor.img = actor.actorTemplate.img
-    -- todo for tomorrow: define a frame to mirror. All actors must use frames!
+function mirror:initialize(actor, args)
+    self.actor = actor
+    self.args = args
 
-    actor.quadWidth = actor.img:getWidth()
-    actor.quadHeight = actor.img:getHeight()
-    
-    actor.centerX = args.centerX
-    actor.centerY = args.centerY
-
-    actor.mirrorTimer = 0
-    actor.animationDirection = 1
+    self:setup()
 end
 
-function component.update(actor, dt)
-    actor.mirrorTimer = actor.mirrorTimer + dt
+function mirror:setup()
+    self.mirrorTime = self.args["time"] or MIRRORTIME
+    self.mirrorTimer = 0
+end
 
-    while actor.mirrorTimer > MIRRORTIME do
-        actor.mirrorTimer = actor.mirrorTimer - MIRRORTIME
+function mirror:update(dt)
+    self.mirrorTimer = self.mirrorTimer + dt
+
+    while self.mirrorTimer > self.mirrorTime do
+        self.mirrorTimer = self.mirrorTimer - self.mirrorTime
         
-        actor.animationDirection = -actor.animationDirection
+        self.actor.animationDirection = -self.actor.animationDirection
     end
 end
 
-return component
+return mirror

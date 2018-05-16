@@ -108,8 +108,8 @@ function Level:cmdpressed(cmds)
     end
     
     if cmds["debug.star"] then -- debug
-        self.marios[1]:removeComponent(components["smb3.star"])
-        self.marios[1]:addComponent(components["smb3.star"])
+        self.marios[1]:removeComponent("smb3.star")
+        self.marios[1]:addComponent("smb3.star")
     end
 end
 

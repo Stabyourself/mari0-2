@@ -95,6 +95,16 @@ function math.round(i, decimals)
     end
 end
 
+function math.sign(i)
+    if i > 0 then
+        return 1
+    elseif i < 0 then
+        return -1
+    else
+        return 0
+    end
+end
+
 function getRequiredSpeed(height, gravity) -- I don't think this is working right
     return math.sqrt(2*(gravity or VAR("gravity"))*height)
 end
@@ -424,3 +434,4 @@ end
 function pointInRectangle(x, y, rx, ry, rw, rh)
     return x >= rx and y >= ry and x < rx+rw and y < ry+rh
 end
+

@@ -9,11 +9,8 @@ for _, path in ipairs(toLoad) do
         path = path:gsub("/", ".") -- replace / with .
         path = path:sub(1, -5) -- remove .lua
         name = path:sub(12) -- really?
-        components[name] = {}
-
-        components[name].code = require(path)
-        components[name].name = name
+        components[name] = require(path)
         
-        assert(type(components[name].code) == "table", string.format("Component \"%s\" didn't return a table.", name))
+        assert(type(components[name]) == "table", string.format("Component \"%s\" didn't return a table.", name))
     end
 end

@@ -1,27 +1,34 @@
-local component = {}
+local crosshair = class("misc.crosshair")
 
-function component.setup(actor)
-    actor.crosshair = DottedCrosshair:new(actor)
+function crosshair:initialize(actor, args)
+    self.actor = actor
+    self.args = args
+
+    self:setup()
 end
 
-function component.postUpdate(actor, dt)
-    local x, y = actor.x+actor.width/2, actor.y+actor.height/2
-    actor.crosshair.origin.x = x
-    actor.crosshair.origin.y = y
+function crosshair:setup()
+    self.actor.crosshair = DottedCrosshair:new(self.actor)
+end
+
+function crosshair:postUpdate(dt)
+    local x, y = self.actor.x+self.actor.width/2, self.actor.y+self.actor.height/2
+    self.actor.crosshair.origin.x = x
+    self.actor.crosshair.origin.y = y
     
-    local mx, my = actor.world:mouseToWorld()
+    local mx, my = self.actor.world:mouseToWorld()
     
-    actor.crosshair.angle = math.atan2(my-y, mx-x)
+    self.actor.crosshair.angle = math.atan2(my-y, mx-x)
     
-    actor.portalGunAngle = actor.crosshair.angle
+    self.actor.portalGunAngle = self.actor.crosshair.angle
     
     prof.push("Crosshair")
-    actor.crosshair:update(dt)
+    self.actor.crosshair:update(dt)
     prof.pop()
 end
 
-function component.draw(actor)
-    actor.crosshair:draw()
+function crosshair:draw()
+    self.actor.crosshair:draw()
 end
 
-return component
+return crosshair

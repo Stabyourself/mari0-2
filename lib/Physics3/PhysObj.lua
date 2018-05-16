@@ -18,14 +18,19 @@ function PhysObj:initialize(world, x, y, width, height)
 
 	self.isGroundFor = {}
 	
+	-- register yourself with the world
+	world:addObject(self)
+
+	self:createTracers()
+end
+
+function PhysObj:createTracers()
+	-- More tracers than a quickplay match in Overwatch
 	self.tracers = {}
 	self.tracers.left = {}
 	self.tracers.right = {}
 	self.tracers.up = {}
 	self.tracers.down = {}
-	
-	-- register yourself with the world
-	world:addObject(self)
 	
 	local xOff, yOff, distance
 	local step = self.world.tileSize
@@ -82,6 +87,19 @@ function PhysObj:initialize(world, x, y, width, height)
 	for xOff = self.width-1-Physics3.TRACER_TOP_SPACING, math.floor(self.width/2), -step do
 		table.insert(self.tracers.up, Physics3.Tracer:new(self, xOff, yOff, 0, -1, distance))
 	end
+end
+
+function PhysObj:changeSize(width, height)
+	local diffX = self.width-width
+	local diffY = self.height-height
+
+	self.x = self.x + diffX/2
+	self.y = self.y + diffY
+
+	self.width = width
+	self.height = height
+
+	self:createTracers()
 end
 
 function PhysObj:unRotate(dt)

@@ -1,4 +1,11 @@
-local component = {}
+local star = class("smb3.star")
+
+function star:initialize(actor, args)
+    self.actor = actor
+    self.args = args
+
+    self:setup()
+end
 
 local STARTIME = 7.45
 
@@ -27,43 +34,43 @@ local STARPALETTES = {
     })
 }
 
-function component.setup(actor)
-    actor.starred = true
-    actor.starTimer = 0
-    actor.somerSaultFrame = 2
-    actor.somerSaultFrameTimer = 0
+function star:setup()
+    self.actor.starred = true
+    self.actor.starTimer = 0
+    self.actor.somerSaultFrame = 2
+    self.actor.somerSaultFrameTimer = 0
 end
 
-function component.update(actor, dt, actorEvent)
-    actor.starTimer = actor.starTimer + dt
+function star:update(dt, actorEvent)
+    self.actor.starTimer = self.actor.starTimer + dt
     
     -- get frame
     local palette
-    if actor.starTimer >= STARTIME - STARFRAMESLOWTIME then
-        palette = math.ceil(math.fmod(actor.starTimer, (#STARPALETTES+1)*STARFRAMETIMESLOW)/STARFRAMETIMESLOW)
+    if self.actor.starTimer >= STARTIME - STARFRAMESLOWTIME then
+        palette = math.ceil(math.fmod(self.actor.starTimer, (#STARPALETTES+1)*STARFRAMETIMESLOW)/STARFRAMETIMESLOW)
     else
-        palette = math.ceil(math.fmod(actor.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
+        palette = math.ceil(math.fmod(self.actor.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
     end
     
     if palette == 4 then
-        actor.palette = actor.defaultPalette
+        self.actor.palette = self.actor.defaultPalette
     else
-        actor.palette = STARPALETTES[palette]
+        self.actor.palette = STARPALETTES[palette]
     end
     
-    if actor.starTimer >= STARTIME then
-        actor.palette = actor.defaultPalette
-        actor.starred = false
+    if self.actor.starTimer >= STARTIME then
+        self.actor.palette = self.actor.defaultPalette
+        self.actor.starred = false
 
-        actor:removeComponent(component)
+        self.actor:removeComponent(self.class)
     end
 end
 
-function component.jump(actor)
-    if actor.onGround then
-        actor.somerSaultFrame = 2
-        actor.somerSaultFrameTimer = 0
+function star:jump()
+    if self.actor.onGround then
+        self.actor.somerSaultFrame = 2
+        self.actor.somerSaultFrameTimer = 0
     end
 end
 
-return component
+return star

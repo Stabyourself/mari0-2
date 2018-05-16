@@ -1,4 +1,4 @@
-local component = {}
+local flying = class("smb3.flying")
 
 local FLYINGUPTIME = 16/60
 local FLYTIME = 4.25
@@ -10,14 +10,21 @@ local FRICTIONFLYSMALL = 56.25
 local FRICTIONFLYBIG = 225
 local FRICTIONSKIDFLY = 675 -- turnaround speed while flying
 
-function component.setup(actor)
-    actor.flyTimer = FLYTIME
-    actor.flying = false
-    
-    actor.flyAnimationFrame = 1
-    actor.flyAnimationTimer = 0
+function flying:initialize(actor, args)
+    self.actor = actor
+    self.args = args
 
-    actor:registerState("fly", function(actor, actorState)
+    self:setup()
+end
+
+function flying:setup()
+    self.actor.flyTimer = FLYTIME
+    self.actor.flying = false
+    
+    self.actor.flyAnimationFrame = 1
+    self.actor.flyAnimationTimer = 0
+
+    self.actor:registerState("fly", function(actor, actorState)
         if not actor.flying then
             return "fall"
         end
@@ -28,50 +35,50 @@ function component.setup(actor)
     end)
 end
 
-function component.jump(actor)
-    if not actor.onGround and actor.flying then
-        actor:switchState("fly")
-        actor.flyAnimationFrame = 1
+function flying:jump()
+    if not self.actor.onGround and self.actor.flying then
+        self.actor:switchState("fly")
+        self.actor.flyAnimationFrame = 1
     end
 
-    if actor.pMeter == VAR("pMeterTicks") and not actor.flying then
-        actor.flyTimer = 0
-        actor.flying = true
+    if self.actor.pMeter == VAR("pMeterTicks") and not self.actor.flying then
+        self.actor.flyTimer = 0
+        self.actor.flying = true
     end
 end
 
-function component.update(actor, dt, actorEvent)
-    if actor.flying then
-        actor.flyTimer = actor.flyTimer + dt
+function flying:update(dt, actorEvent)
+    if self.actor.flying then
+        self.actor.flyTimer = self.actor.flyTimer + dt
         
-        if actor.flyTimer >= FLYTIME then
-            actor.flying = false
-            actor.pMeter = 0
+        if self.actor.flyTimer >= FLYTIME then
+            self.actor.flying = false
+            self.actor.pMeter = 0
         end
     end
 
-    if  (actor.flying and (actor.state.name == "jump" or actor.state.name == "fall")) or
-        actor.state.name == "fly" then
-        if math.abs(actor.speed[1]) > MAXSPEEDFLY then
-            if  actor.speed[1] > 0 and cmdDown("right") or
-                actor.speed[1] < 0 and cmdDown("left") then
-                actor:friction(dt, FRICTIONFLYSMALL, MAXSPEEDFLY)
+    if  (self.actor.flying and (self.actor.state.name == "jump" or self.actor.state.name == "fall")) or
+    self.actor.state.name == "fly" then
+        if math.abs(self.actor.speed[1]) > MAXSPEEDFLY then
+            if  self.actor.speed[1] > 0 and cmdDown("right") or
+                self.actor.speed[1] < 0 and cmdDown("left") then
+                self.actor:friction(dt, FRICTIONFLYSMALL, MAXSPEEDFLY)
             else
-                actor:friction(dt, FRICTIONFLYBIG, MAXSPEEDFLY)
+                self.actor:friction(dt, FRICTIONFLYBIG, MAXSPEEDFLY)
             end
         end
         
-        if actor.state.name == "fly" then
-            accelerate(dt, actor, ACCELERATION, MAXSPEEDFLY)
-            actor.speed[2] = FLYINGASCENSION
+        if self.actor.state.name == "fly" then
+            accelerate(dt, self.actor, ACCELERATION, MAXSPEEDFLY)
+            self.actor.speed[2] = FLYINGASCENSION
             actorEvent:setValue("gravity", 0, 10)
         else
-            local maxSpeed = math.min(MAXSPEEDS[2], actor.maxSpeedJump or MAXSPEEDS[1])
+            local maxSpeed = math.min(MAXSPEEDS[2], self.actor.maxSpeedJump or MAXSPEEDS[1])
             
-            accelerate(dt, actor, ACCELERATION, maxSpeed)
+            accelerate(dt, self.actor, ACCELERATION, maxSpeed)
         end
 
-        skid(dt, actor, FRICTIONSKIDFLY)
+        skid(dt, self.actor, FRICTIONSKIDFLY)
     end
 end
 
@@ -97,4 +104,4 @@ function skid(dt, actor, friction)
     end
 end
 
-return component
+return flying

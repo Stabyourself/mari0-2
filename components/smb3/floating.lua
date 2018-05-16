@@ -1,4 +1,4 @@
-local component = {}
+local floating = class("smb3.floating")
 
 local FLOATASCENSION = 60
 local FLOATTIME = 16/60
@@ -9,48 +9,55 @@ local FRICTIONFLYSMALL = 56.25
 local FRICTIONFLYBIG = 225
 local FRICTIONSKIDFLY = 675 -- turnaround speed while flying
 
-function component.setup(actor)
-    actor.floatAnimationFrame = 1
-    actor.floatAnimationTimer = 0
+function floating:initialize(actor, args)
+    self.actor = actor
+    self.args = args
 
-    actor:registerState("float", function(actor, actorState)
+    self:setup()
+end
+
+function floating:setup()
+    self.actor.floatAnimationFrame = 1
+    self.actor.floatAnimationTimer = 0
+
+    self.actor:registerState("float", function(actor, actorState)
         if actorState.timer >= FLOATTIME then
             return "fall"
         end
     end)
 end
 
-function component.update(actor, dt)
-    if actor.state.name == "float" then
-        if math.abs(actor.speed[1]) > MAXSPEEDFLY then
-            if  actor.speed[1] > 0 and cmdDown("right") or
-                actor.speed[1] < 0 and cmdDown("left") then
-                actor:friction(dt, FRICTIONFLYSMALL, MAXSPEEDFLY)
+function floating:update(dt)
+    if self.actor.state.name == "float" then
+        if math.abs(self.actor.speed[1]) > MAXSPEEDFLY then
+            if  self.actor.speed[1] > 0 and cmdDown("right") or
+                self.actor.speed[1] < 0 and cmdDown("left") then
+                self.actor:friction(dt, FRICTIONFLYSMALL, MAXSPEEDFLY)
             else
-                actor:friction(dt, FRICTIONFLYBIG, MAXSPEEDFLY)
+                self.actor:friction(dt, FRICTIONFLYBIG, MAXSPEEDFLY)
             end
         end
         
-        accelerate(dt, actor, ACCELERATION, MAXSPEEDFLY)
+        accelerate(dt, self.actor, ACCELERATION, MAXSPEEDFLY)
         
-        skid(dt, actor, FRICTIONSKIDFLY)
+        skid(dt, self.actor, FRICTIONSKIDFLY)
 
-        actor.speed[2] = FLOATASCENSION
+        self.actor.speed[2] = FLOATASCENSION
     end
 end
 
-function component.jump(actor)
-    if not actor.flying and not actor.onGround and actor.speed[2] > 0 then
-        actor:switchState("float")
-        actor.floatAnimationTimer = 0
-        actor.floatAnimationFrame = 1
+function floating:jump()
+    if not self.actor.flying and not self.actor.onGround and self.actor.speed[2] > 0 then
+        self.actor:switchState("float")
+        self.actor.floatAnimationTimer = 0
+        self.actor.floatAnimationFrame = 1
     end
 end
 
-function component.bottomCollision(actor)
-    if actor.state.name == "float" then
-        actor:switchState("idle")
+function floating:bottomCollision()
+    if self.actor.state.name == "float" then
+        self.actor:switchState("idle")
     end
 end
 
-return component
+return floating

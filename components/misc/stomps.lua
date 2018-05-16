@@ -1,15 +1,21 @@
-local component = {}
+local stomps = class("misc.stomps")
 
-function component.setup(actor, dt, actorEvent, args)
-    -- todo: define a frame for "stomped"?
-    actor.stompsLevel = args.level or 1
-    actor.goingup = false
+function stomps:initialize(actor, args)
+    self.actor = actor
+    self.args = args
+
+    self:setup()
 end
 
-function component.bottomCollision(actor, dt, actorEvent, args, obj2)
-    if obj2.stompAble then
-        actor.y = obj2.y-actor.height
-        actor.speed[2] = -getRequiredSpeed(VAR("enemyBounceHeight"))
+function stomps:setup()
+    -- todo: define a frame for "stomped"?
+    self.actor.stompsLevel = self.args.level or 1
+end
+
+function stomps:bottomCollision(dt, actorEvent, obj2)
+    if obj2.hasComponent and obj2:hasComponent("misc.stompable") then
+        self.actor.y = obj2.y-self.actor.height
+        self.actor.speed[2] = -getRequiredSpeed(VAR("enemyBounceHeight"))
         
         actorEvent:bind("after", function(actor)
             actor:switchState("fall") -- smb3.movement would love to set us to idle, but we can't have that
@@ -18,8 +24,8 @@ function component.bottomCollision(actor, dt, actorEvent, args, obj2)
         actorEvent.returns = true
 
         obj2:event("getStomped")
-        actor:event("stomp")
+        self.actor:event("stomp")
     end
 end
 
-return component
+return stomps

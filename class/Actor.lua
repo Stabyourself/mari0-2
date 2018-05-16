@@ -11,16 +11,9 @@ function Actor:initialize(world, x, y, actorTemplate)
     local height = self.actorTemplate.height
     
     Physics3.PhysObj.initialize(self, world, x-width/2, y-height, width, height)
+
+    self:loadActorTemplate(self.actorTemplate)
     
-    self.states = {}
-
-    self.components = {}
-    for name, args in pairs(self.actorTemplate.components) do
-        assert(components[name], string.format("Unable to load component \"%s\" requested by actorTemplate \"%s\".", name, actorTemplate.name))
-
-        self:addComponent(components[name], args)
-    end
-
     self.actorEvent = {}
 
     self.debug = {
@@ -36,10 +29,10 @@ function Actor:event(eventName, dt, ...)
     else
         self.actorEvent[eventName]:clear(eventName)
     end
-
+    
     for _, component in ipairs(self.components) do
-        if component.code[eventName] then
-            component.code[eventName](self, dt, self.actorEvent[eventName], component.args, ...)
+        if component[eventName] then
+            component[eventName](component, dt, self.actorEvent[eventName], ...)
         end
     end
 
@@ -70,32 +63,32 @@ function Actor:registerState(name, func)
 end
 
 function Actor:addComponent(component, args)
-    table.insert(self.components, {name = component.name, code=component.code, args=args})
-
-    if component.code.setup then
-        local actorEvent = ActorEvent:new(self, "setup")
-
-        component.code.setup(self, dt, actorEvent, args)
-
-        actorEvent:finish()
+    if type(component) == "string" then
+        component = components[component]
     end
+    
+    table.insert(self.components, component:new(self, args))
 end
 
 function Actor:removeComponent(component)
-    for i = #self.components, 1, -1 do
-        local v = self.components[i]
+    if type(component) == "string" then
+        component = components[component]
+    end
 
-        if v.code == component or v.code == component.code then -- so it works for both raw components and "loaded" components
+    for i = #self.components, 1, -1 do
+        if self.components[i].class == component then
             table.remove(self.components, i)
         end
     end
 end
 
 function Actor:hasComponent(component)
-    for i = #self.components, 1, -1 do
-        local v = self.components[i]
+    if type(component) == "string" then
+        component = components[component]
+    end
 
-        if v.code == component or v.code == component.code then
+    for i = #self.components, 1, -1 do
+        if self.components[i].class == component then
             return true
         end
     end
@@ -103,26 +96,56 @@ function Actor:hasComponent(component)
     return false
 end
 
-function Actor:ceilCollision(obj2)
-    if obj2:isInstanceOf(Block) then
-        -- See if there's a better matching block (because Actor jumped near the edge of a block)
-        -- local toCheck = 0
-        -- local x, y = obj2.blockX, obj2.blockY
+function Actor:loadActorTemplate(actorTemplate)
+    self.actorTemplate = actorTemplate
 
-        -- if self.x+self.width/2 > obj2.x+obj2.width then
-        --     toCheck = 1
-        -- elseif self.x+self.width/2 < obj2.x then
-        --     toCheck = -1
-        -- end
+    self:changeSize(self.actorTemplate.width, self.actorTemplate.height)
 
-        -- if toCheck ~= 0 then
-        --     if game.level:getTile(x+toCheck, y).collision then
-        --         x = x + toCheck
-        --     end
-        -- end
+    self.img = self.actorTemplate.img
 
-        -- Todo: Do this
+    self.quadWidth = self.actorTemplate.quadWidth
+    self.quadHeight = self.actorTemplate.quadHeight
+
+    self.centerX = self.actorTemplate.centerX
+    self.centerY = self.actorTemplate.centerY
+
+    self.quad = nil
+    self.quads = self.actorTemplate.quads
+    
+    self.state = nil
+    self.states = {}
+
+    self.components = {}
+    for name, args in pairs(self.actorTemplate.components) do
+        assert(components[name], string.format("Unable to load component \"%s\" requested by actorTemplate \"%s\".", name, actorTemplate.name))
+
+        self:addComponent(components[name], args)
     end
+end
+
+function Actor:ceilCollision(obj2)
+
+    -- this part goes into "bumps blocks" or something
+
+    -- if obj2:isInstanceOf(Block) then
+    --     -- See if there's a better matching block (because Actor jumped near the edge of a block)
+    --     local toCheck = 0
+    --     local x, y = obj2.blockX, obj2.blockY
+
+    --     if self.x+self.width/2 > obj2.x+obj2.width then
+    --         toCheck = 1
+    --     elseif self.x+self.width/2 < obj2.x then
+    --         toCheck = -1
+    --     end
+
+    --     if toCheck ~= 0 then
+    --         if game.level:getTile(x+toCheck, y).collision then
+    --             x = x + toCheck
+    --         end
+    --     end
+
+    --     -- Todo: Do this
+    -- end
         
     -- self.speed[2] = VAR("blockHitForce")
     
@@ -199,7 +222,7 @@ function Actor:debugDraw()
         local font = love.graphics.getFont()
 
         for i, component in ipairs(self.components) do
-            love.graphics.print(component.name, (self.x+self.width+2)*VAR("scale"), (self.y+self.height)*VAR("scale") - 9 - #self.components*10+i*10)
+            love.graphics.print(string.sub(tostring(component), 19), (self.x+self.width+2)*VAR("scale"), (self.y+self.height)*VAR("scale") - 9 - #self.components*10+i*10)
         end
 
         love.graphics.scale(VAR("scale"), VAR("scale"))

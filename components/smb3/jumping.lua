@@ -1,4 +1,4 @@
-local component = {}
+local jumping = class("smb3.jumping")
 
 local MAXSPEEDS = {90, 150, 210}
 local JUMPTABLE = {
@@ -10,32 +10,39 @@ local JUMPTABLE = {
 local JUMPGRAVITYUNTIL = -120
 local JUMPGRAVITY = 225
 
-function component.setup(actor)
-    actor:registerState("jump", function(actor)
+function jumping:initialize(actor, args)
+    self.actor = actor
+    self.args = args
+
+    self:setup()
+end
+
+function jumping:setup()
+    self.actor:registerState("jump", function(actor)
         if not cmdDown("jump") or actor.speed[2] >= JUMPGRAVITYUNTIL then
             return "fall"
         end
     end)
 end
 
-function component.update(actor, dt, actorEvent)
-    if actor.state.name == "jump" then
+function jumping:update(dt, actorEvent)
+    if self.actor.state.name == "jump" then
         actorEvent:setValue("gravity", VAR("gravityJumping"), 10)
     end
 end
 
-function component.jump(actor, dt, actorEvent)
-    if actor.onGround then
+function jumping:jump(dt, actorEvent)
+    if self.actor.onGround then
         actorEvent:bind("after", function(actor)
             actor.onGround = false
         end)
 
-        actor.jumping = true
+        self.actor.jumping = true
         
         -- Adjust jumpforce according to speed
         for i = 1, #JUMPTABLE do
-            if math.abs(actor.speed[1]) <= JUMPTABLE[i].vel then
-                actor.speed[2] = JUMPTABLE[i].jumpForce
+            if math.abs(self.actor.speed[1]) <= JUMPTABLE[i].vel then
+                self.actor.speed[2] = JUMPTABLE[i].jumpForce
                 break
             end
         end
@@ -44,7 +51,7 @@ function component.jump(actor, dt, actorEvent)
         local maxSpeedJumps
         
         for i = 1, #MAXSPEEDS do
-            if math.abs(actor.speed[1]) <= MAXSPEEDS[i] then
+            if math.abs(self.actor.speed[1]) <= MAXSPEEDS[i] then
                 maxSpeedJump = MAXSPEEDS[i]
                 break
             end
@@ -54,10 +61,10 @@ function component.jump(actor, dt, actorEvent)
             maxSpeedJump = MAXSPEEDS[#MAXSPEEDS]
         end
         
-        actor.maxSpeedJump = maxSpeedJump
+        self.actor.maxSpeedJump = maxSpeedJump
         
-        actor:switchState("jump")
+        self.actor:switchState("jump")
     end
 end
 
-return component
+return jumping

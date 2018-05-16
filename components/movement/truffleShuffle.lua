@@ -1,33 +1,46 @@
-local component = {}
+local truffleShuffle = class("movement.truffleShuffle")
 
 local MAXSPEED = 40
 local ACCELERATION = 200
 
-function component.setup(actor, dt, actorEvent, args)
-    actor.shuffleDir = -1
+function truffleShuffle:initialize(actor, args)
+    self.actor = actor
+    self.args = args
 
-    actor.maxSpeed = args["maxSpeed"] or MAXSPEED
-    actor.acceleration = args["acceleration"] or ACCELERATION
-    actor.speed[1] = actor.shuffleDir*MAXSPEED
+    self:setup()
 end
 
-function component.update(actor, dt)
-    -- update shuffleDir if something (like portals) made us move the other way
-    if actor.speed[1] > 0 then
-        actor.shuffleDir = 1
-    elseif actor.speed[1] < 0 then
-        actor.shuffleDir = -1
+function truffleShuffle:setup()
+    self.shuffleDir = -1
+
+    self.maxSpeed = self.args["maxSpeed"] or MAXSPEED
+    self.acceleration = self.args["acceleration"] or ACCELERATION
+    
+    if self.actor.speed[1] == 0 then
+        self.actor.speed[1] = self.shuffleDir*MAXSPEED
     end
 
-    actor:accelerateTo(dt, actor.shuffleDir*actor.maxSpeed, actor.maxSpeed)
+    self.actor.animationDirection = math.sign(self.actor.speed[1])
 end
 
-function component.leftCollision(actor)
-    actor.speed[1] = -actor.speed[1]
+function truffleShuffle:update(dt)
+    -- update shuffleDir if something (like portals) made us move the other way
+    if self.actor.speed[1] > 0 then
+        self.shuffleDir = 1
+    elseif self.actor.speed[1] < 0 then
+        self.shuffleDir = -1
+    end
+
+    self.actor:accelerateTo(dt, self.shuffleDir*self.maxSpeed, self.maxSpeed)
+    self.actor.animationDirection = math.sign(self.actor.speed[1])
 end
 
-function component.rightCollision(actor)
-    actor.speed[1] = -actor.speed[1]
+function truffleShuffle:leftCollision()
+    self.actor.speed[1] = -self.actor.speed[1]
 end
 
-return component
+function truffleShuffle:rightCollision()
+    self.actor.speed[1] = -self.actor.speed[1]
+end
+
+return truffleShuffle

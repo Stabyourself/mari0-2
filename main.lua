@@ -101,14 +101,6 @@ function love.update(dt)
         return
     end
 
-	if VAR("ffKeys") then
-        for _, ffKey in ipairs(VAR("ffKeys")) do
-			if love.keyboard.isDown(ffKey.key) then
-				dt = dt * ffKey.val
-			end
-		end
-    end
-
     gameStateManager:event("update", dt)
     prof.pop()
 end

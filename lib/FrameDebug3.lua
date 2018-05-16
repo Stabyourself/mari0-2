@@ -17,6 +17,14 @@ function FrameDebug3.update(dt)
             return false
         end
     end
+    
+	if VAR("ffKeys") then
+        for _, ffKey in ipairs(VAR("ffKeys")) do
+			if love.keyboard.isDown(ffKey.key) then
+				dt = dt * ffKey.val
+			end
+		end
+    end
 
     return dt
 end

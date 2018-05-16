@@ -11,6 +11,7 @@ function ActorEvent:clear(name)
     self.name = name
     clearTable(self.binds)
     clearTable(self.values)
+    self.returns = nil
 end
 
 function ActorEvent:finish()

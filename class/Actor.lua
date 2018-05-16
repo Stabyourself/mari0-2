@@ -89,7 +89,7 @@ function Actor:hasComponent(component)
 
     for i = #self.components, 1, -1 do
         if self.components[i].class == component then
-            return true
+            return self.components[i]
         end
     end
 

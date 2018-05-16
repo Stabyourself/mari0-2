@@ -1,34 +1,34 @@
-local crosshair = class("misc.crosshair")
+local hasCrosshair = class("misc.hasCrosshair")
 
-function crosshair:initialize(actor, args)
+function hasCrosshair:initialize(actor, args)
     self.actor = actor
     self.args = args
 
     self:setup()
 end
 
-function crosshair:setup()
-    self.actor.crosshair = DottedCrosshair:new(self.actor)
+function hasCrosshair:setup()
+    self.crosshair = DottedCrosshair:new(self.actor)
 end
 
-function crosshair:postUpdate(dt)
+function hasCrosshair:postUpdate(dt)
     local x, y = self.actor.x+self.actor.width/2, self.actor.y+self.actor.height/2
-    self.actor.crosshair.origin.x = x
-    self.actor.crosshair.origin.y = y
+    self.crosshair.origin.x = x
+    self.crosshair.origin.y = y
     
     local mx, my = self.actor.world:mouseToWorld()
     
-    self.actor.crosshair.angle = math.atan2(my-y, mx-x)
+    self.crosshair.angle = math.atan2(my-y, mx-x)
     
-    self.actor.portalGunAngle = self.actor.crosshair.angle
+    self.actor.portalGunAngle = self.crosshair.angle
     
     prof.push("Crosshair")
-    self.actor.crosshair:update(dt)
+    self.crosshair:update(dt)
     prof.pop()
 end
 
-function crosshair:draw()
-    self.actor.crosshair:draw()
+function hasCrosshair:draw()
+    self.crosshair:draw()
 end
 
-return crosshair
+return hasCrosshair

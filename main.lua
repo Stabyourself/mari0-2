@@ -16,6 +16,10 @@ function love.load()
     love.window.setIcon(love.image.newImageData("img/icon.png"))
 
     love.graphics.setDefaultFilter("nearest", "nearest")
+    
+    objectCollides = { -- Necessary functions that other objects may collide with this
+        hasComponent = function() return false end
+    }
 
     -- Libs
     class = require "lib.middleclass"

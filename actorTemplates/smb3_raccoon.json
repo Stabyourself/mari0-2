@@ -107,8 +107,6 @@
         "misc.crosshair": {},
         "misc.portalGun": {},
         "misc.stomps": {},
-        "misc.stompable": {
-            "loadActorTemplate": "goomba"
-        }
+        "misc.stompable": {}
     }
 }

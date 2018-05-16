@@ -43,7 +43,7 @@ function Editor:initialize(level)
 end
 
 function Editor:load()
-    self.tileMap = self.level.tileMaps["smb3-grass"]
+    self.tileMap = self.level.tileMaps["smb3-overworld"] or self.level.tileMaps["smb3-grass"]
     
     self.tools = {}
     
@@ -68,8 +68,8 @@ function Editor:load()
     
     self.menuBar:addChild(self.fileDropdown)
     
-    self.fileDropdown.box:addChild(Gui3.Button:new(0, 0, "save", false, 1, function(button) self:saveMap() end))
-    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("test.json") end))
+    self.fileDropdown.box:addChild(Gui3.Button:new(0, 0, "save", false, 1, function(button) self:saveLevel() end))
+    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("smb3test.json") end))
     
     self.fileDropdown:autoSize()
     
@@ -166,7 +166,7 @@ function Editor:load()
 
     self.pastePos = {1, 1}
 
-    self.activeLayer = self.level.layers[2]
+    self.activeLayer = self.level.layers[1]
     
     self:toggleGrid(false)
     self:toggleFreeCam(false)
@@ -479,10 +479,10 @@ function Editor:cmdpressed(cmd)
         end
         
     elseif cmd["editor.save"] then
-        self:saveMap()
+        self:saveLevel()
         
     elseif cmd["editor.load"] then
-        self:loadLevel("test.json")
+        self:loadLevel("smb3test.json")
         
     elseif cmd["editor.select.clear"] then
         if self.selection then
@@ -600,10 +600,10 @@ function Editor:resize(w, h)
     self.scaleBar.x = x
 end
 
-function Editor:saveMap()
+function Editor:saveLevel()
     self.fileDropdown:toggle(false)
     
-    self.level:saveMap("test.json")
+    self.level:saveLevel("smb3test.json")
 end
 
 function Editor:loadLevel(path)
@@ -611,6 +611,8 @@ function Editor:loadLevel(path)
     
     local data = JSON:decode(love.filesystem.read(path))
     self.level:loadLevel(data)
+
+    self.activeLayer = self.level.layers[1]
 end
 
 function Editor:clearSelection()
@@ -680,4 +682,9 @@ function Editor:unFloatSelection()
         self.selection = self.floatingSelection:getSelection()
         self.floatingSelection = nil
     end
+end
+
+function Editor:drawSizeHelp(w, h)
+    local x, y = self.level:mouseToWorld()
+    love.graphics.print(string.format("%s,%s", w, h), x+4, y+12)
 end

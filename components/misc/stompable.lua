@@ -8,12 +8,10 @@ function stompable:initialize(actor, args)
 end
 
 function stompable:setup()
-    self.actor.stompAble = true
-    self.actor.stompAbleLevel = self.args.level or 1
+    self.stompAbleLevel = self.args.level or 1
 end
 
 function stompable:getStomped()
-    print(self.args.loadActorTemplate)
     if self.args.loadActorTemplate then
         self.actor:loadActorTemplate(actorTemplates[self.args.loadActorTemplate])
     end

@@ -51,12 +51,12 @@ function Wand:mousereleased(x, y, button)
             local tiles
             
             if cmdDown("editor.wand.global") then
-                local referenceTile = self.level:getTile(mx, my)
+                local referenceTile = self.editor.activeLayer:getTile(mx, my)
                 tiles = {}
                 
-                for y = 1, self.level.height do
-                    for x = 1, self.level.width do
-                        local tile = self.level:getTile(x, y)
+                for y = self.editor.activeLayer:getYStart(), self.editor.activeLayer:getYEnd() do
+                    for x = self.editor.activeLayer:getXStart(), self.editor.activeLayer:getXEnd() do
+                        local tile = self.editor.activeLayer:getTile(x, y)
                         
                         if tile == referenceTile then
                             table.insert(tiles, {x, y})

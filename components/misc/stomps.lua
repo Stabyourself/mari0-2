@@ -9,7 +9,7 @@ end
 
 function stomps:setup()
     -- todo: define a frame for "stomped"?
-    self.actor.stompsLevel = self.args.level or 1
+    self.stompsLevel = self.args.level or 1
 end
 
 function stomps:bottomCollision(dt, actorEvent, obj2)

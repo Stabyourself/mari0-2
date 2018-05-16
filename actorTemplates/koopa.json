@@ -24,7 +24,7 @@
         "movement.truffleShuffle": {},
         "misc.unrotate": {},
         "misc.stompable": {
-            "loadActorTemplate": "smb3_raccoon"
+            "loadActorTemplate": "koopa"
         }
     }
 }

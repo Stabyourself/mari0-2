@@ -17,12 +17,9 @@
             ]
         },
 
-        "animation.mirror": {
-        },
+        "animation.mirror": {},
         "movement.truffleShuffle": {},
         "misc.unrotate": {},
-        "misc.stompable": {
-            "loadActorTemplate": "koopa"
-        }
+        "misc.stompable": {}
     }
 }

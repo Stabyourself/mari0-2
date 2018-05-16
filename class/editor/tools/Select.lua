@@ -36,7 +36,10 @@ function Select:draw()
             love.graphics.rectangle("fill", x, y, w, h)
             love.graphics.setColor(1, 1, 1)
         end
-        -- love.graphics.rectangle("line", (lx-1)*self.level.tileSize, (ty-1)*self.level.tileSize, (rx-lx+1)*self.level.tileSize, (by-ty+1)*self.level.tileSize)
+        
+        if rx-lx+1 > 0 or by-ty+1 > 0 then
+            self.editor:drawSizeHelp(rx-lx+1, by-ty+1)
+        end
     end
 
     local addition = ""

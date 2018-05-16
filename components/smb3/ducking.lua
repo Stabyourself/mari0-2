@@ -21,6 +21,8 @@ function ducking:setup()
 end
 
 function ducking:update(dt)
+    local wasDucking = self.actor.ducking
+
     if self.actor.onGround then
         if cmdDown("down") and not cmdDown("left") and not cmdDown("right") and self.actor.state.name ~= "buttSlide" then
             if self.actor.surfaceAngle ~= 0 then -- check if buttslide
@@ -42,7 +44,16 @@ function ducking:update(dt)
             self.actor.ducking = false
         end
     end
-    
+
+    if wasDucking ~= self.actor.ducking then
+        if self.actor.ducking then
+            self.actor:changeSize(12, 12)
+            self.actor.centerY = 30
+        else
+            self.actor:changeSize(12, 24)
+            self.actor.centerY = 24
+        end
+    end
     
     if self.actor.state.name == "buttSlide" then
         local buttAcceleration = BUTTACCELERATION * (self.actor.surfaceAngle/(math.pi/8))

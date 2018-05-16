@@ -164,6 +164,8 @@ function World:draw()
             quadX = quadX + obj.centerX*2-obj.quadWidth
         end
 
+        love.graphics.stencil(function() end, "replace")
+
         -- Portal duplication
         local inPortals = {}
 
@@ -211,12 +213,11 @@ function World:draw()
         end
 
         -- Actual position
-        local first = true
-
+        love.graphics.stencil(function() end, "replace", 0, false)
         for _, p in ipairs(inPortals) do
-            love.graphics.stencil(function() p:stencilRectangle("in") end, "replace", 1, not first)
-
-            first = false
+            love.graphics.stencil(function()
+                p:stencilRectangle("in")
+            end, "replace", 1, true)
         end
 
         if VAR("debug").portalStencils then
@@ -336,8 +337,6 @@ function World:loadLevel(data)
 
         self.layers[i] = Layer:new(self, layerX, layerY, width, height, map)
     end
-
-    self.layers[2].movement = "sinethefuckout" -- removeme
 end
 
 function World:saveLevel(outPath)
@@ -349,7 +348,7 @@ function World:saveLevel(outPath)
     for _, layer in ipairs(self.layers) do
         for y = 1, layer.height do
             for x = 1, layer.width do
-                local tile = layer:getTile(x, y)
+                local tile = layer.map[x][y]
                 
                 if tile then
                     -- See if the tile is already in the table
@@ -390,23 +389,27 @@ function World:saveLevel(outPath)
     -- build map based on lookup
     out.layers = {}
     
-    for i, v in ipairs(self.layers) do
-        out.layers[i] = Layer:new()
+    for i, layer in ipairs(self.layers) do
+        out.layers[i] = {}
+        out.layers[i].map = {}
+        out.layers[i].x = layer.x
+        out.layers[i].y = layer.y
 
-        for x = 1, self.width do
-            out.layers[i][x] = {}
+        for x = 1, layer.width do
+            out.layers[i].map[x] = {}
             
-            for y = 1, self.height do
-                local tile = self:getTile(x, y)
+            for y = 1, layer.height do
+                local tile = layer.map[x][y]
+
                 if tile then
                     local tileMap = tile.tileMap.name
                     local tileNum = tile.num
                     
                     local found = false
                     
-                    out.layers[i][x][self.height-y+1] = tileMapLookUp[tileMap][tileNum]
+                    out.layers[i].map[x][layer.height-y+1] = tileMapLookUp[tileMap][tileNum]
                 else
-                    out.layers[i][x][self.height-y+1] = 0
+                    out.layers[i].map[x][layer.height-y+1] = 0
                 end
             end
         end
@@ -785,7 +788,7 @@ function World:getCoordinateRectangle(x, y, w, h, clamp) -- todo: add layer para
     
     if clamp then
         if lx > self:getXEnd() or rx < 1 or ty > self:getYEnd() or by < 1 then -- selection is completely outside layer
-            return {}
+            return 0, -1, 0, -1
         end
         
         lx = math.max(lx, 1)

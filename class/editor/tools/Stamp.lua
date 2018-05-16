@@ -4,7 +4,7 @@ function Stamp:initialize(editor)
     self.editor = editor
     self.level = self.editor.level
 
-    self.stampMap = self.editor.tileMap.stampMaps[2]
+    self.stampMap = self.editor.tileMap.stampMaps[1]
     self.dragging = false
 end
 
@@ -56,7 +56,9 @@ function Stamp:draw()
                         quadStampMap[x][y]:draw((startX+x-2)*16, (startY+y-2)*16, true)
                     end
                 end
-                
+
+                love.graphics.setColor(1, 1, 1)
+                self.editor:drawSizeHelp(w, h)
             else
                 local tileX, tileY = self.level:coordinateToWorld(coordX-1, coordY-1)
                 self.stampMap.map[1][1]:draw(tileX, tileY, true)

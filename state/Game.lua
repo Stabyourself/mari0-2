@@ -2,14 +2,13 @@ Game = class("Game")
 
 function Game:load()
     gameState = "game"
+    
+    smb3ui = Smb3Ui:new()
+    self.uiVisible = true
 
     self.timeLeft = 400
     
     self.level = Level:new("levels/smb3test.json")
-    
-    smb3ui = Smb3Ui:new()
-    self.uiVisible = true
-    
     love.graphics.setBackgroundColor(self.level.backgroundColor)
 end
 
@@ -42,7 +41,7 @@ function Game:draw()
         smb3ui.time = math.floor(love.timer.getFPS())--math.ceil(self.timeLeft)
         smb3ui.pMeter = self.level.marios[1].pMeter
         smb3ui.score = 160291
-        smb3ui.lives = 4
+        smb3ui.lives = 10
         smb3ui.coins = 23
         smb3ui.world = 1
         smb3ui:draw()

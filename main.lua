@@ -64,7 +64,7 @@ function love.load()
     require "state.Game"
     require "state.Editor"
 
-    fontOutlined = love.graphics.newImageFont("img/font-outlined.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$.,:;!?_-<>=+*\\/'%∩↔→⇒◔×")
+    fontOutlined = love.graphics.newImageFont("img/font-outlined.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$.,:;!?_-<>=+*\\/'%∩⇔→⇒◔×")
     love.graphics.setFont(fontOutlined)
 
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")

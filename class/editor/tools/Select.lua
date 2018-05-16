@@ -54,7 +54,7 @@ function Select:draw()
             len = len + 1
         elseif  self.editor.selection and self.editor.selection:collision(mouseX, mouseY) or
                 self.editor.floatingSelection and self.editor.floatingSelection:collision(mouseX, mouseY) then
-            addition = "↔"
+            addition = "⇔"
             len = len + 1
         end
     end

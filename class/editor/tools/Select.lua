@@ -40,22 +40,27 @@ function Select:draw()
     end
 
     local addition = ""
+    local len = 0
     
     if not self.editor.floatingSelection or not self.editor.floatingSelection.dragging then
         if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
-            addition = "^"
+            addition = "∩"
+            len = len + 1
         elseif cmdDown("editor.select.add") then
             addition = "+"
+            len = len + 1
         elseif cmdDown("editor.select.subtract") then
             addition = "-"
+            len = len + 1
         elseif  self.editor.selection and self.editor.selection:collision(mouseX, mouseY) or
                 self.editor.floatingSelection and self.editor.floatingSelection:collision(mouseX, mouseY) then
-            addition = "~"
+            addition = "↔"
+            len = len + 1
         end
     end
     
     if addition ~= "" then
-        love.graphics.print(addition, worldX-#addition*8-1, worldY+2)
+        love.graphics.print(addition, worldX-len*8-1, worldY+2)
     end
 end
 

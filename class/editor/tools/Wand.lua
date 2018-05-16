@@ -10,22 +10,27 @@ end
 function Wand:draw()
     local mx, my = self.level:mouseToWorld()
     
+    local len = 0
     local addition = ""
     
     if cmdDown("editor.wand.global") then
         addition = addition .. "G"
+        len = len + 1
     end
     
     if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
-        addition = addition .. "^"
+        addition = addition .. "∩"
+        len = len + 1
     elseif cmdDown("editor.select.add") then
         addition = addition .. "+"
+        len = len + 1
     elseif cmdDown("editor.select.subtract") then
         addition = addition .. "-"
+        len = len + 1
     end
     
     if addition ~= "" then
-        love.graphics.print(addition, mx-#addition*8-1, my+2)
+        love.graphics.print(addition, mx-len*8-1, my+2)
     end
 end
 

@@ -1,5 +1,9 @@
 Actor = class("Actor", Physics3.PhysObj)
 
+function Actor:__tostring ()
+    return string.format("Actor (%s)", self.actorTemplate.name)
+end
+
 function Actor:initialize(world, x, y, actorTemplate)
     self.actorTemplate = actorTemplate
 

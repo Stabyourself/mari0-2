@@ -217,7 +217,11 @@ function PhysObj:resolveCollisions()
 		end
 	end
 
-	x, y, obj = self:bottomColCheck()
+	x = nil
+
+	if self.speed[2] >= 0 then
+		x, y, obj = self:bottomColCheck()
+	end
 
 	if x then
 		if self.onGround or y <= self.y + self.height then

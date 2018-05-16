@@ -64,7 +64,7 @@ function love.load()
     require "state.Game"
     require "state.Editor"
 
-    fontOutlined = love.graphics.newImageFont("img/font-outlined.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$.,:;!?_-<>=+*\\/'%^~")
+    fontOutlined = love.graphics.newImageFont("img/font-outlined.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$.,:;!?_-<>=+*\\/'%∩↔→⇒◔×")
     love.graphics.setFont(fontOutlined)
 
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")
@@ -83,7 +83,7 @@ function love.load()
     game = Game:new()
 
     gameStateManager:loadState(game)
-    -- gameStateManager:addState(Editor:new(game.level))
+    gameStateManager:addState(Editor:new(game.level))
 end
 
 function love.update(dt)
@@ -298,24 +298,6 @@ function playSound(sound)
     sound:stop()
     sound:play()
 end
-
--- function love.graphics.print(s, x, y, align)
---     local len = string.len(tostring(s))
-    
---     if align == "center" then
---         x = x - len*4
---     elseif align == "right" then
---         x = x - len*8
---     end
-    
--- 	for i = 1, len do
--- 		local quad = fontQuad[string.sub(s, i, i)]
-        
--- 		if quad then
--- 			love.graphics.draw(fontImg, quad, (x+(i-1)*8), y, 0, 1, 1)
--- 		end
--- 	end
--- end
 
 function worldArrow(x, y, xDir, yDir)
     local scale = math.sqrt(xDir^2+yDir^2)/8

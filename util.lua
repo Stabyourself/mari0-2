@@ -67,10 +67,6 @@ function string:split(delimiter) -- Credits to https://stackoverflow.com/a/50320
 	return result
 end
 
-function padZeroes(s, num)
-    return string.format("%0" .. num .. "d", s)
-end
-
 function inTable(t, needle)
 	for i, v in pairs(t) do
 		if v == needle then

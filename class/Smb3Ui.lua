@@ -1,5 +1,10 @@
 Smb3Ui = class("Smb3Ui")
 
+local pMeterQuad = {
+    love.graphics.newQuad(0, 0, 16, 8, 32, 8),
+    love.graphics.newQuad(16, 0, 16, 8, 32, 8),
+}
+
 function Smb3Ui:initialize()
     self.pMeter = 0
     
@@ -28,20 +33,40 @@ function Smb3Ui:initialize()
     end
     
     self.element = {}
-    self.element.world = Gui3.Text:new("", 1, 2)
+
+
+    self.element.worldImg = Gui3.Image:new("img/ui/world.png", 1, 2)
+    self.element.world = Gui3.Text:new("", 33, 2)
+
     self.element.pMeter = Gui3.Text:new("", 49, 2)
+    self.element.pMeterImg = Gui3.Image:new("img/ui/p_is_for_power.png", 97, 2, pMeterQuad[1])
+
     self.element.coins = Gui3.Text:new("", 121, 2)
-    self.element.lives = Gui3.Text:new("", 1, 10)
+
+    self.element.livesImg = Gui3.Image:new("img/ui/mario.png", 1, 10)
+    self.element.lives = Gui3.Text:new("", 17, 10)
+
     self.element.score = Gui3.Text:new("", 49, 10)
+
     self.element.time = Gui3.Text:new("", 113, 10)
     
+
+    self.uiBox:addChild(self.element.worldImg)
     self.uiBox:addChild(self.element.world)
+
     self.uiBox:addChild(self.element.pMeter)
+    self.uiBox:addChild(self.element.pMeterImg)
+
     self.uiBox:addChild(self.element.coins)
+
+    self.uiBox:addChild(self.element.livesImg)
     self.uiBox:addChild(self.element.lives)
+
     self.uiBox:addChild(self.element.score)
+
     self.uiBox:addChild(self.element.time)
     
+
     self:resize()
 end
 
@@ -67,6 +92,7 @@ function Smb3Ui:update(dt)
     prof.push("concats")
     self.element.world:setString(self:getWorldText())
     self.element.pMeter:setString(self:getPMeterText())
+    self.element.pMeterImg.quad = pMeterQuad[self:getPMeterStatus()]
     self.element.coins:setString(self:getCoinsText())
     self.element.lives:setString(self:getLivesText())
     self.element.score:setString(self:getScoreText())
@@ -83,58 +109,32 @@ function Smb3Ui:draw()
 end
 
 function Smb3Ui:getWorldText()
-    return "1234" .. self.world
+    return string.format("%s", self.world)
 end
 
 function Smb3Ui:getPMeterText()
-    local s = ""
-    
-    for i = 1, math.min(VAR("pMeterTicks")-1, self.pMeter) do
-        s = s .. "A"
-    end
-    
-    for i = 1, VAR("pMeterTicks")-1-self.pMeter do
-        s = s .. "B"
-    end
-    
-    if self.pMeter == VAR("pMeterTicks") and self.pMeterBlinkTimer >= VAR("pMeterBlinkTime") then
-        s = s .. "CD"
-    else
-        s = s .. "EF"
-    end
-    
-    return s
+    return string.format("%s%s",
+        string.rep("⇒", math.min(VAR("pMeterTicks")-1, self.pMeter)), -- "on" ticks
+        string.rep("→", VAR("pMeterTicks")-1-self.pMeter) -- "off" ticks
+)
+end
+
+function Smb3Ui:getPMeterStatus()
+    return (self.pMeter == VAR("pMeterTicks") and self.pMeterBlinkTimer >= VAR("pMeterBlinkTime")) and 2 or 1
 end
 
 function Smb3Ui:getCoinsText()
-    local s = "$"
-    
-    if self.coins < 10 then
-        s = s .. " " .. self.coins
-    else
-        s = s .. self.coins
-    end
-    
-    return s
+    return string.format("$%2d", self.coins)
 end
 
 function Smb3Ui:getLivesText()
-    local s = ""
-    s = "MNX"
-    
-    if self.lives < 10 then
-        s = s .. " " .. self.lives
-    else
-        s = s .. self.lives
-    end
-    
-    return s
+    return string.format("×%2d", self.lives)
 end
 
 function Smb3Ui:getScoreText()
-    return padZeroes(self.score, 7), x, y
+    return string.format("%07d", self.score)
 end
 
 function Smb3Ui:getTimeText()
-    return "T" .. padZeroes(self.time, 3)
+    return string.format("◔%03d", self.time)
 end

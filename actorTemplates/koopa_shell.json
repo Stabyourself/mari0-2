@@ -2,11 +2,11 @@
     "width": 12,
     "height": 12,
 
-    "img": "img/actors/koopa.png",
+    "img": "img/actors/koopa_shell.png",
     "quadWidth": 16,
-    "quadHeight": 32,
+    "quadHeight": 16,
     "centerX": 8,
-    "centerY": 25,
+    "centerY": 9,
 
     "components": {
         "misc.palettable": {
@@ -18,13 +18,15 @@
         },
 
         "animation.frames": {
-            "frames": [1, 2]
+            "frames": [1, 2, 3, 4],
+            "times": [0.03333333]
         },
 
-        "movement.truffleShuffle": {},
+        "movement.truffleShuffle": {
+            "maxSpeed": 150,
+            "startMax": true
+        },
         "misc.unrotate": {},
-        "misc.stompable": {
-            "loadActorTemplate": "koopa_shell"
-        }
+        "misc.stompable": {}
     }
 }

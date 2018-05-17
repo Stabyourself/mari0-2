@@ -11,8 +11,8 @@ end
 
 function frames:setup()
     self.frame = 1
-    self.frameLookup = self.args["frames"]
-    self.frameTimes = self.args["times"] or FRAMETIMES
+    self.frameLookup = self.args.frames
+    self.frameTimes = self.args.times or FRAMETIMES
     self.frameTimer = 0
 
     self.actor.quad = self.actor.quads[self.frameLookup[1]]

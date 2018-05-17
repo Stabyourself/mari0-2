@@ -11,13 +11,17 @@ function truffleShuffle:initialize(actor, args)
 end
 
 function truffleShuffle:setup()
-    self.shuffleDir = -1
-
-    self.maxSpeed = self.args["maxSpeed"] or MAXSPEED
-    self.acceleration = self.args["acceleration"] or ACCELERATION
-    
     if self.actor.speed[1] == 0 then
-        self.actor.speed[1] = self.shuffleDir*MAXSPEED
+        self.shuffleDir = -1
+    else
+        self.shuffleDir = math.sign(self.actor.speed[1])
+    end
+
+    self.maxSpeed = self.args.maxSpeed or MAXSPEED
+    self.acceleration = self.args.acceleration or ACCELERATION
+    
+    if self.actor.speed[1] == 0 or self.args.startMax then
+        self.actor.speed[1] = self.shuffleDir*self.maxSpeed
     end
 
     self.actor.animationDirection = math.sign(self.actor.speed[1])

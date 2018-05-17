@@ -96,7 +96,7 @@ function love.update(dt)
     prof.enabled(true)
     prof.push("frame")
     prof.push("update")
-    dt = math.min(1/30, dt)
+    dt = math.min(1/30, dt) -- Min 30 FPS
 
     dt = FrameDebug3.update(dt)
 

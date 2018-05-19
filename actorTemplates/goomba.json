@@ -18,7 +18,9 @@
         },
 
         "animation.mirror": {},
-        "movement.truffleShuffle": {},
+        "movement.truffleShuffle": {
+            "dontTurnAnimation": true
+        },
         "misc.unrotate": {},
         "misc.stompable": {}
     }

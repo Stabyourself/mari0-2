@@ -126,9 +126,12 @@ function PhysObj:leftColCheck()
 	return colX, colY, colObj
 end
 
-function PhysObj:leftColResolve(x, y, obj)
+function PhysObj:leftColResolve(obj, x, y)
 	if not self:leftCollision(obj) then
-		self.x = x+1
+		if x then
+			self.x = x+1
+		end
+
 		self.speed[1] = math.max(self.speed[1], 0)
 	end
 end
@@ -147,9 +150,12 @@ function PhysObj:rightColCheck()
 	return colX, colY, colObj
 end
 
-function PhysObj:rightColResolve(x, y, obj)
+function PhysObj:rightColResolve(obj, x, y)
 	if not self:rightCollision(obj) then
-		self.x = x-self.width
+		if x then
+			self.x = x-self.width
+		end
+
 		self.speed[1] = math.min(self.speed[1], 0)
 	end
 end
@@ -168,9 +174,12 @@ function PhysObj:topColCheck()
 	return colX, colY, colObj
 end
 
-function PhysObj:topColResolve(x, y, obj)
+function PhysObj:topColResolve(obj, x, y)
 	if not self:topCollision(obj) then
-		self.y = y+1
+		if y then
+			self.y = y+1
+		end
+
 		self.speed[2] = math.max(self.speed[2], 0)
 	end
 end
@@ -189,13 +198,16 @@ function PhysObj:bottomColCheck()
 	return colX, colY, colObj
 end
 
-function PhysObj:bottomColResolve(x, y, obj)
+function PhysObj:bottomColResolve(obj, x, y)
 	if not self:bottomCollision(obj) then
 		if not self.onGround then
 			self.onGround = true
 		end
 		
-		self.y = y-self.height
+		if y then
+			self.y = y-self.height
+		end
+
 		self.speed[2] = math.min(self.speed[2], 0)
 
 		return true
@@ -226,12 +238,14 @@ function PhysObj:resolveCollisions()
 	end
 
 	if x then -- resolve the left collision
-		self:leftColResolve(x, y, obj)
+		self:leftColResolve(obj, x, y)
+		obj:rightColResolve(self)
 	elseif self.speed[1] >= 0 then -- see if we got a right collision
 		x, y, obj = self:rightColCheck()
 
 		if x then -- resolve the right collision
-			self:rightColResolve(x, y, obj)
+			self:rightColResolve(obj, x, y)
+			obj:leftColResolve(self)
 		end
 	end
 
@@ -243,13 +257,14 @@ function PhysObj:resolveCollisions()
 
 	if x then
 		if self.onGround or y <= self.y + self.height then
-			if self:bottomColResolve(x, y, obj) then
+			if self:bottomColResolve(obj, x, y) then
 				self.standingOn = obj
 
 				if obj.class:isSubclassOf(PhysObj) then
 					obj:getStoodOn(self)
 				end
 			end
+			obj:topColResolve(self)
 	
 			if type(obj) == "table" and obj:isInstanceOf(Physics3.Tile) then -- update the object's surfaceAngle
 				self.surfaceAngle = obj.angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
@@ -266,7 +281,8 @@ function PhysObj:resolveCollisions()
 		x, y, obj = self:topColCheck()
 
 		if x then -- resolve the right collision
-			self:topColResolve(x, y, obj)
+			self:topColResolve(obj, x, y)
+			obj:bottomColResolve(self)
 		end
 	end
 end

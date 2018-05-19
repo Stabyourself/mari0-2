@@ -13,7 +13,7 @@ function stomps:setup()
 end
 
 function stomps:bottomCollision(dt, actorEvent, obj2)
-    if obj2.hasComponent and obj2:hasComponent("misc.stompable") then
+    if obj2:hasComponent("misc.stompable") then
         self.actor.y = obj2.y-self.actor.height
         self.actor.speed[2] = -getRequiredSpeed(VAR("enemyBounceHeight"))
         

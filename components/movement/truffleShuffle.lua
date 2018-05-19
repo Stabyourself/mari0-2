@@ -6,6 +6,11 @@ local ACCELERATION = 200
 function truffleShuffle:initialize(actor, args)
     self.actor = actor
     self.args = args
+    self.canStop = args.canStop or false
+    self.dontTurnAnimation = args.dontTurnAnimation or false
+    self.maxSpeed = args.maxSpeed or MAXSPEED
+
+    self.kickSpeed = self.maxSpeed
 
     self:setup()
 end
@@ -17,14 +22,15 @@ function truffleShuffle:setup()
         self.shuffleDir = math.sign(self.actor.speed[1])
     end
 
-    self.maxSpeed = self.args.maxSpeed or MAXSPEED
     self.acceleration = self.args.acceleration or ACCELERATION
     
-    if self.actor.speed[1] == 0 or self.args.startMax then
-        self.actor.speed[1] = self.shuffleDir*self.maxSpeed
+    if not self.args.startZero then
+       self.actor.speed[1] = self.shuffleDir*self.maxSpeed
     end
 
-    self.actor.animationDirection = math.sign(self.actor.speed[1])
+    if not self.dontTurnAnimation then
+        self.actor.animationDirection = self.shuffleDir
+    end
 end
 
 function truffleShuffle:update(dt)
@@ -35,16 +41,35 @@ function truffleShuffle:update(dt)
         self.shuffleDir = -1
     end
 
-    self.actor:accelerateTo(dt, self.shuffleDir*self.maxSpeed, self.maxSpeed)
-    self.actor.animationDirection = math.sign(self.actor.speed[1])
+    if self.actor.speed[1] ~= 0 or not self.canStop then
+        self.actor:accelerateTo(dt, self.shuffleDir*self.maxSpeed, self.maxSpeed)
+
+        if not self.dontTurnAnimation then
+            self.actor.animationDirection = math.sign(self.actor.speed[1])
+        end
+    end
 end
 
 function truffleShuffle:leftCollision()
-    self.actor.speed[1] = -self.actor.speed[1]
+    if self.actor.speed[1] < 0 then
+        self.actor.speed[1] = -self.actor.speed[1]
+    end
 end
 
 function truffleShuffle:rightCollision()
-    self.actor.speed[1] = -self.actor.speed[1]
+    if self.actor.speed[1] > 0 then
+        self.actor.speed[1] = -self.actor.speed[1]
+    end
+end
+
+function truffleShuffle:kicked(dt, actorEvent, dir)
+    print("I was kicked")
+    self.actor.speed[1] = self.kickSpeed*dir
+end
+
+function truffleShuffle:unkicked()
+    print("I was unkicked")
+    self.actor.speed[1] = 0
 end
 
 return truffleShuffle

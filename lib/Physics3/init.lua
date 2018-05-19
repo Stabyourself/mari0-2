@@ -2,6 +2,14 @@
 
 local Physics3 = {}
 
+Physics3collisionMixin = {
+    leftColResolve = function() end,
+    rightColResolve = function() end,
+    topColResolve = function() end,
+    bottomColResolve = function() end,
+    hasComponent = function() end
+}
+
 Physics3.TRACER_BOTTOM_SPACING = 1--8 -- How far apart the downwards tracers are
 Physics3.TRACER_BOTTOM_EXTEND = 8 -- How far down below the hitbox the downtracers go, for smoothly walking down slopes
 Physics3.TRACER_BOTTOM_DIST = 8 -- How far away the side tracers are from the bottom

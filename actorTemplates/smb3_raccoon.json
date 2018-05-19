@@ -107,6 +107,7 @@
         "misc.crosshair": {},
         "misc.portalGun": {},
         "misc.stomps": {},
-        "misc.stompable": {}
+        "misc.kicks": {},
+        "misc.isHurtByContact": {}
     }
 }

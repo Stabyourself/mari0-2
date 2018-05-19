@@ -23,18 +23,20 @@ local function getDelay(frameTimes, frame)
 end
 
 function frames:update(dt)
-    self.frameTimer = self.frameTimer + dt
+    if not self.args.dontAnimateWhenStill or self.actor.speed[1] ~= 0 then
+        self.frameTimer = self.frameTimer + dt
 
-    while self.frameTimer > getDelay(self.frameTimes, self.frame) do
-        self.frameTimer = self.frameTimer - getDelay(self.frameTimes, self.frame)
-        
-        self.frame = self.frame + 1
+        while self.frameTimer > getDelay(self.frameTimes, self.frame) do
+            self.frameTimer = self.frameTimer - getDelay(self.frameTimes, self.frame)
+            
+            self.frame = self.frame + 1
 
-        if self.frame > #self.frameLookup then
-            self.frame = 1
+            if self.frame > #self.frameLookup then
+                self.frame = 1
+            end
+
+            self.actor.quad = self.actor.quads[self.frameLookup[self.frame]]
         end
-
-        self.actor.quad = self.actor.quads[self.frameLookup[self.frame]]
     end
 end
 

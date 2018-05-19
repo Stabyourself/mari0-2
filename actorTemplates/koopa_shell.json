@@ -19,14 +19,21 @@
 
         "animation.frames": {
             "frames": [1, 2, 3, 4],
-            "times": [0.03333333]
+            "times": [0.03333333],
+            "dontAnimateWhenStill": true
         },
 
         "movement.truffleShuffle": {
             "maxSpeed": 150,
-            "startMax": true
+            "startZero": true,
+            "canStop": true
         },
         "misc.unrotate": {},
-        "misc.stompable": {}
+        "misc.kickable": {},
+        "misc.hurtsByContact": {
+            "left": true,
+            "right": true,
+            "onlyWhenMoving": true
+        }
     }
 }

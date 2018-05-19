@@ -11,8 +11,6 @@ function Actor:initialize(world, x, y, actorTemplate)
     local height = self.actorTemplate.height
     
     Physics3.PhysObj.initialize(self, world, x-width/2, y-height, width, height)
-
-    self:loadActorTemplate(self.actorTemplate)
     
     self.actorEvent = {}
 
@@ -21,6 +19,10 @@ function Actor:initialize(world, x, y, actorTemplate)
         hitBox = VAR("debug").actorHitBox,
         components = VAR("debug").actorComponents,
     }
+
+    self.animationDirection = -1
+
+    self:loadActorTemplate(self.actorTemplate)
 end
 
 function Actor:event(eventName, dt, ...)
@@ -123,7 +125,7 @@ function Actor:loadActorTemplate(actorTemplate)
     end
 end
 
-function Actor:ceilCollision(obj2)
+function Actor:topCollision(obj2)
 
     -- this part goes into "bumps blocks" or something
 
@@ -150,7 +152,7 @@ function Actor:ceilCollision(obj2)
     -- self.speed[2] = VAR("blockHitForce")
     
     -- game.level:bumpBlock(x, y)
-    self:event("ceilCollision", 0, obj2)
+    self:event("topCollision", 0, obj2)
 end
 
 function Actor:bottomCollision(obj2)

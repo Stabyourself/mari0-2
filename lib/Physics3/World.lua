@@ -501,7 +501,7 @@ function World:checkCollision(x, y, obj)
 
     for _, obj2 in ipairs(self.objects) do
         if obj ~= obj2 then
-            if pointInRectangle(x, y, obj2.x, obj2.y, obj2.width, obj2.height) then
+            if obj2:checkCollision(x, y) then
                 return obj2
             end
         end

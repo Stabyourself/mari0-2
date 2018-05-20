@@ -8,25 +8,27 @@ local playing = true
 local advanceFrame = false
 
 function FrameDebug3.update(dt)
-    if not playing then
-        if advanceFrame then
-            advanceFrame = false
+    local mul = 1
 
-            return advanceDT
-        else
-            return false
-        end
-    end
-    
 	if VAR("ffKeys") then
         for _, ffKey in ipairs(VAR("ffKeys")) do
 			if love.keyboard.isDown(ffKey.key) then
-				dt = dt * ffKey.val
+				mul = mul * ffKey.val
 			end
 		end
     end
 
-    return dt
+    if not playing then
+        if advanceFrame then
+            advanceFrame = false
+
+            return advanceDT*mul
+        else
+            return false
+        end
+    end
+
+    return dt*mul
 end
 
 function FrameDebug3.pausePlay()

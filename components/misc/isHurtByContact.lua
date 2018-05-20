@@ -16,8 +16,7 @@ end
 function isHurtByContact:resolve(dir, obj2)
     local hurtsByContactComponent = obj2:hasComponent("misc.hurtsByContact")
     if hurtsByContactComponent and hurtsByContactComponent[dir] then
-        
-        if not hurtsByContactComponent.onlyWhenMoving or obj2.speed[1] ~= 0 then
+        if not hurtsByContactComponent.onlyWhenMoving or obj2.cache.speed[1] ~= 0 then
             print("This fucking 'kicks' component runs before this so I'm not even aware that the shell wasn't moving woooh")
         end
     end

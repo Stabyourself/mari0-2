@@ -32,10 +32,8 @@ function jumping:update(dt, actorEvent)
 end
 
 function jumping:jump(dt, actorEvent)
-    if self.actor.onGround then
-        actorEvent:bind("after", function(actor)
-            actor.onGround = false
-        end)
+    if self.actor.cache.onGround then
+        self.actor.onGround = false
 
         self.actor.jumping = true
         

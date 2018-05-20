@@ -22,6 +22,15 @@ function Actor:initialize(world, x, y, actorTemplate)
 
     self.animationDirection = -1
 
+    self.caching = {
+        "x",
+        "y",
+        "onGround",
+        "speed"
+    }
+
+    self.cache = {speed={}}
+
     self:loadActorTemplate(self.actorTemplate)
 end
 
@@ -46,6 +55,17 @@ end
 function Actor:update(dt)
     if self.state then
         self.state:update(dt, self)
+    end
+
+    -- Cache certain fields so that we don't get weird race conditions between components
+    for _, field in ipairs(self.caching) do
+        if type(self[field]) == "table" then
+            for i, v in ipairs(self[field]) do
+                self.cache[field][i] = v
+            end
+        else
+            self.cache[field] = self[field]
+        end
     end
 
     self:event("update", dt)

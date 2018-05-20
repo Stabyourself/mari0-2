@@ -126,16 +126,6 @@ function PhysObj:leftColCheck()
 	return colX, colY, colObj
 end
 
-function PhysObj:leftColResolve(obj, x, y)
-	if not self:leftCollision(obj) then
-		if x then
-			self.x = x+1
-		end
-
-		self.speed[1] = math.max(self.speed[1], 0)
-	end
-end
-
 function PhysObj:rightColCheck()
 	local colX, colY
 
@@ -148,16 +138,6 @@ function PhysObj:rightColCheck()
 	end
 	
 	return colX, colY, colObj
-end
-
-function PhysObj:rightColResolve(obj, x, y)
-	if not self:rightCollision(obj) then
-		if x then
-			self.x = x-self.width
-		end
-
-		self.speed[1] = math.min(self.speed[1], 0)
-	end
 end
 
 function PhysObj:topColCheck()
@@ -174,16 +154,6 @@ function PhysObj:topColCheck()
 	return colX, colY, colObj
 end
 
-function PhysObj:topColResolve(obj, x, y)
-	if not self:topCollision(obj) then
-		if y then
-			self.y = y+1
-		end
-
-		self.speed[2] = math.max(self.speed[2], 0)
-	end
-end
-
 function PhysObj:bottomColCheck()
 	local colX, colY
 	
@@ -196,6 +166,44 @@ function PhysObj:bottomColCheck()
 	end
 	
 	return colX, colY, colObj
+end
+
+function PhysObj:leftColResolve(obj, x, y)
+	if not self:leftCollision(obj) then
+		if x then
+			if obj.class:isSubclassOf(PhysObj) then
+				self.x = obj.x+obj.width
+			else
+				self.x = x+1
+			end
+		end
+
+		self.speed[1] = math.max(self.speed[1], 0)
+	end
+end
+
+function PhysObj:rightColResolve(obj, x, y)
+	if not self:rightCollision(obj) then
+		if x then
+			if obj.class:isSubclassOf(PhysObj) then
+				self.x = obj.x-self.width
+			else
+				self.x = x-self.width
+			end
+		end
+
+		self.speed[1] = math.min(self.speed[1], 0)
+	end
+end
+
+function PhysObj:topColResolve(obj, x, y)
+	if not self:topCollision(obj) then
+		if y then
+			self.y = y+1
+		end
+
+		self.speed[2] = math.max(self.speed[2], 0)
+	end
 end
 
 function PhysObj:bottomColResolve(obj, x, y)
@@ -294,10 +302,16 @@ end
 
 function PhysObj:postMovement()
 	if self.standingOn and self.standingOn.class:isSubclassOf(PhysObj) then
-		local mx, my = recursivelyGetFrameMovement(self)
+		local mx, my = recursivelyGetFrameMovement(self.standingOn)
 
 		self.x = self.x + mx
 		self.y = self.y + my
+	end
+end    
+
+function PhysObj:checkCollision(x, y)
+	if pointInRectangle(x, y, self.x, self.y, self.width, self.height) then
+		return true
 	end
 end
 

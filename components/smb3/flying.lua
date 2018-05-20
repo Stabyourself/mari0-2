@@ -36,7 +36,7 @@ function flying:setup()
 end
 
 function flying:jump()
-    if not self.actor.onGround and self.actor.flying then
+    if not self.actor.cache.onGround and self.actor.flying then
         self.actor:switchState("fly")
         self.actor.flyAnimationFrame = 1
     end

@@ -5,14 +5,14 @@ function kicks:initialize(actor, args)
 end
 
 function kicks:leftCollision(dt, actorEvent, obj2)
-    if obj2:hasComponent("misc.kickable") and obj2.speed[1] == 0 then
+    if obj2:hasComponent("misc.kickable") and obj2.cache.speed[1] == 0 then
         obj2:event("kicked", 0, -1)
         actorEvent.returns = true
     end
 end
 
 function kicks:rightCollision(dt, actorEvent, obj2)
-    if obj2:hasComponent("misc.kickable") and obj2.speed[1] == 0 then
+    if obj2:hasComponent("misc.kickable") and obj2.cache.speed[1] == 0 then
         obj2:event("kicked", 0, 1)
         actorEvent.returns = true
     end
@@ -20,7 +20,7 @@ end
 
 function kicks:bottomCollision(dt, actorEvent, obj2)
     if obj2:hasComponent("misc.kickable") then
-        if obj2.speed[1] == 0 then -- kick it
+        if obj2.cache.speed[1] == 0 then -- kick it
             local selfX = self.actor.x + self.actor.width*.5
             local obj2X = obj2.x + obj2.width*.5
 

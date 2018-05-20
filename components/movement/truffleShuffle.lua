@@ -6,9 +6,12 @@ local ACCELERATION = 200
 function truffleShuffle:initialize(actor, args)
     self.actor = actor
     self.args = args
+
     self.canStop = args.canStop or false
     self.dontTurnAnimation = args.dontTurnAnimation or false
     self.maxSpeed = args.maxSpeed or MAXSPEED
+    self.acceleration = args.acceleration or ACCELERATION
+    self.startZero = args.startZero or false
 
     self.kickSpeed = self.maxSpeed
 
@@ -21,12 +24,11 @@ function truffleShuffle:setup()
     else
         self.shuffleDir = math.sign(self.actor.speed[1])
     end
-
-    self.acceleration = self.args.acceleration or ACCELERATION
     
-    if not self.args.startZero then
+    if not self.startZero then
        self.actor.speed[1] = self.shuffleDir*self.maxSpeed
     end
+
 
     if not self.dontTurnAnimation then
         self.actor.animationDirection = self.shuffleDir
@@ -42,7 +44,7 @@ function truffleShuffle:update(dt)
     end
 
     if self.actor.speed[1] ~= 0 or not self.canStop then
-        self.actor:accelerateTo(dt, self.shuffleDir*self.maxSpeed, self.maxSpeed)
+        self.actor:accelerateTo(dt, self.shuffleDir*self.maxSpeed, self.acceleration)
 
         if not self.dontTurnAnimation then
             self.actor.animationDirection = math.sign(self.actor.speed[1])
@@ -51,24 +53,22 @@ function truffleShuffle:update(dt)
 end
 
 function truffleShuffle:leftCollision()
-    if self.actor.speed[1] < 0 then
-        self.actor.speed[1] = -self.actor.speed[1]
+    if self.actor.cache.speed[1] < 0 then
+        self.actor.speed[1] = -self.actor.cache.speed[1]
     end
 end
 
 function truffleShuffle:rightCollision()
-    if self.actor.speed[1] > 0 then
-        self.actor.speed[1] = -self.actor.speed[1]
+    if self.actor.cache.speed[1] > 0 then
+        self.actor.speed[1] = -self.actor.cache.speed[1]
     end
 end
 
 function truffleShuffle:kicked(dt, actorEvent, dir)
-    print("I was kicked")
     self.actor.speed[1] = self.kickSpeed*dir
 end
 
 function truffleShuffle:unkicked()
-    print("I was unkicked")
     self.actor.speed[1] = 0
 end
 

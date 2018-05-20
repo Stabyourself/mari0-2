@@ -434,4 +434,3 @@ end
 function pointInRectangle(x, y, rx, ry, rw, rh)
     return x >= rx and y >= ry and x < rx+rw and y < ry+rh
 end
-

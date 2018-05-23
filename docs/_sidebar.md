@@ -1,0 +1,8 @@
+* [Home](/)
+* [Level Format](/components.md)
+* [Triggers](/components.md)
+* [Components](/components.md)
+  * [Movement](/components/movement.md)
+    * [truffleShuffle](/components/movement/truffleShuffle.md)
+  * [Misc](/components/misc.md)
+    * [palettable](/components/misc/palettable)

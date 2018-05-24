@@ -55,12 +55,14 @@ end
 function truffleShuffle:leftCollision()
     if self.actor.cache.speed[1] < 0 then
         self.actor.speed[1] = -self.actor.cache.speed[1]
+        self.shuffleDir = 1
     end
 end
 
 function truffleShuffle:rightCollision()
     if self.actor.cache.speed[1] > 0 then
         self.actor.speed[1] = -self.actor.cache.speed[1]
+        self.shuffleDir = -1
     end
 end
 

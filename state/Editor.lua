@@ -7,7 +7,7 @@ for _, toolName in ipairs(Editor.toolbarOrder) do
     table.insert(Editor.toolbarImg, love.graphics.newImage("img/editor/" .. toolName .. ".png"))
 end
 
-local checkerboardImg = love.graphics.newImage("img/editor/checkerboard.png")
+Editor.checkerboardImg = love.graphics.newImage("img/editor/checkerboard.png")
 
 Editor.toolClasses = {
     entity = require("class.editor.tools.Entity"),
@@ -38,13 +38,21 @@ Editor.selectQuad = {
 
 Gui3.boxCache[Editor.selectQuad] = Gui3.makeBoxCache(Editor.selectQuad)
 
+-- load windows
+Editor.windowClasses = {
+    tiles = require("class.editor.windows.TilesWindow"),
+    stamps = require("class.editor.windows.StampsWindow"),
+}
+
 function Editor:initialize(level)
     self.level = level
 end
 
 function Editor:load()
-    self.tileMap = self.level.tileMaps["smb3-overworld"] or self.level.tileMaps["smb3-grass"]
-    
+    -- The level must be loaded at this point!
+    self:setActiveLayer(1)
+    self:setActiveTileMap(1)
+
     self.tools = {}
     
     for toolName, toolClass in pairs(self.toolClasses) do
@@ -81,11 +89,11 @@ function Editor:load()
     
     self.menuBar:addChild(self.newWindowDropdown)
     
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 0, "tiles", false, 1, function(button) self:newWindow("tiles", button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 10, "stamps", false, 1, function(button) self:newWindow("stamps", button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 20, "minimap", false, 1, function(button) self:newWindow("minimap", button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 30, "map options", false, 1, function(button) self:newWindow("mapOptions", button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 40, "test", false, 1, function(button) self:newWindow("test", button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 0, "tiles", false, 1, function(button) self:newWindow(self.windowClasses.tiles, button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 10, "stamps", false, 1, function(button) self:newWindow(self.windowClasses.stamps, button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 20, "minimap", false, 1, function(button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 30, "map options", false, 1, function(button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 40, "test", false, 1, function(button) end))
     
     self.newWindowDropdown:autoSize()
     
@@ -107,22 +115,22 @@ function Editor:load()
     
     -- SCALE BAR
     local w = 50
-    local fullw = w+52
+    local fullw = w+63
     local x = CAMERAWIDTH-fullw
     self.scaleBar = Gui3.Canvas:new(x, 0, fullw, 14)
     self.menuBar:addChild(self.scaleBar)
     
-    self.scaleSlider = Gui3.Slider:new(self.scaleMin, self.scaleMax, 10, 3, w, false, function(val) self:changeScale(val) end)
+    self.scaleSlider = Gui3.Slider:new(self.scaleMin, self.scaleMax, 17, 3, w, false, function(val) self:changeScale(val) end)
     self.scaleSlider.color.bar = {0, 0, 0}
     
     self.scaleBar:addChild(self.scaleSlider)
     
     self:updateScaleSlider()
     
-    self.scaleBar:addChild(Gui3.Button:new(0, 2, "-", false, 1, function() self:zoom(-1) end))
-    self.scaleBar:addChild(Gui3.Button:new(w+10, 2, "+", false, 1, function() self:zoom(1) end))
+    self.scaleBar:addChild(Gui3.Button:new(0, 0, "-", false, 3, function() self:zoom(-1) end))
+    self.scaleBar:addChild(Gui3.Button:new(w+20, 0, "+", false, 3, function() self:zoom(1) end))
     
-    self.scaleBar:addChild(Gui3.Button:new(w+24, 2, "1:1", false, 1, function() self:resetZoom() end))
+    self.scaleBar:addChild(Gui3.Button:new(w+34, 0, "1:1", false, 3, function() self:resetZoom() end))
     
     
     
@@ -134,13 +142,13 @@ function Editor:load()
     
     self.toolButtons = {}
     
-    local y = 1
+    local y = 0
     for i, tool in ipairs(self.toolbarOrder) do
-        local button = Gui3.Button:new(1, y, self.toolbarImg[i], false, 1, function(button) self:selectTool(tool) end)
+        local button = Gui3.Button:new(0, y, self.toolbarImg[i], false, 2, function(button) self:selectTool(tool) end)
         
         self.toolButtons[tool] = button
         
-        button.color.img = {0, 0, 0}
+        button.children[1].color = {0, 0, 0, 1}
         self.toolbar:addChild(button)
         
         y = y + 14
@@ -159,17 +167,12 @@ function Editor:load()
     self.editorState = 1
     self:saveState()
     
-    self.mapBoundsQuads = {}
-    for i = 1, 4 do
-        self.mapBoundsQuads[i] = love.graphics.newQuad(0, 0, 8, 8, 8, 8)
-    end
+    self.mapBoundsQuad = love.graphics.newQuad(0, 0, 8, 8, 8, 8)
 
     self.pastePos = {1, 1}
-
-    self.activeLayer = self.level.layers[1]
     
     self:toggleGrid(false)
-    self:toggleFreeCam(false)
+    self:toggleFreeCam(true)
 end
 
 function Editor:update(dt)
@@ -240,9 +243,9 @@ function Editor:draw()
     end)
     love.graphics.setStencilTest("notequal", 1)
     
-    self.mapBoundsQuads[1]:setViewport(0, 0, xr-xl, yb-yt)
+    self.mapBoundsQuad:setViewport(0, 0, xr-xl, yb-yt)
     love.graphics.setColor(0, 0, 0, 0.1)
-    love.graphics.draw(debugCandyImg, self.mapBoundsQuads[1], xl, yt)
+    love.graphics.draw(debugCandyImg, self.mapBoundsQuad, xl, yt)
     love.graphics.setColor(1, 1, 1)
     
     love.graphics.setStencilTest()
@@ -347,82 +350,57 @@ function Editor:selectTool(toolName)
     self.toolButtons[toolName].color.background = {0.75, 0.75, 0.75}
 end
 
-function Editor:newWindow(type, button)
-    local y = 14
-    local x = 14
-    
+function Editor:newWindow(windowClass, button)
     self.newWindowDropdown:toggle(false)
 
-    if type == "test" then
-        local testWindow = Gui3.Box:new(x, y, 100, 100)
-        testWindow.draggable = true
-        testWindow.resizeable = true
-        testWindow.closeable = true
-        testWindow.scrollable = {true, true}
-        testWindow.title = "Why did you press"
-        testWindow.background = self.level.backgroundColor
-        testWindow.clip = true
+    table.insert(self.windows, windowClass:new(self))
+
+    -- if type == "test" then
+        -- local testWindow = Gui3.Box:new(x, y, 100, 100)
+        -- testWindow.draggable = true
+        -- testWindow.resizeable = true
+        -- testWindow.closeable = true
+        -- testWindow.scrollable = {true, true}
+        -- testWindow.title = "Why did you press"
+        -- testWindow.background = self.level.backgroundColor
+        -- testWindow.clip = true
         
-        self.canvas:addChild(testWindow)
+        -- self.canvas:addChild(testWindow)
         
         
-        for y = 0, 80, 20 do
-            local text = Gui3.Text:new("Important", 0, y)
-            testWindow:addChild(text)
+        -- for y = 0, 80, 20 do
+        --     local text = Gui3.Text:new("Important", 0, y)
+        --     testWindow:addChild(text)
             
-            local slider = Gui3.Slider:new(0, 100, 0, y+9, 100, true)
+        --     local slider = Gui3.Slider:new(0, 100, 0, y+9, 100, true)
             
-            testWindow:addChild(slider)
-        end
+        --     testWindow:addChild(slider)
+        -- end
         
         
-        local testWindow2 = Gui3.Box:new(10, 30, 100, 100)
-        testWindow2.draggable = true
-        testWindow2.resizeable = true
-        testWindow2.closeable = true
-        testWindow2.scrollable = {true, true}
-        testWindow2.title = ":<"
-        testWindow2.background = self.level.backgroundColor
-        testWindow2.clip = true
+        -- local testWindow2 = Gui3.Box:new(10, 30, 100, 100)
+        -- testWindow2.draggable = true
+        -- testWindow2.resizeable = true
+        -- testWindow2.closeable = true
+        -- testWindow2.scrollable = {true, true}
+        -- testWindow2.title = ":<"
+        -- testWindow2.background = self.level.backgroundColor
+        -- testWindow2.clip = true
         
-        testWindow:addChild(testWindow2)
+        -- testWindow:addChild(testWindow2)
         
-        testWindow2:addChild(Gui3.Button:new(5, 5, "don't hurt me!", true))
-        
-    elseif type == "tiles" then
-        local tileListWindow = Gui3.Box:new(x, y, 8*17+15, 200)
-        tileListWindow.draggable = true
-        tileListWindow.resizeable = true
-        tileListWindow.closeable = true
-        tileListWindow.scrollable = {true, true}
-        tileListWindow.title = "tiles"
-        tileListWindow.background = checkerboardImg
-        tileListWindow.clip = true
-        
-        self.canvas:addChild(tileListWindow)
-        
-        
-        -- local backButton = Gui3.Button:new(0, 0, "< back", true, 1, function() print("woah") end)
-        -- tileListWindow:addChild(backButton)
-        
-        
-        local tileListTileGrid = Gui3.TileGrid:new(1, 1, self.tileMap, 
-            function(TileGrid, i) 
-                TileGrid.selected = i
-                self:selectTile(i)
-            end
-        )
-        tileListWindow:addChild(tileListTileGrid)
-        
-    end
+        -- testWindow2:addChild(Gui3.Button:new(5, 5, "don't hurt me!", true))
+    -- end
 end
 
-function Editor:selectTile(i)
+function Editor:selectTile(tile)
     if self.tool ~= self.tools.paint and self.tool ~= self.tools.fill then
         self:selectTool("paint")
     end
     
-    self.tools.paint.tile = self.tileMap.tiles[i]
+    self.tools.paint.tile = tile
+
+    -- todo: something about de-selecting the tile in all the other TilesWindows
 end
 
 function Editor:cmdpressed(cmd)
@@ -500,7 +478,6 @@ function Editor:cmdpressed(cmd)
             self.floatingSelection:unFloat()
             self.floatingSelection = nil
         end
-        
     end
     
     for i, _ in pairs(self.toolClasses) do
@@ -595,7 +572,7 @@ function Editor:resize(w, h)
     self.toolbar.h = CAMERAHEIGHT-14
     
     local w = 50
-    local fullw = w+52
+    local fullw = w+63
     local x = CAMERAWIDTH-fullw
     self.scaleBar.x = x
 end
@@ -686,5 +663,33 @@ end
 
 function Editor:drawSizeHelp(w, h)
     local x, y = self.level:mouseToWorld()
-    love.graphics.print(string.format("%s,%s", w, h), x+4, y+12)
+    love.graphics.print(string.format("%s,%s", w, h), x+4, y+12, 0, 1/self.level.camera.scale)
+end
+
+function Editor:setActiveLayer(layerNo)
+    self.activeLayer = self.level.layers[layerNo]
+end
+
+function Editor:setActiveTileMap(tileMap)
+    self.tileMap = tileMap
+end
+
+function Editor:setActiveStampMap(stampMap)
+    self.tools.stamp.stampMap = stampMap
+end
+
+function Editor:pipette()
+    local coordX, coordY = self.level:mouseToCoordinate()
+    local layer = self.activeLayer
+    
+    if layer:inMap(coordX, coordY) then
+        local tile = layer:getTile(coordX, coordY)
+        
+        if tile then
+            self.tools.paint.tile = tile
+            self:selectTool("paint")
+        else
+            self:selectTool("erase")
+        end
+    end
 end

@@ -55,17 +55,24 @@ function StampMap:initialize(map, w, h)
     self.type = "simple"
 end
 
-function StampMap:draw(x, y, w, h)
+function StampMap:draw(x, y, w, h, uncentered)
     if self.type == "simple" then
+        if not uncentered then
+            local offsetX, offsetY = self:getOffset()
+    
+            x = math.floor(x + offsetX+1)
+            y = math.floor(y + offsetY+1)
+        end
+
         for qx = 1, self.width do
             for qy = 1, self.height do
-                local tileX = (x+qx-1)*16
-                local tileY = (y+qy-1)*16
+                local tileX = (x+qx-2)*16
+                local tileY = (y+qy-2)*16
                 
                 local tile = self.map[qx] and self.map[qx][qy]
 
                 if tile then
-                    tile:draw(tileX, tileY, true)
+                    tile:draw(tileX, tileY)
                 end
             end
         end
@@ -74,7 +81,7 @@ function StampMap:draw(x, y, w, h)
                     
         for qx = 1, w do
             for qy = 1, h do
-                quadStampMap[qx][qy]:draw((x+qx-2)*16, (y+qy-2)*16, true)
+                quadStampMap[qx][qy]:draw((x+qx-2)*16, (y+qy-2)*16)
             end
         end
     end
@@ -82,6 +89,14 @@ end
 
 function StampMap:stamp(layer, x, y, w, h)
     if self.type == "simple" then
+        local offsetX, offsetY = self:getOffset()
+
+        x = math.floor(x + offsetX)
+        y = math.floor(y + offsetY)
+
+        layer:expandTo(x+1, y+1)
+        layer:expandTo(x+self.width, y+self.height)
+
         for qx = 1, self.width do
             for qy = 1, self.height do
                 layer:setCoordinate(x+qx, y+qy, self.map[qx][qy])
@@ -215,4 +230,8 @@ function StampMap:getQuadStampMap(w, h)
     end
     
     return map
+end
+
+function StampMap:getOffset()
+    return -self.width/2-.5, -self.height/2-.5
 end

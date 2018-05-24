@@ -9,7 +9,7 @@ The actor will move at a constant speed until hitting any obstacle, at which poi
     "maxSpeed": 60,
     "acceleration": 150,
     "dontTurnAnimation": true
-},
+}
 ```
 
 ## maxSpeed
@@ -17,7 +17,7 @@ The actor will move at a constant speed until hitting any obstacle, at which poi
 * Type: `Number (pps)`
 * Default: `40`
 
-To what speed the actor will accelerate.
+To what speed the actor will accelerates (and decelerates) towards its `maxSpeed`.
 
 ## acceleration
 

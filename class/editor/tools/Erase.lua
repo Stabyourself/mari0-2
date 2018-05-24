@@ -28,7 +28,7 @@ end
 
 function Erase:mousepressed(x, y, button)
     if (button == 1 and cmdDown("editor.pipette")) or button == 3 then
-        self:pipette(x, y)
+        self.editor:pipette()
         
     elseif button == 1 then
         self.penDown = true
@@ -42,20 +42,6 @@ function Erase:mousereleased(x, y, button)
     if self.penDown then
         self.editor:saveState()
         self.penDown = false
-    end
-end
-
-function Erase:pipette(x, y)
-    local coordX, coordY = self.level:mouseToCoordinate()
-    local layer = self.editor.activeLayer
-    
-    if layer:inMap(coordX, coordY) then
-        local tile = layer:getTile(coordX, coordY)
-        
-        if tile then
-            self.editor:selectTool("paint")
-            self.editor.tool.tile = tile
-        end
     end
 end
 

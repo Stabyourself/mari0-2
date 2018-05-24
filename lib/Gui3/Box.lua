@@ -1,8 +1,9 @@
-local Box = class("Gui3.Box", Gui3.Element)
+local Gui3 = ...
+Gui3.Box = class("Gui3.Box", Gui3.Element)
 
-Box.movesToTheFront = true
+Gui3.Box.movesToTheFront = true
 
-function Box:initialize(x, y, w, h)
+function Gui3.Box:initialize(x, y, w, h)
     Gui3.Element.initialize(self, x, y, w, h)
 
     self.background = {0, 0, 0, 0}
@@ -19,7 +20,7 @@ function Box:initialize(x, y, w, h)
     self.childBox = {2, 3, self.w-4, self.h-6}
 end
 
-function Box:update(dt, x, y, mouseBlocked, absX, absY)
+function Gui3.Box:update(dt, x, y, mouseBlocked, absX, absY)
     local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
     
     if self.draggable then
@@ -43,7 +44,7 @@ function Box:update(dt, x, y, mouseBlocked, absX, absY)
     return ret
 end
 
-function Box:draw(level)
+function Gui3.Box:draw(level)
     Gui3.Element.translate(self)
     
     if type(self.background) == "table" then
@@ -112,23 +113,23 @@ function Box:draw(level)
     Gui3.Element.unTranslate(self)
 end
 
-function Box:titleBarCollision(x, y)
+function Gui3.Box:titleBarCollision(x, y)
     return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < 12
 end
 
-function Box:resizeCornerCollision(x, y)
+function Gui3.Box:resizeCornerCollision(x, y)
     return not self.mouseBlocked and x >= self.w-11 and x < self.w-3 and y >= self.h-12 and y < self.h-4
 end
 
-function Box:closeCollision(x, y)
+function Gui3.Box:closeCollision(x, y)
     return not self.mouseBlocked and x >= self.w-12 and x < self.w-3 and y >= 2 and y < 11
 end
 
-function Box:collision(x, y)
+function Gui3.Box:collision(x, y)
     return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < self.h
 end
 
-function Box:mousepressed(x, y, button)
+function Gui3.Box:mousepressed(x, y, button)
     -- Check resize before the rest because reasons
     if self.resizeable and self:resizeCornerCollision(x, y) then
         self.resizing = true
@@ -148,7 +149,7 @@ function Box:mousepressed(x, y, button)
     return Gui3.Element.mousepressed(self, x, y, button)
 end
 
-function Box:mousereleased(x, y, button)
+function Gui3.Box:mousereleased(x, y, button)
     self.dragging = false
     self.resizing = false
     
@@ -162,5 +163,3 @@ function Box:mousereleased(x, y, button)
 
     Gui3.Element.mousereleased(self, x, y, button)
 end
-
-return Box

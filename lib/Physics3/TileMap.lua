@@ -5,6 +5,9 @@ function TileMap:initialize(path, name)
 	self.name = name
 	
 	local tileMapCode = love.filesystem.read(self.path .. "props.lua")
+	
+	assert(tileMapCode, string.format("Map tried to tell me that it uses the tilemap \"%s\" but we all know that's bullshit because that tilemap's props doesn't exist.", name))
+
     self.data = sandbox.run(tileMapCode, {env={
 		VAR = VAR
 	}})
@@ -42,7 +45,13 @@ function TileMap:initialize(path, name)
 				map[x] = {}
 
 				for y = 1, h do
-					map[x][y] = self.tiles[stampMap.map[y][x]]
+					local tile = self.tiles[stampMap.map[y][x]]
+					
+					if tile then
+						map[x][y] = tile
+					else
+						map[x][y] = false
+					end
 				end
 			end
 			

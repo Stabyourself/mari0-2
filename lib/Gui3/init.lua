@@ -1,19 +1,16 @@
 -- GUI library thing for Mari0 2. Feel free to use it, MIT License
 
-Gui3 = class("Gui3")
+local Gui3 = class("Gui3")
 
 local current_folder = (...):gsub('%.init$', '')
+current_folder = current_folder:gsub('%.', '/')
 
-Gui3.Element = require(current_folder.. ".Element")
-Gui3.Canvas = require(current_folder.. ".Canvas")
-Gui3.Box = require(current_folder.. ".Box")
-Gui3.Text = require(current_folder.. ".Text")
-Gui3.Image = require(current_folder.. ".Image")
-Gui3.Button = require(current_folder.. ".Button")
-Gui3.Slider = require(current_folder.. ".Slider")
-Gui3.TileGrid = require(current_folder.. ".TileGrid")
-Gui3.Checkbox = require(current_folder.. ".Checkbox")
-Gui3.Dropdown = require(current_folder.. ".Dropdown")
+local toLoad = {"Element", "Canvas", "Box", "Text", "Image", "Button", "Slider", "TileGrid", "Checkbox", "Dropdown", "SubDraw"}
+
+for _, fileName in ipairs(toLoad) do
+    local path = string.format("%s/%s.lua", current_folder, fileName)
+    love.filesystem.load(path)(Gui3)
+end
 
 function Gui3.makeBoxCache(quads)
     local _, _, w1 = quads[1]:getViewport()
@@ -128,3 +125,5 @@ function Gui3.drawBox(img, quads, x, y, w, h)
 
     love.graphics.pop()
 end
+
+return Gui3

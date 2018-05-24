@@ -35,7 +35,7 @@ function love.load()
     Color3 = require "lib.Color3"
     -- Font3 = require "lib.Font3"
     Physics3 = require "lib.Physics3"
-    require "lib.Gui3"
+    Gui3 = require "lib.Gui3"
     FrameDebug3 = require "lib.FrameDebug3"
 
     -- Loaders

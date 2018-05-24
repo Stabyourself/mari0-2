@@ -293,16 +293,21 @@ function World:loadLevel(data)
     
     -- load any used tilemaps
     self.tileMaps = {}
-    self.tileLookup = {}
-    
-    for i, tileMap in pairs(data.tileMaps) do
-        self.tileMaps[i] = Physics3.TileMap:new("tilemaps/" .. i, i)
-        
-        for j, tile in pairs(tileMap) do
-            self.tileLookup[tonumber(j)] = self.tileMaps[i].tiles[tile]
-        end
+    self.tileLookups = {}
+
+    -- Load used tileMaps
+    for _, tileMap in ipairs(data.tileMaps) do
+        table.insert(self.tileMaps, Physics3.TileMap:new("tilemaps/" .. tileMap, tileMap))
     end
-    
+
+    -- Load lookup
+    for _, lookupTile in ipairs(data.lookup) do
+        local tileMap = lookupTile.tileMap
+        local tileNo = lookupTile.tileNo
+
+        table.insert(self.tileLookups, self.tileMaps[tileMap].tiles[tileNo])
+    end
+
     for i = 1, #data.layers do
         local dataLayer = data.layers[i]
     
@@ -323,8 +328,8 @@ function World:loadLevel(data)
                 local unresolvedTile = dataLayer.map[x][y]
                 local realY = height-y+1
                 
-                if unresolvedTile ~= 0 then
-                    local tile = self.tileLookup[unresolvedTile] -- convert from the saved file's specific tile lookup to the actual tileMap's number
+                if unresolvedTile ~= 0 then -- 0 means no tile
+                    local tile = self.tileLookups[unresolvedTile] -- convert from the saved file's specific tile lookup to the actual tileMap's number
                     
                     assert(tile, string.format("Couldn't load real tile at x=%s, y=%s for requested lookup \"%s\". This may mean that the map is corrupted.", x, y, mapTile))
                     

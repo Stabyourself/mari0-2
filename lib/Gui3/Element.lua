@@ -1,4 +1,5 @@
-local Element = class("Gui3.Element")
+local Gui3 = ...
+Gui3.Element = class("Gui3.Element")
 
 local scrollbarQuad = {
     love.graphics.newQuad(0, 0, 1, 8, 3, 8),
@@ -6,9 +7,9 @@ local scrollbarQuad = {
     love.graphics.newQuad(2, 0, 1, 8, 3, 8),
 }
 
-Element.scrollbarSpace = 8
+Gui3.Element.scrollbarSpace = 8
 
-function Element:initialize(x, y, w, h)
+function Gui3.Element:initialize(x, y, w, h)
     self.x = x
     self.y = y
     self.w = w
@@ -40,7 +41,7 @@ function Element:initialize(x, y, w, h)
     self.children = {}
 end
 
-function Element:resize(w, h)
+function Gui3.Element:resize(w, h)
     self.w = w
     self.h = h
     
@@ -50,7 +51,7 @@ function Element:resize(w, h)
     self.childBox[4] = self.h
 end
 
-function Element:addChild(element)
+function Gui3.Element:addChild(element)
     assert(self ~= element, "You can't add an element to itself. That's stupid.")
     element.gui = self.gui
     element.parent = self
@@ -59,7 +60,7 @@ function Element:addChild(element)
     element:onAssign()
 end
 
-function Element:removeChild(element)
+function Gui3.Element:removeChild(element)
     for i, child in ipairs(self.children) do
         if child == element then
             table.remove(self.children, i)
@@ -67,7 +68,103 @@ function Element:removeChild(element)
     end
 end
 
-function Element:update(dt, x, y, mouseBlocked, absX, absY)
+function Gui3.Element:clearChildren()
+    clearTable(self.children)
+end
+
+function Gui3.Element:update(dt, x, y, mouseBlocked, absX, absY)
+
+    -- Update scroll bar visibility
+    self.hasScrollbar[1] = false
+    self.hasScrollbar[2] = false
+
+    self.childrenW, self.childrenH = self:getChildrenSize()
+
+    if self.scrollable[1] or self.scrollable[2] then
+        if self.scrollable[1] and self.childrenW > self:getInnerWidth() then
+            self.hasScrollbar[1] = true
+        end
+
+        if self.scrollable[2] and self.childrenH > self:getInnerHeight() then
+            self.hasScrollbar[2] = true
+            
+            if self.scrollable[1] and self.childrenW > self:getInnerWidth() then
+                self.hasScrollbar[1] = true
+            end
+        end
+        
+        self.scrollbarSize[1] = math.max(4, (self:getInnerWidth()/self.childrenW)*(self.childBox[3]-self.scrollbarSpace))
+        self.scrollbarSize[2] = math.max(4, (self:getInnerHeight()/self.childrenH)*(self.childBox[4]-self.scrollbarSpace))
+    end
+    
+    if self.draggable then
+        if self.dragging then
+            self.x = self.parent.mouse[1]-self.parent.childBox[1]-self.dragPos[1]+self.parent.scroll[1]
+            self.y = self.parent.mouse[2]-self.parent.childBox[2]-self.dragPos[2]+self.parent.scroll[2]
+        end
+    end
+
+    if self.resizeable then
+        if self.resizing then
+            local w = self.w
+            local h = self.h
+
+            self.w = self.parent.mouse[1]-self.parent.childBox[1]-self.x+self.resizePos[1]+self.parent.scroll[1]
+            self.h = self.parent.mouse[2]-self.parent.childBox[2]-self.y+self.resizePos[2]+self.parent.scroll[2]
+
+            if not self.parent.scrollable[1] then
+                self.w = math.min(self.parent:getInnerWidth()-self.x-self.posMax[1], self.w)
+            end
+
+            if not self.parent.scrollable[2] then
+                self.h = math.min(self.parent:getInnerHeight()-self.y-self.posMax[2], self.h)
+            end
+
+            if (self.w ~= w or self.h ~= h) and self.sizeChanged then
+                self:sizeChanged()
+            end
+        end
+    end
+
+    --limit x, y, w and h
+    --lower
+    
+    self.w = math.max(self.sizeMin[1], self.w)
+    self.h = math.max(self.sizeMin[2], self.h)
+
+    self.x = math.max(self.posMin[1], self.x)
+    self.y = math.max(self.posMin[2], self.y)
+    
+    if self.resizeable and self.parent then
+        --upper
+        if not self.parent.scrollable[1] then
+            self.w = math.min(self.parent:getInnerWidth()-self.posMax[1]-self.posMin[1], self.w)
+            self.x = math.min(self.parent:getInnerWidth()-self.w-self.posMax[1], self.x)
+        end
+
+        if not self.parent.scrollable[2] then
+            self.h = math.min(self.parent:getInnerHeight()-self.posMax[2]-self.posMin[2], self.h)
+            self.y = math.min(self.parent:getInnerHeight()-self.h-self.posMax[2], self.y)
+        end
+    end
+
+    if self.scrolling[1] then
+        local factor = ((self.mouse[1]-self.scrollingDragOffset[1]-self.childBox[1])/(self.childBox[3]-self.scrollbarSize[1]-self.scrollbarSpace))
+        
+        factor = math.clamp(factor, 0, 1)
+        self.scroll[1] = factor*(self.childrenW-self:getInnerWidth())
+    end
+    
+    
+    if self.scrolling[2] then
+        local factor = ((self.mouse[2]-self.scrollingDragOffset[2]-self.childBox[2])/(self.childBox[4]-self.scrollbarSize[2]-self.scrollbarSpace))
+        
+        factor = math.clamp(factor, 0, 1)
+        self.scroll[2] = factor*(self.childrenH-self:getInnerHeight())
+    end
+
+    self:limitScroll()
+    
     if x then -- child element
         self.absPos[1] = absX
         self.absPos[2] = absY
@@ -115,113 +212,27 @@ function Element:update(dt, x, y, mouseBlocked, absX, absY)
         end
     end
 
-    -- Update scroll bar visibility
-    self.hasScrollbar[1] = false
-    self.hasScrollbar[2] = false
-
-    local childrenW, childrenH
-
-    if self.scrollable[1] or self.scrollable[2] then
-        childrenW, childrenH = self:getChildrenSize()
-        
-        if self.scrollable[1] and childrenW > self:getInnerWidth() then
-            self.hasScrollbar[1] = true
-        end
-
-        if self.scrollable[2] and childrenH > self:getInnerHeight() then
-            self.hasScrollbar[2] = true
-            
-            if self.scrollable[1] and childrenW > self:getInnerWidth() then
-                self.hasScrollbar[1] = true
-            end
-        end
-        
-        self.scrollbarSize[1] = math.max(4, (self:getInnerWidth()/childrenW)*(self.childBox[3]-self.scrollbarSpace))
-        self.scrollbarSize[2] = math.max(4, (self:getInnerHeight()/childrenH)*(self.childBox[4]-self.scrollbarSpace))
-    end
-    
-    if self.draggable then
-        if self.dragging then
-            self.x = self.parent.mouse[1]-self.parent.childBox[1]-self.dragPos[1]+self.parent.scroll[1]
-            self.y = self.parent.mouse[2]-self.parent.childBox[2]-self.dragPos[2]+self.parent.scroll[2]
-        end
-    end
-
-    if self.resizeable then
-        if self.resizing then
-            self.w = self.parent.mouse[1]-self.parent.childBox[1]-self.x+self.resizePos[1]+self.parent.scroll[1]
-            self.h = self.parent.mouse[2]-self.parent.childBox[2]-self.y+self.resizePos[2]+self.parent.scroll[2]
-
-            if not self.parent.scrollable[1] then
-                self.w = math.min(self.parent:getInnerWidth()-self.x-self.posMax[1], self.w)
-            end
-
-            if not self.parent.scrollable[2] then
-                self.h = math.min(self.parent:getInnerHeight()-self.y-self.posMax[2], self.h)
-            end
-        end
-    end
-
-    --limit x, y, w and h
-    --lower
-    
-    self.w = math.max(self.sizeMin[1], self.w)
-    self.h = math.max(self.sizeMin[2], self.h)
-
-    self.x = math.max(self.posMin[1], self.x)
-    self.y = math.max(self.posMin[2], self.y)
-    
-    if self.resizeable and self.parent then
-        --upper
-        if not self.parent.scrollable[1] then
-            self.w = math.min(self.parent:getInnerWidth()-self.posMax[1]-self.posMin[1], self.w)
-            self.x = math.min(self.parent:getInnerWidth()-self.w-self.posMax[1], self.x)
-        end
-
-        if not self.parent.scrollable[2] then
-            self.h = math.min(self.parent:getInnerHeight()-self.posMax[2]-self.posMin[2], self.h)
-            self.y = math.min(self.parent:getInnerHeight()-self.h-self.posMax[2], self.y)
-        end
-    end
-
-    if (self.scrolling[1] or self.scrolling[2]) and not childrenW then
-        childrenW, childrenH = self:getChildrenSize()
-    end
-
-    if self.scrolling[1] then
-        local factor = ((self.mouse[1]-self.scrollingDragOffset[1]-self.childBox[1])/(self.childBox[3]-self.scrollbarSize[1]-self.scrollbarSpace))
-        
-        factor = math.clamp(factor, 0, 1)
-        self.scroll[1] = factor*(childrenW-self:getInnerWidth())
-
-        self.scroll[1] = math.min(childrenW-self:getInnerWidth(), self.scroll[1])
-        self.scroll[1] = math.max(0, self.scroll[1])
-    end
-    
-    
-    if self.scrolling[2] then
-        local factor = ((self.mouse[2]-self.scrollingDragOffset[2]-self.childBox[2])/(self.childBox[4]-self.scrollbarSize[2]-self.scrollbarSpace))
-        
-        factor = math.clamp(factor, 0, 1)
-        self.scroll[2] = factor*(childrenH-self:getInnerHeight())
-    
-        self.scroll[2] = math.min(childrenH-self:getInnerHeight(), self.scroll[2])
-        self.scroll[2] = math.max(0, self.scroll[2])
-    end
-
     return (not self.clip and siblingsBlocked) or (self.mouse[1] > 0 and self.mouse[1] <= self.w and self.mouse[2] > 0 and self.mouse[2] <= self.h)
 end
 
-function Element:translate()
+function Gui3.Element:limitScroll()
+    self.scroll[1] = math.min(self.childrenW-self:getInnerWidth(), self.scroll[1])
+    self.scroll[1] = math.max(0, self.scroll[1])
+
+    self.scroll[2] = math.min(self.childrenH-self:getInnerHeight(), self.scroll[2])
+    self.scroll[2] = math.max(0, self.scroll[2])
+end
+
+function Gui3.Element:translate()
     love.graphics.push()
     love.graphics.translate(self.x, self.y)
 end
 
-function Element:unTranslate()
+function Gui3.Element:unTranslate()
     love.graphics.pop()
 end
 
-function Element:draw()
+function Gui3.Element:draw()
     local scissorX, scissorY, scissorW, scissorH
 
     if self.clip then
@@ -272,7 +283,7 @@ function Element:draw()
     end
 end
 
-function Element:scrollCollision(i, x, y)
+function Gui3.Element:scrollCollision(i, x, y)
     local pos = self:getScrollbarPos(i)
     
     if i == 1 then
@@ -282,17 +293,15 @@ function Element:scrollCollision(i, x, y)
     end
 end
 
-function Element:getScrollbarPos(i)
-    local childrenW, childrenH = self:getChildrenSize()
-    
+function Gui3.Element:getScrollbarPos(i)
     if i == 1 then
-        return (self.scroll[1]/(childrenW-self:getInnerWidth()))*(self.childBox[3]-self.scrollbarSize[1]-self.scrollbarSpace)+self.childBox[1]
+        return (self.scroll[1]/(self.childrenW-self:getInnerWidth()))*(self.childBox[3]-self.scrollbarSize[1]-self.scrollbarSpace)+self.childBox[1]
     else
-        return (self.scroll[2]/(childrenH-self:getInnerHeight()))*(self.childBox[4]-self.scrollbarSize[2]-self.scrollbarSpace)+self.childBox[2]
+        return (self.scroll[2]/(self.childrenH-self:getInnerHeight()))*(self.childBox[4]-self.scrollbarSize[2]-self.scrollbarSpace)+self.childBox[2]
     end
 end
 
-function Element:getInnerHeight()
+function Gui3.Element:getInnerHeight()
     local h = self.childBox[4]
 
     if self.hasScrollbar[1] then
@@ -302,7 +311,7 @@ function Element:getInnerHeight()
     return h
 end
 
-function Element:getInnerWidth()
+function Gui3.Element:getInnerWidth()
     local w = self.childBox[3]
 
     if self.hasScrollbar[2] then
@@ -312,7 +321,7 @@ function Element:getInnerWidth()
     return w
 end
 
-function Element:mousepressed(x, y, button)
+function Gui3.Element:mousepressed(x, y, button)
     local toReturn = false
     
     if self.scrollable[1] and self.hasScrollbar[1] and self:scrollCollision(1, x, y) then
@@ -356,7 +365,7 @@ function Element:mousepressed(x, y, button)
     return toReturn
 end
 
-function Element:mousereleased(x, y, button)
+function Gui3.Element:mousereleased(x, y, button)
     self.scrolling[1] = false
     self.scrolling[2] = false
 
@@ -367,10 +376,11 @@ function Element:mousereleased(x, y, button)
     end
 end
 
-function Element:wheelmoved(x, y)
+function Gui3.Element:wheelmoved(x, y)
     if not self.mouseBlocked then
         if self.hasScrollbar[2] and y ~= 0 then
             self.scroll[2] = self.scroll[2] - y*17
+            self:limitScroll()
             
             return true
         end
@@ -378,12 +388,14 @@ function Element:wheelmoved(x, y)
         -- scroll horizontally if there's no y scrolling
         if not self.hasScrollbar[2] and self.hasScrollbar[1] and y ~= 0 then
             self.scroll[1] = self.scroll[1] - y*17
+            self:limitScroll()
             
             return true
         end
         
         if self.hasScrollbar[1] and x ~= 0 then
             self.scroll[1] = self.scroll[1] - x*17
+            self:limitScroll()
             
             return true
         end
@@ -401,24 +413,24 @@ function Element:wheelmoved(x, y)
     end
 end
 
-function Element:getChildrenSize()
+function Gui3.Element:getChildrenSize()
     local w = 0
     local h = 0
     
     for _, child in ipairs(self.children) do
-        if child.x+child.w+child.posMax[1] > w then
-            w = child.x+child.w+child.posMax[1]
-        end
-        
-        if child.y+child.h+child.posMax[2] > h then
-            h = child.y+child.h+child.posMax[2]
+        if not child.ignoreForParentSize then
+            local childW = child.x+child.w+child.posMax[1]
+            local childH = child.y+child.h+child.posMax[2]
+
+            w = math.max(w, childW)
+            h = math.max(h, childH)
         end
     end
     
     return w, h
 end
 
-function Element:autoSize()
+function Gui3.Element:autoSize()
     local w, h = self:getChildrenSize()
     
     self.w = self.childBox[1]*2+w
@@ -428,6 +440,4 @@ function Element:autoSize()
     self.childBox[4] = h
 end
 
-function Element:onAssign() end
-    
-return Element
+function Gui3.Element:onAssign() end

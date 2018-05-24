@@ -99,11 +99,7 @@ function Tile:checkCollision(x, y)
 	end
 end
 
-function Tile:draw(x, y, ghost)
-	if ghost then
-		love.graphics.setColor(1, 1, 1, 0.5)
-	end
-	
+function Tile:draw(x, y)
 	love.graphics.draw(self.img, self.quad, x, y)
 end
 

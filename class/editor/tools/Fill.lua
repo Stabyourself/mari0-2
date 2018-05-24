@@ -22,7 +22,9 @@ function Fill:draw()
     local coordX, coordY = self.level:cameraToCoordinate(mouseX, mouseY)
     local worldX, worldY = self.level:coordinateToWorld(coordX-1, coordY-1)
     
-    self.editor.tools.paint.tile:draw(worldX, worldY, true)
+    love.graphics.setColor(1, 1, 1, 0.5)
+    self.editor.tools.paint.tile:draw(worldX, worldY)
+    love.graphics.setColor(1, 1, 1)
 end
 
 function Fill:mousereleased(x, y, button)

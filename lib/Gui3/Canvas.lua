@@ -1,15 +1,16 @@
-local Canvas = class("Gui3.Canvas", Gui3.Element)
+local Gui3 = ...
+Gui3.Canvas = class("Gui3.Canvas", Gui3.Element)
 
-Canvas.movesToTheFront = true
+Gui3.Canvas.movesToTheFront = true
 
-function Canvas:initialize(x, y, w, h)
+function Gui3.Canvas:initialize(x, y, w, h)
     Gui3.Element.initialize(self, x, y, w, h)
 
     self.children = {}
     self.background = {0, 0, 0, 0}
 end
 
-function Canvas:draw(level)
+function Gui3.Canvas:draw(level)
     Gui3.Element.translate(self)
 
     love.graphics.setColor(self.background)
@@ -19,5 +20,3 @@ function Canvas:draw(level)
 
     Gui3.Element.unTranslate(self)
 end
-
-return Canvas

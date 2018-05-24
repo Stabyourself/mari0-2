@@ -62,6 +62,7 @@ function FloatingSelection:update(dt)
 end
 
 function FloatingSelection:draw()
+    love.graphics.setColor(1, 1, 1, 0.5)
     for x = 1, self.width do
         for y = 1, self.height do
             local tile = self.map[x][y]

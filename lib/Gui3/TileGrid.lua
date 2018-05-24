@@ -1,10 +1,11 @@
-TileGrid = class("Gui3.TileGrid", Gui3.Element)
+local Gui3 = ...
+Gui3.TileGrid = class("Gui3.TileGrid", Gui3.Element)
 
-TileGrid.perRow = 8
-TileGrid.size = {16, 16}
-TileGrid.gutter = {1, 1}
+Gui3.TileGrid.perRow = 8
+Gui3.TileGrid.size = {16, 16}
+Gui3.TileGrid.gutter = {1, 1}
 
-function TileGrid:initialize(x, y, tileMap, func)
+function Gui3.TileGrid:initialize(x, y, tileMap, func)
     self.tileMap = tileMap
     self.tiles = tileMap.tiles
     self.func = func
@@ -16,7 +17,7 @@ function TileGrid:initialize(x, y, tileMap, func)
     self.selected = nil
 end
 
-function TileGrid:update(dt, x, y, mouseBlocked, absX, absY)
+function Gui3.TileGrid:update(dt, x, y, mouseBlocked, absX, absY)
     Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
     
     local maxWidth = self.parent:getInnerWidth()
@@ -26,12 +27,12 @@ function TileGrid:update(dt, x, y, mouseBlocked, absX, absY)
     self:updateSize()
 end
 
-function TileGrid:updateSize()
+function Gui3.TileGrid:updateSize()
     self.w = self.perRow*(self.size[1]+self.gutter[1])-self.gutter[1]
     self.h = math.ceil(#self.tiles/self.perRow)*(self.size[2]+self.gutter[2])
 end
 
-function TileGrid:getCollision(x, y)
+function Gui3.TileGrid:getCollision(x, y)
     if self.mouseBlocked then
         return false
     end
@@ -39,15 +40,16 @@ function TileGrid:getCollision(x, y)
     local tileX = math.ceil(x/(self.size[1]+self.gutter[1]))
     local tileY = math.ceil(y/(self.size[2]+self.gutter[2]))
     
-    if tileX < 1 or tileX > self.perRow or
-        tileY < 1 or tileY > math.ceil(#self.tiles/self.perRow) then
+    local tileNum = (tileY-1)*self.perRow+tileX
+
+    if tileNum < 1 or tileNum > #self.tiles then
         return false
+    else
+        return tileNum
     end
-    
-    return (tileY-1)*self.perRow+tileX
 end 
 
-function TileGrid:draw(level)
+function Gui3.TileGrid:draw(level)
     Gui3.Element.translate(self)
     
     local mouseTile = self:getCollision(self.mouse[1], self.mouse[2])
@@ -89,7 +91,7 @@ function TileGrid:draw(level)
     Gui3.Element.unTranslate(self)
 end
 
-function TileGrid:mousepressed(x, y, button)
+function Gui3.TileGrid:mousepressed(x, y, button)
     local col = self:getCollision(x, y)
     
     if col then
@@ -98,5 +100,3 @@ function TileGrid:mousepressed(x, y, button)
     
     return Gui3.Element.mousepressed(self, x, y, button)
 end
-
-return TileGrid

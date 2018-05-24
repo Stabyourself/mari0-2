@@ -5,7 +5,7 @@ function Paint:initialize(editor)
     
     self.level = self.editor.level
     self.penDown = false
-    self.tile = self.editor.tileMap.tiles[1]
+    self.tile = self.level.tileMaps[1].tiles[1]
 end
 
 function Paint:update(dt)
@@ -27,12 +27,14 @@ function Paint:draw()
     local coordX, coordY = self.level:cameraToCoordinate(mouseX, mouseY)
     local worldX, worldY = self.level:coordinateToWorld(coordX-1, coordY-1)
     
-    self.tile:draw(worldX, worldY, true)
+    love.graphics.setColor(1, 1, 1, 0.5)
+    self.tile:draw(worldX, worldY)
+    love.graphics.setColor(1, 1, 1)
 end
 
 function Paint:mousepressed(x, y, button)
     if (button == 1 and cmdDown("editor.pipette")) or button == 3 then
-        self:pipette(x, y)
+        self.editor:pipette(x, y)
         
     elseif button == 1 then
         self.penDown = true
@@ -47,21 +49,6 @@ function Paint:mousereleased(x, y, button)
         self.penDown = false
 
         self.editor:saveState()
-    end
-end
-
-function Paint:pipette(x, y)
-    local coordX, coordY = self.level:mouseToCoordinate()
-    local layer = self.editor.activeLayer
-
-    if layer:inMap(coordX, coordY) then
-        local tile = layer:getTile(coordX, coordY)
-        
-        if tile then
-            self.tile = tile
-        else
-            self.editor:selectTool("erase")
-        end
     end
 end
 

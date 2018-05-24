@@ -1,4 +1,5 @@
-local Slider = class("Gui3.Slider", Gui3.Element)
+local Gui3 = ...
+Gui3.Slider = class("Gui3.Slider", Gui3.Element)
 
 local sliderQuad = {
     love.graphics.newQuad(0, 0, 8, 8, 17, 8),
@@ -6,10 +7,10 @@ local sliderQuad = {
     love.graphics.newQuad(9, 0, 8, 8, 17, 8),
 }
 
-Slider.barOffset = 2
-Slider.textWidth = 25
+Gui3.Slider.barOffset = 2
+Gui3.Slider.textWidth = 25
 
-function Slider:initialize(min, max, x, y, w, showValue, func)
+function Gui3.Slider:initialize(min, max, x, y, w, showValue, func)
     self.min = min
     self.max = max
     self.showValue = showValue
@@ -36,7 +37,7 @@ function Slider:initialize(min, max, x, y, w, showValue, func)
     }
 end
 
-function Slider:update(dt, x, y, mouseBlocked, absX, absY)
+function Gui3.Slider:update(dt, x, y, mouseBlocked, absX, absY)
     local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
     
     if self.dragging then
@@ -58,25 +59,25 @@ function Slider:update(dt, x, y, mouseBlocked, absX, absY)
     return ret
 end
 
-function Slider:getValue()
+function Gui3.Slider:getValue()
     return self.min + (self.max-self.min)*self.val
 end
 
-function Slider:setValue(val)
+function Gui3.Slider:setValue(val)
     self.val = (val-self.min)/(self.max-self.min)
 end
 
-function Slider:getCollision(x, y)
+function Gui3.Slider:getCollision(x, y)
     local sliderX = self:getPosX()
     
     return not self.mouseBlocked and x >= sliderX-2 and x < sliderX+2 and y >= 0 and y < 8
 end
 
-function Slider:getPosX()
+function Gui3.Slider:getPosX()
     return self.val*(self.barWidth)+self.barOffset
 end
 
-function Slider:draw(level)
+function Gui3.Slider:draw(level)
     Gui3.Element.translate(self)
     
     Gui3.Element.draw(self, level)
@@ -104,7 +105,7 @@ function Slider:draw(level)
     Gui3.Element.unTranslate(self)
 end
 
-function Slider:mousepressed(x, y, button)
+function Gui3.Slider:mousepressed(x, y, button)
     if self:getCollision(x, y) then
         self.dragging = true
         self.dragX = x-self:getPosX()
@@ -112,10 +113,8 @@ function Slider:mousepressed(x, y, button)
     
     return Gui3.Element.mousepressed(self, x, y, button)
 end
-function Slider:mousereleased(x, y, button)
+function Gui3.Slider:mousereleased(x, y, button)
     self.dragging = false
 
     Gui3.Element.mousereleased(self, x, y, button)
 end
-
-return Slider

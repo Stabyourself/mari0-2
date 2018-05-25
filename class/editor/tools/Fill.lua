@@ -32,27 +32,29 @@ function Fill:mousereleased(x, y, button)
         x, y = self.level:cameraToCoordinate(x, y)
         
         if x == self.pressingPos[1] and y == self.pressingPos[2] then
-            if self.editor.selection and #self.editor.selection.tiles > 0 then
-                local found = false
-                
-                for _, tile in ipairs(self.editor.selection.tiles) do
-                    if tile[1] == x and tile[2] == y then
-                        found = true
-                        break
+            if self.level:inMap(x, y) then
+                if self.editor.selection and #self.editor.selection.tiles > 0 then
+                    local found = false
+                    
+                    for _, tile in ipairs(self.editor.selection.tiles) do
+                        if tile[1] == x and tile[2] == y then
+                            found = true
+                            break
+                        end
+                    end
+                    
+                    if found then
+                        self:fillTiles(self.editor.selection.tiles, self.editor.tools.paint.tile)
+                        self.editor:saveState()
+                        return
                     end
                 end
                 
-                if found then
-                    self:fillTiles(self.editor.selection.tiles, self.editor.tools.paint.tile)
-                    self.editor:saveState()
-                    return
-                end
+                local tiles = self.editor.activeLayer:getFloodArea(x, y, self.editor.activeLayer)
+                
+                self:fillTiles(tiles, self.editor.tools.paint.tile)
+                self.editor:saveState()
             end
-            
-            local tiles = self.editor.activeLayer:getFloodArea(x, y, self.editor.activeLayer)
-            
-            self:fillTiles(tiles, self.editor.tools.paint.tile)
-            self.editor:saveState()
         end
     end
     

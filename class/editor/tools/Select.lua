@@ -43,27 +43,22 @@ function Select:draw()
     end
 
     local addition = ""
-    local len = 0
     
     if not self.editor.floatingSelection or not self.editor.floatingSelection.dragging then
         if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
             addition = "∩"
-            len = len + 1
         elseif cmdDown("editor.select.add") then
             addition = "+"
-            len = len + 1
         elseif cmdDown("editor.select.subtract") then
             addition = "-"
-            len = len + 1
         elseif  self.editor.selection and self.editor.selection:collision(mouseX, mouseY) or
                 self.editor.floatingSelection and self.editor.floatingSelection:collision(mouseX, mouseY) then
             addition = "⇔"
-            len = len + 1
         end
     end
     
     if addition ~= "" then
-        love.graphics.print(addition, worldX-len*8-1, worldY+2)
+        love.graphics.print(addition, worldX-utf8.len(addition)*8-1, worldY+2)
     end
 end
 
@@ -92,6 +87,8 @@ function Select:mousereleased(x, y, button)
     local mx, my = self.level:mouseToWorld()
     if self.pressing then
         local tiles, dirty = self:getTiles(self.selectionStart[1], self.selectionStart[2], mx-self.selectionStart[1], my-self.selectionStart[2])
+
+        print(dirty)
         
         if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
             self.editor:intersectSelection(tiles)
@@ -115,7 +112,9 @@ function Select:getTiles(x, y, w, h)
     local lx, rx, ty, by
     local dirtySelect = false
     
-    if math.abs(w) < 3 and math.abs(h) < 3 then
+    print(w, h)
+
+    if math.abs(w) < 3 and math.abs(h) < 3 then -- a "dirty" selection is one where the mouse only moved very little, which usually is done by the user as an "unselect" motion
         lx, ty = self.level:worldToCoordinate(x, y)
         rx, by = lx, ty
         dirtySelect = true

@@ -102,7 +102,7 @@ function Layer:setCoordinate(x, y, tile)
     self.map[x-self.x][y-self.y] = tile
 end
 
-function Layer:optimize()
+function Layer:optimize() -- cuts a layer to its content and moves it instead
     -- left
     local x = self:getXStart()
     local found = false

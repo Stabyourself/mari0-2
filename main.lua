@@ -22,6 +22,7 @@ function love.load()
     }
 
     -- Libs
+    utf8 = require "utf8"
     class = require "lib.middleclass"
     sandbox = require "lib.sandbox"
     JSON = require "lib.JSON"

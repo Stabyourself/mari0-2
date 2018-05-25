@@ -796,9 +796,9 @@ function World:getCoordinateRectangle(x, y, w, h, clamp) -- todo: add layer para
             return 0, -1, 0, -1
         end
         
-        lx = math.max(lx, 1)
+        lx = math.max(lx, self:getXStart())
         rx = math.min(rx, self:getXEnd())
-        ty = math.max(ty, 1)
+        ty = math.max(ty, self:getYStart())
         by = math.min(by, self:getYEnd())
     end
     

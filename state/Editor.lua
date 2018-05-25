@@ -662,8 +662,26 @@ function Editor:unFloatSelection()
 end
 
 function Editor:drawSizeHelp(w, h)
-    local x, y = self.level:mouseToWorld()
-    love.graphics.print(string.format("%s,%s", w, h), x+4, y+12, 0, 1/self.level.camera.scale)
+    self.level.camera:detach()
+
+    local x, y = self.level:getMouse()
+    local s = string.format("%s×%s", w, h)
+    local width = utf8.len(s)*8
+
+    local textX = x+6
+    local textY = y
+
+    if textX+width > SCREENWIDTH then
+        textX = x - width
+    end
+
+    if textY+8 > SCREENHEIGHT then
+        textY = y-8
+    end
+
+    love.graphics.print(s, textX, textY, 0, 1, r)
+
+    self.level.camera:attach()
 end
 
 function Editor:setActiveLayer(layerNo)

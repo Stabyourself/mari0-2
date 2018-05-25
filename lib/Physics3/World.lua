@@ -555,6 +555,14 @@ function World:getYEnd()
     return y
 end
 
+function World:getWidth()
+    return self:getXEnd() - self:getXStart() + 1
+end
+
+function World:getHeight()
+    return self:getYEnd() - self:getYStart() + 1
+end
+
 function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/raycasting.html - thanks!
     local rayPosX = x+1
     local rayPosY = y+1
@@ -773,6 +781,16 @@ end
 function World:getMouse()
     local x, y = love.mouse.getPosition()
     return x/VAR("scale"), y/VAR("scale")
+end
+
+function World:getTile(x, y)
+    for _, layer in ipairs(self.layers) do
+        local tile = layer:getTile(x, y)
+
+        if tile then
+            return tile
+        end
+    end
 end
 
 function World:getCoordinateRectangle(x, y, w, h, clamp) -- todo: add layer parameter

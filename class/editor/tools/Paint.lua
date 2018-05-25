@@ -11,14 +11,22 @@ end
 function Paint:update(dt)
     if self.penDown then
         local x, y = self.level:cameraToCoordinate(getWorldMouse())
-        local layer = self.editor.activeLayer
 
-        if not layer:inMap(x, y) then
-            layer:expandTo(x, y)
+        if x ~= self.lastX or y ~= self.lastY then
+            local layer = self.editor.activeLayer
+
+            if not layer:inMap(x, y) then
+                layer:expandTo(x, y)
+            end
+            
+            layer:setCoordinate(x, y, self.tile)
+            layer:optimize()
+
+            self.editor:updateMinimap()
+
+            self.lastX = x
+            self.lastY = y
         end
-        
-        layer:setCoordinate(x, y, self.tile)
-        layer:optimize()
     end
 end
 
@@ -47,6 +55,9 @@ end
 function Paint:mousereleased(x, y, button)
     if self.penDown then
         self.penDown = false
+
+        self.lastX = nil
+        self.lastY = nil
 
         self.editor:saveState()
     end

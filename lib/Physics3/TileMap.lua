@@ -14,6 +14,7 @@ function TileMap:initialize(path, name)
 	self.tileSize = self.data.tileSize or 16
 	self.tileMargin = self.data.tileMargin or 1
 	self.img = love.graphics.newImage(self.path .. self.data.tileMap)
+	self.imgData = love.image.newImageData(self.path .. self.data.tileMap)
 	
 	self.tiles = {}
 	self.updateTiles = {}

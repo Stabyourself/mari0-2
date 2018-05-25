@@ -103,4 +103,37 @@ function Tile:draw(x, y)
 	love.graphics.draw(self.img, self.quad, x, y)
 end
 
+function Tile:getAverageColor()
+	if not self.averageColor then
+		local tr, tg, tb, ta = 0, 0, 0, 0
+
+		for y = 0, 15 do
+			for x = 0, 15 do
+				local r, g, b, a = self.tileMap.imgData:getPixel((self.x-1)*17+x, (self.y-1)*17+y)
+
+				if a == 0 then -- use level background color if transparent
+					tr = tr + game.level.backgroundColor[1]
+					tg = tg + game.level.backgroundColor[2]
+					tb = tb + game.level.backgroundColor[3]
+				else
+					tr = tr + r
+					tg = tg + g
+					tb = tb + b
+				end
+			end
+		end
+
+		local pixels = 16*16
+
+		self.averageColor = {
+			tr/pixels,
+			tg/pixels,
+			tb/pixels,
+			1,--ta/pixels,
+		}
+	end
+
+	return self.averageColor
+end
+
 return Tile

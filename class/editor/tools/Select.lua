@@ -111,8 +111,6 @@ end
 function Select:getTiles(x, y, w, h)
     local lx, rx, ty, by
     local dirtySelect = false
-    
-    print(w, h)
 
     if math.abs(w) < 3 and math.abs(h) < 3 then -- a "dirty" selection is one where the mouse only moved very little, which usually is done by the user as an "unselect" motion
         lx, ty = self.level:worldToCoordinate(x, y)

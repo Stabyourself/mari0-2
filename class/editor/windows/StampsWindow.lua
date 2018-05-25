@@ -10,7 +10,7 @@ function StampsWindow:initialize(editor)
     self.editor = editor
     self.level = self.editor.level
 
-    self.element = Gui3.Box:new(self.x, self.y, StampsWindow.width, StampsWindow.height)
+    self.element = Gui3.Box:new(self.x, self.y, self.width, self.height)
     self.element.draggable = true
     self.element.resizeable = true
     self.element.closeable = true

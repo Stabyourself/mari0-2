@@ -14,7 +14,7 @@ function TilesWindow:initialize(editor)
     self.editor = editor
     self.level = self.editor.level
 
-    self.element = Gui3.Box:new(self.x, self.y, TilesWindow.width, TilesWindow.height)
+    self.element = Gui3.Box:new(self.x, self.y, self.width, self.height)
     self.element.draggable = true
     self.element.resizeable = true
     self.element.closeable = true
@@ -55,14 +55,14 @@ function TilesWindow:goToTileMap(tileMap)
     self.element:addChild(backButton)
     
     
-    local tileListTileGrid = Gui3.TileGrid:new(1, 16, self.tileMap, 
+    self.tileListTileGrid = Gui3.TileGrid:new(1, 16, self.tileMap, 
         function(TileGrid, i) 
             TileGrid.selected = i
 
             self.editor:selectTile(self.tileMap.tiles[i])
         end
     )
-    self.element:addChild(tileListTileGrid)
+    self.element:addChild(self.tileListTileGrid)
 end
 
 return TilesWindow

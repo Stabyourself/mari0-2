@@ -42,6 +42,7 @@ Gui3.boxCache[Editor.selectQuad] = Gui3.makeBoxCache(Editor.selectQuad)
 Editor.windowClasses = {
     tiles = require("class.editor.windows.TilesWindow"),
     stamps = require("class.editor.windows.StampsWindow"),
+    minimap = require("class.editor.windows.MinimapWindow"),
 }
 
 function Editor:initialize(level)
@@ -91,9 +92,9 @@ function Editor:load()
     
     self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 0, "tiles", false, 1, function(button) self:newWindow(self.windowClasses.tiles, button) end))
     self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 10, "stamps", false, 1, function(button) self:newWindow(self.windowClasses.stamps, button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 20, "minimap", false, 1, function(button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 30, "map options", false, 1, function(button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 40, "test", false, 1, function(button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 20, "layers", false, 1, function(button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 30, "minimap", false, 1, function(button) self:newWindow(self.windowClasses.minimap, button) end))
+    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 40, "map options", false, 1, function(button) end))
     
     self.newWindowDropdown:autoSize()
     
@@ -170,6 +171,8 @@ function Editor:load()
     self.mapBoundsQuad = love.graphics.newQuad(0, 0, 8, 8, 8, 8)
 
     self.pastePos = {1, 1}
+
+    self:updateMinimap()
     
     self:toggleGrid(false)
     self:toggleFreeCam(true)
@@ -354,43 +357,6 @@ function Editor:newWindow(windowClass, button)
     self.newWindowDropdown:toggle(false)
 
     table.insert(self.windows, windowClass:new(self))
-
-    -- if type == "test" then
-        -- local testWindow = Gui3.Box:new(x, y, 100, 100)
-        -- testWindow.draggable = true
-        -- testWindow.resizeable = true
-        -- testWindow.closeable = true
-        -- testWindow.scrollable = {true, true}
-        -- testWindow.title = "Why did you press"
-        -- testWindow.background = self.level.backgroundColor
-        -- testWindow.clip = true
-        
-        -- self.canvas:addChild(testWindow)
-        
-        
-        -- for y = 0, 80, 20 do
-        --     local text = Gui3.Text:new("Important", 0, y)
-        --     testWindow:addChild(text)
-            
-        --     local slider = Gui3.Slider:new(0, 100, 0, y+9, 100, true)
-            
-        --     testWindow:addChild(slider)
-        -- end
-        
-        
-        -- local testWindow2 = Gui3.Box:new(10, 30, 100, 100)
-        -- testWindow2.draggable = true
-        -- testWindow2.resizeable = true
-        -- testWindow2.closeable = true
-        -- testWindow2.scrollable = {true, true}
-        -- testWindow2.title = ":<"
-        -- testWindow2.background = self.level.backgroundColor
-        -- testWindow2.clip = true
-        
-        -- testWindow:addChild(testWindow2)
-        
-        -- testWindow2:addChild(Gui3.Button:new(5, 5, "don't hurt me!", true))
-    -- end
 end
 
 function Editor:selectTile(tile)
@@ -400,7 +366,15 @@ function Editor:selectTile(tile)
     
     self.tools.paint.tile = tile
 
-    -- todo: something about de-selecting the tile in all the other TilesWindows
+    for _, window in ipairs(self.windows) do
+        if window:isInstanceOf(self.windowClasses.tiles) then
+            if window.tileMap ~= tile.tileMap then -- deselect it
+                window.tileListTileGrid.selected = false
+            else -- select the same tile that was selected
+                window.tileListTileGrid.selected = tile.num
+            end
+        end
+    end
 end
 
 function Editor:cmdpressed(cmd)
@@ -708,6 +682,36 @@ function Editor:pipette()
             self:selectTool("paint")
         else
             self:selectTool("erase")
+        end
+    end
+end
+
+function Editor:updateMinimap()
+    local t = love.timer.getTime()
+    local width = self.level:getWidth()
+    local height = self.level:getHeight()
+
+    self.minimapImgData = love.image.newImageData(width, height)
+
+    for y = 1, height do
+        for x = 1, width do
+            local tile = self.level:getTile(x, y)
+
+            if tile then
+                self.minimapImgData:setPixel(x-1, y-1, unpack(tile:getAverageColor()))
+            else
+                self.minimapImgData:setPixel(x-1, y-1, unpack(self.level.backgroundColor))
+            end
+        end
+    end
+
+    self.minimapImg = love.graphics.newImage(self.minimapImgData)
+
+    -- update all minimap windows
+
+    for _, window in ipairs(self.windows) do
+        if window:isInstanceOf(self.windowClasses.minimap) then
+            window:updateImg(self.minimapImg)
         end
     end
 end

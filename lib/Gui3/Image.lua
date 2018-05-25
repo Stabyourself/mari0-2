@@ -1,20 +1,19 @@
 local Gui3 = ...
 Gui3.Image = class("Gui3.Image", Gui3.Element)
 
-function Gui3.Image:initialize(img, x, y, quad)
+function Gui3.Image:initialize(img, x, y, quad, scale)
     if type(img) == "string" then
         self.img = love.graphics.newImage(img)
     else
         self.img = img
     end
 
-    if quad then
-        self.quad = quad
-    end
+    self.quad = quad
+    self.scale = scale or 1
 
     self.color = {1, 1, 1, 1}
     
-    Gui3.Element.initialize(self, x, y, self.img:getWidth(), self.img:getHeight())
+    Gui3.Element.initialize(self, x, y, self.img:getWidth()*self.scale, self.img:getHeight()*self.scale)
 end
 
 function Gui3.Image:draw(level)
@@ -25,9 +24,9 @@ function Gui3.Image:draw(level)
     love.graphics.setColor(self.color)
     
     if self.quad then
-        love.graphics.draw(self.img, self.quad, 0, 0)
+        love.graphics.draw(self.img, self.quad, 0, 0, 0, self.scale, self.scale)
     else
-        love.graphics.draw(self.img, 0, 0)
+        love.graphics.draw(self.img, 0, 0, 0, self.scale, self.scale)
     end
 
     love.graphics.setColor(1, 1, 1)

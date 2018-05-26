@@ -5,7 +5,7 @@ local Gui3 = class("Gui3")
 local current_folder = (...):gsub('%.init$', '')
 current_folder = current_folder:gsub('%.', '/')
 
-local toLoad = {"Element", "Canvas", "Box", "Text", "Image", "Button", "Slider", "TileGrid", "Checkbox", "Dropdown", "SubDraw"}
+local toLoad = {"Element", "Canvas", "Box", "Text", "Image", "Button", "Slider", "TileGrid", "Checkbox", "Dropdown", "SubDraw", "Rectangle"}
 
 for _, fileName in ipairs(toLoad) do
     local path = string.format("%s/%s.lua", current_folder, fileName)

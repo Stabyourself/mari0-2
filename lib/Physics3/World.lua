@@ -129,13 +129,11 @@ end
 function World:draw()
     prof.push("Layers")
     -- Layers
-    for _, layer in ipairs(self.layers) do
-        layer:draw()
-    end
+    for i = #self.layers, 1, -1 do -- draw layers in reverse order (1 on top)
+        self.layers[i]:draw()
 
-    if VAR("debug").layers then
-        for _, layer in ipairs(self.layers) do
-            layer:debugDraw()
+        if VAR("debug").layers then
+            self.layers[i]:debugDraw()
         end
     end
 
@@ -301,9 +299,9 @@ function World:loadLevel(data)
     end
 
     -- Load lookup
-    for _, lookupTile in ipairs(data.lookup) do
-        local tileMap = lookupTile.tileMap
-        local tileNo = lookupTile.tileNo
+    for _, lookup in ipairs(data.lookups) do
+        local tileMap = lookup[1]
+        local tileNo = lookup[2]
 
         table.insert(self.tileLookups, self.tileMaps[tileMap].tiles[tileNo])
     end
@@ -348,7 +346,7 @@ function World:saveLevel(outPath)
     local out = {}
     
     -- build the lookup table
-    local lookUp = {}
+    local lookups = {}
     
     for _, layer in ipairs(self.layers) do
         for y = 1, layer.height do
@@ -359,39 +357,76 @@ function World:saveLevel(outPath)
                     -- See if the tile is already in the table
                     local found = false
                     
-                    for i, lookUpTile in ipairs(lookUp) do
-                        if lookUpTile.tileNum == tile.num and lookUpTile.tileMap == tile.tileMap then
+                    for i, lookupTile in ipairs(lookups) do
+                        if lookupTile.tileNum == tile.num and lookupTile.tileMap == tile.tileMap then
                             found = i
                             break
                         end
                     end
                     
                     if found then
-                        lookUp[found].count = lookUp[found].count + 1
+                        lookups[found].count = lookups[found].count + 1
                     else
-                        table.insert(lookUp, {tileMap = tile.tileMap, tileNum = tile.num, count = 1})
+                        table.insert(lookups, {tileMap = tile.tileMap, tileNum = tile.num, count = 1})
                     end
                 end
             end
         end
     end
 
-    out.tileMaps = {}
-    local tileMapLookUp = {}
-    
-    table.sort(lookUp, function(a, b) return a.count > b.count end)
-    
-    for j, w in ipairs(lookUp) do
-        if not out.tileMaps[w.tileMap.name] then
-            out.tileMaps[w.tileMap.name] = {}
-            tileMapLookUp[w.tileMap.name] = {}
+    table.sort(lookups, function(a, b) return a.count > b.count end)
+
+    -- build tileMap order
+    local tileMaps = {}
+    for _, lookup in ipairs(lookups) do
+        local tileMapName = lookup.tileMap.name
+
+        local tileMapI = false
+
+        for i, tileMap in ipairs(tileMaps) do
+            if tileMap.name == tileMapName then
+                tileMapI = i
+                break
+            end
         end
 
-        out.tileMaps[w.tileMap.name][tostring(j)] = w.tileNum
-        tileMapLookUp[w.tileMap.name][w.tileNum] = j
+        if not tileMapI then
+            table.insert(tileMaps, {name = tileMapName, count = 0})
+            tileMapI = #tileMaps
+        end
+
+        tileMaps[tileMapI].count = tileMaps[tileMapI].count + 1
+    end
+
+    table.sort(tileMaps, function(a, b) return a.count > b.count end)
+
+    out.tileMaps = {}
+
+    local tileMapLookup = {}
+    for i, tileMap in ipairs(tileMaps) do
+        tileMapLookup[tileMap.name] = i
+
+        table.insert(out.tileMaps, tileMap.name)
     end
     
-    -- build map based on lookup
+    -- build lookups
+    out.lookups = {}
+
+    for _, lookup in ipairs(lookups) do
+        -- find the proper tileMap index for this
+        local tileMapI = false
+
+        for i, tileMap in ipairs(tileMaps) do
+            if tileMap.name == lookup.tileMap.name then
+                tileMapI = i
+                break
+            end
+        end
+
+        table.insert(out.lookups, {tileMapI, lookup.tileNum})
+    end
+
+    -- build map based on lookups
     out.layers = {}
     
     for i, layer in ipairs(self.layers) do
@@ -407,12 +442,20 @@ function World:saveLevel(outPath)
                 local tile = layer.map[x][y]
 
                 if tile then
-                    local tileMap = tile.tileMap.name
-                    local tileNum = tile.num
+                    --find the lookup
+                    local tileMapI = tileMapLookup[tile.tileMap.name]
+                    local tileI = tile.num
+
+                    local lookupI = false
+
+                    for i, lookup in ipairs(out.lookups) do
+                        if lookup[1] == tileMapI and lookup[2] == tileI then
+                            lookupI = i
+                            break
+                        end
+                    end
                     
-                    local found = false
-                    
-                    out.layers[i].map[x][layer.height-y+1] = tileMapLookUp[tileMap][tileNum]
+                    out.layers[i].map[x][layer.height-y+1] = lookupI
                 else
                     out.layers[i].map[x][layer.height-y+1] = 0
                 end

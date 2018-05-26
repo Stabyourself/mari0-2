@@ -47,12 +47,13 @@ function StampMap.fromSelection(editor, selection)
     return StampMap:new(stampMap, width, height), xl, yt
 end
 
-function StampMap:initialize(map, w, h)
+function StampMap:initialize(map, w, h, type, name, paddings) 
     self.map = map
     self.width = w
     self.height = h
-
-    self.type = "simple"
+    self.type = type or "simple"
+    self.name = name or ""
+    self.paddings = paddings or {}
 end
 
 function StampMap:draw(x, y, w, h, uncentered)
@@ -81,7 +82,11 @@ function StampMap:draw(x, y, w, h, uncentered)
                     
         for qx = 1, w do
             for qy = 1, h do
-                quadStampMap[qx][qy]:draw((x+qx-2)*16, (y+qy-2)*16)
+                local tile = quadStampMap[qx][qy]
+                
+                if tile then
+                    tile:draw((x+qx-2)*16, (y+qy-2)*16)
+                end
             end
         end
     end
@@ -149,13 +154,35 @@ function StampMap:getQuadStampMap(w, h)
         end
     end
     
-    -- Bottom
-    for lx = 1+paddings[4], w-paddings[2] do
-        for ly = h-paddings[3]+1, h do
-            local offsetX = lx%middleXnum
-            local offsetY = (ly-h-1)%paddings[3]
-            
-            map[lx][ly] = self.map[1+paddings[4]+offsetX][1+self.height-paddings[3]+offsetY]
+    if paddings[2] + paddings[4] < #self.map then
+        -- Bottom
+        for lx = 1+paddings[4], w-paddings[2] do
+            for ly = h-paddings[3]+1, h do
+                local offsetX = (lx-1)%middleXnum
+                local offsetY = (ly-h-1)%paddings[3]
+                
+                map[lx][ly] = self.map[1+paddings[4]+offsetX][1+self.height-paddings[3]+offsetY]
+            end
+        end
+    
+        -- Center
+        for lx = paddings[4]+1, w-paddings[2] do
+            for ly = 1+paddings[1], h-paddings[3] do
+                local offsetX = (lx-1)%middleXnum
+                local offsetY = (ly-1)%middleYnum
+                
+                map[lx][ly] = self.map[1+paddings[4]+offsetX][1+paddings[1]+offsetY]
+            end
+        end
+    
+        -- Top
+        for lx = 1+paddings[4], w-paddings[2] do
+            for ly = 1, paddings[1] do
+                local offsetX = (lx-1)%middleXnum
+                local offsetY = (ly-1)%paddings[1]
+                
+                map[lx][ly] = self.map[1+paddings[4]+offsetX][1+offsetY]
+            end
         end
     end
     
@@ -173,19 +200,9 @@ function StampMap:getQuadStampMap(w, h)
     for lx = math.max(1, w-paddings[2]+1), w do
         for ly = 1+paddings[1], h-paddings[3] do
             local offsetX = (lx-w-1)%paddings[2]
-            local offsetY = ly%middleYnum
+            local offsetY = (ly-1)%middleYnum
             
             map[lx][ly] = self.map[1+self.width-paddings[2]+offsetX][1+paddings[1]+offsetY]
-        end
-    end
-    
-    -- Center
-    for lx = paddings[4]+1, w-paddings[2] do
-        for ly = 1+paddings[1], h-paddings[3] do
-            local offsetX = lx%middleXnum
-            local offsetY = ly%middleYnum
-            
-            map[lx][ly] = self.map[1+paddings[4]+offsetX][1+paddings[1]+offsetY]
         end
     end
     
@@ -193,7 +210,7 @@ function StampMap:getQuadStampMap(w, h)
     for lx = 1, math.min(w, paddings[4]) do
         for ly = 1+paddings[1], h-paddings[3] do
             local offsetX = (lx-1)%paddings[4]
-            local offsetY = ly%middleYnum
+            local offsetY = (ly-1)%middleYnum
             
             map[lx][ly] = self.map[1+offsetX][1+paddings[1]+offsetY]
         end
@@ -206,16 +223,6 @@ function StampMap:getQuadStampMap(w, h)
             local offsetY = (ly-1)%paddings[1]
             
             map[lx][ly] = self.map[1+self.width-paddings[2]+offsetX][1+offsetY]
-        end
-    end
-    
-    -- Top
-    for lx = 1+paddings[4], w-paddings[2] do
-        for ly = 1, paddings[1] do
-            local offsetX = lx%middleXnum
-            local offsetY = (ly-1)%paddings[1]
-            
-            map[lx][ly] = self.map[1+paddings[4]+offsetX][1+offsetY]
         end
     end
     

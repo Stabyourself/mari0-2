@@ -4,73 +4,21 @@
         {"type": "goomba", "x": 8, "y": 8.75}
     ],
     
-    "tileMaps": ["smb3-grass", "smb3-general", "smb3-overworld"],
+    "tileMaps": ["smb3-grass", "smb3-general"],
 
-    "lookup": [
-        {
-            "tileMap": 1,
-            "tileNo": 10
-        },
-        
-        {
-            "tileMap": 1,
-            "tileNo": 2
-        },
-        
-        {
-            "tileMap": 1,
-            "tileNo": 11
-        },
-        
-        {
-            "tileMap": 1,
-            "tileNo": 9
-        },
-        
-        {
-            "tileMap": 1,
-            "tileNo": 27
-        },
-        
-        {
-            "tileMap": 1,
-            "tileNo": 35
-        },
-        
-        {
-            "tileMap": 1,
-            "tileNo": 38
-        },
-        
-        {
-            "tileMap": 1,
-            "tileNo": 19
-        },
-        
-        {
-            "tileMap": 1,
-            "tileNo": 25
-        },
-        
-        {
-            "tileMap": 1,
-            "tileNo": 26
-        },
-        
-        {
-            "tileMap": 1,
-            "tileNo": 17
-        },
-        
-        {
-            "tileMap": 1,
-            "tileNo": 18
-        },
-        
-        {
-            "tileMap": 2,
-            "tileNo": 1
-        }
+    "lookups": [
+        [1, 10],
+        [1, 2],
+        [1, 11],
+        [1, 9],
+        [1, 27],
+        [1, 35],
+        [1, 38],
+        [1, 19],
+        [1, 25],
+        [1, 26],
+        [1, 17],
+        [1, 18]
     ],
     
     "layers": [

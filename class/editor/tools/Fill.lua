@@ -11,7 +11,7 @@ function Fill:mousepressed(x, y, button)
         self.pressingPos = {self.level:cameraToCoordinate(x, y)}
         self.pressing = true
     elseif button == 3 then
-        self.editor.tools.paint:pipette(x, y)
+        self.editor:pipette(x, y)
     end
     
     return true

@@ -73,7 +73,7 @@ function Tile:cacheCollisions()
 			local col = false
 
 			for _, points in ipairs(self.collisionTriangulated) do
-				if pointInTriangle(x, y, points) then
+				if pointInTriangle(x+0.5, y+0.5, points) then
 					col = true
 					break
 				end

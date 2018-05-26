@@ -310,7 +310,7 @@ function PhysObj:postMovement()
 end    
 
 function PhysObj:checkCollision(x, y)
-	if pointInRectangle(x, y, self.x, self.y, self.width, self.height) then
+	if pointInRectangle(x, y, math.round(self.x), math.round(self.y), self.width, self.height) then
 		return true
 	end
 end

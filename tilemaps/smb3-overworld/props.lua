@@ -25,6 +25,16 @@ local stampMaps = {
             {9, 10, 11},
         },
         paddings = {1, 1, 0, 1}, -- clockwise from top (like in css)
+    },
+
+    {
+        name = "cloud",
+        type = "quads",
+        map = {
+            {4, 5, 6},
+            {12, 13, 14},
+        },
+        paddings = {1, 1, 1, 1}, -- clockwise from top (like in css)
     }
 }
 

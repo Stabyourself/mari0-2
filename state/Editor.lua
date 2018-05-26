@@ -78,7 +78,7 @@ function Editor:load()
     self.menuBar:addChild(self.fileDropdown)
     
     self.fileDropdown.box:addChild(Gui3.Button:new(0, 0, "save", false, 1, function(button) self:saveLevel() end))
-    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("smb3test.json") end))
+    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("1-1.json") end))
     
     self.fileDropdown:autoSize()
     
@@ -106,7 +106,7 @@ function Editor:load()
     
     self.menuBar:addChild(viewDropdown)
     
-    viewDropdown.box:addChild(Gui3.Checkbox:new(0, 0, "free camera", 1, function(checkbox) self:toggleFreeCam(checkbox.value) end, true))
+    viewDropdown.box:addChild(Gui3.Checkbox:new(0, 0, "free camera", 1, function(checkbox) self:toggleFreeCam(checkbox.value) end))
     viewDropdown.box:addChild(Gui3.Checkbox:new(0, 11, "draw grid", 1, function(checkbox) self:toggleGrid(checkbox.value) end))
     viewDropdown.box:addChild(Gui3.Checkbox:new(0, 22, "hide ui", 1, function(checkbox) self:toggleUI(checkbox.value) end))
     
@@ -175,7 +175,7 @@ function Editor:load()
     self:updateMinimap()
     
     self:toggleGrid(false)
-    self:toggleFreeCam(true)
+    self:toggleFreeCam(false)
 end
 
 function Editor:update(dt)
@@ -221,6 +221,17 @@ function Editor:update(dt)
 
     if self.floatingSelection then
         self.floatingSelection:update(dt)
+    end
+
+    for _, window in ipairs(self.windows) do
+        if window:isInstanceOf(self.windowClasses.minimap) then
+            local x, y = self.level:cameraToWorld(0, 0)
+
+            x = x/16 - self.level:getXStart()
+            y = y/16 - self.level:getYStart()
+            
+            window:updateBorder(x*3, y*3, CAMERAWIDTH/16+1, CAMERAHEIGHT/16+1)
+        end
     end
     prof.pop()
     prof.pop()
@@ -434,7 +445,7 @@ function Editor:cmdpressed(cmd)
         self:saveLevel()
         
     elseif cmd["editor.load"] then
-        self:loadLevel("smb3test.json")
+        self:loadLevel("1-1.json")
         
     elseif cmd["editor.select.clear"] then
         if self.selection then
@@ -554,7 +565,7 @@ end
 function Editor:saveLevel()
     self.fileDropdown:toggle(false)
     
-    self.level:saveLevel("smb3test.json")
+    self.level:saveLevel("1-1.json")
 end
 
 function Editor:loadLevel(path)
@@ -564,6 +575,8 @@ function Editor:loadLevel(path)
     self.level:loadLevel(data)
 
     self.activeLayer = self.level.layers[1]
+
+    self:updateMinimap()
 end
 
 function Editor:clearSelection()
@@ -679,7 +692,10 @@ function Editor:pipette()
         
         if tile then
             self.tools.paint.tile = tile
-            self:selectTool("paint")
+
+            if self.tool ~= self.tools["fill"] then
+                self:selectTool("paint")
+            end
         else
             self:selectTool("erase")
         end
@@ -688,14 +704,23 @@ end
 
 function Editor:updateMinimap()
     local t = love.timer.getTime()
-    local width = self.level:getWidth()
-    local height = self.level:getHeight()
+    
+    local yStart = self.level:getYStart()
+    local yEnd = self.level:getYEnd()
+    local xStart = self.level:getXStart()
+    local xEnd = self.level:getXEnd()
+
+    local width = xEnd - xStart + 1
+    local height = yEnd - yStart + 1
 
     self.minimapImgData = love.image.newImageData(width, height)
 
     for y = 1, height do
         for x = 1, width do
-            local tile = self.level:getTile(x, y)
+            local tileX = xStart + x - 1
+            local tileY = yStart + y - 1
+
+            local tile = self.level:getTile(tileX, tileY)
 
             if tile then
                 self.minimapImgData:setPixel(x-1, y-1, unpack(tile:getAverageColor()))
@@ -714,4 +739,8 @@ function Editor:updateMinimap()
             window:updateImg(self.minimapImg)
         end
     end
+end
+
+function Editor:drawMinimap()
+    love.graphics.draw(self.minimapImg)
 end

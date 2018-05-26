@@ -8,8 +8,8 @@ Portal.thingSmallImg = love.graphics.newImage("img/portal-thing-small.png")
 Portal.thingMediumImg = love.graphics.newImage("img/portal-thing-medium.png")
 
 local PORTALANIMATIONTIME = 1.5
-local PORTALSMALLLAG = 0.15
 local PORTALMEDIUMLAG = 0.06
+local PORTALSMALLLAG = 0.15
 local PORTALTHINGS = 3
 local PORTALTHINGDIFF = math.pi*2/PORTALTHINGS
 local PORTALPARTICLETIME = 0.1

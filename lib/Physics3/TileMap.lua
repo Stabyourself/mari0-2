@@ -58,13 +58,15 @@ function TileMap:initialize(path, name)
 
 			-- sanity checks
 			for i = 1, 4 do
-				local compareTo = w
+				if stampMap.paddings and stampMap.paddings[i] then
+					local compareTo = w
 
-				if i%2 == 1 then
-					compareTo = h
+					if i%2 == 1 then
+						compareTo = h
+					end
+
+					assert(stampMap.paddings[i] <= compareTo, string.format("StampMap \"%s\" from the TileMap \"%s\" had a padding[%s] bigger than its own size. I hope I don't have to explain how nonsensical that is.", stampMap.name, name, i))
 				end
-
-				assert(stampMap.paddings[i] <= compareTo, string.format("StampMap \"%s\" from the TileMap \"%s\" had a padding[%s] bigger than its own size. I hope I don't have to explain how nonsensical that is.", stampMap.name, name, i))
 			end
 			
 			table.insert(self.stampMaps, StampMap:new(map, w, h, stampMap.type, stampMap.name, stampMap.paddings))

@@ -257,7 +257,7 @@ function Editor:draw()
     end)
     love.graphics.setStencilTest("notequal", 1)
     
-    self.mapBoundsQuad:setViewport(0, 0, xr-xl, yb-yt)
+    self.mapBoundsQuad:setViewport(self.level.camera.x%8, self.level.camera.y%8, xr-xl, yb-yt)
     love.graphics.setColor(0, 0, 0, 0.1)
     love.graphics.draw(debugCandyImg, self.mapBoundsQuad, xl, yt)
     love.graphics.setColor(1, 1, 1)

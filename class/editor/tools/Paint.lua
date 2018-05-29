@@ -32,8 +32,6 @@ function Paint:update(dt)
                 layer:setCoordinate(tile[1], tile[2], self.tile)
             end
 
-            self.editor:updateMinimap()
-
             self.lastX = x
             self.lastY = y
         end
@@ -88,6 +86,7 @@ function Paint:mousepressed(x, y, button)
         end
         
         self.editor:saveState()
+        self.editor:updateMinimap()
 
         self.lastX = coordX
         self.lastY = coordY
@@ -107,6 +106,7 @@ function Paint:mousereleased(x, y, button)
         self.penDown = false
 
         self.editor:saveState()
+        self.editor:updateMinimap()
     end
 end
 

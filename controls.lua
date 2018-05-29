@@ -7,8 +7,8 @@ return {
     ["s"] = "down",
     ["w"] = "up",
     ["space"] = {"jump", "editor.tool.entity"},
-    ["lshift"] = {"run", "editor.pipette", "editor.select.add"},
-    ["rshift"] = {"run", "editor.pipette", "editor.select.add"},
+    ["lshift"] = {"run", "editor.line", "editor.select.add"},
+    ["rshift"] = {"run", "editor.line", "editor.select.add"},
     ["r"] = {"closePortals", "editor.tool.paint"},
     
     ["delete"] = "editor.delete",
@@ -21,8 +21,8 @@ return {
     
     ["^s"] = "editor.save",
 
-    ["lctrl"] = "editor.select.subtract",
-    ["rctrl"] = "editor.select.subtract",
+    ["lctrl"] = {"editor.select.subtract", "editor.pipette"},
+    ["rctrl"] = {"editor.select.subtract", "editor.pipette"},
     ["lalt"] = "editor.wand.global",
     ["ralt"] = "editor.wand.global",
     

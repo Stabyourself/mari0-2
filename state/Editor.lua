@@ -191,7 +191,7 @@ function Editor:update(dt)
     prof.pop()
     
     if self.freeCamera then
-        local cameraSpeed = dt*VAR("editor").cameraSpeed--*(1/self.level.camera.scale)
+        local cameraSpeed = dt*VAR("editor").cameraSpeed*(1/self.level.camera.scale)
         
         if cmdDown("right") then
             self.level.camera.x = self.level.camera.x + cameraSpeed
@@ -428,8 +428,10 @@ function Editor:cmdpressed(cmd)
     
     elseif cmd["editor.paste"] then
         if self.clipboard then
-            self:selectTool("select")
-
+            if self.tool ~= self.tools.select then
+                self:selectTool("select")
+            end
+            
             if self.floatingSelection then
                 self.pastePos = {unpack(self.floatingSelection.pos)}
                 self.floatingSelection:unFloat()
@@ -648,11 +650,11 @@ function Editor:unFloatSelection()
     end
 end
 
-function Editor:drawSizeHelp(w, h)
+function Editor:drawSizeHelp(w, h, glue)
     self.level.camera:detach()
 
     local x, y = self.level:getMouse()
-    local s = string.format("%s×%s", w, h)
+    local s = string.format("%s%s%s", w, glue or "×", h)
     local width = utf8.len(s)*8
 
     local textX = x+6

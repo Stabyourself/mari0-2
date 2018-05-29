@@ -214,7 +214,7 @@ function pointInTriangle(x, y, t) -- Credits to https://stackoverflow.com/questi
     local s = (t[2] * t[5] - t[1] * t[6] + (t[6] - t[2]) * x + (t[1] - t[5]) * y) * sign
     local t = (t[1] * t[4] - t[2] * t[3] + (t[2] - t[4]) * x + (t[3] - t[1]) * y) * sign
 
-    return s >= 0 and t >= 0 and (s + t) < 2 * A * sign
+    return s >= 0 and t >= 0 and (s + t) <= 2 * A * sign
 end
 
 function paletteSwap(imgData, swaps)
@@ -433,4 +433,45 @@ end
 
 function pointInRectangle(x, y, rx, ry, rw, rh)
     return x >= rx and y >= ry and x < rx+rw and y < ry+rh
+end
+
+function tilesInLine(x1, y1, x2, y2) -- Mostly copied from https://github.com/kikito/bresenham.lua
+    local tiles = {}
+    local sx,sy,dx,dy
+  
+    if x1 < x2 then
+        sx = 1
+        dx = x2 - x1
+    else
+        sx = -1
+        dx = x1 - x2
+    end
+  
+    if y1 < y2 then
+        sy = 1
+        dy = y2 - y1
+    else
+        sy = -1
+        dy = y1 - y2
+    end
+  
+    local err, e2 = dx-dy, nil
+
+    table.insert(tiles, {x1, y1})
+  
+    while x1 ~= x2 or y1 ~= y2 do
+        e2 = err + err
+        if e2 > -dy then
+            err = err - dy
+            x1  = x1 + sx
+        end
+        if e2 < dx then
+            err = err + dx
+            y1  = y1 + sy
+        end
+
+        table.insert(tiles, {x1, y1})
+    end
+  
+    return tiles
 end

@@ -120,7 +120,7 @@ function Gui3.Element:update(dt, x, y, mouseBlocked, absX, absY)
                 self.h = math.min(self.parent:getInnerHeight()-self.y-self.posMax[2], self.h)
             end
 
-            if (self.w ~= w or self.h ~= h) and self.sizeChanged then
+            if (self.w ~= w or self.h ~= h) then
                 self:sizeChanged()
             end
         end
@@ -439,5 +439,7 @@ function Gui3.Element:autoSize()
     self.childBox[3] = w
     self.childBox[4] = h
 end
+
+function Gui3.Element:sizeChanged() end
 
 function Gui3.Element:onAssign() end

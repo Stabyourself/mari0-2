@@ -4,7 +4,7 @@ The actor will move at a constant speed until hitting any obstacle, at which poi
 
 ![truffleShuffle](truffleShuffle.gif)
 
-```js
+```json
 "movement.truffleShuffle": {
     "maxSpeed": 60,
     "acceleration": 150,

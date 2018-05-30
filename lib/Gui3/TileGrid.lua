@@ -37,8 +37,12 @@ function Gui3.TileGrid:getCollision(x, y)
         return false
     end
     
-    local tileX = math.ceil(x/(self.size[1]+self.gutter[1]))
-    local tileY = math.ceil(y/(self.size[2]+self.gutter[2]))
+    local tileX = math.floor(x/(self.size[1]+self.gutter[1]))+1
+    local tileY = math.floor(y/(self.size[2]+self.gutter[2]))+1
+
+    if tileX < 1 or tileX > self.perRow then
+        return false
+    end
     
     local tileNum = (tileY-1)*self.perRow+tileX
 

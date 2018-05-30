@@ -35,11 +35,13 @@ function TilesWindow:goToMenu()
     -- populate element with a button for each tileMap
     for i, tileMap in ipairs(self.level.tileMaps) do
         local thumb = tileMap.thumbImg or tileMap.img
-        local y = 2+(i-1)*(tileMapImageH+17)
 
-        local tileMapButton = Gui3.Button:new(2, y, {tileMap.name, {img = thumb, h = tileMapImageH}}, true, 0, function() self:goToTileMap(tileMap) end, tileMapImageW)
+        local tileMapButton = Gui3.Button:new(2, 2, {tileMap.name, {img = thumb, h = tileMapImageH}}, true, 0, function() self:goToTileMap(tileMap) end, tileMapImageW)
         self.element:addChild(tileMapButton)
     end
+
+    self.element.autoArrangeChildren = true
+    self.element:sizeChanged()
 end
 
 function TilesWindow:goToTileMap(tileMap)
@@ -63,6 +65,7 @@ function TilesWindow:goToTileMap(tileMap)
         end
     )
     self.element:addChild(self.tileListTileGrid)
+    self.element.autoArrangeChildren = false
 end
 
 return TilesWindow

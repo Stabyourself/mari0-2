@@ -1,4 +1,4 @@
--- ^ctrl !alt +shift (the order is important)
+-- ^ctrl !alt +shift (the order is important when stacking)
 return {
     ["escape"] = {"quit", "editor.select.clear"},
     

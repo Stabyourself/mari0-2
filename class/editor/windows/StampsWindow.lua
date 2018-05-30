@@ -40,35 +40,9 @@ function StampsWindow:initialize(editor)
         end
     end
 
-    self:arrangeButtons()
-
-    self.element.sizeChanged = function()
-        self:arrangeButtons()
-    end
-end
-
-function StampsWindow:arrangeButtons()
-    local x = 2
-    local y = 2
-    local maxHeight = 0
-
-    for _, button in ipairs(self.buttons) do
-        local width = button.w
-        local height = button.h
-
-        maxHeight = math.max(maxHeight, height)
-
-        if x + width+2 > self.element:getInnerWidth() then
-            x = 2
-            y = y + maxHeight + 2
-            maxHeight = 0
-        end
-
-        button.x = x
-        button.y = y
-
-        x = x + width + 2
-    end
+    self.element.autoArrangeChildren = true
+    self.element.hasScrollbar[2] = true
+    self.element:sizeChanged()
 end
 
 function StampsWindow:clickStampMap(stampMap)

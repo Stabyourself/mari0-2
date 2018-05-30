@@ -20,3 +20,7 @@ function Gui3.Canvas:draw(level)
 
     Gui3.Element.unTranslate(self)
 end
+
+function Gui3.Canvas:update(dt, x, y, mouseBlocked, absX, absY)
+    Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
+end

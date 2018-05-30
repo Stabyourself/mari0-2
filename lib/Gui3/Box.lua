@@ -163,3 +163,36 @@ function Gui3.Box:mousereleased(x, y, button)
 
     Gui3.Element.mousereleased(self, x, y, button)
 end
+
+function Gui3.Box:sizeChanged()
+    if self.autoArrangeChildren then
+        self:arrangeChildren()
+    end
+end
+
+function Gui3.Box:arrangeChildren()
+    local offX = self.offX or 2
+    local offY = self.offY or 2
+
+    local x = offX
+    local y = offY
+    local maxHeight = 0
+
+    for _, child in ipairs(self.children) do
+        local width = child.w
+        local height = child.h
+
+        maxHeight = math.max(maxHeight, height)
+
+        if x ~= offX and x + width+2 > self:getInnerWidth() then
+            x = offX
+            y = y + maxHeight + offY
+            maxHeight = 0
+        end
+
+        child.x = x
+        child.y = y
+
+        x = x + width + offX
+    end
+end

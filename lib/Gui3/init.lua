@@ -5,7 +5,20 @@ local Gui3 = class("Gui3")
 local current_folder = (...):gsub('%.init$', '')
 current_folder = current_folder:gsub('%.', '/')
 
-local toLoad = {"Element", "Canvas", "Box", "Text", "Image", "Button", "Slider", "TileGrid", "Checkbox", "Dropdown", "SubDraw", "Rectangle"}
+local toLoad = {
+    "Element",
+    "Canvas",
+    "Box",
+    "Text",
+    "Image",
+    "Button",
+    "Slider",
+    "TileGrid",
+    "Checkbox",
+    "Dropdown",
+    "SubDraw",
+    "Rectangle",
+}
 
 for _, fileName in ipairs(toLoad) do
     local path = string.format("%s/%s.lua", current_folder, fileName)
@@ -14,11 +27,9 @@ end
 
 function Gui3.makeBoxCache(quads)
     local _, _, w1 = quads[1]:getViewport()
-    local _, _, w2 = quads[2]:getViewport()
     local _, _, w3 = quads[3]:getViewport()
-    
+
     local _, _, _, h1 = quads[1]:getViewport()
-    local _, _, _, h2 = quads[4]:getViewport()
     local _, _, _, h3 = quads[7]:getViewport()
 
     local out = {}
@@ -66,33 +77,33 @@ Gui3.boxCache[Gui3.titledBoxQuad] = Gui3.makeBoxCache(Gui3.titledBoxQuad)
 
 function Gui3:initialize(folder)
     self.folder = folder
-    
+
     self.img = {}
     self.img.box = love.graphics.newImage(folder .. "/box.png")
     self.img.boxTitled = love.graphics.newImage(folder .. "/box-titled.png")
-    
+
     self.img.scrollbar = love.graphics.newImage(folder .. "/scrollbar.png")
     self.img.scrollbarHover = love.graphics.newImage(folder .. "/scrollbar-hover.png")
     self.img.scrollbarActive = love.graphics.newImage(folder .. "/scrollbar-active.png")
     self.img.scrollbarBack = love.graphics.newImage(folder .. "/scrollbar-back.png")
-    
+
     self.img.boxResize = love.graphics.newImage(folder .. "/box-resize.png")
     self.img.boxResizeHover = love.graphics.newImage(folder .. "/box-resize-hover.png")
     self.img.boxResizeActive = love.graphics.newImage(folder .. "/box-resize-active.png")
-    
+
     self.img.boxClose = love.graphics.newImage(folder .. "/box-close.png")
     self.img.boxCloseHover = love.graphics.newImage(folder .. "/box-close-hover.png")
     self.img.boxCloseActive = love.graphics.newImage(folder .. "/box-close-active.png")
-    
+
     self.img.button = love.graphics.newImage(folder .. "/button.png")
     self.img.buttonHover = love.graphics.newImage(folder .. "/button-hover.png")
     self.img.buttonActive = love.graphics.newImage(folder .. "/button-active.png")
-    
+
     self.img.slider = love.graphics.newImage(folder .. "/slider.png")
     self.img.sliderHover = love.graphics.newImage(folder .. "/slider-hover.png")
     self.img.sliderActive = love.graphics.newImage(folder .. "/slider-active.png")
     self.img.sliderBar = love.graphics.newImage(folder .. "/slider-bar.png")
-    
+
     self.img.checkbox = {
         on = love.graphics.newImage(folder .. "/checkbox-on.png"),
         off = love.graphics.newImage(folder .. "/checkbox-off.png"),
@@ -112,7 +123,7 @@ function Gui3.drawBox(img, quads, x, y, w, h)
 
     love.graphics.push()
     love.graphics.translate(x, y)
-    
+
     love.graphics.draw(img, quads[1], v[1][1], v[1][2], 0, 1, 1)
     love.graphics.draw(img, quads[2], v[2][1], v[2][2], 0, w+v[2][3], 1)
     love.graphics.draw(img, quads[3], w+v[3][1], v[3][2], 0, 1, 1)

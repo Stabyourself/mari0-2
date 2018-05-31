@@ -14,23 +14,23 @@ function Gui3.Slider:initialize(min, max, x, y, w, showValue, func)
     self.min = min
     self.max = max
     self.showValue = showValue
-    
+
     self.val = 0
     self.func = func
-    
+
     self.barWidth = w-self.barOffset*2
-    
+
     if showValue then
         self.barWidth = self.barWidth - self.textWidth
         self.text = Gui3.Text:new(tostring(self:getValue()), w-self.textWidth+1, 0)
     end
-    
+
     Gui3.Element.initialize(self, x, y, w, 8)
-    
+
     if showValue then
         self:addChild(self.text)
     end
-    
+
     self.color = {
         bar = {1, 1, 1},
         slider = {1, 1, 1},
@@ -39,18 +39,18 @@ end
 
 function Gui3.Slider:update(dt, x, y, mouseBlocked, absX, absY)
     local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
-    
+
     if self.dragging then
         local pos = (self.mouse[1]-self.dragX-self.barOffset)/(self.barWidth)
-        
+
         pos = math.clamp(pos, 0, 1)
-        
+
         self.val = pos
-        
+
         if self.showValue then
             self.text:setString(tostring(math.round(self:getValue())))
         end
-        
+
         if self.func then
             self.func(self:getValue())
         end
@@ -69,7 +69,7 @@ end
 
 function Gui3.Slider:getCollision(x, y)
     local sliderX = self:getPosX()
-    
+
     return not self.mouseBlocked and x >= sliderX-2 and x < sliderX+2 and y >= 0 and y < 8
 end
 
@@ -79,15 +79,15 @@ end
 
 function Gui3.Slider:draw(level)
     Gui3.Element.translate(self)
-    
+
     Gui3.Element.draw(self, level)
-    
+
     love.graphics.setColor(self.color.bar)
-    
+
     love.graphics.draw(self.gui.img.sliderBar, sliderQuad[1], 0, 0)
     love.graphics.draw(self.gui.img.sliderBar, sliderQuad[2], 8, 0, 0, self.barWidth+self.barOffset*2-16, 1)
     love.graphics.draw(self.gui.img.sliderBar, sliderQuad[3], self.barWidth+self.barOffset*2-8, 0)
-    
+
     local img = self.gui.img.slider
 
     if self.dragging then
@@ -95,11 +95,11 @@ function Gui3.Slider:draw(level)
     elseif self:getCollision(self.mouse[1], self.mouse[2]) then
         img = self.gui.img.sliderHover
     end
-    
+
     love.graphics.setColor(self.color.slider)
-    
+
     love.graphics.draw(img, self:getPosX(), 0, 0, 1, 1, 4)
-    
+
     love.graphics.setColor(1, 1, 1)
 
     Gui3.Element.unTranslate(self)
@@ -110,7 +110,7 @@ function Gui3.Slider:mousepressed(x, y, button)
         self.dragging = true
         self.dragX = x-self:getPosX()
     end
-    
+
     return Gui3.Element.mousepressed(self, x, y, button)
 end
 function Gui3.Slider:mousereleased(x, y, button)

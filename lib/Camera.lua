@@ -96,7 +96,7 @@ end
 function camera:zoom(mul, x, y)
 	x = x or self.w/2
 	y = y or self.h/2
-	
+
 	local px, py = self:worldCoords(x, y)
 	self.scale = self.scale * mul
 
@@ -177,7 +177,7 @@ function camera:mousePosition(ox,oy)
 
 	mx = mx/VAR("scale")
 	my = my/VAR("scale")
-	
+
 	return self:worldCoords(mx, my, ox,oy)
 end
 

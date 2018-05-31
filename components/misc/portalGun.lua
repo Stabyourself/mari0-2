@@ -37,15 +37,23 @@ function portalGun:click(dt, actorEvent, button)
         local crosshair = hasCrosshair.crosshair
 
         if crosshair.target.valid then
-            local portal = self.actor.world:attemptPortal(crosshair.target.layer, crosshair.target.tileX, crosshair.target.tileY, crosshair.target.blockSide, crosshair.target.worldX, crosshair.target.worldY, self.portalColor[button], self.portals[button])
-            
+            local portal = self.actor.world:attemptPortal(
+                crosshair.target.layer,
+                crosshair.target.tileX,
+                crosshair.target.tileY,
+                crosshair.target.blockSide,
+                crosshair.target.worldX,
+                crosshair.target.worldY,
+                self.portalColor[button],
+                self.portals[button])
+
             if portal then
                 if self.portals[button] then
                     self.portals[button].deleteMe = true
                 end
-                
+
                 self.portals[button] = portal
-                        
+
                 if self.portals[1] and self.portals[2] then
                     self.portals[1]:connectTo(self.portals[2])
                     self.portals[2]:connectTo(self.portals[1])

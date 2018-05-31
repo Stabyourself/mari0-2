@@ -7,31 +7,31 @@ local pMeterQuad = {
 
 function Smb3Ui:initialize()
     self.pMeter = 0
-    
+
     self.pMeterBlinkTimer = 0
-    
+
     self.skyColor = game.level.backgroundColor
     self.time = 0
     self.world = 1
     self.score = 0
     self.coins = 0
     self.lives = 0
-    
+
     self.canvas = Gui3.Canvas:new(0, SCREENHEIGHT-VAR("uiHeight"), SCREENWIDTH, VAR("uiHeight"))
     self.canvas.gui = defaultUI
     self.canvas.background = {0, 0, 0}
-    
+
     self.uiBox = Gui3.Box:new(16, 3, 150, 26)
     self.uiBox.background = self.skyColor
     self.canvas:addChild(self.uiBox)
-    
+
     self.cardBoxes = {}
     for i = 1, 3 do
         self.cardBoxes[i] = Gui3.Box:new(150+i*28, 3, 22, 26)
         self.cardBoxes[i].background = self.skyColor
         self.canvas:addChild(self.cardBoxes[i])
     end
-    
+
     self.element = {}
 
 
@@ -49,7 +49,7 @@ function Smb3Ui:initialize()
     self.element.score = Gui3.Text:new("", 49, 10)
 
     self.element.time = Gui3.Text:new("", 113, 10)
-    
+
 
     self.uiBox:addChild(self.element.worldImg)
     self.uiBox:addChild(self.element.world)
@@ -65,7 +65,7 @@ function Smb3Ui:initialize()
     self.uiBox:addChild(self.element.score)
 
     self.uiBox:addChild(self.element.time)
-    
+
 
     self:resize()
 end
@@ -73,7 +73,7 @@ end
 function Smb3Ui:resize()
     self.canvas:resize(SCREENWIDTH, self.canvas.h)
     self.canvas.y = SCREENHEIGHT-VAR("uiHeight")
-    
+
     self.uiBox.x = (SCREENWIDTH-256)/2+13
     for i, cardBox in ipairs(self.cardBoxes) do
         cardBox.x = (SCREENWIDTH-256)/2+i*24+149
@@ -83,12 +83,12 @@ end
 function Smb3Ui:update(dt)
     if self.pMeter == VAR("pMeterTicks") then
         self.pMeterBlinkTimer = self.pMeterBlinkTimer + dt
-        
+
         while self.pMeterBlinkTimer > VAR("pMeterBlinkTime")*2 do
             self.pMeterBlinkTimer = self.pMeterBlinkTimer - VAR("pMeterBlinkTime")*2
         end
     end
-    
+
     prof.push("concats")
     self.element.world:setString(self:getWorldText())
     self.element.pMeter:setString(self:getPMeterText())
@@ -98,7 +98,7 @@ function Smb3Ui:update(dt)
     self.element.score:setString(self:getScoreText())
     self.element.time:setString(self:getTimeText())
     prof.pop()
-    
+
     prof.push("canvas")
     self.canvas:update(dt)
     prof.pop()

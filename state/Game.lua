@@ -2,27 +2,27 @@ Game = class("Game")
 
 function Game:load()
     gameState = "game"
-    
+
     self.level = Level:new("levels/smb3test.json")
-    
+
     smb3ui = Smb3Ui:new()
     self.uiVisible = true
 
     self.timeLeft = 400
-    
+
     love.graphics.setBackgroundColor(self.level.backgroundColor)
 end
 
 function Game:update(dt)
     prof.push("Game")
     self.timeLeft = math.max(0, self.timeLeft-(60/42)*dt)
-    
+
     self.level:update(dt)
-    
+
     if self.level.marios[1].y > self.level:getYEnd()*self.level.tileSize+.5 then
         self.level.marios[1].y = -1
     end
-    
+
     prof.push("UI")
     if self.uiVisible then
         smb3ui:update(dt)
@@ -36,7 +36,7 @@ function Game:draw()
     self.level:draw()
 
     love.graphics.setColor(1, 1, 1)
-    
+
     prof.push("UI")
     if self.uiVisible then
         smb3ui.time = math.floor(love.timer.getFPS())--math.ceil(self.timeLeft)

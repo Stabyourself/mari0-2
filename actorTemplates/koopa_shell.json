@@ -25,7 +25,7 @@
 
         "movement.truffleShuffle": {
             "maxSpeed": 150,
-            "startZero": true,
+            "startSpeed": 0,
             "canStop": true
         },
         "misc.unrotate": {},
@@ -34,6 +34,17 @@
             "left": true,
             "right": true,
             "onlyWhenMoving": true
+        },
+        "misc.wakesUp": {
+            "when": "stopped",
+            "time": 6.9,
+            "loadActorTemplate": "koopa",
+            "wiggles": true,
+            "wiggleAfter": 5.233333,
+            "wiggleDistance": 1,
+            "wiggleTime": 0.016666667,
+            "wiggleFrames": [1, 5],
+            "wiggleFrameTime": [0.03333333]
         }
     }
 }

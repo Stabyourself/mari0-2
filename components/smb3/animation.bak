@@ -24,13 +24,13 @@ local STARPALETTES = {
         {  0/255,   0/255,   0/255},
         {216/255,  40/255,   0/255},
     },
-    
+
     {
         {252/255, 252/255, 252/255},
         {  0/255,   0/255,   0/255},
         { 76/255, 220/255,  72/255},
     },
-    
+
     {
         {252/255/255, 188/255, 176/255},
         {  0/255/255,   0/255,   0/255},
@@ -51,44 +51,44 @@ local powerUpStates = {
         centerY = 15,
         frames = {
             "idle",
-            
+
             "run",
             "run",
-            
+
             "sprint",
             "sprint",
-            
+
             "skid",
-            
+
             "jump",
-            
+
             "fall",
-            
+
             "fly",
-            
+
             "die",
-            
+
             "buttSlide",
-            
+
             "swim",
             "swim",
             "swim",
             "swim",
-            
+
             "pipe",
-            
+
             "holdIdle",
-            
+
             "holdRun",
             "holdRun",
-            
+
             "kick",
-            
+
             "climb",
             "climb",
         },
     },
-    
+
     big = {
         colors = {
             {252/255, 188/255, 176/255},
@@ -102,55 +102,55 @@ local powerUpStates = {
         canDuck = true,
         frames = {
             "idle",
-            
+
             "run",
             "run",
             "run",
             "run",
-            
+
             "sprint",
             "sprint",
             "sprint",
             "sprint",
-            
+
             "skid",
-            
+
             "jump",
-            
+
             "fall",
-            
+
             "fly",
-            
+
             "die",
-            
+
             "duck",
-            
+
             "buttSlide",
-            
+
             "swim",
             "swim",
             "swim",
             "swim",
-            
+
             "swimUp",
             "swimUp",
             "swimUp",
-            
+
             "pipe",
             "useless",
-            
+
             "holdIdle",
-            
+
             "holdRun",
             "holdRun",
             "holdRun",
             "holdRun",
-            
+
             "kick",
-            
+
             "climb",
             "climb",
-            
+
             "somerSault",
             "somerSault",
             "somerSault",
@@ -159,17 +159,17 @@ local powerUpStates = {
             "somerSault",
             "somerSault",
             "somerSault",
-            
+
             "shoot",
             "shoot",
             "shoot",
-            
+
             "shootAir",
             "shootAir",
             "shootAir",
         },
     },
-    
+
     fire = {
         colors = {
             {252/255, 188/255, 176/255},
@@ -184,55 +184,55 @@ local powerUpStates = {
         canShoot = true,
         frames = {
             "idle",
-            
+
             "run",
             "run",
             "run",
             "run",
-            
+
             "sprint",
             "sprint",
             "sprint",
             "sprint",
-            
+
             "skid",
-            
+
             "jump",
-            
+
             "fall",
-            
+
             "fly",
-            
+
             "die",
-            
+
             "duck",
-            
+
             "buttSlide",
-            
+
             "swim",
             "swim",
             "swim",
             "swim",
-            
+
             "swimUp",
             "swimUp",
             "swimUp",
-            
+
             "pipe",
             "useless",
-            
+
             "holdIdle",
-            
+
             "holdRun",
             "holdRun",
             "holdRun",
             "holdRun",
-            
+
             "kick",
-            
+
             "climb",
             "climb",
-            
+
             "somerSault",
             "somerSault",
             "somerSault",
@@ -241,17 +241,17 @@ local powerUpStates = {
             "somerSault",
             "somerSault",
             "somerSault",
-            
+
             "shoot",
             "shoot",
             "shoot",
-            
+
             "shootAir",
             "shootAir",
             "shootAir",
         },
     },
-    
+
     hammer = {
         colors = {
             {252/255, 188/255, 176/255},
@@ -266,55 +266,55 @@ local powerUpStates = {
         canShoot = true,
         frames = {
             "idle",
-            
+
             "run",
             "run",
             "run",
             "run",
-            
+
             "sprint",
             "sprint",
             "sprint",
             "sprint",
-            
+
             "skid",
-            
+
             "jump",
-            
+
             "fall",
-            
+
             "fly",
-            
+
             "die",
-            
+
             "duck",
-            
+
             "buttSlide",
-            
+
             "swim",
             "swim",
             "swim",
             "swim",
-            
+
             "swimUp",
             "swimUp",
             "swimUp",
-            
+
             "pipe",
             "useless",
-            
+
             "holdIdle",
-            
+
             "holdRun",
             "holdRun",
             "holdRun",
             "holdRun",
-            
+
             "kick",
-            
+
             "climb",
             "climb",
-            
+
             "somerSault",
             "somerSault",
             "somerSault",
@@ -323,17 +323,17 @@ local powerUpStates = {
             "somerSault",
             "somerSault",
             "somerSault",
-            
+
             "shoot",
             "shoot",
             "shoot",
-            
+
             "shootAir",
             "shootAir",
             "shootAir",
         },
     },
-    
+
     raccoon = {
         colors = {
             {252/255, 188/255, 176/255},
@@ -350,68 +350,68 @@ local powerUpStates = {
         canDuck = true,
         frames = {
             "idle",
-            
+
             "run",
             "run",
             "run",
             "run",
-            
+
             "sprint",
             "sprint",
             "sprint",
             "sprint",
-            
+
             "skid",
-            
+
             "jump",
-            
+
             "fall",
-            
+
             "fly",
             "fly",
             "fly",
-            
+
             "float",
             "float",
             "float",
-            
+
             "die",
-            
+
             "duck",
-            
+
             "buttSlide",
-            
+
             "swim",
             "swim",
             "swim",
             "swim",
-            
+
             "swimUp",
             "swimUp",
             "swimUp",
-            
+
             "spin",
             "spin",
             "spin",
             "spin",
-            
+
             "spinAir",
             "spinAir",
             "spinAir",
             "spinAir",
-            
+
             "holdIdle",
-            
+
             "holdRun",
             "holdRun",
             "holdRun",
             "holdRun",
-            
+
             "kick",
-            
+
             "climb",
             "climb",
-            
+
             "somerSault",
             "somerSault",
             "somerSault",
@@ -422,7 +422,7 @@ local powerUpStates = {
             "somerSault",
         },
     },
-    
+
     tanooki = {
         colors = {
             {252/255, 188/255, 176},
@@ -439,68 +439,68 @@ local powerUpStates = {
         canDuck = true,
         frames = {
             "idle",
-            
+
             "run",
             "run",
             "run",
             "run",
-            
+
             "sprint",
             "sprint",
             "sprint",
             "sprint",
-            
+
             "skid",
-            
+
             "jump",
-            
+
             "fall",
-            
+
             "fly",
             "fly",
             "fly",
-            
+
             "float",
             "float",
             "float",
-            
+
             "die",
-            
+
             "duck",
-            
+
             "buttSlide",
-            
+
             "swim",
             "swim",
             "swim",
             "swim",
-            
+
             "swimUp",
             "swimUp",
             "swimUp",
-            
+
             "spin",
             "spin",
             "spin",
             "spin",
-            
+
             "spinAir",
             "spinAir",
             "spinAir",
             "spinAir",
-            
+
             "holdIdle",
-            
+
             "holdRun",
             "holdRun",
             "holdRun",
             "holdRun",
-            
+
             "kick",
-            
+
             "climb",
             "climb",
-            
+
             "somerSault",
             "somerSault",
             "somerSault",
@@ -509,7 +509,7 @@ local powerUpStates = {
             "somerSault",
             "somerSault",
             "somerSault",
-            
+
             "statue",
         },
     }
@@ -524,59 +524,59 @@ end
 for i, v in pairs(powerUpStates) do
     graphics[i] = {}
     local char = graphics[i]
-    
+
     for j, w in pairs(v) do
         char[j] = w
     end
-    
+
     char.img = {}
     local imgWidth, imgHeight
-    
+
     local j = 1
     local fileInfo = love.filesystem.getInfo(getPath(i, j))
-    
+
     while fileInfo and fileInfo.type == "file" do
         char.img[j] = love.graphics.newImage(getPath(i, j))
-        
+
         imgWidth = char.img[j]:getWidth()
         imgHeight = char.img[j]:getHeight()
-        
+
         j = j + 1
         fileInfo = love.filesystem.getInfo(getPath(i, j))
     end
-    
+
     local fileInfo = love.filesystem.getInfo(getPath(i, "static"))
     if fileInfo and fileInfo.type == "file" then
         char.img["static"] = love.graphics.newImage(getPath(i, "static"))
-        
+
         imgWidth = char.img["static"]:getWidth()
         imgHeight = char.img["static"]:getHeight()
     end
-    
+
     assert(imgWidth, "I couldn't load a single image for powerUpState \"" .. i .. "\", this is illegal and you're going to jail")
-    
+
     char.quad = {}
     char.frames = {}
-    
+
     for y = 1, 5 do
         char.quad[y] = {}
         local x = 0
-        
+
         for _, name in ipairs(v.frames) do
             local quad = love.graphics.newQuad(x*v.width, (y-1)*v.height, v.width, v.height, imgWidth, imgHeight)
-            
+
             if char.quad[y][name] then
                 if type(char.quad[y][name]) ~= "table" then
                     char.quad[y][name] = {char.quad[y][name]}
                 end
-                
+
                 table.insert(char.quad[y][name], quad)
                 char.frames[name] = char.frames[name] + 1
             else
                 char.quad[y][name] = quad
                 char.frames[name] = 1
             end
-                
+
             x = x + 1
         end
     end
@@ -585,13 +585,13 @@ end
 function component.setup(actor)
     actor.img = graphics["small"].img
     actor.quad = graphics["small"].quad[3].idle
-    
+
     actor.sizeX = graphics["small"].width
     actor.sizeY = graphics["small"].height
-    
+
     actor.centerX = graphics["small"].centerX
     actor.centerY = graphics["small"].centerY
-    
+
     actor.defaultPalette = graphics["small"].colors
 end
 
@@ -604,21 +604,21 @@ function animation(actor, dt)
     if actor.starMan then
         -- get frame
         local palette = math.ceil(math.fmod(actor.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
-        
+
         if palette == 4 then
             actor.palette = actor.defaultPalette
         else
             actor.palette = STARPALETTES[palette]
         end
     end
-    
+
     if actor.hasPortalGun then -- look towards portalGunAngle
         if math.abs(actor.portalGunAngle-actor.angle) <= math.pi*.5 then
             actor.animationDirection = 1
         else
             actor.animationDirection = -1
         end
-        
+
     else -- look towards last pressed direction
         if cmdDown("left") then
             actor.animationDirection = -1
@@ -626,18 +626,18 @@ function animation(actor, dt)
             actor.animationDirection = 1
         end
     end
-    
+
     local frame = false
-    
+
     if actor.spinning and (not actor.starMan or (actor.state.name ~= "jump" and actor.state.name ~= "fall"))  then
         if actor.onGround then
             actor.animationState = "spin"
         else
             actor.animationState = "spinAir"
         end
-        
+
         actor.animationDirection = actor.spinDirection
-        
+
         -- calculate spin frame from spinTimer
         frame = math.ceil(math.fmod(actor.spinTimer, graphics["small"].frames.spin*SPINFRAMETIME)/SPINFRAMETIME)
 
@@ -647,38 +647,38 @@ function animation(actor, dt)
         else
             actor.animationState = "shootAir"
         end
-        
+
         frame = math.ceil(actor.shootTimer/SHOOTTIME*graphics["small"].frames.shoot)
 
     elseif actor.ducking then
         actor.animationState = "duck"
-        
+
     elseif actor.state.name == "idle" then
         actor.animationState = "idle"
-        
+
     elseif actor.state.name == "skid" then
         actor.animationState = "skid"
-        
+
     elseif actor.state.name == "stop" or actor.state.name == "run" then
         if math.abs(actor.speed[1]) >= MAXSPEEDS[3] then
             actor.animationState = "sprint"
         else
             actor.animationState = "run"
         end
-        
+
     elseif actor.flying and (actor.state.name == "jump" or actor.state.name == "fly" or actor.state.name == "fall") then
         actor.animationState = "fly"
-    
+
     elseif actor.state.name == "buttSlide" then
         actor.animationState = "buttSlide"
-        
+
     elseif actor.starMan and graphics["small"].frames.somerSault then
         actor.animationState = "somerSault"
         frame = actor.somerSaultFrame
-        
+
     elseif actor.state.name == "float" then
         actor.animationState = "float"
-        
+
     elseif actor.state.name == "jump" or actor.state.name == "fall" then
         if not graphics["small"].canFly and actor.pMeter == VAR("pMeterTicks") then
             actor.animationState = "fly"
@@ -691,31 +691,31 @@ function animation(actor, dt)
                 actor.animationState = "fall"
             end
         end
-        
+
     end
 
-    
+
     -- Running animation
     if (actor.animationState == "run" or actor.animationState == "sprint") then
         actor.runAnimationTimer = actor.runAnimationTimer + (math.abs(actor.speed[1])+50)/8*dt
         while actor.runAnimationTimer > RUNANIMATIONTIME do
             actor.runAnimationTimer = actor.runAnimationTimer - RUNANIMATIONTIME
             actor.runAnimationFrame = actor.runAnimationFrame + 1
-            
+
             local runFrames = graphics["small"].frames.run
 
             if actor.runAnimationFrame > runFrames then
                 actor.runAnimationFrame = actor.runAnimationFrame - runFrames
             end
         end
-        
+
         frame = actor.runAnimationFrame
     end
-    
+
     -- Flying animation
     if actor.animationState == "fly" then
         local flyFrames = graphics["small"].frames.fly
-        
+
         if flyFrames > 1 then
             if actor.state.name == "fall" then
                 actor.flyAnimationFrame = 2
@@ -730,11 +730,11 @@ function animation(actor, dt)
                     end
                 end
             end
-            
+
             frame = actor.flyAnimationFrame
         end
     end
-    
+
     -- Float animation
     if actor.animationState == "float" then
         actor.floatAnimationTimer = actor.floatAnimationTimer + dt
@@ -747,17 +747,17 @@ function animation(actor, dt)
                 actor.floatAnimationFrame = floatFrames -- don't reset to the start
             end
         end
-        
+
         frame = actor.floatAnimationFrame
     end
-    
+
     -- Make sure to properly use the tables if it's an animationState with frames
     if frame then
         actor.quad = graphics["small"].quad[getAngleFrame(actor)][actor.animationState][frame]
     else
         actor.quad = graphics["small"].quad[getAngleFrame(actor)][actor.animationState]
     end
-    
+
     assert(type(actor.quad) == "userdata", "The state \"" .. actor.animationState .. "\" seems to not be have a quad set up correctly.")
 end
 
@@ -767,13 +767,13 @@ function getAngleFrame(actor)
     end
 
     local angle = actor.portalGunAngle-actor.angle
-    
+
     if angle > math.pi*.5 then
         angle = math.pi - angle
     elseif angle < -math.pi*.5 then
         angle = -math.pi - angle
     end
-    
+
     if angle < -math.pi*0.375 then
         return 1
     elseif angle < -math.pi*0.125 then

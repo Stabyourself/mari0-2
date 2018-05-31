@@ -20,13 +20,13 @@ local STARPALETTES = {
         {  0,   0,   0},
         {216,  40,   0},
     }),
-    
+
     convertPalette({
         {252, 252, 252},
         {  0,   0,   0},
         { 76, 220,  72},
     }),
-    
+
     convertPalette({
         {252, 188, 176},
         {  0,   0,   0},
@@ -43,7 +43,7 @@ end
 
 function star:update(dt, actorEvent)
     self.actor.starTimer = self.actor.starTimer + dt
-    
+
     -- get frame
     local palette
     if self.actor.starTimer >= STARTIME - STARFRAMESLOWTIME then
@@ -51,13 +51,13 @@ function star:update(dt, actorEvent)
     else
         palette = math.ceil(math.fmod(self.actor.starTimer, (#STARPALETTES+1)*STARFRAMETIME)/STARFRAMETIME)
     end
-    
+
     if palette == 4 then
         self.actor.palette = self.actor.defaultPalette
     else
         self.actor.palette = STARPALETTES[palette]
     end
-    
+
     if self.actor.starTimer >= STARTIME then
         self.actor.palette = self.actor.defaultPalette
         self.actor.starred = false

@@ -33,7 +33,11 @@ function StampsWindow:initialize(editor)
             local drawWidth = width*scale
             local drawHeight = height*scale
 
-            local button = Gui3.Button:new(0, 0, {stampMap.name, function() self:drawStampMap(stampMap, width, height, scale) end}, true, 0, function() self:clickStampMap(stampMap) end, drawWidth*16, drawHeight*16+9)
+            local button = Gui3.Button:new(0, 0, {stampMap.name,
+                function()
+                    self:drawStampMap(stampMap, width, height, scale)
+                end
+                }, true, 0, function() self:clickStampMap(stampMap) end, drawWidth*16, drawHeight*16+9)
 
             table.insert(self.buttons, button)
             self.element:addChild(button)

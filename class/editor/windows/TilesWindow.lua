@@ -36,7 +36,11 @@ function TilesWindow:goToMenu()
     for i, tileMap in ipairs(self.level.tileMaps) do
         local thumb = tileMap.thumbImg or tileMap.img
 
-        local tileMapButton = Gui3.Button:new(2, 2, {tileMap.name, {img = thumb, h = tileMapImageH}}, true, 0, function() self:goToTileMap(tileMap) end, tileMapImageW)
+        local tileMapButton = Gui3.Button:new(2, 2, {tileMap.name, {img = thumb, h = tileMapImageH}}, true, 0,
+            function()
+                self:goToTileMap(tileMap)
+            end,
+            tileMapImageW)
         self.element:addChild(tileMapButton)
     end
 
@@ -55,10 +59,9 @@ function TilesWindow:goToTileMap(tileMap)
     local backButton = Gui3.Button:new(1, 1, "< back", true, 0, function() self:goToMenu() end)
     backButton.ignoreForParentSize = true
     self.element:addChild(backButton)
-    
-    
-    self.tileListTileGrid = Gui3.TileGrid:new(1, 16, self.tileMap, 
-        function(TileGrid, i) 
+
+    self.tileListTileGrid = Gui3.TileGrid:new(1, 16, self.tileMap,
+        function(TileGrid, i)
             TileGrid.selected = i
 
             self.editor:selectTile(self.tileMap.tiles[i])

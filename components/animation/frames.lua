@@ -28,7 +28,7 @@ function frames:update(dt)
 
         while self.frameTimer > getDelay(self.frameTimes, self.frame) do
             self.frameTimer = self.frameTimer - getDelay(self.frameTimes, self.frame)
-            
+
             self.frame = self.frame + 1
 
             if self.frame > #self.frameLookup then

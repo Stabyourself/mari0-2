@@ -11,7 +11,7 @@ function paletteShader.on(imgPalette, newPalette)
         shader:sendColor("oldColors", unpack(imgPalette))
         shader:sendColor("newColors", unpack(newPalette))
     end
-    
+
     love.graphics.setShader(shader)
 end
 

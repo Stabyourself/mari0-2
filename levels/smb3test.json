@@ -1,7 +1,7 @@
 {
     "entities": [
         {"type": "spawn", "x": 5, "y": 8.75},
-        {"type": "goomba", "x": 8, "y": 8.75}
+        {"type": "koopa", "x": 8, "y": 8.75}
     ],
     
     "tileMaps": ["smb3-grass", "smb3-general", "smb3-overworld", "smb3"],

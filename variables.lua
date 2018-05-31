@@ -27,13 +27,13 @@ return {
     -- Move to smb3mario?
     pMeterTicks = 7,
     pMeterBlinkTime = 8/60,
-    
+
     -- These are all from the center of the screen and towards the center of the player
     cameraScrollLeftBorder = -85,
     cameraScrollRightBorder = 85,
     cameraScrollUpBorder = -53,
     cameraScrollDownBorder = 25,
-    
+
     cameraScrollRate = 300,
 
     tileTemplates = {
@@ -99,7 +99,7 @@ return {
                  0, 16,
             }
         },
-        
+
         bigSlopeLeftUpsideDown = {
             angle = 0,
             collision = {
@@ -118,7 +118,7 @@ return {
             }
         }
     },
-    
+
     editor = {
         cameraSpeed = 300
     }

@@ -9,13 +9,15 @@ function FloatingSelection.fromSelection(editor, selection)
     for x = 1, stampMap.width do
         for y = 1, stampMap.height do
             local absX, absY = x+xl-1, y+yt-1
-            
-            if stampMap.map[x][y] and editor.activeLayer:inMap(absX, absY) and editor.activeLayer:getTile(absX, absY) then
+
+            if  stampMap.map[x][y] and
+                editor.activeLayer:inMap(absX, absY) and
+                editor.activeLayer:getTile(absX, absY) then
                 editor.activeLayer:setCoordinate(absX, absY, false)
             end
         end
     end
-    
+
     local floatingSelection = FloatingSelection:new(editor, stampMap, {xl, yt})
 
     return floatingSelection
@@ -30,7 +32,7 @@ function FloatingSelection:initialize(editor, stampMap, pos)
     self.quad = {}
     for i = 0, 3 do
         local r = math.pi*0.5*(i-1)
-    
+
         self.quad[r] = love.graphics.newQuad(0, 0, 16, 2, 4, 1)
     end
 
@@ -48,13 +50,13 @@ function FloatingSelection:update(dt)
 
     for i = 0, 3 do
         local r = math.pi*0.5*(i-1)
-        
+
         self.quad[r]:setViewport(math.floor(self.borderTimer-i*2)%4+1, 0, 16, 2)
     end
-    
+
     if self.dragging then
         local x, y = self.level:mouseToWorld()
-        
+
         self.pos[1] = self.dragStartPos[1] + math.round((x-self.draggingStart[1])/16)
         self.pos[2] = self.dragStartPos[2] + math.round((y-self.draggingStart[2])/16)
     end
@@ -66,24 +68,22 @@ function FloatingSelection:draw()
     for x = 1, self.width do
         for y = 1, self.height do
             local tile = self.map[x][y]
-            
+
             if tile then
                 worldX, worldY = self.level:coordinateToWorld(x+self.pos[1]-2, y+self.pos[2]-2)
                 tile:draw(worldX, worldY, true)
             end
         end
     end
-    
-    local scaleY = 1
-    
-    if self.floating then
-        scaleY = 2
-    end
 
     love.graphics.setColor(1, 1, 1)
-    
+
     for _, border in ipairs(self.borders) do
-        love.graphics.draw(borderImg, self.quad[border[3]], border[1]+(self.pos[1]-1)*16, border[2]+(self.pos[2]-1)*16, border[3])
+        love.graphics.draw(borderImg,
+        self.quad[border[3]],
+        border[1]+(self.pos[1]-1)*16,
+        border[2]+(self.pos[2]-1)*16,
+        border[3])
     end
 end
 
@@ -102,11 +102,11 @@ function FloatingSelection:unFloat()
     if self.pos[1] < layer:getXStart() or self.pos[2] < layer:getYStart() then
         layer:expandTo(self.pos[1], self.pos[2])
     end
-    
+
     if self.pos[1]+self.width-1 > layer:getXEnd() or self.pos[2]+self.height-1 > layer:getYEnd() then
         layer:expandTo(self.pos[1]+self.width-1, self.pos[2]+self.height-1)
     end
-    
+
     for x = 1, self.width do
         for y = 1, self.height do
             if self.map[x][y] then
@@ -126,7 +126,7 @@ end
 
 function FloatingSelection:updateBorders()
     local tiles = {}
-    
+
     for x = 1, self.width do
         for y = 1, self.height do
             if self.map[x][y] then
@@ -173,7 +173,7 @@ function FloatingSelection:getStampMap()
 
     for x = 1, self.width do
         stampMap.map[x] = {}
-        
+
         for y = 1, self.height do
             stampMap.map[x][y] = self.map[x][y]
         end

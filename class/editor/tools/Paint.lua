@@ -2,15 +2,15 @@ local Paint = class("Editor.Paint")
 
 function Paint:initialize(editor)
     self.editor = editor
-    
+
     self.level = self.editor.level
     self.penDown = false
     self.tile = self.level.tileMaps[1].tiles[1]
 end
 
-function Paint:update(dt)
+function Paint:update()
     if self.penDown then
-        local x, y = self.level:cameraToCoordinate(getWorldMouse())
+        local x, y = self.level:mouseToCoordinate()
 
         if x ~= self.lastX or y ~= self.lastY then
             local layer = self.editor.activeLayer
@@ -18,8 +18,8 @@ function Paint:update(dt)
             if not layer:inMap(x, y) then
                 layer:expandTo(x, y)
             end
-            
-            local tiles = {}
+
+            local tiles
 
             if not self.lastX then
                 tiles = {{x, y}}
@@ -28,7 +28,6 @@ function Paint:update(dt)
             end
 
             for _, tile in ipairs(tiles) do
-                local worldX, worldY = self.level:coordinateToWorld(tile[1]-1, tile[2]-1)
                 layer:setCoordinate(tile[1], tile[2], self.tile)
             end
 
@@ -39,8 +38,7 @@ function Paint:update(dt)
 end
 
 function Paint:draw()
-    local mouseX, mouseY = getWorldMouse()
-    local coordX, coordY = self.level:cameraToCoordinate(mouseX, mouseY)
+    local coordX, coordY = self.level:mouseToCoordinate()
 
     if cmdDown("editor.line") and self.lastX then -- line
         love.graphics.setColor(1, 1, 1, 0.5)
@@ -51,7 +49,7 @@ function Paint:draw()
             local worldX, worldY = self.level:coordinateToWorld(tile[1]-1, tile[2]-1)
             self.tile:draw(worldX, worldY)
         end
-        
+
         love.graphics.setColor(1, 1, 1)
 
         self.editor:drawSizeHelp(coordX-self.lastX, coordY-self.lastY, ",")
@@ -84,7 +82,7 @@ function Paint:mousepressed(x, y, button)
         for _, tile in ipairs(tiles) do
             layer:setCoordinate(tile[1], tile[2], self.tile)
         end
-        
+
         self.editor:saveState()
         self.editor:updateMinimap()
 
@@ -97,7 +95,7 @@ function Paint:mousepressed(x, y, button)
         self.lastX = nil
         self.lastY = nil
     end
-    
+
     return true
 end
 

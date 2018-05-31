@@ -17,7 +17,7 @@ end
 function spinning:update(dt)
     if self.actor.spinning then
         self.actor.spinTimer = self.actor.spinTimer + dt
-        
+
         if self.actor.spinTimer >= SPINTIME then
             self.actor.spinning = false
         end

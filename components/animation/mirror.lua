@@ -19,7 +19,7 @@ function mirror:update(dt)
 
     while self.mirrorTimer > self.mirrorTime do
         self.mirrorTimer = self.mirrorTimer - self.mirrorTime
-        
+
         self.actor.animationDirection = -self.actor.animationDirection
     end
 end

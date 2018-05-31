@@ -34,11 +34,11 @@ function EditorState:serialize()
 
     -- Selection
     local selection = self.editor.selection
-    
+
     if selection then
         state.selection = {}
         state.selection.tiles = {}
-        
+
         for _, tile in ipairs(selection.tiles) do
             table.insert(state.selection.tiles, {tile[1], tile[2]})
         end
@@ -60,7 +60,7 @@ function EditorState:load()
     local world = self.editor.level
 
     world.layers = {}
-    
+
     for i, layer in ipairs(state.layers) do
         local map = {}
 
@@ -76,25 +76,29 @@ function EditorState:load()
     end
 
     self.editor.activeLayer = self.editor.level.layers[1]
-    
+
     self.editor.level.width = state.width
     self.editor.level.height = state.height
-    
+
     self.editor.selection = nil
     self.editor.floatingSelection = nil
-    
+
     if state.selection then
         local tiles = {}
         for _, tile in ipairs(state.selection.tiles) do
             table.insert(tiles, {tile[1], tile[2]})
         end
-        
+
         local selection = Selection:new(self.editor, tiles)
         self.editor.selection = selection
     end
 
     if state.floatingSelection then
-        self.editor.floatingSelection = FloatingSelection:new(self.editor, state.floatingSelection, state.floatingSelectionPos)
+        self.editor.floatingSelection = FloatingSelection:new(
+            self.editor,
+            state.floatingSelection,
+            state.floatingSelectionPos
+        )
         self.editor.floatingSelection.pos = {state.floatingSelectionPos[1], state.floatingSelectionPos[2]}
     end
 end

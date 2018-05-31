@@ -27,16 +27,16 @@ end
 
 function Gui3.Button:initialize(x, y, content, border, padding, func, sizeX, sizeY)
     self.padding = padding or 1
-    
+
     self.border = border
 
-    if self.border then 
-        self.padding = self.padding + 3 
+    if self.border then
+        self.padding = self.padding + 3
     end
 
     Gui3.Element.initialize(self, x, y, 0, 0)
 
-    local y = 0
+    local elY = 0
     local maxW = 0
 
     if type(content) ~= "table" then
@@ -45,29 +45,29 @@ function Gui3.Button:initialize(x, y, content, border, padding, func, sizeX, siz
 
     for _, el in ipairs(content) do
         if type(el) == "string" then
-            self:addText(el, y)
+            self:addText(el, elY)
 
-            y = y + 9
+            elY = elY + 9
             maxW = math.max(maxW, #el*8)
 
         elseif type(el) == "userdata" then -- simple image
-            self:addImage(el, y)
+            self:addImage(el, elY)
 
-            y = y + el:getHeight()+1
+            elY = elY + el:getHeight()+1
             maxW = math.max(maxW, el:getWidth())
 
         elseif type(el) == "table" then -- advanced image
-            self:addImage(el.img, y)
+            self:addImage(el.img, elY)
 
-            y = y + ((el.h + 1) or (el.img:getHeight())+1)
+            elY = elY + ((el.h + 1) or (el.img:getHeight())+1)
             maxW = math.max(maxW, (el.clipX or el.img:getWidth()))
         elseif type(el) == "function" then -- subdraw
-            self:addSubDraw(el, y)
+            self:addSubDraw(el, elY)
         end
     end
-    
+
     local w = maxW
-    local h = y-1
+    local h = elY-1
 
     if sizeX then
         w = sizeX
@@ -76,7 +76,7 @@ function Gui3.Button:initialize(x, y, content, border, padding, func, sizeX, siz
     if sizeY then
         h = sizeY
     end
-    
+
     self.childBox = {self.padding, self.padding, w, h}
 
     w = w + self.padding*2
@@ -100,22 +100,22 @@ end
 
 function Gui3.Button:getCollision(x, y)
     return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < self.h
-end 
+end
 
 function Gui3.Button:draw(level)
     Gui3.Element.translate(self)
-    
+
     love.graphics.setColor(1, 1, 1)
-    
+
     if self.border then
         local img = self.gui.img.button
-        
+
         if self.pressing then
             img = self.gui.img.buttonActive
         elseif self:getCollision(self.mouse[1], self.mouse[2]) then
             img = self.gui.img.buttonHover
         end
-        
+
         love.graphics.draw(img, buttonQuad[1], -6, -6)
         love.graphics.draw(img, buttonQuad[2], 2, -6, 0, self.w-4, 1)
         love.graphics.draw(img, buttonQuad[3], self.w-2, -6)
@@ -128,22 +128,22 @@ function Gui3.Button:draw(level)
     else
         love.graphics.setColor(self.color.background)
         love.graphics.rectangle("fill", 0, 0, self.w, self.h)
-        
+
         love.graphics.setColor(self.color.normal)
-        
+
         if self.pressing then
             love.graphics.setColor(self.color.active)
         elseif self:getCollision(self.mouse[1], self.mouse[2]) then
             love.graphics.setColor(self.color.hover)
         end
-        
+
         love.graphics.rectangle("fill", 0, 0, self.w, self.h)
     end
-    
+
     love.graphics.setColor(1, 1, 1)
-    
+
     Gui3.Element.draw(self, level)
-    
+
     Gui3.Element.unTranslate(self)
 end
 
@@ -151,7 +151,7 @@ function Gui3.Button:mousepressed(x, y, button)
     if self:getCollision(x, y) then
         self.pressing = true
     end
-    
+
     return Gui3.Element.mousepressed(self, x, y, button)
 end
 
@@ -161,7 +161,7 @@ function Gui3.Button:mousereleased(x, y, button)
             self.func(self)
         end
     end
-    
+
     self.pressing = false
 
     Gui3.Element.mousereleased(self, x, y, button)

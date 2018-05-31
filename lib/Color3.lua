@@ -27,17 +27,17 @@ end
 
 function Color:darken(i)
     local h, s, v, a = Color.RGBtoHSV(self.r, self.g, self.b, self.a)
-    
+
     v = (1-i)*v
-    
+
     return Color.HSVtoRGB(h, s, v, a)
 end
 
 function Color:lighten(i)
     local h, s, v, a = Color.RGBtoHSV(self.r, self.g, self.b, self.a)
-    
+
     s = (1-i)*s
-    
+
     return Color.fromHSV(h, s, v, a)
 end
 
@@ -47,11 +47,11 @@ function Color.HSVtoRGB(h, s, v, a)
     local p = v * (1 - s);
     local q = v * (1 - f * s);
     local t = v * (1 - (1 - f) * s);
-    
+
     local mod = i % 6
-    
+
     local r, g, b
-    
+
     if mod == 0 then
         r, g, b = v, t, p
     elseif mod == 1 then
@@ -65,14 +65,14 @@ function Color.HSVtoRGB(h, s, v, a)
     elseif mod == 5 then
         r, g, b = v, p, q
     end
-    
+
     return r, g, b, a
 end
 
 function Color.RGBtoHSV(r, g, b, a)
     local max = math.max(r, g, b)
     local min = math.min(r, g, b)
-    local h, s, v = max, max, max
+    local h, v = max, max
 
     local d = max - min
     local s = (max == 0) and 0 or d / max

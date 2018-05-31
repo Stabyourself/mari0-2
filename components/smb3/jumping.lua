@@ -8,7 +8,6 @@ local JUMPTABLE = {
     {vel = math.huge, jumpForce = -236.25},
 }
 local JUMPGRAVITYUNTIL = -120
-local JUMPGRAVITY = 225
 
 function jumping:initialize(actor, args)
     self.actor = actor
@@ -36,7 +35,7 @@ function jumping:jump(dt, actorEvent)
         self.actor.onGround = false
 
         self.actor.jumping = true
-        
+
         -- Adjust jumpforce according to speed
         for i = 1, #JUMPTABLE do
             if math.abs(self.actor.speed[1]) <= JUMPTABLE[i].vel then
@@ -44,23 +43,23 @@ function jumping:jump(dt, actorEvent)
                 break
             end
         end
-        
+
         -- Store how fast Mario is allowed to accelerate during the jump
-        local maxSpeedJumps
-        
+        local maxSpeedJump
+
         for i = 1, #MAXSPEEDS do
             if math.abs(self.actor.speed[1]) <= MAXSPEEDS[i] then
                 maxSpeedJump = MAXSPEEDS[i]
                 break
             end
         end
-        
+
         if not maxSpeedJump then
             maxSpeedJump = MAXSPEEDS[#MAXSPEEDS]
         end
-        
+
         self.actor.maxSpeedJump = maxSpeedJump
-        
+
         self.actor:switchState("jump")
     end
 end

@@ -16,7 +16,7 @@ function love.load()
     love.window.setIcon(love.image.newImageData("img/icon.png"))
 
     love.graphics.setDefaultFilter("nearest", "nearest")
-    
+
     objectCollides = { -- Necessary functions that other objects may collide with this
         hasComponent = function() return false end
     }
@@ -69,7 +69,8 @@ function love.load()
     require "state.Game"
     require "state.Editor"
 
-    fontOutlined = love.graphics.newImageFont("img/font-outlined.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$.,:;!?_-<>=+*\\/'%∩⇔→⇒◔×")
+    fontOutlined = love.graphics.newImageFont("img/font-outlined.png",
+        " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$.,:;!?_-<>=+*\\/'%∩⇔→⇒◔×")
     love.graphics.setFont(fontOutlined)
 
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")
@@ -179,7 +180,9 @@ function love.keypressed(key)
 
     local keyModified = key
 
-    if key ~= "lshift" and key ~= "rshift" and key ~= "lalt" and key ~= "ralt" and key ~= "lctrl" and key ~= "rctrl" then
+    if  key ~= "lshift" and key ~= "rshift" and
+        key ~= "lalt" and key ~= "ralt" and
+        key ~= "lctrl" and key ~= "rctrl" then
         if love.keyboard.isDown({"lshift", "rshift"}) then
             keyModified = "+" .. keyModified
         end
@@ -192,14 +195,14 @@ function love.keypressed(key)
             keyModified = "^" .. keyModified
         end
     end
-    
+
     if keyModified ~= key then
         if CONTROLS(keyModified) then
             appendCmds(cmds, CONTROLS(keyModified))
             sendCmds = true
         end
     end
-    
+
     if cmds["quit"] then
         love.event.quit()
         return
@@ -217,7 +220,7 @@ function love.keypressed(key)
     if sendCmds then
         gameStateManager:event("cmdpressed", cmds)
     end
-    
+
     gameStateManager:event("keypressed", key)
 end
 
@@ -226,29 +229,29 @@ function getWorldMouse()
 end
 
 function love.mousepressed(x, y, button)
-    x, y = getWorldMouse()
-    
+    x, y = x/VAR("scale"), y/VAR("scale")
+
     gameStateManager:event("mousepressed", x, y, button)
 end
 
 function love.mousereleased(x, y, button)
-    x, y = getWorldMouse()
-    
+    x, y = x/VAR("scale"), y/VAR("scale")
+
     gameStateManager:event("mousereleased", x, y, button)
 end
 
 function love.mousemoved(x, y, dx, dy)
     dx, dy = dx/VAR("scale"), dy/VAR("scale")
-    
+
     gameStateManager:event("mousemoved", dx, dy)
 end
 
 function love.resize(w, h)
     SCREENWIDTH = w/VAR("scale")
     SCREENHEIGHT = h/VAR("scale")
-    
+
     updateSizes()
-    
+
     gameStateManager:event("resize", SCREENWIDTH, SCREENHEIGHT)
 end
 
@@ -261,17 +264,17 @@ end
 function updateSizes()
     CAMERAWIDTH = SCREENWIDTH
     CAMERAHEIGHT = SCREENHEIGHT
-    
+
     if not game or game.uiVisible then
         CAMERAHEIGHT = CAMERAHEIGHT-VAR("uiLineHeight")-VAR("uiHeight")
     end
 
     WIDTH = math.ceil(CAMERAWIDTH/VAR("tileSize"))
     HEIGHT = math.ceil(CAMERAHEIGHT/VAR("tileSize"))
-    
+
     RIGHTSCROLLBORDER = VAR("cameraScrollRightBorder")
     LEFTSCROLLBORDER = VAR("cameraScrollLeftBorder")
-    
+
     DOWNSCROLLBORDER = VAR("cameraScrollDownBorder")
     UPSCROLLBORDER = VAR("cameraScrollUpBorder")
 
@@ -299,7 +302,7 @@ function playSound(sound)
         print("Error playing some sound")
         return
     end
-    
+
     sound:stop()
     sound:play()
 end
@@ -308,17 +311,19 @@ function worldArrow(x, y, xDir, yDir)
     local scale = math.sqrt(xDir^2+yDir^2)/8
     local angle = math.atan2(yDir, xDir)
     local arrowTipScale = 0.2
-    
+
     --body
     local x2, y2 = x+math.cos(angle)*scale, y+math.sin(angle)*scale
-    
+
     love.graphics.line(x, y, x2, y2)
-    
+
     --tipleft
-    local x3, y3 = x2+math.cos(angle-math.pi*0.75)*scale*arrowTipScale, y2+math.sin(angle-math.pi*0.75)*scale*arrowTipScale
+    local x3 = x2+math.cos(angle-math.pi*0.75)*scale*arrowTipScale
+    local y3 = y2+math.sin(angle-math.pi*0.75)*scale*arrowTipScale
     love.graphics.line(x2, y2, x3, y3)
-    
+
     --tipright
-    local x4, y4 = x2+math.cos(angle+math.pi*0.75)*scale*arrowTipScale, y2+math.sin(angle+math.pi*0.75)*scale*arrowTipScale
+    local x4 = x2+math.cos(angle+math.pi*0.75)*scale*arrowTipScale
+    local y4 = y2+math.sin(angle+math.pi*0.75)*scale*arrowTipScale
     love.graphics.line(x2, y2, x4, y4)
 end

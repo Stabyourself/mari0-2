@@ -14,7 +14,7 @@ end
 
 function Gui3.Rectangle:draw(level)
     Gui3.Element.translate(self)
-    
+
     Gui3.Element.draw(self, level)
 
     love.graphics.scale(self.scale)

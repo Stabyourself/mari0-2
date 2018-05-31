@@ -1,7 +1,7 @@
 local GameStateManager = class("GameStateManager")
 
 GameStateManager.reversedEvents = {
-    mousepressed = true, 
+    mousepressed = true,
     cmdpressed = true
 }
 
@@ -21,12 +21,12 @@ end
 
 function GameStateManager:event(event, ...)
     local from, to, step = 1, #self.activeStates, 1
-    
+
     if self.reversedEvents[event] then
         from, to, step = to, from, -1
-    end 
+    end
 
-    for i = from, to, step do 
+    for i = from, to, step do
         local state = self.activeStates[i]
 
         if type(state[event]) == "function" then
@@ -34,7 +34,7 @@ function GameStateManager:event(event, ...)
                 break
             end
         end
-    end 
+    end
 end
 
 return GameStateManager

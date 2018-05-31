@@ -8,21 +8,21 @@ function Gui3.Box:initialize(x, y, w, h)
 
     self.background = {0, 0, 0, 0}
     self.backgroundQuad = love.graphics.newQuad(0, 0, 4, 4, 4, 4)
-    
+
     self.children = {}
-    
+
     self.posMin[1] = -3
     self.posMin[2] = -2
-    
+
     self.posMax[1] = -3
     self.posMax[2] = -4
-    
+
     self.childBox = {2, 3, self.w-4, self.h-6}
 end
 
 function Gui3.Box:update(dt, x, y, mouseBlocked, absX, absY)
     local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
-    
+
     if self.draggable then
         self.sizeMin[1] = 19
         self.sizeMin[2] = 29
@@ -46,70 +46,75 @@ end
 
 function Gui3.Box:draw(level)
     Gui3.Element.translate(self)
-    
+
     if type(self.background) == "table" then
         love.graphics.setColor(self.background)
         love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
     elseif type(self.background) == "userdata" then
         self.backgroundQuad:setViewport(self.scroll[1]%4, self.scroll[2]%4, self.childBox[3], self.childBox[4])
         self.background:setWrap("repeat", "repeat")
-            
+
         love.graphics.setColor(1, 1, 1)
         love.graphics.draw(self.background, self.backgroundQuad, self.childBox[1], self.childBox[2])
     end
-    
-    
+
+
     love.graphics.setColor(1, 1, 1)
-    
+
     -- Border
-    local img = self.gui.img.box
+    local borderImg = self.gui.img.box
     local quad = Gui3.boxQuad
     if self.draggable then
-        img = self.gui.img.boxTitled
+        borderImg = self.gui.img.boxTitled
         quad = Gui3.titledBoxQuad
     end
-    
-    Gui3.drawBox(img, quad, 0, 0, self.w, self.h)
-    
+
+    Gui3.drawBox(borderImg, quad, 0, 0, self.w, self.h)
+
     if self.title then
         local scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
-        love.graphics.intersectScissor((self.absPos[1]+3)*VAR("scale"), (self.absPos[2]+2)*VAR("scale"), (self.w-16)*VAR("scale"), 8*VAR("scale"))
+        love.graphics.intersectScissor(
+            (self.absPos[1]+3)*VAR("scale"),
+            (self.absPos[2]+2)*VAR("scale"),
+            (self.w-16)*VAR("scale"),
+            8*VAR("scale")
+        )
 
         love.graphics.print(self.title, 3, 2)
-        
+
         love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
     end
-    
+
     if self.closeable then
-        local img = self.gui.img.boxClose
+        local closeImg = self.gui.img.boxClose
         if self.closing then
-            img = self.gui.img.boxCloseActive
+            closeImg = self.gui.img.boxCloseActive
         elseif self:closeCollision(self.mouse[1], self.mouse[2]) then
-            img = self.gui.img.boxCloseHover
+            closeImg = self.gui.img.boxCloseHover
         end
-        
-        love.graphics.draw(img, self.w-12, 2)
+
+        love.graphics.draw(closeImg, self.w-12, 2)
     end
-    
+
     Gui3.Element.draw(self, level)
-    
+
     if self.resizeable then
-        local img = self.gui.img.boxResize
+        local resizeImg = self.gui.img.boxResize
         if self.resizing then
-            img = self.gui.img.boxResizeActive
+            resizeImg = self.gui.img.boxResizeActive
         elseif self:resizeCornerCollision(self.mouse[1], self.mouse[2]) then
-            img = self.gui.img.boxResizeHover
+            resizeImg = self.gui.img.boxResizeHover
         end
-        
+
         local x, y = self.w-11, self.h-12
         if not self.draggable then
             x = x + 1
             y = y + 1
         end
-        
-        love.graphics.draw(img, x, y)
+
+        love.graphics.draw(resizeImg, x, y)
     end
-    
+
     Gui3.Element.unTranslate(self)
 end
 
@@ -138,21 +143,21 @@ function Gui3.Box:mousepressed(x, y, button)
 
     elseif self.closeable and self:closeCollision(x, y) then
         self.closing = true
-        
+
     elseif self.draggable and self:titleBarCollision(x, y) then
         self.dragging = true
         self.dragPos[1] = x
         self.dragPos[2] = y
-        
+
     end
-    
+
     return Gui3.Element.mousepressed(self, x, y, button)
 end
 
 function Gui3.Box:mousereleased(x, y, button)
     self.dragging = false
     self.resizing = false
-    
+
     if self.closing then
         if self:closeCollision(x, y) then
             self.parent:removeChild(self)

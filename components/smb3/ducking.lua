@@ -24,10 +24,13 @@ function ducking:update(dt)
     local wasDucking = self.actor.ducking
 
     if self.actor.onGround then
-        if cmdDown("down") and not cmdDown("left") and not cmdDown("right") and self.actor.state.name ~= "buttSlide" then
+        if  cmdDown("down") and
+            not cmdDown("left") and
+            not cmdDown("right") and
+            self.actor.state.name ~= "buttSlide" then
             if self.actor.surfaceAngle ~= 0 then -- check if buttslide
                 self.actor:switchState("buttSlide")
-                
+
                 if self.actor.surfaceAngle > 0 then
                     self.actor.speed[1] = math.max(0, self.actor.speed[1])
                 else
@@ -35,7 +38,7 @@ function ducking:update(dt)
                 end
             else
                 self.actor.ducking = true
-                
+
                 -- Stop spinning in case
                 self.actor.spinning = false
                 self.actor.spinTimer = SPINTIME
@@ -54,12 +57,12 @@ function ducking:update(dt)
             self.actor.centerY = 24
         end
     end
-    
+
     if self.actor.state.name == "buttSlide" then
         local buttAcceleration = BUTTACCELERATION * (self.actor.surfaceAngle/(math.pi/8))
-        
+
         self.actor.speed[1] = self.actor.speed[1] + buttAcceleration*dt
-        
+
         if self.actor.surfaceAngle == 0 then
             self.actor:friction(dt, FRICTIONBUTT)
         end

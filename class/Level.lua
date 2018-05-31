@@ -2,32 +2,32 @@ Level = class("Level", Physics3.World)
 
 function Level:initialize(path)
     local data = JSON:decode(love.filesystem.read(path))
-    
+
     self:loadLevel(data)
-    
+
     self.camera.target = self.marios[1]
 end
 
 function Level:loadLevel(data)
     self.data = data
-    
+
     Physics3.World.initialize(self)
     Physics3.World.loadLevel(self, self.data)
-    
+
     self.backgroundColor = self.data.backgroundColor or {156, 252, 240}
     self.backgroundColor[1] = self.backgroundColor[1]/255
     self.backgroundColor[2] = self.backgroundColor[2]/255
     self.backgroundColor[3] = self.backgroundColor[3]/255
-    
+
     -- Camera stuff
     self.camera = Camera.new(CAMERAWIDTH/2, CAMERAHEIGHT/2, CAMERAWIDTH, CAMERAHEIGHT)
-    
+
     self.camera.rot = 0
     self.spawnLine = 0
     self.spawnI = 1
 
     self.blockBounces = {}
-    
+
     self.spawnList = {}
     -- Parse entities
     for _, entity in ipairs(self.data.entities) do
@@ -51,25 +51,25 @@ function Level:loadLevel(data)
     self.marios = {}
 
     local x, y = self:coordinateToWorld(self.spawnX-.5, self.spawnY)
-    
+
     local mario = Actor:new(self, x, y, actorTemplates.smb3_raccoon)
 
     table.insert(self.marios, mario)
     table.insert(self.actors, mario)
-    
-    
+
+
     self:spawnActors(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end
 
 function Level:update(dt)
     updateGroup(self.blockBounces, dt)
-    
+
     prof.push("World")
     Physics3.World.update(self, dt)
     prof.pop()
 
     self:updateCamera(dt)
-    
+
     prof.push("Post Update")
     for _, obj in ipairs(self.objects) do
         if obj.postUpdate then
@@ -86,11 +86,11 @@ end
 
 function Level:draw()
     self.camera:attach()
-    
+
     prof.push("World")
     Physics3.World.draw(self)
     prof.pop()
-    
+
     self.camera:detach()
 end
 
@@ -98,15 +98,15 @@ function Level:cmdpressed(cmds)
     if cmds["jump"] then
         self.marios[1]:event("jump")
     end
-    
+
     if cmds["run"] then
         self.marios[1]:event("action")
     end
-    
+
     if cmds["closePortals"] then
         self.marios[1]:event("closePortals")
     end
-    
+
     if cmds["debug.star"] then -- debug
         self.marios[1]:removeComponent("smb3.star")
         self.marios[1]:addComponent("smb3.star")
@@ -124,7 +124,7 @@ function Level:spawnActors(untilX)
         toSpawn = self.spawnList[self.spawnI]
         local x, y = self:coordinateToWorld(toSpawn.x-.5, toSpawn.y)
         local actor = Actor:new(self, x, y, toSpawn.actorTemplate)
-        
+
         table.insert(self.actors, actor)
 
         self.spawnI = self.spawnI + 1
@@ -139,53 +139,53 @@ end
 function Level:updateCamera(dt)
     if self.camera.target then
         local target = self.camera.target
-        
+
         -- Horizontal
         local pX = target.x + target.width/2
         local pXr = pX - self.camera.x
-        
+
         if pXr > RIGHTSCROLLBORDER then
             self.camera.x = self.camera.x + VAR("cameraScrollRate")*dt
-            
+
             if pX - self.camera.x < RIGHTSCROLLBORDER then
                 self.camera.x = pX - RIGHTSCROLLBORDER
             end
-            
+
         elseif pXr < LEFTSCROLLBORDER then
             self.camera.x = self.camera.x - VAR("cameraScrollRate")*dt
-            
+
             if pX - self.camera.x > LEFTSCROLLBORDER then
                 self.camera.x = pX - LEFTSCROLLBORDER
             end
         end
-        
+
         -- Vertical
         local pY = target.y + target.height/2
         local pYr = pY - self.camera.y
-        
+
         if pYr > DOWNSCROLLBORDER then
             self.camera.y = self.camera.y + VAR("cameraScrollRate")*dt
-            
+
             if pY - self.camera.y < DOWNSCROLLBORDER then
                 self.camera.y = pY - DOWNSCROLLBORDER
             end
         end
-            
+
         -- Only scroll up in flight mode
         if target.flying or self.camera.y < self:getYEnd()*self.tileSize-CAMERAHEIGHT then -- ?
             if pYr < UPSCROLLBORDER then
                 self.camera.y = self.camera.y - VAR("cameraScrollRate")*dt
-            
+
                 if pY - self.camera.y > UPSCROLLBORDER then
                     self.camera.y = pY - UPSCROLLBORDER
                 end
             end
         end
-        
+
         -- -- And clamp it to level boundaries
         self.camera.x = math.min(self.camera.x, self:getXEnd()*self.tileSize-CAMERAWIDTH/2)
         self.camera.x = math.max(self.camera.x, (self:getXStart()-1)*self.tileSize+CAMERAWIDTH/2)
-        
+
         self.camera.y = math.min(self.camera.y, self:getYEnd()*self.tileSize-CAMERAHEIGHT/2)
         self.camera.y = math.max(self.camera.y, (self:getYStart()-1)*self.tileSize+CAMERAHEIGHT/2)
     end
@@ -195,7 +195,7 @@ function Level:bumpBlock(x, y)
     local Tile = self:getTile(x, y)
     if Tile.breakable or Tile.coinBlock then
         local blockBounce = BlockBounce:new(x, y)
-        
+
         table.insert(self.blockBounces, blockBounce)
 
         if Tile.coinBlock then
@@ -207,7 +207,7 @@ end
 function Level:objVisible(x, y, w, h)
     local lx, ty = self.camera:worldCoords(0, 0)
     local rx, by = self.camera:worldCoords(CAMERAWIDTH, CAMERAHEIGHT)
-    
+
     return x+w > lx and x < rx and
         y+h > ty and y < by
 end

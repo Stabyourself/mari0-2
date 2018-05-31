@@ -37,9 +37,9 @@ function floating:update(dt)
                 self.actor:friction(dt, FRICTIONFLYBIG, MAXSPEEDFLY)
             end
         end
-        
+
         accelerate(dt, self.actor, ACCELERATION, MAXSPEEDFLY)
-        
+
         skid(dt, self.actor, FRICTIONSKIDFLY)
 
         self.actor.speed[2] = FLOATASCENSION

@@ -8,5 +8,4 @@ function CharacterModel:initialize(path)
         VAR = VAR,
         ActorState = ActorState,
     }})
-    
 end

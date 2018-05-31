@@ -9,9 +9,9 @@ function Actor:initialize(world, x, y, actorTemplate)
 
     local width = self.actorTemplate.width
     local height = self.actorTemplate.height
-    
+
     Physics3.PhysObj.initialize(self, world, x-width/2, y-height, width, height)
-    
+
     self.actorEvent = {}
 
     self.debug = {
@@ -40,7 +40,7 @@ function Actor:event(eventName, dt, ...)
     else
         self.actorEvent[eventName]:clear(eventName)
     end
-    
+
     for _, component in ipairs(self.components) do
         if component[eventName] then
             component[eventName](component, dt, self.actorEvent[eventName], ...)
@@ -88,7 +88,7 @@ function Actor:addComponent(component, args)
     if type(component) == "string" then
         component = components[component]
     end
-    
+
     table.insert(self.components, component:new(self, args))
 end
 
@@ -133,13 +133,19 @@ function Actor:loadActorTemplate(actorTemplate)
 
     self.quad = nil
     self.quads = self.actorTemplate.quads
-    
+
     self.state = nil
     self.states = {}
 
     self.components = {}
     for name, args in pairs(self.actorTemplate.components) do
-        assert(components[name], string.format("Unable to load component \"%s\" requested by actorTemplate \"%s\".", name, actorTemplate.name))
+        assert(components[name],
+            string.format(
+                "Unable to load component \"%s\" requested by actorTemplate \"%s\".",
+                name,
+                actorTemplate.name
+            )
+        )
 
         self:addComponent(components[name], args)
     end
@@ -168,9 +174,9 @@ function Actor:topCollision(obj2)
 
     --     -- Todo: Do this
     -- end
-        
+
     -- self.speed[2] = VAR("blockHitForce")
-    
+
     -- game.level:bumpBlock(x, y)
     self:event("topCollision", 0, obj2)
 end
@@ -214,7 +220,10 @@ end
 
 function Actor:switchState(stateName)
     if stateName then
-        assert(self.states[stateName], string.format("Tried to switch to nonexistent ActorState \"%s\" on %s.", stateName, self.actorTemplate.name))
+        assert(self.states[stateName], string.format(
+            "Tried to switch to nonexistent ActorState \"%s\" on %s.",
+            stateName,
+            self.actorTemplate.name))
         self.state = ActorState:new(self, stateName, self.states[stateName])
 
         self.state:checkExit()
@@ -238,13 +247,14 @@ function Actor:debugDraw()
     end
 
     if self.debug.components then
-        local mx, my = self.world:mouseToWorld()
-
         love.graphics.scale(1/VAR("scale"), 1/VAR("scale"))
         local font = love.graphics.getFont()
 
         for i, component in ipairs(self.components) do
-            love.graphics.print(string.sub(tostring(component), 19), (self.x+self.width+2)*VAR("scale"), (self.y+self.height)*VAR("scale") - 9 - #self.components*10+i*10)
+            love.graphics.print(
+                string.sub(tostring(component), 19),
+                (self.x+self.width+2)*VAR("scale"),
+                (self.y+self.height)*VAR("scale") - 9 - #self.components*10+i*10)
         end
 
         love.graphics.scale(VAR("scale"), VAR("scale"))

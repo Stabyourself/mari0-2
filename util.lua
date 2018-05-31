@@ -39,13 +39,13 @@ function print_r (t, name, indent) -- Credits to http://www.hpelbers.org/lua/pri
           tableList[t]= full and (full .. '.' .. id) or id
           if next(t) then -- Table not empty
             table.insert(out, tag .. '{')
-            for key,value in pairs(t) do 
+            for key,value in pairs(t) do
               table.insert(out,table_r(value,key,indent .. '|  ',tableList[t]))
-            end 
+            end
             table.insert(out,indent .. '}')
           else table.insert(out,tag .. '{}') end
         end
-      else 
+      else
         local val = type(t)~="number" and type(t)~="boolean" and '"'..tostring(t)..'"' or tostring(t)
         table.insert(out, tag .. val)
       end
@@ -109,8 +109,8 @@ function getRequiredSpeed(height, gravity) -- I don't think this is working righ
     return math.sqrt(2*(gravity or VAR("gravity"))*height)
 end
 
-function math.clamp(n, low, high) 
-    return math.max(math.min(high, n), low) 
+function math.clamp(n, low, high)
+    return math.max(math.min(high, n), low)
 end
 
 function sideOfLine(ox, oy, p1x, p1y, p2x, p2y) -- Credits to https://stackoverflow.com/a/293052
@@ -163,16 +163,16 @@ function pointOnLine(lx1, ly1, lx2, ly2, px, py) -- Credits to https://stackover
         math.abs(math.abs(dist2P + dist1P) - dist12) < 0.0000001 then
         return dist1P - dist2P
     end
-    return 
+    return
 end
 
 -- function pointOnLine(l1x, l1y, l2x, l2y, px, py)
---     if l1x == px then 
---         return l2x == px 
+--     if l1x == px then
+--         return l2x == px
 --     end
 
 --     if l1y == py then
---         return l2y == py 
+--         return l2y == py
 --     end
 
 --     return math.abs((l1x - px)*(l1y - py) - (px - l2x)*(py - l2y)) < 0.000001
@@ -185,10 +185,10 @@ function objectWithinPortalRange(p, x, y)
 end
 
 function linesIntersect(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) -- Credits to https://stackoverflow.com/a/1968345
-    local s0x = p2x - p1x 
+    local s0x = p2x - p1x
     local s0y = p2y - p1y
 
-    local s2_x = p4x - p3x  
+    local s2_x = p4x - p3x
     local s2_y = p4y - p3y
 
     local s = (-s0y * (p1x - p3x) + s0x * (p1y - p3y)) / (-s2_x * s0y + s0x * s2_y)
@@ -241,7 +241,7 @@ function normalizeAngle(a)
 
     return a
 end
-    
+
 local function combineTableCall(var, t) -- basically makes var["some.dot.separated.string"] into var.some.dot.separated.string
     local ct = table.remove(t, 1)
 
@@ -409,10 +409,10 @@ function recursiveEnumerate(folder, files) -- What's with all the recursion in t
     end
 
     local filesTable = love.filesystem.getDirectoryItems(folder)
-    
+
 	for i,v in ipairs(filesTable) do
         local file = folder.."/"..v
-        
+
         local fileInfo = love.filesystem.getInfo(file)
 
 		if fileInfo.type == "file" then
@@ -421,7 +421,7 @@ function recursiveEnumerate(folder, files) -- What's with all the recursion in t
 			recursiveEnumerate(file, files)
 		end
     end
-    
+
 	return files
 end
 
@@ -438,7 +438,7 @@ end
 function tilesInLine(x1, y1, x2, y2) -- Mostly copied from https://github.com/kikito/bresenham.lua
     local tiles = {}
     local sx,sy,dx,dy
-  
+
     if x1 < x2 then
         sx = 1
         dx = x2 - x1
@@ -446,7 +446,7 @@ function tilesInLine(x1, y1, x2, y2) -- Mostly copied from https://github.com/ki
         sx = -1
         dx = x1 - x2
     end
-  
+
     if y1 < y2 then
         sy = 1
         dy = y2 - y1
@@ -454,11 +454,11 @@ function tilesInLine(x1, y1, x2, y2) -- Mostly copied from https://github.com/ki
         sy = -1
         dy = y1 - y2
     end
-  
+
     local err, e2 = dx-dy, nil
 
     table.insert(tiles, {x1, y1})
-  
+
     while x1 ~= x2 or y1 ~= y2 do
         e2 = err + err
         if e2 > -dy then
@@ -472,6 +472,6 @@ function tilesInLine(x1, y1, x2, y2) -- Mostly copied from https://github.com/ki
 
         table.insert(tiles, {x1, y1})
     end
-  
+
     return tiles
 end

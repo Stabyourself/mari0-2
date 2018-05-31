@@ -55,111 +55,111 @@ function Editor:load()
     self:setActiveTileMap(1)
 
     self.tools = {}
-    
+
     for toolName, toolClass in pairs(self.toolClasses) do
         self.tools[toolName] = toolClass:new(self)
     end
-    
+
     self.canvas = Gui3.Canvas:new(0, 0, SCREENWIDTH, SCREENHEIGHT)
     self.canvas.gui = defaultUI
-    
+
     self.windows = {}
-    
+
     -- MENU BAR
     self.menuBar = Gui3.Canvas:new(0, 0, SCREENWIDTH, 14)
     self.menuBar.background = {1, 1, 1}
-    
+
     self.canvas:addChild(self.menuBar)
 
 
-    
+
     self.fileDropdown = Gui3.Dropdown:new(0, 0, "file")
-    
+
     self.menuBar:addChild(self.fileDropdown)
-    
+
     self.fileDropdown.box:addChild(Gui3.Button:new(0, 0, "save", false, 1, function(button) self:saveLevel() end))
     self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("1-1.json") end))
-    
+
     self.fileDropdown:autoSize()
-    
-    
-    
+
+
+
     -- WINDOW
-    
+
     self.newWindowDropdown = Gui3.Dropdown:new(38, 0, "window")
-    
+
     self.menuBar:addChild(self.newWindowDropdown)
-    
+
     self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 0, "tiles", false, 1, function(button) self:newWindow(self.windowClasses.tiles, button) end))
     self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 10, "stamps", false, 1, function(button) self:newWindow(self.windowClasses.stamps, button) end))
     self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 20, "layers", false, 1, function(button) end))
     self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 30, "minimap", false, 1, function(button) self:newWindow(self.windowClasses.minimap, button) end))
     self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 40, "map options", false, 1, function(button) end))
-    
+
     self.newWindowDropdown:autoSize()
-    
-    
-    
+
+
+
     -- VIEW
-    
+
     local viewDropdown = Gui3.Dropdown:new(92, 0, "view")
-    
+
     self.menuBar:addChild(viewDropdown)
-    
+
     viewDropdown.box:addChild(Gui3.Checkbox:new(0, 0, "free camera", 1, function(checkbox) self:toggleFreeCam(checkbox.value) end))
     viewDropdown.box:addChild(Gui3.Checkbox:new(0, 11, "draw grid", 1, function(checkbox) self:toggleGrid(checkbox.value) end))
     viewDropdown.box:addChild(Gui3.Checkbox:new(0, 22, "hide ui", 1, function(checkbox) self:toggleUI(checkbox.value) end))
-    
+
     viewDropdown:autoSize()
-    
-    
-    
+
+
+
     -- SCALE BAR
     local w = 50
     local fullw = w+63
     local x = CAMERAWIDTH-fullw
     self.scaleBar = Gui3.Canvas:new(x, 0, fullw, 14)
     self.menuBar:addChild(self.scaleBar)
-    
+
     self.scaleSlider = Gui3.Slider:new(self.scaleMin, self.scaleMax, 17, 3, w, false, function(val) self:changeScale(val) end)
     self.scaleSlider.color.bar = {0, 0, 0}
-    
+
     self.scaleBar:addChild(self.scaleSlider)
-    
+
     self:updateScaleSlider()
-    
+
     self.scaleBar:addChild(Gui3.Button:new(0, 0, "-", false, 3, function() self:zoom(-1) end))
     self.scaleBar:addChild(Gui3.Button:new(w+20, 0, "+", false, 3, function() self:zoom(1) end))
-    
+
     self.scaleBar:addChild(Gui3.Button:new(w+34, 0, "1:1", false, 3, function() self:resetZoom() end))
-    
-    
-    
-    
+
+
+
+
     -- TOOL BAR
     self.toolbar = Gui3.Canvas:new(0, 14, 14, CAMERAHEIGHT-14)
     self.toolbar.background = {255, 255, 255}
     self.canvas:addChild(self.toolbar)
-    
+
     self.toolButtons = {}
-    
+
     local y = 0
     for i, tool in ipairs(self.toolbarOrder) do
         local button = Gui3.Button:new(0, y, self.toolbarImg[i], false, 2, function(button) self:selectTool(tool) end)
-        
+
         self.toolButtons[tool] = button
-        
+
         button.children[1].color = {0, 0, 0, 1}
         self.toolbar:addChild(button)
-        
+
         y = y + 14
     end
-    
-    
-    
-    
+
+
+
+
     self:selectTool("paint")
-    
+
     self.gridImg = love.graphics.newImage("img/grid.png")
     self.gridImg:setWrap("repeat", "repeat")
     self.gridQuad = love.graphics.newQuad(0, 0, 16, 16, 16, 16)
@@ -167,13 +167,13 @@ function Editor:load()
     self.editorStates = {}
     self.editorState = 1
     self:saveState()
-    
+
     self.mapBoundsQuad = love.graphics.newQuad(0, 0, 8, 8, 8, 8)
 
     self.pastePos = {1, 1}
 
     self:updateMinimap()
-    
+
     self:toggleGrid(false)
     self:toggleFreeCam(false)
 end
@@ -183,37 +183,37 @@ function Editor:update(dt)
     prof.push("UI")
     self.canvas:update(dt)
     prof.pop()
-    
+
     prof.push("Tool update")
     if self.tool.update then
         self.tool:update(dt)
     end
     prof.pop()
-    
+
     if self.freeCamera then
         local cameraSpeed = dt*VAR("editor").cameraSpeed*(1/self.level.camera.scale)
-        
+
         if cmdDown("right") then
             self.level.camera.x = self.level.camera.x + cameraSpeed
         end
-        
+
         if cmdDown("left") then
             self.level.camera.x = self.level.camera.x - cameraSpeed
         end
-        
+
         if cmdDown("down") then
             self.level.camera.y = self.level.camera.y + cameraSpeed
         end
-        
+
         if cmdDown("up") then
             self.level.camera.y = self.level.camera.y - cameraSpeed
         end
     end
-    
+
     -- Limit camera position so you can't lose the level
     self.level.camera.x = math.clamp(self.level.camera.x, self.level:getXStart()*16, self.level:getXEnd()*16)
     self.level.camera.y = math.clamp(self.level.camera.y, self.level:getYStart()*16, self.level:getYEnd()*16)
-    
+
     prof.push("Selection")
     if self.selection then
         self.selection:update(dt)
@@ -229,7 +229,7 @@ function Editor:update(dt)
 
             x = x/16 - self.level:getXStart()
             y = y/16 - self.level:getYStart()
-            
+
             window:updateBorder(x*3, y*3, CAMERAWIDTH/16+1, CAMERAHEIGHT/16+1)
         end
     end
@@ -240,10 +240,10 @@ end
 function Editor:draw()
     prof.push("Editor")
     self.level.camera:attach()
-    
+
     local xl, yt = self.level:cameraToWorld(0, 0)
     local xr, yb = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)
-    
+
     -- Map bounds graphics
     prof.push("Candy")
     love.graphics.stencil(function()
@@ -256,15 +256,15 @@ function Editor:draw()
         love.graphics.rectangle("fill", xStart, yStart, xEnd-xStart, yEnd-yStart)
     end)
     love.graphics.setStencilTest("notequal", 1)
-    
+
     self.mapBoundsQuad:setViewport(self.level.camera.x%8, self.level.camera.y%8, xr-xl, yb-yt)
     love.graphics.setColor(0, 0, 0, 0.1)
     love.graphics.draw(debugCandyImg, self.mapBoundsQuad, xl, yt)
     love.graphics.setColor(1, 1, 1)
-    
+
     love.graphics.setStencilTest()
     prof.pop()
-        
+
     prof.push("Grid")
     if self.showGrid then
         self.gridQuad:setViewport(
@@ -273,7 +273,7 @@ function Editor:draw()
             xr-xl+self.level.tileSize,
             yb-yt+self.level.tileSize
         )
-        
+
         love.graphics.draw(
             self.gridImg,
             self.gridQuad,
@@ -282,25 +282,25 @@ function Editor:draw()
         )
     end
     prof.pop()
-    
+
     prof.push("Selection")
     if self.selection then
         self.selection:draw()
     end
-    
+
     if self.floatingSelection then
         self.floatingSelection:draw()
     end
     prof.pop()
-    
+
     prof.push("Tool")
     if self.tool.draw then
         self.tool:draw()
     end
     prof.pop()
-    
+
     self.level.camera:detach()
-    
+
     prof.push("UI")
     self.canvas:draw()
     prof.pop()
@@ -335,9 +335,9 @@ function Editor:toggleUI(on)
         updateSizes()
         self.toolbar.h = CAMERAHEIGHT-14
         self.level.camera.h = CAMERAHEIGHT
-        
+
         local offset = (VAR("uiLineHeight")+VAR("uiHeight"))/2/self.level.camera.scale
-        
+
         if on then
             self.level.camera:move(0, offset)
         else
@@ -350,17 +350,17 @@ function Editor:selectTool(toolName)
     if self.tool and self.tool.unSelect then
         self.tool:unSelect()
     end
-    
+
     self.tool = self.tools[toolName]
-    
+
     if self.tool.select then
         self.tool:select()
     end
-    
+
     for _, toolButton in pairs(self.toolButtons) do
         toolButton.color.background = {1, 1, 1}
     end
-    
+
     self.toolButtons[toolName].color.background = {0.75, 0.75, 0.75}
 end
 
@@ -374,7 +374,7 @@ function Editor:selectTile(tile)
     if self.tool ~= self.tools.paint and self.tool ~= self.tools.fill then
         self:selectTool("paint")
     end
-    
+
     self.tools.paint.tile = tile
 
     for _, window in ipairs(self.windows) do
@@ -392,11 +392,11 @@ function Editor:cmdpressed(cmd)
     if self.tool.cmdpressed and self.tool:cmdpressed(cmd) then
         return true
     end
-    
+
     if cmd["editor.delete"] then
         if self.selection then
             self.selection:delete()
-            
+
             self:saveState()
         end
 
@@ -425,13 +425,13 @@ function Editor:cmdpressed(cmd)
                 self.floatingSelection = nil
             end
         end
-    
+
     elseif cmd["editor.paste"] then
         if self.clipboard then
             if self.tool ~= self.tools.select then
                 self:selectTool("select")
             end
-            
+
             if self.floatingSelection then
                 self.pastePos = {unpack(self.floatingSelection.pos)}
                 self.floatingSelection:unFloat()
@@ -442,31 +442,31 @@ function Editor:cmdpressed(cmd)
 
             self:saveState()
         end
-        
+
     elseif cmd["editor.save"] then
         self:saveLevel()
-        
+
     elseif cmd["editor.load"] then
         self:loadLevel("1-1.json")
-        
+
     elseif cmd["editor.select.clear"] then
         if self.selection then
             self.selection = nil
         end
-        
+
         if self.floatingSelection then
             self.floatingSelection:reset()
             self.floatingSelection:unFloat()
             self.floatingSelection = nil
         end
-        
+
     elseif cmd["editor.select.unFloat"] then
         if self.floatingSelection then
             self.floatingSelection:unFloat()
             self.floatingSelection = nil
         end
     end
-    
+
     for i, _ in pairs(self.toolClasses) do
         if cmd["editor.tool." .. i] then
             self:selectTool(i)
@@ -478,7 +478,7 @@ function Editor:mousepressed(x, y, button)
     if self.canvas:mousepressed(x, y, button) then -- don't do tool stuff if the click was on a GUI element
         return true
     end
-    
+
     if self.tool.mousepressed and self.tool:mousepressed(x, y, button) then
         return true
     end
@@ -486,15 +486,15 @@ end
 
 function Editor:mousereleased(x, y, button)
     self.canvas:mousereleased(x, y, button)
-    
+
     if self.tool.mousereleased then
         self.tool:mousereleased(x, y, button)
     end
-    
+
     if self.selection then
         self.selection:mousereleased(x, y, button)
     end
-    
+
     if self.floatingSelection then
         self.floatingSelection:mousereleased(x, y, button)
     end
@@ -510,7 +510,7 @@ function Editor:wheelmoved(x, y)
     if self.canvas:wheelmoved(x, y) then
         return true
     end
-    
+
     if self.tool.wheelmoved and self.tool:wheelmoved(x, y) then
         return true
     end
@@ -522,30 +522,30 @@ end
 
 function Editor:zoom(i, toMouse)
     local zoom
-         
+
     if i > 0 then -- out
         zoom = 1.1^i
     else
         zoom = 1/(1.1^-i)
     end
-    
-    
+
+
     if self.level.camera.scale*zoom < self.scaleMin then
         zoom = self.scaleMin/self.level.camera.scale
     elseif self.level.camera.scale*zoom > self.scaleMax then
         zoom = self.scaleMax/self.level.camera.scale
     end
-    
+
     local x, y
     if toMouse then
         x, y = getWorldMouse()
     end
-    
+
     self.level.camera:zoom(zoom, x, y)
-    
+
     self:updateScaleSlider()
 end
-    
+
 function Editor:resetZoom()
     self.level.camera:zoomTo(1/VAR("scale"))
     self:updateScaleSlider()
@@ -553,12 +553,11 @@ end
 
 function Editor:resize(w, h)
     self.canvas:resize(w, h)
-    
+
     self.menuBar:resize(w, self.menuBar.h)
-    
+
     self.toolbar.h = CAMERAHEIGHT-14
-    
-    local w = 50
+
     local fullw = w+63
     local x = CAMERAWIDTH-fullw
     self.scaleBar.x = x
@@ -566,13 +565,13 @@ end
 
 function Editor:saveLevel()
     self.fileDropdown:toggle(false)
-    
+
     self.level:saveLevel("1-1.json")
 end
 
 function Editor:loadLevel(path)
     self.fileDropdown:toggle(false)
-    
+
     local data = JSON:decode(love.filesystem.read(path))
     self.level:loadLevel(data)
 
@@ -613,7 +612,7 @@ function Editor:saveState()
     for i = 1, self.editorState-1 do
         table.remove(self.editorStates, 1)
     end
-    
+
     table.insert(self.editorStates, 1, EditorState:new(self))
 
     self.editorState = 1
@@ -643,7 +642,7 @@ end
 function Editor:unFloatSelection()
     if self.floatingSelection then
         self:saveState()
-        
+
         self.floatingSelection:unFloat()
         self.selection = self.floatingSelection:getSelection()
         self.floatingSelection = nil
@@ -688,10 +687,10 @@ end
 function Editor:pipette()
     local coordX, coordY = self.level:mouseToCoordinate()
     local layer = self.activeLayer
-    
+
     if layer:inMap(coordX, coordY) then
         local tile = layer:getTile(coordX, coordY)
-        
+
         if tile then
             self.tools.paint.tile = tile
 
@@ -705,8 +704,6 @@ function Editor:pipette()
 end
 
 function Editor:updateMinimap()
-    local t = love.timer.getTime()
-    
     local yStart = self.level:getYStart()
     local yEnd = self.level:getYEnd()
     local xStart = self.level:getXStart()

@@ -3,7 +3,7 @@ local Select = class("Editor.Select")
 function Select:initialize(editor)
     self.editor = editor
     self.level = self.editor.level
-    
+
     self.pressing = false
 end
 
@@ -11,14 +11,14 @@ function Select:draw()
     local mouseX, mouseY = self.level:getMouse()
     local worldX, worldY = self.level:mouseToWorld()
     local coordX, coordY = self.level:mouseToCoordinate()
-    
+
     if self.pressing then
         local lx, rx, ty, by = self.level:getCoordinateRectangle(self.selectionStart[1], self.selectionStart[2], worldX-self.selectionStart[1], worldY-self.selectionStart[2])
         local x = (lx-1)*self.level.tileSize
         local y = (ty-1)*self.level.tileSize
         local w = (rx-lx+1)*self.level.tileSize
         local h = (by-ty+1)*self.level.tileSize
-        
+
         if w > 0 and h > 0 then
             Gui3.drawBox(self.editor.selectImg, self.editor.selectQuad, x, y, w, h)
         elseif w > 0 or h > 0 then -- line
@@ -27,23 +27,23 @@ function Select:draw()
                 x = x - 1
                 w = 2
             end
-            
+
             if h == 0 then
                 y = y - 1
                 h = 2
             end
-            
+
             love.graphics.rectangle("fill", x, y, w, h)
             love.graphics.setColor(1, 1, 1)
         end
-        
+
         if rx-lx+1 > 0 or by-ty+1 > 0 then
             self.editor:drawSizeHelp(rx-lx+1, by-ty+1)
         end
     end
 
     local addition = ""
-    
+
     if not self.editor.floatingSelection or not self.editor.floatingSelection.dragging then
         if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
             addition = "∩"
@@ -56,7 +56,7 @@ function Select:draw()
             addition = "⇔"
         end
     end
-    
+
     if addition ~= "" then
         love.graphics.print(addition, worldX-utf8.len(addition)*8-1, worldY+2)
     end
@@ -65,7 +65,7 @@ end
 function Select:mousepressed(x, y, button)
     if button == 1 then
         local worldX, worldY = self.level:mouseToWorld()
-        
+
         if self.editor.selection and not cmdDown("editor.select.add") and not cmdDown("editor.select.subtract") and self.editor.selection:collision(x, y) then
             self.editor:floatSelection()
             self.editor.floatingSelection:startDrag(worldX, worldY)
@@ -79,7 +79,7 @@ function Select:mousepressed(x, y, button)
             self.selectionStart = {worldX, worldY}
         end
     end
-        
+
     return true
 end
 
@@ -89,7 +89,7 @@ function Select:mousereleased(x, y, button)
         local tiles, dirty = self:getTiles(self.selectionStart[1], self.selectionStart[2], mx-self.selectionStart[1], my-self.selectionStart[2])
 
         print(dirty)
-        
+
         if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
             self.editor:intersectSelection(tiles)
         elseif cmdDown("editor.select.add") then
@@ -101,9 +101,9 @@ function Select:mousereleased(x, y, button)
         else
             self.editor:clearSelection()
         end
-        
+
         self.editor:saveState()
-        
+
         self.pressing = false
     end
 end
@@ -119,15 +119,15 @@ function Select:getTiles(x, y, w, h)
     else
         lx, rx, ty, by = self.level:getCoordinateRectangle(x, y, w, h, true)
     end
-    
+
     local ret = {}
-    
+
     for x = lx, rx do
         for y = ty, by do
             table.insert(ret, {x, y})
         end
     end
-    
+
     return ret, dirtySelect
 end
 

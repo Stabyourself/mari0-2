@@ -10,10 +10,10 @@ return {
 
         portalVector = false,
         portalStencils = false,
-        
+
         input = false,
     },
-    
+
     noEnemies = false,
     musicDisabled = true,
     volume = 1,

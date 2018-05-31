@@ -2,7 +2,7 @@ local Move = class("Editor.Move")
 
 function Move:initialize(editor)
     self.editor = editor
-    
+
     self.level = self.editor.level
 end
 
@@ -17,7 +17,7 @@ function Move:mousereleased(x, y, button)
 end
 
 function Move:mousemoved(x, y)
-    
+
 end
 
 return Move

@@ -10,10 +10,14 @@ end
 function Select:draw()
     local mouseX, mouseY = self.level:getMouse()
     local worldX, worldY = self.level:mouseToWorld()
-    local coordX, coordY = self.level:mouseToCoordinate()
 
     if self.pressing then
-        local lx, rx, ty, by = self.level:getCoordinateRectangle(self.selectionStart[1], self.selectionStart[2], worldX-self.selectionStart[1], worldY-self.selectionStart[2])
+        local lx, rx, ty, by = self.level:getCoordinateRectangle(
+            self.selectionStart[1],
+            self.selectionStart[2],
+            worldX-self.selectionStart[1],
+            worldY-self.selectionStart[2]
+        )
         local x = (lx-1)*self.level.tileSize
         local y = (ty-1)*self.level.tileSize
         local w = (rx-lx+1)*self.level.tileSize
@@ -87,8 +91,6 @@ function Select:mousereleased(x, y, button)
     local mx, my = self.level:mouseToWorld()
     if self.pressing then
         local tiles, dirty = self:getTiles(self.selectionStart[1], self.selectionStart[2], mx-self.selectionStart[1], my-self.selectionStart[2])
-
-        print(dirty)
 
         if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
             self.editor:intersectSelection(tiles)

@@ -1,62 +1,59 @@
 local Tracer = class("Physics3.Tracer") -- The cavalry is here
 
-function Tracer:initialize(physObj, xOff, yOff, xDir, yDir, distance)
+function Tracer:initialize(physObj, x, y, vector)
 	self.physObj = physObj
-	self.xOff = xOff
-	self.yOff = yOff
-	self.xDir = xDir
-	self.yDir = yDir
-	self.distance = distance
+	self.x = x
+	self.y = y
+	self.vector = vector
+	self.vectorNormalized = self.vector:normalized()
+	self.len = self.vector:len()
+	self.angle = self.physObj.angle
 end
 
 function Tracer:trace()
-	local x, y, col
-	
-	for i = 0, self.distance-1 do
-		local objX = self.physObj.x
-		local objY = self.physObj.y
+	local i = 1
 
-		if self.xDir > 0 then
-			objX = math.ceil(objX)
-		elseif self.xDir < 0 then
-			objX = math.floor(objX)
-		end
+	while i <= self.len do
+		local x = self.x + self.vectorNormalized.x*i -- todo: these could be cached
+		local y = self.y + self.vectorNormalized.y*i
 
-		if self.yDir > 0 then
-			objY = math.ceil(objY)
-		elseif self.yDir < 0 then
-			objY = math.floor(objY)
-		end
+		x, y = self.physObj.transform:transformPoint(x, y)
 
-		x = objX + self.xOff + i*self.xDir
-		y = objY + self.yOff + i*self.yDir
-		
-		col = self.physObj.World:checkCollision(x, y, self.physObj)
+		x = x + self.physObj.x
+		y = y + self.physObj.y
+
+		xRounded = math.round(x)
+		yRounded = math.round(y)
+
+		col = self.physObj.World:checkCollision(xRounded, yRounded, self.physObj)
 		if col then
 			return x, y, col
 		end
+
+		i = i + 1
 	end
 end
 
 function Tracer:debugDraw()
-	local xWidth = self.xDir*self.distance
-	local yWidth = self.yDir*self.distance
-	local xOff = self.xOff
-	local yOff = self.yOff
-	
-	if xWidth < 0 then
-		xOff = xOff + 1
-	elseif xWidth == 0 then
-		xWidth = 1
-	end
-	
-	if yWidth < 0 then
-		yOff = yOff + 1
-	elseif yWidth == 0 then
-		yWidth = 1
-	end
+	local angle = self.vector:angleTo()
 
-	love.graphics.rectangle("fill", self.physObj.x + xOff, self.physObj.y + yOff, xWidth, yWidth)
+	local x = self.x
+	local y = self.y
+
+	x, y = self.physObj.transform:transformPoint(x, y)
+
+	x = x + self.physObj.x
+	y = y + self.physObj.y
+
+	-- x = math.round(x)
+	-- y = math.round(y)
+
+	love.graphics.push()
+	love.graphics.translate(x, y)
+	love.graphics.rotate(angle+self.angle)
+
+	love.graphics.rectangle("fill", 0, -.5, self.len, 1)
+	love.graphics.pop()
 end
 
 return Tracer

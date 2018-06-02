@@ -57,7 +57,7 @@ end
 
 function animation:postUpdate(dt)
     if self.actor.hasPortalGun then -- look towards portalGunAngle
-        if math.abs(self.actor.portalGunAngle-self.actor.angle) <= math.pi*.5 then
+        if math.abs(self.actor.portalGunAngle-self.actor.visAngle) <= math.pi*.5 then
             self.actor.animationDirection = 1
         else
             self.actor.animationDirection = -1
@@ -248,7 +248,7 @@ function getAngleFrame(actor)
         return 5
     end
 
-    local angle = actor.portalGunAngle-actor.angle
+    local angle = actor.portalGunAngle-actor.visAngle
 
     if angle > math.pi*.5 then
         angle = math.pi - angle

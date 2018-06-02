@@ -31,6 +31,7 @@ function love.load()
     GameStateManager = require "lib.GameStateManager"
     prof = require "lib.jprof.jprof"
     paletteShader = require "lib.paletteShader"
+    Vector = require "lib.vector"
 
     -- Self written libs
     Color3 = require "lib.Color3"

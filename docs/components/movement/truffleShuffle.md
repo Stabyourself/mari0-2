@@ -4,11 +4,11 @@ The actor will move at a constant speed until hitting any obstacle, at which poi
 
 ![truffleShuffle](truffleShuffle.gif)
 
-```json
-"movement.truffleShuffle": {
-    "maxSpeed": 60,
-    "acceleration": 150,
-    "dontTurnAnimation": true
+```lua
+["movement.truffleShuffle"] = {
+    maxSpeed = 60,
+    acceleration = 150,
+    dontTurnAnimation = true,
 }
 ```
 

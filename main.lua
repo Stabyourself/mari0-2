@@ -25,7 +25,6 @@ function love.load()
     utf8 = require "utf8"
     class = require "lib.middleclass"
     sandbox = require "lib.sandbox"
-    JSON = require "lib.JSON"
     Camera = require "lib.Camera"
     Easing = require "lib.Easing"
     GameStateManager = require "lib.GameStateManager"

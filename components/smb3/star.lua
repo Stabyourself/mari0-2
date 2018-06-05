@@ -1,11 +1,4 @@
-local star = class("smb3.star")
-
-function star:initialize(actor, args)
-    self.actor = actor
-    self.args = args
-
-    self:setup()
-end
+local star = class("smb3.star", Component)
 
 local STARTIME = 7.45
 
@@ -34,7 +27,9 @@ local STARPALETTES = {
     })
 }
 
-function star:setup()
+function star:initialize(actor, args)
+    Component.initialize(self, actor, args)
+
     self.actor.starred = true
     self.actor.starTimer = 0
     self.actor.somerSaultFrame = 2

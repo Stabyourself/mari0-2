@@ -1,18 +1,19 @@
-local palettable = class("misc.palettable")
+local palettable = class("misc.palettable", Component)
+
+palettable.argList = {
+    {"imgPalette", "required|palette"},
+    {"defaultPalette", "palette", function(self) return self.imgPalette end},
+}
 
 function palettable:initialize(actor, args)
-    self.actor = actor
-    self.args = args
+    Component.initialize(self, actor, args)
 
-    self:setup()
-end
+    self.actor.imgPalette = self.imgPalette
+    self.actor.defaultPalette = self.defaultPalette
 
-function palettable:setup(s)
-    self.actor.imgPalette = convertPalette(self.args.imgPalette)
-
-    self.actor.defaultPalette = convertPalette(self.args.defaultPalette or self.args.imgPalette)
-
-    self.actor.palette = self.actor.defaultPalette
+    if self.defaultPalette ~= self.imgPalette then
+        self.actor.palette = self.defaultPalette
+    end
 end
 
 return palettable

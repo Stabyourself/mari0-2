@@ -1,4 +1,4 @@
-local movement = class("smb3.movement")
+local movement = class("smb3.movement", Component)
 
 local ACCELERATION = 196.875 -- acceleration on ground
 
@@ -22,13 +22,8 @@ local PMETERTIMEMARGIN = 16/60
 -- local DOWNHILLWALKBONUS = 7.5
 
 function movement:initialize(actor, args)
-    self.actor = actor
-    self.args = args
+    Component.initialize(self, actor, args)
 
-    self:setup()
-end
-
-function movement:setup()
     self.actor.jumping = false
 
     self.actor.animationState = "idle"

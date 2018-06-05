@@ -1,13 +1,8 @@
-local hasCrosshair = class("misc.hasCrosshair")
+local hasCrosshair = class("misc.hasCrosshair", Component)
 
 function hasCrosshair:initialize(actor, args)
-    self.actor = actor
-    self.args = args
+    Component.initialize(self, actor, args)
 
-    self:setup()
-end
-
-function hasCrosshair:setup()
     self.crosshair = DottedCrosshair:new(self.actor)
 end
 

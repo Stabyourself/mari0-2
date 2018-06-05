@@ -1,15 +1,10 @@
-local spinning = class("smb3.spinning")
+local spinning = class("smb3.spinning", Component)
 
 local SPINTIME = 19/60
 
 function spinning:initialize(actor, args)
-    self.actor = actor
-    self.args = args
+    Component.initialize(self, actor, args)
 
-    self:setup()
-end
-
-function spinning:setup()
     self.actor.spinning = false
     self.actor.spinTimer = SPINTIME
 end

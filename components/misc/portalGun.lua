@@ -1,13 +1,8 @@
-local portalGun = class("misc.portalGun")
+local portalGun = class("misc.portalGun", Component)
 
 function portalGun:initialize(actor, args)
-    self.actor = actor
-    self.args = args
+    Component.initialize(self, actor, args)
 
-    self:setup()
-end
-
-function portalGun:setup()
     self.actor.hasPortalGun = true
     self.actor.portalGunAngle = 0
 

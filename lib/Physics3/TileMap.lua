@@ -3,9 +3,9 @@ local TileMap = class("Physics3.TileMap")
 function TileMap:initialize(path, name)
 	self.path = path .. "/"
 	self.name = name
-	
+
 	local tileMapCode = love.filesystem.read(self.path .. "props.lua")
-	
+
 	assert(tileMapCode, string.format("Map tried to tell me that it uses the tilemap \"%s\" but we all know that's bullshit because that tilemap's props doesn't exist.", name))
 
     self.data = sandbox.run(tileMapCode, {env={
@@ -15,7 +15,7 @@ function TileMap:initialize(path, name)
 	self.tileMargin = self.data.tileMargin or 1
 	self.img = love.graphics.newImage(self.path .. self.data.tileMap)
 	self.imgData = love.image.newImageData(self.path .. self.data.tileMap)
-	
+
 	self.tiles = {}
 	self.updateTiles = {}
 
@@ -47,7 +47,7 @@ function TileMap:initialize(path, name)
 
 				for y = 1, h do
 					local tile = self.tiles[stampMap.map[y][x]]
-					
+
 					if tile then
 						map[x][y] = tile
 					else
@@ -68,7 +68,7 @@ function TileMap:initialize(path, name)
 					assert(stampMap.paddings[i] <= compareTo, string.format("StampMap \"%s\" from the TileMap \"%s\" had a padding[%s] bigger than its own size. I hope I don't have to explain how nonsensical that is.", stampMap.name, name, i))
 				end
 			end
-			
+
 			table.insert(self.stampMaps, StampMap:new(map, w, h, stampMap.type, stampMap.name, stampMap.paddings))
 		end
 	end

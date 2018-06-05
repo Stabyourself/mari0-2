@@ -1,16 +1,11 @@
-local ducking = class("smb3.ducking")
+local ducking = class("smb3.ducking", Component)
 
 local BUTTACCELERATION = 225 -- this is per 1/8*pi of downhill slope
 local FRICTIONBUTT = 277+7/9
 
 function ducking:initialize(actor, args)
-    self.actor = actor
-    self.args = args
+    Component.initialize(self, actor, args)
 
-    self:setup()
-end
-
-function ducking:setup()
     self.actor.ducking = false
 
     self.actor:registerState("buttSlide", function(actor)

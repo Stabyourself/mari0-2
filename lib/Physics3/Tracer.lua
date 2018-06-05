@@ -11,7 +11,7 @@ end
 
 function Tracer:trace()
 	local x, y, col
-	
+
 	for i = 0, self.distance-1 do
 		local objX = self.physObj.x
 		local objY = self.physObj.y
@@ -30,7 +30,7 @@ function Tracer:trace()
 
 		x = objX + self.xOff + i*self.xDir
 		y = objY + self.yOff + i*self.yDir
-		
+
 		col = self.physObj.World:checkCollision(x, y, self.physObj)
 		if col then
 			return x, y, col
@@ -43,13 +43,13 @@ function Tracer:debugDraw()
 	local yWidth = self.yDir*self.distance
 	local xOff = self.xOff
 	local yOff = self.yOff
-	
+
 	if xWidth < 0 then
 		xOff = xOff + 1
 	elseif xWidth == 0 then
 		xWidth = 1
 	end
-	
+
 	if yWidth < 0 then
 		yOff = yOff + 1
 	elseif yWidth == 0 then

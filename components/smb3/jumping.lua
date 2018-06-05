@@ -1,4 +1,4 @@
-local jumping = class("smb3.jumping")
+local jumping = class("smb3.jumping", Component)
 
 local MAXSPEEDS = {90, 150, 210}
 local JUMPTABLE = {
@@ -10,13 +10,8 @@ local JUMPTABLE = {
 local JUMPGRAVITYUNTIL = -120
 
 function jumping:initialize(actor, args)
-    self.actor = actor
-    self.args = args
+    Component.initialize(self, actor, args)
 
-    self:setup()
-end
-
-function jumping:setup()
     self.actor:registerState("jump", function(actor)
         if not cmdDown("jump") or actor.speed[2] >= JUMPGRAVITYUNTIL then
             return "fall"

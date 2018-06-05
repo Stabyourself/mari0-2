@@ -8,21 +8,21 @@ function Tile:initialize(tileMap, img, x, y, num, props, path)
 	self.num = num
 	self.props = props or {}
 	self.path = path
-	
+
 	self.type = self.props.type or "normal"
 	self.angle = self.props.angle or 0
 
 	self.collision = self.props.collision or false
 
 	self:cacheCollisions()
-	
+
 	if self.props.img then
 		self.img = love.graphics.newImage(self.path .. self.props.img)
 
 		self.quads = {}
 
-		for x = 1, (self.img:getWidth()+1)/self.tileMap.tileSize do
-			table.insert(self.quads, love.graphics.newQuad((x-1)*17, 0, 16, 16, self.img:getWidth(), self.img:getHeight()))
+		for qx = 1, (self.img:getWidth()+1)/self.tileMap.tileSize do
+			table.insert(self.quads, love.graphics.newQuad((qx-1)*17, 0, 16, 16, self.img:getWidth(), self.img:getHeight()))
 		end
 
 		self.timer = 0
@@ -31,7 +31,14 @@ function Tile:initialize(tileMap, img, x, y, num, props, path)
 		self.quad = self.quads[self.frame]
 	else
 		self.img = img
-		self.quad = love.graphics.newQuad((self.x-1)*(self.tileMap.tileSize+self.tileMap.tileMargin), (self.y-1)*(self.tileMap.tileSize+self.tileMap.tileMargin), self.tileMap.tileSize, self.tileMap.tileSize, self.img:getWidth(), self.img:getHeight())
+		self.quad = love.graphics.newQuad(
+			(self.x-1)*(self.tileMap.tileSize+self.tileMap.tileMargin),
+			(self.y-1)*(self.tileMap.tileSize+self.tileMap.tileMargin),
+			self.tileMap.tileSize,
+			self.tileMap.tileSize,
+			self.img:getWidth(),
+			self.img:getHeight()
+		)
 	end
 end
 
@@ -46,7 +53,7 @@ function Tile:update(dt)
 		self.timer = self.timer - self:getDelay()
 
 		self.frame = self.frame + 1
-		
+
 		if self.frame > #self.quads then
 			self.frame = 1
 		end
@@ -88,7 +95,7 @@ function Tile:checkCollision(x, y)
 	if not self.collision then
 		return false
 	end
-	
+
 	if self.collision == VAR("tileTemplates").cube then -- optimization for cubes
 		return true
 	else
@@ -105,7 +112,7 @@ end
 
 function Tile:getAverageColor()
 	if not self.averageColor then
-		local tr, tg, tb, ta = 0, 0, 0, 0
+		local tr, tg, tb = 0, 0, 0
 
 		for y = 0, 15 do
 			for x = 0, 15 do

@@ -31,7 +31,7 @@ function Layer:draw()
 
     local yStart = ty-1
     local yEnd = by
-    
+
     xStart = math.clamp(xStart, self:getXStart(), self:getXEnd())
     yStart = math.clamp(yStart, self:getYStart(), self:getYEnd())
     xEnd = math.clamp(xEnd, self:getXStart(), self:getXEnd())
@@ -41,7 +41,7 @@ function Layer:draw()
         for y = yStart, yEnd do
             if self:inMap(x, y) then
                 local tile = self:getTile(x, y)
-                
+
                 if tile then
                     tile:draw((x-1)*16+math.ceil(self.xOffset), (y-1)*16+math.ceil(self.yOffset))
                 end
@@ -58,11 +58,11 @@ function Layer:checkCollision(x, y)
 
     if self:inMap(tileX, tileY) then
         local tile = self:getTile(tileX, tileY)
-        
+
         if tile then
             local inTileX = math.fmod(x, 16)
             local inTileY = math.fmod(y, 16)
-            
+
             if tile:checkCollision(inTileX, inTileY) then
                 return tile
             end
@@ -88,7 +88,13 @@ end
 
 function Layer:debugDraw()
     love.graphics.setColor(1, 0, 0)
-    love.graphics.rectangle("line", self.x*16-.5+math.ceil(self.xOffset), self.y*16-.5+math.ceil(self.yOffset), self.width*16+1, self.height*16+1)
+    love.graphics.rectangle(
+        "line",
+        self.x*16-.5+math.ceil(self.xOffset),
+        self.y*16-.5+math.ceil(self.yOffset),
+        self.width*16+1,
+        self.height*16+1
+    )
     love.graphics.setColor(1, 1, 1)
 end
 
@@ -98,7 +104,7 @@ end
 
 function Layer:setCoordinate(x, y, tile)
     assert(self:inMap(x, y), string.format("Tried to set out-of-bounds coordinate %s, %s. Stop that.", x, y))
-    
+
     self.map[x-self.x][y-self.y] = tile
 end
 
@@ -109,7 +115,7 @@ function Layer:optimize() -- cuts a layer to its content and moves it instead
 
     repeat
         for y = self:getYStart(), self:getYEnd() do
-            
+
             if self:getTile(x, y) then
                 found = true
             end
@@ -138,7 +144,7 @@ function Layer:optimize() -- cuts a layer to its content and moves it instead
 
     repeat
         for y = self:getYStart(), self:getYEnd() do
-            
+
             if self:getTile(x, y) then
                 found = true
             end
@@ -148,10 +154,10 @@ function Layer:optimize() -- cuts a layer to its content and moves it instead
     until found or x < self:getXStart()
 
     x = x + 1
-    
+
     if x < self:getXEnd() then
         local toRemove = self:getXEnd() - x
-        
+
         for i = 1, toRemove do
             table.remove(self.map)
         end
@@ -165,7 +171,7 @@ function Layer:optimize() -- cuts a layer to its content and moves it instead
 
     repeat
         for x = self:getXStart(), self:getXEnd() do
-            
+
             if self:getTile(x, y) then
                 found = true
             end
@@ -196,7 +202,7 @@ function Layer:optimize() -- cuts a layer to its content and moves it instead
 
     repeat
         for x = self:getXStart(), self:getXEnd() do
-            
+
             if self:getTile(x, y) then
                 found = true
             end
@@ -225,22 +231,22 @@ function Layer:inMap(x, y)
     return x > self.x and x <= self.x+self.width and y > self.y and y <= self.y+self.height
 end
 
-function Layer:getFloodArea(x, y) -- Based off https://github.com/Yonaba/FloodFill/blob/master/floodfill/floodstackscanline.lua (which seems to be based off lodev?)
-    local targetTile = self:getTile(x, y)
+function Layer:getFloodArea(startX, startY) -- Based off https://github.com/Yonaba/FloodFill/blob/master/floodfill/floodstackscanline.lua (which seems to be based off lodev?)
+    local targetTile = self:getTile(startX, startY)
 
     local tileLookupTable = {}
-    for x = 1, self.width do
-        tileLookupTable[x+self.x] = {}
+    for tx = 1, self.width do
+        tileLookupTable[tx+self.x] = {}
     end
 
 	local spanLeft, spanRight
 
     local tileTable = {}
-    stack = {{x, y}}
-    
+    stack = {{startX, startY}}
+
     while #stack > 0 do
         local p = table.remove(stack)
-        
+
 		local x, y = p[1], p[2]
 
 		while ((y >= self:getYStart()) and self:getTile(x, y) == targetTile) do -- go to the highest possible point
@@ -274,12 +280,12 @@ function Layer:getFloodArea(x, y) -- Based off https://github.com/Yonaba/FloodFi
 			y = y + 1
 		end
 	end
-    
+
     return tileTable
 end
 
 function Layer:expandTo(x, y)
-    local x, y = x-self.x, y-self.y
+    x, y = x-self.x, y-self.y
 
     if x <= 0 then
         local newColumns = 1-x
@@ -305,7 +311,7 @@ function Layer:expandTo(x, y)
             for ly = 1, self.height do
                 table.insert(emptyRow, false)
             end
-            
+
             table.insert(self.map, emptyRow)
         end
 

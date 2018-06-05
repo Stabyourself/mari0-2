@@ -1,12 +1,11 @@
-local hurtsByContact = class("misc.hurtsByContact")
+local hurtsByContact = class("misc.hurtsByContact", Component)
 
-function hurtsByContact:initialize(actor, args)
-    self.left = args.left or false
-    self.right = args.right or false
-    self.top = args.top or false
-    self.bottom = args.bottom or false
-
-    self.onlyWhenMoving = args.onlyWhenMoving or false
-end
+hurtsByContact.argList = {
+    {"left", "boolean", false},
+    {"right", "boolean", false},
+    {"top", "boolean", false},
+    {"bottom", "boolean", false},
+    {"onlyWhenMoving", "boolean", false},
+}
 
 return hurtsByContact

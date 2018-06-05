@@ -6,18 +6,18 @@ function PhysObj:initialize(world, x, y, width, height)
 	self.width = width
 	self.height = height
 	self.world = world
-	
+
 	self.speed = {0, 0}
-	
+
 	self.gravityDirection = math.pi*.5
-	
+
 	self.angle = 0
-	
+
     self.surfaceAngle = 0
 	self.onGround = false
 
 	self.isGroundFor = {}
-	
+
 	-- register yourself with the world
 	world:addObject(self)
 
@@ -31,58 +31,58 @@ function PhysObj:createTracers()
 	self.tracers.right = {}
 	self.tracers.up = {}
 	self.tracers.down = {}
-	
+
 	local xOff, yOff, distance
 	local step = self.world.tileSize
-	
+
 	-- Create left tracers
 	xOff = math.floor(self.width/2)-1
 	distance = math.floor(self.width/2)
-	
+
 	for yOff = self.height - Physics3.TRACER_BOTTOM_DIST - 1, Physics3.TRACER_SIDE_TOP_DIST+1, -step do
 		table.insert(self.tracers.left, Physics3.Tracer:new(self, xOff, yOff, -1, 0, distance))
 	end
-	
+
 	-- Also include almost top
 	table.insert(self.tracers.left, Physics3.Tracer:new(self, xOff, Physics3.TRACER_SIDE_TOP_DIST, -1, 0, distance))
-	
-	
+
+
 	-- Create right tracers
 	xOff = math.floor(self.width/2)
 	distance = math.floor(self.width/2)
-	
+
 	for yOff = self.height - Physics3.TRACER_BOTTOM_DIST - 1, Physics3.TRACER_SIDE_TOP_DIST+1, -step do
 		table.insert(self.tracers.right, Physics3.Tracer:new(self, xOff, yOff, 1, 0, distance))
 	end
-	
+
 	-- Also include almost top
 	table.insert(self.tracers.right, Physics3.Tracer:new(self, xOff, Physics3.TRACER_SIDE_TOP_DIST, 1, 0, distance))
-	
-	
+
+
 	-- Create bottom tracers
 	yOff = self.height/2
 	distance = self.height/2+Physics3.TRACER_BOTTOM_EXTEND
-	
+
 	--from left side
 	for xOff = 0+Physics3.TRACER_BOTTOM_SIDE_SPACING, math.floor(self.width/2)-1, Physics3.TRACER_BOTTOM_SPACING do
 		table.insert(self.tracers.down, Physics3.Tracer:new(self, xOff, yOff, 0, 1, distance))
 	end
-	
+
 	--from right side
 	for xOff = self.width-1-Physics3.TRACER_BOTTOM_SIDE_SPACING, math.floor(self.width/2), -Physics3.TRACER_BOTTOM_SPACING do
 		table.insert(self.tracers.down, Physics3.Tracer:new(self, xOff, yOff, 0, 1, distance))
 	end
-	
-	
+
+
 	-- Create top tracers
 	yOff = self.height/2-1
 	distance = self.height/2
-	
+
 	--from left side
 	for xOff = 0+Physics3.TRACER_TOP_SPACING, math.floor(self.width/2)-1, step do
 		table.insert(self.tracers.up, Physics3.Tracer:new(self, xOff, yOff, 0, -1, distance))
 	end
-	
+
 	--from right side
 	for xOff = self.width-1-Physics3.TRACER_TOP_SPACING, math.floor(self.width/2), -step do
 		table.insert(self.tracers.up, Physics3.Tracer:new(self, xOff, yOff, 0, -1, distance))
@@ -104,7 +104,7 @@ end
 
 function PhysObj:unRotate(dt)
 	self.angle = normalizeAngle(self.angle)
-	
+
 	if self.angle > 0 then
 		self.angle = math.max(0, self.angle - VAR("rotationSpeed")*dt)
 	else
@@ -117,7 +117,7 @@ function PhysObj:leftColCheck()
 
 	for _, tracer in ipairs(self.tracers.left) do
 		local traceX, traceY, traceObj = tracer:trace()
-		
+
 		if traceX and (not colX or traceX < colX) then
 			colX, colY, colObj = traceX, traceY, traceObj
 		end
@@ -131,40 +131,40 @@ function PhysObj:rightColCheck()
 
 	for _, tracer in ipairs(self.tracers.right) do
 		local traceX, traceY, traceObj = tracer:trace()
-		
+
 		if traceX and (not colX or traceX > colX) then
 			colX, colY, colObj = traceX, traceY, traceObj
 		end
 	end
-	
+
 	return colX, colY, colObj
 end
 
 function PhysObj:topColCheck()
 	local colX, colY
-	
+
 	for _, tracer in ipairs(self.tracers.up) do
 		local traceX, traceY, traceObj = tracer:trace()
-		
+
 		if traceX and (not colX or traceY < colY) then
 			colX, colY, colObj = traceX, traceY, traceObj
 		end
 	end
-	
+
 	return colX, colY, colObj
 end
 
 function PhysObj:bottomColCheck()
 	local colX, colY
-	
+
 	for _, tracer in ipairs(self.tracers.down) do
 		local traceX, traceY, traceObj = tracer:trace()
-		
+
 		if traceX and (not colX or traceY < colY) then
 			colX, colY, colObj = traceX, traceY, traceObj
 		end
 	end
-	
+
 	return colX, colY, colObj
 end
 
@@ -211,7 +211,7 @@ function PhysObj:bottomColResolve(obj, x, y)
 		if not self.onGround then
 			self.onGround = true
 		end
-		
+
 		if y then
 			self.y = y-self.height
 		end
@@ -220,16 +220,9 @@ function PhysObj:bottomColResolve(obj, x, y)
 
 		return true
 	end
-	
+
 	return false
 end
-
-local col = {
-	left = {},
-	right = {},
-	top = {},
-	bottom = {}
-}
 
 function PhysObj:checkCollisions()
 	return	self:leftColCheck() or
@@ -273,7 +266,7 @@ function PhysObj:resolveCollisions()
 				end
 			end
 			obj:topColResolve(self)
-	
+
 			if type(obj) == "table" and obj:isInstanceOf(Physics3.Tile) then -- update the object's surfaceAngle
 				self.surfaceAngle = obj.angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
 			else
@@ -285,7 +278,7 @@ function PhysObj:resolveCollisions()
 			self:startFall()
 			self.onGround = false
 		end
-		
+
 		x, y, obj = self:topColCheck()
 
 		if x then -- resolve the right collision
@@ -307,7 +300,7 @@ function PhysObj:postMovement()
 		self.x = self.x + mx
 		self.y = self.y + my
 	end
-end    
+end
 
 function PhysObj:checkCollision(x, y)
 	if pointInRectangle(x, y, math.round(self.x), math.round(self.y), self.width, self.height) then
@@ -320,7 +313,7 @@ function PhysObj:portalled()
 	for _, obj in ipairs(self.isGroundFor) do
 		obj.standingOn = nil
 	end
-	
+
 	clearTable(self.isGroundFor)
 end
 
@@ -350,27 +343,27 @@ end
 function PhysObj:debugDraw(xOff, yOff)
 	love.graphics.setColor(1, 0, 0)
 	love.graphics.rectangle("line", self.x+.5, self.y+.5, self.width-1, self.height-1)
-	
+
 	love.graphics.setColor(0, 1, 0, 0.5)
 	for j, w in ipairs(self.tracers.right) do
 		w:debugDraw()
 	end
-	
+
 	love.graphics.setColor(0, 0, 1, 0.5)
 	for j, w in ipairs(self.tracers.left) do
 		w:debugDraw()
 	end
-	
+
 	love.graphics.setColor(1, 0, 1, 0.5)
 	for j, w in ipairs(self.tracers.down) do
 		w:debugDraw()
 	end
-	
+
 	love.graphics.setColor(1, 1, 0, 0.5)
 	for j, w in ipairs(self.tracers.up) do
 		w:debugDraw()
 	end
-	
+
 	love.graphics.setColor(1, 1, 1)
 end
 

@@ -20,7 +20,8 @@
         "animation.frames": {
             "frames": [1, 2, 3, 4],
             "times": [0.03333333],
-            "dontAnimateWhenStill": true
+            "dontAnimateWhenStill": true,
+            "useFrameWhenStill": 1
         },
 
         "movement.truffleShuffle": {
@@ -36,15 +37,18 @@
             "onlyWhenMoving": true
         },
         "misc.wakesUp": {
-            "when": "stopped",
+            "onlyWhen": "stopped",
             "time": 6.9,
-            "loadActorTemplate": "koopa",
             "wiggles": true,
             "wiggleAfter": 5.233333,
             "wiggleDistance": 1,
             "wiggleTime": 0.016666667,
             "wiggleFrames": [1, 5],
             "wiggleFrameTime": [0.03333333]
+        },
+        "misc.transforms": {
+            "on": "wakeUp",
+            "into": "koopa"
         }
     }
 }

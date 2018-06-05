@@ -1,9 +1,9 @@
 {
     "entities": [
         {"type": "spawn", "x": 5, "y": 8.75},
-        {"type": "koopa", "x": 8, "y": 8.75}
+        {"type": "koopa_shell", "x": 8, "y": 8.75}
     ],
-    
+
     "tileMaps": ["smb3-grass", "smb3-general", "smb3-overworld", "smb3"],
 
     "lookups": [
@@ -20,10 +20,10 @@
         [1, 17],
         [1, 18]
     ],
-    
+
     "layers": [
         {
-            "map": [   
+            "map": [
                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                 [1, 1, 1, 1, 3, 3, 3, 3, 1, 1, 1, 1],
                 [1, 1, 1, 5, 0, 0, 0, 0, 6, 1, 1, 1],

@@ -1,24 +1,21 @@
-local truffleShuffle = class("movement.truffleShuffle")
+local truffleShuffle = class("movement.truffleShuffle", Component)
 
 local MAXSPEED = 40
 local ACCELERATION = 200
 
-function truffleShuffle:initialize(actor, args)
-    self.actor = actor
-    self.args = args
+truffleShuffle.argList = {
+    {"canStop", "boolean", false},
+    {"dontTurnAnimation", "boolean", false},
+    {"maxSpeed", "number", 40},
+    {"acceleration", "number", 200},
+    {"startSpeed", "number", function(self) return self.maxSpeed end},
+}
 
-    self.canStop = args.canStop or false
-    self.dontTurnAnimation = args.dontTurnAnimation or false
-    self.maxSpeed = args.maxSpeed or MAXSPEED
-    self.acceleration = args.acceleration or ACCELERATION
-    self.startSpeed = args.startSpeed or self.maxSpeed
+function truffleShuffle:initialize(actor, args)
+    Component.initialize(self, actor, args)
 
     self.kickSpeed = self.maxSpeed
 
-    self:setup()
-end
-
-function truffleShuffle:setup()
     if self.actor.speed[1] == 0 then
         self.shuffleDir = -1
     else

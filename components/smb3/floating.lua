@@ -1,4 +1,4 @@
-local floating = class("smb3.floating")
+local floating = class("smb3.floating", Component)
 
 local FLOATASCENSION = 60
 local FLOATTIME = 16/60
@@ -10,13 +10,8 @@ local FRICTIONFLYBIG = 225
 local FRICTIONSKIDFLY = 675 -- turnaround speed while flying
 
 function floating:initialize(actor, args)
-    self.actor = actor
-    self.args = args
+    Component.initialize(self, actor, args)
 
-    self:setup()
-end
-
-function floating:setup()
     self.actor.floatAnimationFrame = 1
     self.actor.floatAnimationTimer = 0
 

@@ -1,15 +1,4 @@
-local unrotate = class("misc.unrotate")
-
-function unrotate:initialize(actor, args)
-    self.actor = actor
-    self.args = args
-
-    self:setup()
-end
-
-function unrotate:setup()
-
-end
+local unrotate = class("misc.unrotate", Component)
 
 function unrotate:update(dt)
     if CHEAT("tumble") then

@@ -1,8 +1,4 @@
-local isHurtByContact = class("misc.isHurtByContact")
-
-function isHurtByContact:initialize(actor, args)
-    self.actor = actor
-end
+local isHurtByContact = class("misc.isHurtByContact", Component)
 
 function isHurtByContact:rightCollision(dt, actorEvent, obj2)
     self:resolve("left", obj2)

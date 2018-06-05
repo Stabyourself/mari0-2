@@ -1,16 +1,8 @@
-local stomps = class("misc.stomps")
+local stomps = class("misc.stomps", Component)
 
-function stomps:initialize(actor, args)
-    self.actor = actor
-    self.args = args
-
-    self:setup()
-end
-
-function stomps:setup()
-    -- todo: define a frame for "stomped"?
-    self.stompsLevel = self.args.level or 1
-end
+stomps.argList = {
+    {"level", "number", 1},
+}
 
 function stomps:bottomCollision(dt, actorEvent, obj2)
     if obj2:hasComponent("misc.stompable") then

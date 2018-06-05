@@ -40,6 +40,7 @@ function love.load()
     FrameDebug3 = require "lib.FrameDebug3"
 
     -- Loaders
+    Component = require "class.Component"
     require "componentLoader"
     require "actorTemplateLoader"
 
@@ -317,7 +318,7 @@ function worldArrow(x, y, xDir, yDir)
 
     love.graphics.line(x, y, x2, y2)
 
-    --tipleft
+    --tipleft (m'lady)
     local x3 = x2+math.cos(angle-math.pi*0.75)*scale*arrowTipScale
     local y3 = y2+math.sin(angle-math.pi*0.75)*scale*arrowTipScale
     love.graphics.line(x2, y2, x3, y3)

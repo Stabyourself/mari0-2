@@ -475,3 +475,14 @@ function tilesInLine(x1, y1, x2, y2) -- Mostly copied from https://github.com/ki
 
     return tiles
 end
+
+function componentAssert(component, condition, s)
+    if not condition then
+        local errstring = string.format([[%s
+        actorTemplate %s]],
+        s,
+        component.actor and component.actor.actorTemplate.name or "unknown")
+
+        error(errstring)
+    end
+end

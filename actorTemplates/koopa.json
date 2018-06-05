@@ -23,8 +23,10 @@
 
         "movement.truffleShuffle": {},
         "misc.unrotate": {},
-        "misc.stompable": {
-            "loadActorTemplate": "koopa_shell"
+        "misc.stompable": {},
+        "misc.transforms": {
+            "on": "getStomped",
+            "into": "koopa_shell"
         }
     }
 }

@@ -1,8 +1,4 @@
-local kicks = class("misc.kicks")
-
-function kicks:initialize(actor, args)
-    self.actor = actor
-end
+local kicks = class("misc.kicks", Component)
 
 function kicks:leftCollision(dt, actorEvent, obj2)
     if obj2:hasComponent("misc.kickable") and obj2.cache.speed[1] == 0 then

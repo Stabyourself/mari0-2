@@ -1,3 +1,3 @@
-local kickable = class("misc.kickable")
+local kickable = class("misc.kickable", Component)
 
 return kickable

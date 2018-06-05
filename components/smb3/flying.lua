@@ -1,4 +1,4 @@
-local flying = class("smb3.flying")
+local flying = class("smb3.flying", Component)
 
 local FLYINGUPTIME = 16/60
 local FLYTIME = 4.25
@@ -11,13 +11,8 @@ local FRICTIONFLYBIG = 225
 local FRICTIONSKIDFLY = 675 -- turnaround speed while flying
 
 function flying:initialize(actor, args)
-    self.actor = actor
-    self.args = args
+    Component.initialize(self, actor, args)
 
-    self:setup()
-end
-
-function flying:setup()
     self.actor.flyTimer = FLYTIME
     self.actor.flying = false
 

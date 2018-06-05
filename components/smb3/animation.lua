@@ -1,4 +1,8 @@
-local animation = class("smb3.animation")
+local animation = class("smb3.animation", Component)
+
+animation.argList = {
+    {"frames", "required|table"},
+}
 
 local MAXSPEEDS = {90, 150, 210}
 local ANIMATIONSPEEDS = {1/4*60, 1/3*60, 1/2*60, 1*60}
@@ -12,15 +16,10 @@ local SOMERSAULTTIME = 2/60
 local SHOOTTIME = 12/60
 
 function animation:initialize(actor, args)
-    self.actor = actor
-    self.args = args
+    Component.initialize(self, actor, args)
 
-    self:setup()
-end
-
-function animation:setup()
     self.actor.quadList = {}
-    self.actor.frames = self.args["frames"]
+    self.actor.frames = self.frames
     self.actor.frameCounts = {}
 
     for y = 1, 5 do

@@ -1,4 +1,4 @@
-local Component = class("Component")
+Component = class("Component")
 
 function Component:validationError(s)
     error(string.format(
@@ -76,5 +76,3 @@ function Component:initialize(actor, args)
         end
     end
 end
-
-return Component

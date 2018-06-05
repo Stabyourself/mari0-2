@@ -5,9 +5,11 @@ local dir = "actorTemplates/"
 local files = love.filesystem.getDirectoryItems(dir)
 
 for _, file in ipairs(files) do
-    if string.sub(file, -4) == "json" then
-        local name = string.sub(file, 1, -6)
-        local template = JSON:decode(love.filesystem.read(dir .. file))
+    if string.sub(file, -3) == "lua" then
+        local name = string.sub(file, 1, -5)
+
+        local templateCode = love.filesystem.read(dir .. file)
+        local template = sandbox.run(templateCode)
 
         template.name = name
 

@@ -322,16 +322,15 @@ function World:loadLevel(data)
 
             for y = 1, #dataLayer.map[1] do
                 local unresolvedTile = dataLayer.map[x][y]
-                local realY = height-y+1
 
                 if unresolvedTile ~= 0 then -- 0 means no tile
                     local tile = self.tileLookups[unresolvedTile] -- convert from the saved file's specific tile lookup to the actual tileMap's number
 
                     assert(tile, string.format("Couldn't load real tile at x=%s, y=%s for requested lookup \"%s\". This may mean that the map is corrupted.", x, y, mapTile))
 
-                    map[x][realY] = tile
+                    map[x][y] = tile
                 else
-                    map[x][realY] = false
+                    map[x][y] = false
                 end
             end
         end
@@ -453,9 +452,9 @@ function World:saveLevel(outPath)
                         end
                     end
 
-                    out.layers[i].map[x][layer.height-y+1] = lookupI
+                    out.layers[i].map[x][y] = lookupI
                 else
-                    out.layers[i].map[x][layer.height-y+1] = 0
+                    out.layers[i].map[x][y] = 0
                 end
             end
         end
@@ -466,9 +465,7 @@ function World:saveLevel(outPath)
 
     table.insert(out.entities, {type="spawn", x=self.spawnX, y=self.spawnY})
 
-    local outJson = JSON:encode(out)
-
-    love.filesystem.write(outPath, outJson)
+    love.filesystem.write("test.lua", serialize.tstr(out))
 end
 
 function World:advancedPhysicsDebug()

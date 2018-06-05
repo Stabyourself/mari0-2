@@ -38,13 +38,10 @@ function love.load()
     Physics3 = require "lib.Physics3"
     Gui3 = require "lib.Gui3"
     FrameDebug3 = require "lib.FrameDebug3"
-
-    -- Loaders
-    Component = require "class.Component"
-    require "componentLoader"
-    require "actorTemplateLoader"
+    serialize = require "lib.serialize"
 
     -- Classes
+    require "class.Component"
     require "class.Level"
     require "class.Actor"
     require "class.ActorState"
@@ -56,6 +53,10 @@ function love.load()
     require "class.PortalThing"
     require "class.Smb3Ui"
     require "class.Crosshair"
+
+    -- Loaders
+    require "actorTemplateLoader"
+    require "componentLoader"
 
     -- Editor
     require "class.editor.EditorState"

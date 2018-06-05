@@ -78,7 +78,7 @@ function Editor:load()
     self.menuBar:addChild(self.fileDropdown)
 
     self.fileDropdown.box:addChild(Gui3.Button:new(0, 0, "save", false, 1, function(button) self:saveLevel() end))
-    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("1-1.json") end))
+    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("1-1.lua") end))
 
     self.fileDropdown:autoSize()
 
@@ -117,7 +117,7 @@ function Editor:load()
     -- SCALE BAR
     local w = 50
     local fullw = w+63
-    local x = CAMERAWIDTH-fullw
+    local x = CAMERAWIDTH-113
     self.scaleBar = Gui3.Canvas:new(x, 0, fullw, 14)
     self.menuBar:addChild(self.scaleBar)
 
@@ -447,7 +447,7 @@ function Editor:cmdpressed(cmd)
         self:saveLevel()
 
     elseif cmd["editor.load"] then
-        self:loadLevel("1-1.json")
+        self:loadLevel("1-1.lua")
 
     elseif cmd["editor.select.clear"] then
         if self.selection then
@@ -558,21 +558,22 @@ function Editor:resize(w, h)
 
     self.toolbar.h = CAMERAHEIGHT-14
 
-    local fullw = w+63
-    local x = CAMERAWIDTH-fullw
+    local x = CAMERAWIDTH-113
     self.scaleBar.x = x
 end
+
 
 function Editor:saveLevel()
     self.fileDropdown:toggle(false)
 
-    self.level:saveLevel("1-1.json")
+    self.level:saveLevel("1-1.lua")
 end
 
 function Editor:loadLevel(path)
     self.fileDropdown:toggle(false)
 
-    local data = JSON:decode(love.filesystem.read(path))
+    local mapCode = love.filesystem.read(path)
+    local data = sandbox.run(mapCode)
     self.level:loadLevel(data)
 
     self.activeLayer = self.level.layers[1]

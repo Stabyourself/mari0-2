@@ -1,32 +1,32 @@
-{
-    "width": 12,
-    "height": 24,
+return {
+    width = 12,
+    height = 24,
 
-    "img": "characters/smb3-mario/raccoon.png",
-    "quadWidth": 40,
-    "quadHeight": 40,
-    "centerX": 23,
-    "centerY": 24,
+    img = "characters/smb3-mario/raccoon.png",
+    quadWidth = 40,
+    quadHeight = 40,
+    centerX = 23,
+    centerY = 24,
 
-    "dontAutoQuad": true,
+    dontAutoQuad = true,
 
-    "components": {
-        "misc.palettable": {
-            "imgPalette": [
-                [252, 188, 176],
-                [216,  40,   0],
-                [  0,   0,   0]
-            ],
+    components = {
+        ["misc.palettable"] = {
+            imgPalette = {
+                {252, 188, 176},
+                {216,  40,   0},
+                {  0,   0,   0}
+            },
 
-            "defaultPalette": [
-                [252, 188, 176],
-                [40,  216,   0],
-                [  0,   0,   0]
-            ]
+            defaultPalette = {
+                {252, 188, 176},
+                {40,  216,   0},
+                {  0,   0,   0}
+            }
         },
 
-        "smb3.animation": {
-            "frames": [
+        ["smb3.animation"] = {
+            frames = {
                 "idle",
 
                 "run",
@@ -97,20 +97,20 @@
                 "somerSault",
                 "somerSault",
                 "somerSault",
-                "somerSault"
-            ]
+                "somerSault",
+            }
         },
-        "smb3.movement": {},
-        "smb3.jumping": {},
-        "smb3.flying": {},
-        "smb3.ducking": {},
-        "smb3.floating": {},
-        "smb3.spinning": {},
-        "misc.unrotate": {},
-        "misc.crosshair": {},
-        "misc.portalGun": {},
-        "misc.stomps": {},
-        "misc.kicks": {},
-        "misc.isHurtByContact": {}
+        ["smb3.movement"] = {},
+        ["smb3.jumping"] = {},
+        ["smb3.flying"] = {},
+        ["smb3.ducking"] = {},
+        ["smb3.floating"] = {},
+        ["smb3.spinning"] = {},
+        ["misc.unrotate"] = {},
+        ["misc.crosshair"] = {},
+        ["misc.portalGun"] = {},
+        ["misc.stomps"] = {},
+        ["misc.kicks"] = {},
+        ["misc.isHurtByContact"] = {}
     }
 }

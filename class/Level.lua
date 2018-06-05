@@ -1,7 +1,8 @@
 Level = class("Level", Physics3.World)
 
 function Level:initialize(path)
-    local data = JSON:decode(love.filesystem.read(path))
+    local mapCode = love.filesystem.read(path)
+    local data = sandbox.run(mapCode)
 
     self:loadLevel(data)
 

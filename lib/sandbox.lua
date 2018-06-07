@@ -106,8 +106,8 @@ local function merge(dest, source)
 end
 
 local function sethook(f, key, quota)
-  if type(debug) ~= 'table' or type(debug.sethook) ~= 'function' then return end
-  debug.sethook(f, key, quota)
+  -- if type(debug) ~= 'table' or type(debug.sethook) ~= 'function' then return end
+  -- debug.sethook(f, key, quota)
 end
 
 local function cleanup()

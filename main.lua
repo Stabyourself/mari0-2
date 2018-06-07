@@ -91,12 +91,13 @@ function love.load()
 
     gameStateManager:loadState(game)
     gameStateManager:addState(Editor:new(game.level))
+
+    prof.enabled(true)
 end
 
 function love.update(dt)
     require("lib/lovebird").update()
 
-    prof.enabled(true)
     prof.push("frame")
     prof.push("update")
     dt = math.min(1/30, dt) -- Min 30 FPS
@@ -104,12 +105,12 @@ function love.update(dt)
     dt = FrameDebug3.update(dt)
 
     if not dt then
-        prof.pop()
+        prof.pop("update")
         return
     end
 
     gameStateManager:event("update", dt)
-    prof.pop()
+    prof.pop("update")
 end
 
 local function setColorBasedOn(key)
@@ -151,9 +152,8 @@ function love.draw()
     if funkyImg then
         love.graphics.draw(funkyImg, love.graphics.getWidth(), 0, 0, 1, 1, 340)
     end
-    prof.pop()
-    prof.pop()
-    prof.enabled(false)
+    prof.pop("draw")
+    prof.pop("frame")
 end
 
 function appendCmds(cmds, t)

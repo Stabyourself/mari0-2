@@ -123,7 +123,6 @@ if PROF_CAPTURE then
     end
 
     function profiler.enabled(enabled)
-        print("Enabled!")
         profEnabled = enabled
     end
 

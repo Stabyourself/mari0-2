@@ -290,7 +290,7 @@ end
 
 function PhysObj:preMovement()
 	self.standingOn = nil
-	clearTable(self.isGroundFor)
+	iClearTable(self.isGroundFor)
 end
 
 function PhysObj:postMovement()
@@ -314,7 +314,7 @@ function PhysObj:portalled()
 		obj.standingOn = nil
 	end
 
-	clearTable(self.isGroundFor)
+	iClearTable(self.isGroundFor)
 end
 
 function recursivelyGetFrameMovement(obj, x, y) -- god I hate recursion

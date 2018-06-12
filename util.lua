@@ -431,6 +431,12 @@ function clearTable(t)
     end
 end
 
+function iClearTable(t)
+    for k in pairs (t) do
+        t[k] = nil
+    end
+end
+
 function pointInRectangle(x, y, rx, ry, rw, rh)
     return x >= rx and y >= ry and x < rx+rw and y < ry+rh
 end

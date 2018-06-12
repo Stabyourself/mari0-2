@@ -69,7 +69,7 @@ function Gui3.Element:removeChild(element)
 end
 
 function Gui3.Element:clearChildren()
-    clearTable(self.children)
+    iClearTable(self.children)
 end
 
 function Gui3.Element:update(dt, x, y, mouseBlocked, absX, absY)

@@ -32,19 +32,18 @@ function PhysObj:createTracers()
 	self.tracers.up = {}
 	self.tracers.down = {}
 
-	local xOff, yOff, distance
 	local step = self.world.tileSize
 
 	-- Create left tracers
-	xOff = math.floor(self.width/2)-1
-	distance = math.floor(self.width/2)
+	local xOff = math.floor(self.width/2)-1
+	local distance = math.floor(self.width/2)
 
 	for yOff = self.height - Physics3.TRACER_BOTTOM_DIST - 1, Physics3.TRACER_SIDE_TOP_DIST+1, -step do
-		table.insert(self.tracers.left, Physics3.Tracer:new(self, xOff, yOff, -1, 0, distance))
+		table.insert(self.tracers.left, Physics3.Tracer:new(self, xOff, yOff, Vector(-distance, 0)))
 	end
 
 	-- Also include almost top
-	table.insert(self.tracers.left, Physics3.Tracer:new(self, xOff, Physics3.TRACER_SIDE_TOP_DIST, -1, 0, distance))
+	table.insert(self.tracers.left, Physics3.Tracer:new(self, xOff, Physics3.TRACER_SIDE_TOP_DIST, Vector(-distance, 0)))
 
 
 	-- Create right tracers
@@ -52,11 +51,11 @@ function PhysObj:createTracers()
 	distance = math.floor(self.width/2)
 
 	for yOff = self.height - Physics3.TRACER_BOTTOM_DIST - 1, Physics3.TRACER_SIDE_TOP_DIST+1, -step do
-		table.insert(self.tracers.right, Physics3.Tracer:new(self, xOff, yOff, 1, 0, distance))
+		table.insert(self.tracers.right, Physics3.Tracer:new(self, xOff, yOff, Vector(distance, 0)))
 	end
 
 	-- Also include almost top
-	table.insert(self.tracers.right, Physics3.Tracer:new(self, xOff, Physics3.TRACER_SIDE_TOP_DIST, 1, 0, distance))
+	table.insert(self.tracers.right, Physics3.Tracer:new(self, xOff, Physics3.TRACER_SIDE_TOP_DIST, Vector(distance, 0)))
 
 
 	-- Create bottom tracers
@@ -65,12 +64,12 @@ function PhysObj:createTracers()
 
 	--from left side
 	for xOff = 0+Physics3.TRACER_BOTTOM_SIDE_SPACING, math.floor(self.width/2)-1, Physics3.TRACER_BOTTOM_SPACING do
-		table.insert(self.tracers.down, Physics3.Tracer:new(self, xOff, yOff, 0, 1, distance))
+		table.insert(self.tracers.down, Physics3.Tracer:new(self, xOff, yOff, Vector(0, distance)))
 	end
 
 	--from right side
 	for xOff = self.width-1-Physics3.TRACER_BOTTOM_SIDE_SPACING, math.floor(self.width/2), -Physics3.TRACER_BOTTOM_SPACING do
-		table.insert(self.tracers.down, Physics3.Tracer:new(self, xOff, yOff, 0, 1, distance))
+		table.insert(self.tracers.down, Physics3.Tracer:new(self, xOff, yOff, Vector(0, distance)))
 	end
 
 
@@ -80,12 +79,12 @@ function PhysObj:createTracers()
 
 	--from left side
 	for xOff = 0+Physics3.TRACER_TOP_SPACING, math.floor(self.width/2)-1, step do
-		table.insert(self.tracers.up, Physics3.Tracer:new(self, xOff, yOff, 0, -1, distance))
+		table.insert(self.tracers.up, Physics3.Tracer:new(self, xOff, yOff, Vector(0, -distance)))
 	end
 
 	--from right side
 	for xOff = self.width-1-Physics3.TRACER_TOP_SPACING, math.floor(self.width/2), -step do
-		table.insert(self.tracers.up, Physics3.Tracer:new(self, xOff, yOff, 0, -1, distance))
+		table.insert(self.tracers.up, Physics3.Tracer:new(self, xOff, yOff, Vector(0, -distance)))
 	end
 end
 

@@ -44,7 +44,7 @@ function movement:initialize(actor, args)
     self.actor.shootTimer = 0
 
     self.actor:registerState("idle", function(actor)
-        if cmdDown("right") or cmdDown("left") then
+        if controls3.cmdDown("right") or controls3.cmdDown("left") then
             return "run"
         end
 
@@ -54,7 +54,7 @@ function movement:initialize(actor, args)
     end)
 
     self.actor:registerState("stop", function(actor)
-        if cmdDown("right") or cmdDown("left") then
+        if controls3.cmdDown("right") or controls3.cmdDown("left") then
             return "run"
         end
 
@@ -64,12 +64,12 @@ function movement:initialize(actor, args)
     end)
 
     self.actor:registerState("run", function(actor)
-        if not cmdDown("right") and not cmdDown("left") then
+        if not controls3.cmdDown("right") and not controls3.cmdDown("left") then
             return "stop"
         end
 
-        if  self.actor.speed[1] > 0 and cmdDown("left") or
-            self.actor.speed[1] < 0 and cmdDown("right") then
+        if  self.actor.speed[1] > 0 and controls3.cmdDown("left") or
+            self.actor.speed[1] < 0 and controls3.cmdDown("right") then
             return "skid"
         end
     end)
@@ -79,16 +79,16 @@ function movement:initialize(actor, args)
             return "idle"
         end
 
-        if  (self.actor.speed[1] < 0 and cmdDown("left") and not cmdDown("right")) or
-            (self.actor.speed[1] > 0 and cmdDown("right") and not cmdDown("right")) or
-            (self.actor.speed[1] > 0 and not cmdDown("left")) or
-            (self.actor.speed[1] < 0 and not cmdDown("right")) then
+        if  (self.actor.speed[1] < 0 and controls3.cmdDown("left") and not controls3.cmdDown("right")) or
+            (self.actor.speed[1] > 0 and controls3.cmdDown("right") and not controls3.cmdDown("right")) or
+            (self.actor.speed[1] > 0 and not controls3.cmdDown("left")) or
+            (self.actor.speed[1] < 0 and not controls3.cmdDown("right")) then
             return "run"
         end
     end)
 
     self.actor:registerState("fall", function(actor)
-        if cmdDown("jump") and self.actor.speed[2] < JUMPGRAVITYUNTIL then
+        if controls3.cmdDown("jump") and self.actor.speed[2] < JUMPGRAVITYUNTIL then
             return "jump"
         end
         -- otherwise handled by bottomCollision
@@ -113,15 +113,15 @@ function movement:update(dt, actorEvent)
     if self.actor.state.name == "run" then
         local maxSpeed = 0
 
-        if cmdDown("left") or cmdDown("right") then
+        if controls3.cmdDown("left") or controls3.cmdDown("right") then
             maxSpeed = MAXSPEEDS[1]
         end
 
-        if cmdDown("run") then
+        if controls3.cmdDown("run") then
             maxSpeed = MAXSPEEDS[2]
         end
 
-        if self.actor.pMeter == VAR("pMeterTicks") and cmdDown("run") then
+        if self.actor.pMeter == VAR("pMeterTicks") and controls3.cmdDown("run") then
             maxSpeed = MAXSPEEDS[3]
         end
 
@@ -158,8 +158,8 @@ function movement:update(dt, actorEvent)
     if self.actor.pMeter == VAR("pMeterTicks") and
         (not self.actor.onGround or
         (math.abs(self.actor.speed[1]) >= MAXSPEEDS[2] and
-        cmdDown("run") and
-        ((self.actor.speed[1] > 0 and cmdDown("right")) or (self.actor.speed[1] < 0 and cmdDown("left"))))) then
+        controls3.cmdDown("run") and
+        ((self.actor.speed[1] > 0 and controls3.cmdDown("right")) or (self.actor.speed[1] < 0 and controls3.cmdDown("left"))))) then
         self.actor.pMeterTimer = 0
         self.actor.pMeterTime = PMETERTIMEMARGIN
     end
@@ -225,22 +225,22 @@ function movement:startFall()
 end
 
 function skid(dt, actor, friction)
-    if cmdDown("right") and actor.speed[1] < 0 then
+    if controls3.cmdDown("right") and actor.speed[1] < 0 then
         actor.speed[1] = math.min(0, actor.speed[1] + friction*dt)
     end
 
-    if cmdDown("left") and actor.speed[1] > 0 then
+    if controls3.cmdDown("left") and actor.speed[1] > 0 then
         actor.speed[1] = math.max(0, actor.speed[1] - friction*dt)
     end
 end
 
 function accelerate(dt, actor, acceleration, maxSpeed)
     if math.abs(actor.speed[1]) < maxSpeed then
-        if cmdDown("left") and not cmdDown("right") and actor.speed[1] <= 0 then
+        if controls3.cmdDown("left") and not controls3.cmdDown("right") and actor.speed[1] <= 0 then
             actor.speed[1] = math.max(-maxSpeed, actor.speed[1] - acceleration*dt)
         end
 
-        if cmdDown("right") and not cmdDown("left") and actor.speed[1] >= 0 then
+        if controls3.cmdDown("right") and not controls3.cmdDown("left") and actor.speed[1] >= 0 then
             actor.speed[1] = math.min(maxSpeed, actor.speed[1] + acceleration*dt)
         end
     end

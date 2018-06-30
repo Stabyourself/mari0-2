@@ -37,7 +37,12 @@ function love.load()
     Physics3 = require "lib.Physics3"
     Gui3 = require "lib.Gui3"
     FrameDebug3 = require "lib.FrameDebug3"
+    controls3 = require "lib.controls3"
+    controls3.setCmdTable(require "controls")
+
+    -- Other libs
     serialize = require "lib.serialize"
+    Vector = require "lib.Vector"
 
     -- Classes
     require "class.Component"
@@ -114,7 +119,7 @@ function love.update(dt)
 end
 
 local function setColorBasedOn(key)
-    if cmdDown(key) then
+    if controls3.cmdDown(key) then
         love.graphics.setColor(1, 1, 1)
     else
         love.graphics.setColor(0.2, 0.2, 0.2)
@@ -156,53 +161,8 @@ function love.draw()
     prof.pop("frame")
 end
 
-function appendCmds(cmds, t)
-    if type(t) == "string" then
-        cmds[t] = true
-    elseif type(t) == "table" then
-        for _, v in ipairs(t) do
-            cmds[v] = true
-        end
-    end
-end
-
 function love.keypressed(key)
-    -- Convert the key to its binding
-    -- ^ctrl !alt +shift
-
-    local cmds = {}
-    local sendCmds = false
-    if CONTROLS(key) then
-        appendCmds(cmds, CONTROLS(key))
-        sendCmds = true
-    end
-
-    appendCmds(cmds, CONTROLS(key))
-
-    local keyModified = key
-
-    if  key ~= "lshift" and key ~= "rshift" and
-        key ~= "lalt" and key ~= "ralt" and
-        key ~= "lctrl" and key ~= "rctrl" then
-        if love.keyboard.isDown({"lshift", "rshift"}) then
-            keyModified = "+" .. keyModified
-        end
-
-        if love.keyboard.isDown({"lalt", "ralt"}) then
-            keyModified = "!" .. keyModified
-        end
-
-        if love.keyboard.isDown({"lctrl", "rctrl"}) then
-            keyModified = "^" .. keyModified
-        end
-    end
-
-    if keyModified ~= key then
-        if CONTROLS(keyModified) then
-            appendCmds(cmds, CONTROLS(keyModified))
-            sendCmds = true
-        end
-    end
+    local cmds, any = controls3.getCmdsForKey(key)
 
     if cmds["quit"] then
         love.event.quit()
@@ -218,7 +178,7 @@ function love.keypressed(key)
         FrameDebug3.frameAdvance()
     end
 
-    if sendCmds then
+    if any then
         gameStateManager:event("cmdpressed", cmds)
     end
 

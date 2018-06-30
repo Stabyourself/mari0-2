@@ -36,7 +36,7 @@ function TilesWindow:goToMenu()
     for i, tileMap in ipairs(self.level.tileMaps) do
         local thumb = tileMap.thumbImg or tileMap.img
 
-        local tileMapButton = Gui3.Button:new(2, 2, {tileMap.name, {img = thumb, h = tileMapImageH}}, true, 0,
+        local tileMapButton = Gui3.Button:new(0, 0, {tileMap.name, {img = thumb, h = tileMapImageH}}, true, 0,
             function()
                 self:goToTileMap(tileMap)
             end,

@@ -12,15 +12,15 @@ function Wand:draw()
 
     local addition = ""
 
-    if cmdDown("editor.wand.global") then
+    if controls3.cmdDown("editor.wand.global") then
         addition = addition .. "G"
     end
 
-    if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
+    if controls3.cmdDown("editor.select.add") and controls3.cmdDown("editor.select.subtract") then
         addition = addition .. "∩"
-    elseif cmdDown("editor.select.add") then
+    elseif controls3.cmdDown("editor.select.add") then
         addition = addition .. "+"
-    elseif cmdDown("editor.select.subtract") then
+    elseif controls3.cmdDown("editor.select.subtract") then
         addition = addition .. "-"
     end
 
@@ -46,7 +46,7 @@ function Wand:mousereleased(x, y, button)
             if self.level:inMap(mx, my) then
                 local tiles
 
-                if cmdDown("editor.wand.global") then
+                if controls3.cmdDown("editor.wand.global") then
                     local referenceTile = self.editor.activeLayer:getTile(mx, my)
                     tiles = {}
 
@@ -63,11 +63,11 @@ function Wand:mousereleased(x, y, button)
                     tiles = self.editor.activeLayer:getFloodArea(mx, my)
                 end
 
-                if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
+                if controls3.cmdDown("editor.select.add") and controls3.cmdDown("editor.select.subtract") then
                     self.editor:intersectSelection(tiles)
-                elseif cmdDown("editor.select.add") then
+                elseif controls3.cmdDown("editor.select.add") then
                     self.editor:addToSelection(tiles)
-                elseif cmdDown("editor.select.subtract") then
+                elseif controls3.cmdDown("editor.select.subtract") then
                     self.editor:subtractFromSelection(tiles)
                 else
                     self.editor:replaceSelection(tiles)

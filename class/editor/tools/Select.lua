@@ -49,11 +49,11 @@ function Select:draw()
     local addition = ""
 
     if not self.editor.floatingSelection or not self.editor.floatingSelection.dragging then
-        if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
+        if controls3.cmdDown("editor.select.add") and controls3.cmdDown("editor.select.subtract") then
             addition = "∩"
-        elseif cmdDown("editor.select.add") then
+        elseif controls3.cmdDown("editor.select.add") then
             addition = "+"
-        elseif cmdDown("editor.select.subtract") then
+        elseif controls3.cmdDown("editor.select.subtract") then
             addition = "-"
         elseif  self.editor.selection and self.editor.selection:collision(mouseX, mouseY) or
                 self.editor.floatingSelection and self.editor.floatingSelection:collision(mouseX, mouseY) then
@@ -70,7 +70,7 @@ function Select:mousepressed(x, y, button)
     if button == 1 then
         local worldX, worldY = self.level:mouseToWorld()
 
-        if self.editor.selection and not cmdDown("editor.select.add") and not cmdDown("editor.select.subtract") and self.editor.selection:collision(x, y) then
+        if self.editor.selection and not controls3.cmdDown("editor.select.add") and not controls3.cmdDown("editor.select.subtract") and self.editor.selection:collision(x, y) then
             self.editor:floatSelection()
             self.editor.floatingSelection:startDrag(worldX, worldY)
         elseif self.editor.floatingSelection and self.editor.floatingSelection:collision(x, y) then
@@ -92,11 +92,11 @@ function Select:mousereleased(x, y, button)
     if self.pressing then
         local tiles, dirty = self:getTiles(self.selectionStart[1], self.selectionStart[2], mx-self.selectionStart[1], my-self.selectionStart[2])
 
-        if cmdDown("editor.select.add") and cmdDown("editor.select.subtract") then
+        if controls3.cmdDown("editor.select.add") and controls3.cmdDown("editor.select.subtract") then
             self.editor:intersectSelection(tiles)
-        elseif cmdDown("editor.select.add") then
+        elseif controls3.cmdDown("editor.select.add") then
             self.editor:addToSelection(tiles)
-        elseif cmdDown("editor.select.subtract") then
+        elseif controls3.cmdDown("editor.select.subtract") then
             self.editor:subtractFromSelection(tiles)
         elseif #tiles > 0 and not dirty then
             self.editor:replaceSelection(tiles)

@@ -63,9 +63,9 @@ function animation:postUpdate(dt)
         end
 
     else -- look towards last pressed direction
-        if cmdDown("left") then
+        if controls3.cmdDown("left") then
             self.actor.animationDirection = -1
-        elseif cmdDown("right") then
+        elseif controls3.cmdDown("right") then
             self.actor.animationDirection = 1
         end
     end

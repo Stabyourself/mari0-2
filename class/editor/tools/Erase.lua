@@ -27,7 +27,7 @@ function Erase:update(dt)
 end
 
 function Erase:mousepressed(x, y, button)
-    if (button == 1 and cmdDown("editor.pipette")) or button == 3 then
+    if (button == 1 and controls3.cmdDown("editor.pipette")) or button == 3 then
         self.editor:pipette()
 
     elseif button == 1 then

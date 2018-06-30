@@ -9,7 +9,7 @@ function ducking:initialize(actor, args)
     self.actor.ducking = false
 
     self.actor:registerState("buttSlide", function(actor)
-        if cmdDown("right") or cmdDown("left") or (actor.speed[1] == 0 and actor.surfaceAngle == 0) then
+        if controls3.cmdDown("right") or controls3.cmdDown("left") or (actor.speed[1] == 0 and actor.surfaceAngle == 0) then
             return "idle"
         end
     end)
@@ -19,9 +19,9 @@ function ducking:update(dt)
     local wasDucking = self.actor.ducking
 
     if self.actor.onGround then
-        if  cmdDown("down") and
-            not cmdDown("left") and
-            not cmdDown("right") and
+        if  controls3.cmdDown("down") and
+            not controls3.cmdDown("left") and
+            not controls3.cmdDown("right") and
             self.actor.state.name ~= "buttSlide" then
             if self.actor.surfaceAngle ~= 0 then -- check if buttslide
                 self.actor:switchState("buttSlide")

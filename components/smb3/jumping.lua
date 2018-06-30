@@ -13,7 +13,7 @@ function jumping:initialize(actor, args)
     Component.initialize(self, actor, args)
 
     self.actor:registerState("jump", function(actor)
-        if not cmdDown("jump") or actor.speed[2] >= JUMPGRAVITYUNTIL then
+        if not controls3.cmdDown("jump") or actor.speed[2] >= JUMPGRAVITYUNTIL then
             return "fall"
         end
     end)

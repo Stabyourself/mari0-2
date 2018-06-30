@@ -13,7 +13,10 @@ end
 local topThings = {17, 18, 19, 20, 21, 22, 41, 42, 43, 44, 45, 46}
 
 for _, v in ipairs(topThings) do
-    tiles[v] = {collision = templates.cube}
+    tiles[v] = {
+        collision = templates.cube,
+        exclusiveCollision = {0, 1},
+    }
 end
 
 local stampMaps = {

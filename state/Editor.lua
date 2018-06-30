@@ -78,7 +78,7 @@ function Editor:load()
     self.menuBar:addChild(self.fileDropdown)
 
     self.fileDropdown.box:addChild(Gui3.Button:new(0, 0, "save", false, 1, function(button) self:saveLevel() end))
-    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("1-1.lua") end))
+    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("levels/1-1.lua") end))
 
     self.fileDropdown:autoSize()
 
@@ -193,19 +193,19 @@ function Editor:update(dt)
     if self.freeCamera then
         local cameraSpeed = dt*VAR("editor").cameraSpeed*(1/self.level.camera.scale)
 
-        if cmdDown("right") then
+        if controls3.cmdDown("right") then
             self.level.camera.x = self.level.camera.x + cameraSpeed
         end
 
-        if cmdDown("left") then
+        if controls3.cmdDown("left") then
             self.level.camera.x = self.level.camera.x - cameraSpeed
         end
 
-        if cmdDown("down") then
+        if controls3.cmdDown("down") then
             self.level.camera.y = self.level.camera.y + cameraSpeed
         end
 
-        if cmdDown("up") then
+        if controls3.cmdDown("up") then
             self.level.camera.y = self.level.camera.y - cameraSpeed
         end
     end
@@ -447,7 +447,7 @@ function Editor:cmdpressed(cmd)
         self:saveLevel()
 
     elseif cmd["editor.load"] then
-        self:loadLevel("1-1.lua")
+        self:loadLevel("levels/1-1.lua")
 
     elseif cmd["editor.select.clear"] then
         if self.selection then
@@ -566,13 +566,14 @@ end
 function Editor:saveLevel()
     self.fileDropdown:toggle(false)
 
-    self.level:saveLevel("1-1.lua")
+    self.level:saveLevel("levels/1-1.lua")
 end
 
 function Editor:loadLevel(path)
     self.fileDropdown:toggle(false)
 
     local mapCode = love.filesystem.read(path)
+    print(mapCode)
     local data = sandbox.run(mapCode)
     self.level:loadLevel(data)
 

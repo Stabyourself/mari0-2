@@ -40,7 +40,7 @@ end
 function Paint:draw()
     local coordX, coordY = self.level:mouseToCoordinate()
 
-    if cmdDown("editor.line") and self.lastX then -- line
+    if controls3.cmdDown("editor.line") and self.lastX then -- line
         love.graphics.setColor(1, 1, 1, 0.5)
 
         local tiles = tilesInLine(self.lastX, self.lastY, coordX, coordY)
@@ -65,10 +65,10 @@ function Paint:draw()
 end
 
 function Paint:mousepressed(x, y, button)
-    if (button == 1 and cmdDown("editor.pipette")) or button == 3 then
+    if (button == 1 and controls3.cmdDown("editor.pipette")) or button == 3 then
         self.editor:pipette(x, y)
 
-    elseif button == 1 and cmdDown("editor.line") and self.lastX then
+    elseif button == 1 and controls3.cmdDown("editor.line") and self.lastX then
         local coordX, coordY = self.level:cameraToCoordinate(x, y)
 
         local layer = self.editor.activeLayer

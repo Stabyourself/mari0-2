@@ -176,8 +176,8 @@ function Gui3.Box:sizeChanged()
 end
 
 function Gui3.Box:arrangeChildren()
-    local offX = self.offX or 2
-    local offY = self.offY or 2
+    local offX = self.offX or 1
+    local offY = self.offY or 1
 
     local x = offX
     local y = offY

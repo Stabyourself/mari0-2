@@ -1,62 +1,60 @@
 local Tracer = class("Physics3.Tracer") -- The cavalry is here
 
-function Tracer:initialize(physObj, xOff, yOff, xDir, yDir, distance)
+function Tracer:initialize(physObj, x, y, vector)
 	self.physObj = physObj
-	self.xOff = xOff
-	self.yOff = yOff
-	self.xDir = xDir
-	self.yDir = yDir
-	self.distance = distance
+	self.x = x
+	self.y = y
+	self.vector = vector
+	self.vectorNormalized = self.vector:normalized()
+	self.len = self.vector:len()
 end
 
 function Tracer:trace()
-	local x, y, col
+	local i = 1
 
-	for i = 0, self.distance-1 do
-		local objX = self.physObj.x
-		local objY = self.physObj.y
+	while i <= self.len do
+		local x = self.x + self.physObj.x + self.vectorNormalized.x*i -- todo: these could be cached (definitely do this)
+		local y = self.y + self.physObj.y + self.vectorNormalized.y*i
 
-		if self.xDir > 0 then
-			objX = math.ceil(objX)
-		elseif self.xDir < 0 then
-			objX = math.floor(objX)
+		if self.vector.y < 0 then -- don't ask me why
+			yRounded = math.ceil(y)
+		else
+			yRounded = math.floor(y)
 		end
 
-		if self.yDir > 0 then
-			objY = math.ceil(objY)
-		elseif self.yDir < 0 then
-			objY = math.floor(objY)
+		if self.vector.x < 0 then
+			xRounded = math.ceil(x)
+		else
+			xRounded = math.floor(x)
 		end
 
-		x = objX + self.xOff + i*self.xDir
-		y = objY + self.yOff + i*self.yDir
-
-		col = self.physObj.World:checkCollision(x, y, self.physObj)
+		col = self.physObj.World:checkCollision(xRounded, yRounded, self.physObj, self.vectorNormalized)
 		if col then
-			return x, y, col
+			return xRounded, yRounded, col
 		end
+
+		i = i + 1
 	end
 end
 
 function Tracer:debugDraw()
-	local xWidth = self.xDir*self.distance
-	local yWidth = self.yDir*self.distance
-	local xOff = self.xOff
-	local yOff = self.yOff
+	local angle = self.vector:angleTo()
 
-	if xWidth < 0 then
-		xOff = xOff + 1
-	elseif xWidth == 0 then
-		xWidth = 1
-	end
+	local x = self.x+0.5
+	local y = self.y+0.5
 
-	if yWidth < 0 then
-		yOff = yOff + 1
-	elseif yWidth == 0 then
-		yWidth = 1
-	end
+	x = x + self.physObj.x
+	y = y + self.physObj.y
 
-	love.graphics.rectangle("fill", self.physObj.x + xOff, self.physObj.y + yOff, xWidth, yWidth)
+	x = math.round(x)
+	y = math.round(y)
+
+	love.graphics.push()
+	love.graphics.translate(x, y)
+	love.graphics.rotate(angle)
+
+	love.graphics.rectangle("fill", 0, -.5, self.len, 1)
+	love.graphics.pop()
 end
 
 return Tracer

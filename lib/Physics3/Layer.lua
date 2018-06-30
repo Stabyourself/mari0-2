@@ -50,7 +50,7 @@ function Layer:draw()
     end
 end
 
-function Layer:checkCollision(x, y)
+function Layer:checkCollision(x, y, obj, vector)
     x = x - self.xOffset
     y = y - self.yOffset
 
@@ -63,7 +63,7 @@ function Layer:checkCollision(x, y)
             local inTileX = math.fmod(x, 16)
             local inTileY = math.fmod(y, 16)
 
-            if tile:checkCollision(inTileX, inTileY) then
+            if tile:checkCollision(inTileX, inTileY, obj, vector) then
                 return tile
             end
         end

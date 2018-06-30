@@ -55,8 +55,8 @@ function flying:update(dt, actorEvent)
     if  (self.actor.flying and (self.actor.state.name == "jump" or self.actor.state.name == "fall")) or
     self.actor.state.name == "fly" then
         if math.abs(self.actor.speed[1]) > MAXSPEEDFLY then
-            if  self.actor.speed[1] > 0 and cmdDown("right") or
-                self.actor.speed[1] < 0 and cmdDown("left") then
+            if  self.actor.speed[1] > 0 and controls3.cmdDown("right") or
+                self.actor.speed[1] < 0 and controls3.cmdDown("left") then
                 self.actor:friction(dt, FRICTIONFLYSMALL, MAXSPEEDFLY)
             else
                 self.actor:friction(dt, FRICTIONFLYBIG, MAXSPEEDFLY)
@@ -79,22 +79,22 @@ end
 
 function accelerate(dt, actor, acceleration, maxSpeed)
     if math.abs(actor.speed[1]) < maxSpeed then
-        if cmdDown("left") and not cmdDown("right") and actor.speed[1] <= 0 then
+        if controls3.cmdDown("left") and not controls3.cmdDown("right") and actor.speed[1] <= 0 then
             actor.speed[1] = math.max(-maxSpeed, actor.speed[1] - acceleration*dt)
         end
 
-        if cmdDown("right") and not cmdDown("left") and actor.speed[1] >= 0 then
+        if controls3.cmdDown("right") and not controls3.cmdDown("left") and actor.speed[1] >= 0 then
             actor.speed[1] = math.min(maxSpeed, actor.speed[1] + acceleration*dt)
         end
     end
 end
 
 function skid(dt, actor, friction)
-    if cmdDown("right") and actor.speed[1] < 0 then
+    if controls3.cmdDown("right") and actor.speed[1] < 0 then
         actor.speed[1] = math.min(0, actor.speed[1] + friction*dt)
     end
 
-    if cmdDown("left") and actor.speed[1] > 0 then
+    if controls3.cmdDown("left") and actor.speed[1] > 0 then
         actor.speed[1] = math.max(0, actor.speed[1] - friction*dt)
     end
 end

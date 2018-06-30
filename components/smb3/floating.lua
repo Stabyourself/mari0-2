@@ -25,8 +25,8 @@ end
 function floating:update(dt)
     if self.actor.state.name == "float" then
         if math.abs(self.actor.speed[1]) > MAXSPEEDFLY then
-            if  self.actor.speed[1] > 0 and cmdDown("right") or
-                self.actor.speed[1] < 0 and cmdDown("left") then
+            if  self.actor.speed[1] > 0 and controls3.cmdDown("right") or
+                self.actor.speed[1] < 0 and controls3.cmdDown("left") then
                 self.actor:friction(dt, FRICTIONFLYSMALL, MAXSPEEDFLY)
             else
                 self.actor:friction(dt, FRICTIONFLYBIG, MAXSPEEDFLY)

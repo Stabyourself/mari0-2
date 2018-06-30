@@ -2,7 +2,7 @@ CharacterModel = class("character", Mario)
 
 function CharacterModel:initialize(path)
     self.data = sandbox.run(characterData, {env = {
-        cmdDown = cmdDown,
+        controls3 = controls3,
         print = print,
         print_r = print_r,
         VAR = VAR,

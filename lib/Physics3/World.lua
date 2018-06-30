@@ -501,7 +501,7 @@ function World:portalVectorDebug()
     end
 end
 
-function World:checkCollision(x, y, obj)
+function World:checkCollision(x, y, obj, vector)
     if obj then
         -- Portal hijacking
         for _, p in ipairs(self.portals) do
@@ -532,7 +532,7 @@ function World:checkCollision(x, y, obj)
 
     -- World
     for _, layer in ipairs(self.layers) do
-        local tile = layer:checkCollision(x, y)
+        local tile = layer:checkCollision(x, y, obj, vector)
 
         if tile then
             return tile

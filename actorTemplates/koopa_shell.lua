@@ -25,7 +25,7 @@ return {
         },
 
         ["movement.truffleShuffle"] = {
-            maxSpeed = 150,
+            maxSpeed = 236.25,
             startSpeed = 0,
             canStop = true
         },

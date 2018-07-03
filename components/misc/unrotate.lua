@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local unrotate = class("misc.unrotate", Component)
 
 function unrotate:update(dt)

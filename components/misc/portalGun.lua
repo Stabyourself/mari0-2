@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local portalGun = class("misc.portalGun", Component)
 
 function portalGun:initialize(actor, args)

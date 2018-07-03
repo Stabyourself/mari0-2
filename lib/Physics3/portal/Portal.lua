@@ -1,4 +1,6 @@
-Portal = class("Portal")
+PortalThing = require((...):gsub('%.Portal$', '') .. ".PortalThing")
+PortalParticle = require((...):gsub('%.Portal$', '') .. ".PortalParticle")
+local Portal = class("Portal")
 
 Portal.baseImg = love.graphics.newImage("img/portal-base.png")
 Portal.glowImg = love.graphics.newImage("img/portal-glow.png")
@@ -156,3 +158,5 @@ function Portal:stencilRectangle(way)
 
     love.graphics.pop()
 end
+
+return Portal

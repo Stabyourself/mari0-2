@@ -1,4 +1,7 @@
-Level = class("Level", Physics3.World)
+local Camera = require "lib.Camera"
+local Actor = require("class.Actor")
+local Level = class("Level", Physics3.World)
+local BlockBounce = require("class.BlockBounce")
 
 function Level:initialize(path)
     local mapCode = love.filesystem.read(path)
@@ -217,3 +220,5 @@ function Level:resize(w, h)
     self.camera.w = w
     self.camera.h = h
 end
+
+return Level

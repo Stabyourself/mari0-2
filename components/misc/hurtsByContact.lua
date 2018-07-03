@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local hurtsByContact = class("misc.hurtsByContact", Component)
 
 hurtsByContact.argList = {

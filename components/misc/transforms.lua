@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local transforms = class("misc.transforms", Component)
 
 transforms.argList = {

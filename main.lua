@@ -17,19 +17,14 @@ function love.load()
 
     love.graphics.setDefaultFilter("nearest", "nearest")
 
-    objectCollides = { -- Necessary functions that other objects may collide with this
-        hasComponent = function() return false end
-    }
-
     -- Libs
     utf8 = require "utf8"
     class = require "lib.middleclass"
     sandbox = require "lib.sandbox"
-    Camera = require "lib.Camera"
     Easing = require "lib.Easing"
-    GameStateManager = require "lib.GameStateManager"
     prof = require "lib.jprof.jprof"
     paletteShader = require "lib.paletteShader"
+    GameStateManager = require "lib.GameStateManager"
 
     -- Self written libs
     Color3 = require "lib.Color3"
@@ -40,40 +35,19 @@ function love.load()
     controls3 = require "lib.controls3"
     controls3.setCmdTable(require "controls")
 
-    -- Other libs
-    serialize = require "lib.serialize"
-    Vector = require "lib.Vector"
-
-    -- Classes
-    require "class.Component"
-    require "class.Level"
-    require "class.Actor"
-    require "class.ActorState"
-    require "class.ActorEvent"
-    require "class.BlockBounce"
-    require "class.Portal"
-    require "class.PortalWall"
-    require "class.PortalParticle"
-    require "class.PortalThing"
-    require "class.Smb3Ui"
-    require "class.Crosshair"
-
     -- Loaders
     require "actorTemplateLoader"
     require "componentLoader"
 
     -- Editor
-    require "class.editor.EditorState"
-    require "class.editor.Selection"
-    require "class.editor.FloatingSelection"
-    require "class.editor.StampMap"
+    Selection = require "class.editor.Selection"
 
     -- Misc
     require "cheats"
 
     -- States
-    require "state.Game"
-    require "state.Editor"
+    local Game = require "state.Game"
+    local Editor = require "state.Editor"
 
     fontOutlined = love.graphics.newImageFont("img/font-outlined.png",
         " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$.,:;!?_-<>=+*\\/'%∩⇔→⇒◔×")

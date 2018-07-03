@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local mirror = class("animation.mirror", Component)
 
 mirror.argList = {

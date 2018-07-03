@@ -1,4 +1,6 @@
-EditorState = class("EditorState")
+local Selection = require "class.editor.Selection"
+local FloatingSelection = require "class.editor.FloatingSelection"
+local EditorState = class("EditorState")
 
 function EditorState:initialize(editor)
     self.editor = editor
@@ -102,3 +104,5 @@ function EditorState:load()
         self.editor.floatingSelection.pos = {state.floatingSelectionPos[1], state.floatingSelectionPos[2]}
     end
 end
+
+return EditorState

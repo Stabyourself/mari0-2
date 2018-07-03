@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local spinning = class("smb3.spinning", Component)
 
 local SPINTIME = 19/60

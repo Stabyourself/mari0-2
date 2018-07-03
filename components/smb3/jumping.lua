@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local jumping = class("smb3.jumping", Component)
 
 local MAXSPEEDS = {90, 150, 210}

@@ -1,3 +1,4 @@
+local Vector = require "lib.Vector"
 local PhysObj = class("Physics3.PhysObj")
 
 function PhysObj:initialize(world, x, y, width, height)
@@ -282,6 +283,7 @@ function PhysObj:resolveCollisions()
 
 		if x then -- resolve the right collision
 			self:topColResolve(obj, x, y)
+
 			obj:bottomColResolve(self)
 		end
 	end

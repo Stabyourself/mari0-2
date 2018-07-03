@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local wakesUp = class("misc.wakesUp", Component)
 
 wakesUp.argList = {

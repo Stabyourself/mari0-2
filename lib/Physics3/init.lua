@@ -28,4 +28,9 @@ Physics3.Tile = require(current_folder .. ".Tile")
 Physics3.TileMap = require(current_folder .. ".TileMap")
 Physics3.Tracer = require(current_folder .. ".Tracer")
 
+-- Portal
+Physics3.Portal = require(current_folder .. ".portal.Portal")
+Physics3.PortalParticle = require(current_folder .. ".portal.PortalParticle")
+Physics3.PortalThing = require(current_folder .. ".portal.PortalThing")
+
 return Physics3

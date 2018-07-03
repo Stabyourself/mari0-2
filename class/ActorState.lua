@@ -1,4 +1,4 @@
-ActorState = class("ActorState")
+local ActorState = class("ActorState")
 
 function ActorState:initialize(actor, name, func)
     self.actor = actor
@@ -20,3 +20,5 @@ function ActorState:checkExit()
         self.actor.state = ActorState:new(self.actor, newState, self.actor.states[newState])
     end
 end
+
+return ActorState

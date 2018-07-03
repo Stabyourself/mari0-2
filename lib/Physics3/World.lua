@@ -1,4 +1,9 @@
+local serialize = require "lib.serialize"
+local Tile = require((...):gsub('%.World$', '') .. ".Tile")
+local Portal = require((...):gsub('%.World$', '') .. ".portal.Portal")
 local World = class("Physics3.World")
+
+local fakeTileInstance = Tile:new()
 
 function World:initialize()
     self.tileSize = 16 --lol hardcode
@@ -520,7 +525,7 @@ function World:checkCollision(x, y, obj, vector)
 
                     else
                         if ny > p.y1 and ny <= p.y1+2 then -- point is "on" the line of the portal
-                            return portalWallInstance
+                            return fakeTileInstance
                         elseif ny > p.y1 then
                             return false
                         end

@@ -1,4 +1,4 @@
-BlockBounce = class("BlockBounce")
+local BlockBounce = class("BlockBounce")
 
 local halfblockbouncetime = VAR("blockBounceTime")/2
 
@@ -21,3 +21,5 @@ function BlockBounce:update(dt)
 
     return self.t >= VAR("blockBounceTime")
 end
+
+return BlockBounce

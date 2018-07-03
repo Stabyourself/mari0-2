@@ -1,3 +1,4 @@
+local StampMap = require "class.editor.StampMap"
 local TileMap = class("Physics3.TileMap")
 
 function TileMap:initialize(path, name)

@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local kicks = class("misc.kicks", Component)
 
 function kicks:leftCollision(dt, actorEvent, obj2)

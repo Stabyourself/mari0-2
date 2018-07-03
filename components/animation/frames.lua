@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local frames = class("animation.frames", Component)
 
 frames.argList = {

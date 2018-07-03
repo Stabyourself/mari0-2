@@ -1,4 +1,6 @@
-Selection = class("Selection")
+local FloatingSelection = require "class.editor.FloatingSelection"
+local StampMap = require "class.editor.StampMap"
+local Selection = class("Selection")
 
 local borderImg = love.graphics.newImage("img/editor/selection-border.png")
 borderImg:setWrap("repeat")
@@ -156,3 +158,5 @@ end
 function Selection:getStampMap()
     return StampMap.fromSelection(self.editor, self)
 end
+
+return Selection

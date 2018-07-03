@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local truffleShuffle = class("movement.truffleShuffle", Component)
 
 local MAXSPEED = 40

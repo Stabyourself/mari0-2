@@ -1,4 +1,4 @@
-StampMap = class("StampMap")
+local StampMap = class("StampMap")
 
 function StampMap.fromSelection(editor, selection)
     local tiles = selection.tiles
@@ -242,3 +242,5 @@ end
 function StampMap:getOffset()
     return -self.width/2-.5, -self.height/2-.5
 end
+
+return StampMap

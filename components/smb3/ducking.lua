@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local ducking = class("smb3.ducking", Component)
 
 local BUTTACCELERATION = 225 -- this is per 1/8*pi of downhill slope

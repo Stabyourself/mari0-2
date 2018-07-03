@@ -1,3 +1,5 @@
+local Component = require "class.Component"
+local ActorState = require "class.ActorState"
 local movement = class("smb3.movement", Component)
 
 local ACCELERATION = 196.875 -- acceleration on ground
@@ -94,7 +96,7 @@ function movement:initialize(actor, args)
         -- otherwise handled by bottomCollision
     end)
 
-    self.actor.state = ActorState:new(self.actor, "idle", self.actor.states.idle) -- maybe change this
+    self.actor.state = ActorState:new(self.actor, "idle", self.actor.states.idle) -- maybe change this so it's a method on actor?
 end
 
 function movement:update(dt, actorEvent)

@@ -1,4 +1,4 @@
-ActorEvent = class("ActorEvent")
+local ActorEvent = class("ActorEvent")
 
 function ActorEvent:initialize(actor, name)
     self.actor = actor
@@ -59,3 +59,5 @@ function ActorEvent:setValue(name, value, priority)
 
     table.insert(self.values[name], {value=value, priority=priority or 1})
 end
+
+return ActorEvent

@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local stompable = class("misc.stompable", Component)
 
 stompable.argList = {

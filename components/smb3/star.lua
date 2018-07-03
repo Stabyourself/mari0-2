@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local star = class("smb3.star", Component)
 
 local STARTIME = 7.45

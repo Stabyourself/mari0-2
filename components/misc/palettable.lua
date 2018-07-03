@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local palettable = class("misc.palettable", Component)
 
 palettable.argList = {

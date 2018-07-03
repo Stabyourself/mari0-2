@@ -29,7 +29,7 @@ function Tile:initialize(tileMap, img, x, y, num, props, path)
 		self.frame = 1
 
 		self.quad = self.quads[self.frame]
-	else
+	elseif img then
 		self.img = img
 		self.quad = love.graphics.newQuad(
 			(self.x-1)*(self.tileMap.tileSize+self.tileMap.tileMargin),

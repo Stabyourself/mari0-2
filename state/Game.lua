@@ -1,4 +1,7 @@
-Game = class("Game")
+local Smb3Ui = require "class.Smb3Ui"
+local Level = require "class.Level"
+
+local Game = class("Game")
 
 function Game:load()
     gameState = "game"
@@ -63,3 +66,5 @@ end
 function Game:mousepressed(x, y, button)
     self.level:mousepressed(x, y, button)
 end
+
+return Game

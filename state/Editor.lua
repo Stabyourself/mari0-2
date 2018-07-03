@@ -1,4 +1,7 @@
-Editor = class("Editor")
+local EditorState = require "class.editor.EditorState"
+local Selection = require "class.editor.Selection"
+local FloatingSelection = require "class.editor.FloatingSelection"
+local Editor = class("Editor")
 
 Editor.toolbarOrder = {"entity", "paint", "erase", "move", "select", "wand", "fill", "stamp"}
 Editor.toolbarImg = {}
@@ -745,3 +748,5 @@ end
 function Editor:drawMinimap()
     love.graphics.draw(self.minimapImg)
 end
+
+return Editor

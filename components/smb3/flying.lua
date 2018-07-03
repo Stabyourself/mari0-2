@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local flying = class("smb3.flying", Component)
 
 local FLYINGUPTIME = 16/60

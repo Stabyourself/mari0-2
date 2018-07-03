@@ -1,4 +1,4 @@
-PortalParticle = class("PortalParticle")
+local PortalParticle = class("PortalParticle")
 
 local PORTALPARTICLETIME = 1
 local SPEEDCHANGE = 300
@@ -34,3 +34,5 @@ function PortalParticle:draw()
     love.graphics.setColor(r, g, b, glowA)
     love.graphics.rectangle("fill", self.x-.5, self.y-.5, 1, 1)
 end
+
+return PortalParticle

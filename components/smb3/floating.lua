@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local floating = class("smb3.floating", Component)
 
 local FLOATASCENSION = 60

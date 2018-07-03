@@ -1,4 +1,6 @@
-Actor = class("Actor", Physics3.PhysObj)
+local Actor = class("Actor", Physics3.PhysObj)
+local ActorState = require "class.ActorState"
+local ActorEvent = require "class.ActorEvent"
 
 function Actor:__tostring ()
     return string.format("Actor (%s)", self.actorTemplate.name)
@@ -261,3 +263,5 @@ function Actor:debugDraw()
         love.graphics.setFont(font)
     end
 end
+
+return Actor

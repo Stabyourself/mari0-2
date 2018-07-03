@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local isHurtByContact = class("misc.isHurtByContact", Component)
 
 function isHurtByContact:rightCollision(dt, actorEvent, obj2)

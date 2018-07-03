@@ -1,4 +1,4 @@
-Smb3Ui = class("Smb3Ui")
+local Smb3Ui = class("Smb3Ui")
 
 local pMeterQuad = {
     love.graphics.newQuad(0, 0, 16, 8, 32, 8),
@@ -138,3 +138,5 @@ end
 function Smb3Ui:getTimeText()
     return string.format("◔%03d", self.time)
 end
+
+return Smb3Ui

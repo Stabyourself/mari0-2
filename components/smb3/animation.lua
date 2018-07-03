@@ -1,3 +1,4 @@
+local Component = require "class.Component"
 local animation = class("smb3.animation", Component)
 
 animation.argList = {

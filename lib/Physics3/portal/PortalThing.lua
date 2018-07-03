@@ -1,4 +1,4 @@
-PortalThing = class("PortalThing")
+local PortalThing = class("PortalThing")
 
 function PortalThing:initialize(img, offset)
     self.img = img
@@ -34,3 +34,5 @@ function PortalThing:draw(side, color, mult)
         love.graphics.draw(self.img, x*mult, 0, 0, sx, 1, self.img:getWidth()/2, self.img:getHeight()+1)
     end
 end
+
+return PortalThing

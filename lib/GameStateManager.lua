@@ -11,7 +11,7 @@ end
 
 function GameStateManager:loadState(state)
     self.activeStates = {state}
-    self:event("load")
+    state:load()
 end
 
 function GameStateManager:addState(state)

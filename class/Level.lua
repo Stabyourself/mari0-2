@@ -9,6 +9,8 @@ function Level:initialize(path)
 
     self:loadLevel(data)
 
+    self.coinTile = Physics3.Tile:new(nil, nil, nil, nil, nil, require("img.smb3.coin"), "img/smb3/")
+
     self.camera.target = self.marios[1]
 end
 
@@ -70,6 +72,7 @@ function Level:update(dt)
 
     prof.push("World")
     Physics3.World.update(self, dt)
+    self.coinTile:update(dt)
     prof.pop()
 
     self:updateCamera(dt)

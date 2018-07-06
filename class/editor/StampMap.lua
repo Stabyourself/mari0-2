@@ -104,7 +104,11 @@ function StampMap:stamp(layer, x, y, w, h)
 
         for qx = 1, self.width do
             for qy = 1, self.height do
-                layer:setCoordinate(x+qx, y+qy, self.map[qx][qy])
+                local tileNum = self.map[qx][qy]
+
+                if type(tileNum) ~= "nil" then -- is that how this works
+                    layer:setCoordinate(x+qx, y+qy, self.map[qx][qy])
+                end
             end
         end
     elseif self.type == "quads" then
@@ -126,7 +130,11 @@ function StampMap:stamp(layer, x, y, w, h)
 
         for lx = 1, w do
             for ly = 1, h do
-                layer:setCoordinate(x+lx-1, y+ly-1, quadStampMap[lx][ly])
+                local tileNum = quadStampMap[lx][ly]
+
+                if type(tileNum) ~= "nil" then -- is that how this works
+                    layer:setCoordinate(x+lx-1, y+ly-1, quadStampMap[lx][ly])
+                end
             end
         end
     end

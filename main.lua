@@ -24,7 +24,8 @@ function love.load()
     Easing = require "lib.Easing"
     prof = require "lib.jprof.jprof"
     paletteShader = require "lib.paletteShader"
-    GameStateManager = require "lib.GameStateManager"
+
+    prof.enabled(true)
 
     -- Self written libs
     Color3 = require "lib.Color3"
@@ -38,9 +39,6 @@ function love.load()
     -- Loaders
     require "actorTemplateLoader"
     require "componentLoader"
-
-    -- Editor
-    Selection = require "class.editor.Selection"
 
     -- Misc
     require "cheats"
@@ -62,16 +60,16 @@ function love.load()
 
     defaultUI = Gui3:new("img/gui/default")
 
+    local GameStateManager = require "lib.GameStateManager"
     gameStateManager = GameStateManager:new()
 
     love.resize(400*VAR("scale"), 224*VAR("scale"))
 
+    -- Alright let's go do the stuff
     game = Game:new()
 
     gameStateManager:loadState(game)
     gameStateManager:addState(Editor:new(game.level))
-
-    prof.enabled(true)
 end
 
 function love.update(dt)

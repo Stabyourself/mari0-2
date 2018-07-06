@@ -4,7 +4,8 @@ local FloatingSelection = class("FloatingSelection")
 local borderImg = love.graphics.newImage("img/editor/selection-border.png")
 borderImg:setWrap("repeat")
 
-function FloatingSelection.fromSelection(editor, selection)
+function FloatingSelection.fromSelection(selection)
+    local editor = selection.editor
     local stampMap, xl, yt = StampMap.fromSelection(editor, selection)
 
     for x = 1, stampMap.width do
@@ -14,7 +15,7 @@ function FloatingSelection.fromSelection(editor, selection)
             if  stampMap.map[x][y] and
                 editor.activeLayer:inMap(absX, absY) and
                 editor.activeLayer:getTile(absX, absY) then
-                editor.activeLayer:setCoordinate(absX, absY, false)
+                editor.activeLayer:setCoordinate(absX, absY, nil)
             end
         end
     end
@@ -152,17 +153,9 @@ function FloatingSelection:collision(x, y)
 end
 
 function FloatingSelection:getSelection()
-    local tiles = {}
+    local Selection = require "class.editor.Selection"
 
-    for x = 1, self.width do
-        for y = 1, self.height do
-            if self.map[x][y] then
-                table.insert(tiles, {x+self.pos[1]-1, y+self.pos[2]-1})
-            end
-        end
-    end
-
-    return Selection:new(self.editor, tiles)
+    return Selection.fromFloatingSelection(self)
 end
 
 function FloatingSelection:getStampMap()

@@ -6,7 +6,7 @@ local Game = class("Game")
 function Game:load()
     gameState = "game"
 
-    self.level = Level:new("levels/smb3-test.lua")
+    self.level = Level:new("levels/1-1.lua")
 
     smb3ui = Smb3Ui:new()
     self.uiVisible = true

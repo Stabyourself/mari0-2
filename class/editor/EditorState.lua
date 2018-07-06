@@ -29,7 +29,7 @@ function EditorState:serialize()
             state.layers[i].map[x] = {}
 
             for y = 1, layer.height do
-                state.layers[i].map[x][y] = layer.map[x][y]
+                state.layers[i].map[x][y] = layer.map[x][y].tile
             end
         end
     end
@@ -70,7 +70,7 @@ function EditorState:load()
             map[x] = {}
 
             for y = 1, layer.height do
-                map[x][y] = layer.map[x][y]
+                map[x][y] = Physics3.Cell:new(layer.map[x][y])
             end
         end
 

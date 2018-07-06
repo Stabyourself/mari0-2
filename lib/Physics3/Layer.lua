@@ -1,3 +1,4 @@
+local Cell = require((...):gsub('%.Layer$', '') .. ".Cell")
 Layer = class("Layer")
 
 function Layer:initialize(world, x, y, width, height, map)
@@ -6,13 +7,15 @@ function Layer:initialize(world, x, y, width, height, map)
     self.y = y
     self.width = width
     self.height = height
-    self.map = map or {}
 
     self.xOffset = 0
     self.yOffset = 0
 
     self.movement = false
     self.movementTimer = 0
+
+    -- put cells into map oh man what a mess
+    self.map = map or {}
 end
 
 function Layer:update(dt)
@@ -40,11 +43,7 @@ function Layer:draw()
     for x = xStart, xEnd do
         for y = yStart, yEnd do
             if self:inMap(x, y) then
-                local tile = self:getTile(x, y)
-
-                if tile then
-                    tile:draw((x-1)*16+math.ceil(self.xOffset), (y-1)*16+math.ceil(self.yOffset))
-                end
+                self:getCell(x, y):draw((x-1)*16+math.ceil(self.xOffset), (y-1)*16+math.ceil(self.yOffset))
             end
         end
     end
@@ -98,14 +97,18 @@ function Layer:debugDraw()
     love.graphics.setColor(1, 1, 1)
 end
 
-function Layer:getTile(x, y)
+function Layer:getCell(x, y)
     return self.map[x-self.x][y-self.y]
+end
+
+function Layer:getTile(x, y)
+    return self.map[x-self.x][y-self.y].tile
 end
 
 function Layer:setCoordinate(x, y, tile)
     assert(self:inMap(x, y), string.format("Tried to set out-of-bounds coordinate %s, %s. Stop that.", x, y))
 
-    self.map[x-self.x][y-self.y] = tile
+    self.map[x-self.x][y-self.y].tile = tile
 end
 
 function Layer:optimize() -- cuts a layer to its content and moves it instead
@@ -255,7 +258,7 @@ function Layer:getFloodArea(startX, startY) -- Based off https://github.com/Yona
 		y = y + 1
 		spanLeft, spanRight = false, false
 
-        while (y <= self:getYEnd() and self:getTile(x, y) == targetTile) do -- walk vertically down
+        while (y <= self:getYEnd() and self:getTile(x, y) == targetTile) and not tileLookupTable[x][y] do -- walk vertically down
             table.insert(tileTable, {x, y})
             tileLookupTable[x][y] = true
 
@@ -292,8 +295,9 @@ function Layer:expandTo(x, y)
 
         for i = 1, newColumns do
             local emptyRow = {}
+
             for ly = 1, self.height do
-                table.insert(emptyRow, false)
+                table.insert(emptyRow, Cell:new(nil))
             end
 
             table.insert(self.map, 1, emptyRow)
@@ -309,7 +313,7 @@ function Layer:expandTo(x, y)
         for i = 1, newColumns do
             local emptyRow = {}
             for ly = 1, self.height do
-                table.insert(emptyRow, false)
+                table.insert(emptyRow, Cell:new(nil))
             end
 
             table.insert(self.map, emptyRow)
@@ -323,7 +327,7 @@ function Layer:expandTo(x, y)
 
         for i = 1, newRows do
             for lx = 1, self.width do
-                table.insert(self.map[lx], 1, false)
+                table.insert(self.map[lx], 1, Cell:new(nil))
             end
         end
 
@@ -336,7 +340,7 @@ function Layer:expandTo(x, y)
 
         for i = 1, newRows do
             for lx = 1, self.width do
-                table.insert(self.map[lx], false)
+                table.insert(self.map[lx], Cell:new(nil))
             end
         end
 

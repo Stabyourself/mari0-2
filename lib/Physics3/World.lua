@@ -1,4 +1,5 @@
 local serialize = require "lib.serialize"
+local Cell = require((...):gsub('%.World$', '') .. ".Cell")
 local Tile = require((...):gsub('%.World$', '') .. ".Tile")
 local Portal = require((...):gsub('%.World$', '') .. ".portal.Portal")
 local World = class("Physics3.World")
@@ -333,10 +334,17 @@ function World:loadLevel(data)
 
                     assert(tile, string.format("Couldn't load real tile at x=%s, y=%s for requested lookup \"%s\". This may mean that the map is corrupted.", x, y, mapTile))
 
-                    map[x][y] = tile
+                    map[x][y] = Cell:new(tile)
                 else
-                    map[x][y] = false
+                    map[x][y] = Cell:new(nil)
                 end
+            end
+        end
+
+        -- propagate map with coins
+        if dataLayer.coins then
+            for _, coin in ipairs(dataLayer.coins) do
+                map[coin[1]][coin[2]].coin = coin[3] or 1
             end
         end
 
@@ -353,7 +361,7 @@ function World:saveLevel(outPath)
     for _, layer in ipairs(self.layers) do
         for y = 1, layer.height do
             for x = 1, layer.width do
-                local tile = layer.map[x][y]
+                local tile = layer.map[x][y].tile
 
                 if tile then
                     -- See if the tile is already in the table
@@ -441,7 +449,7 @@ function World:saveLevel(outPath)
             out.layers[i].map[x] = {}
 
             for y = 1, layer.height do
-                local tile = layer.map[x][y]
+                local tile = layer.map[x][y].tile
 
                 if tile then
                     --find the lookup
@@ -470,7 +478,7 @@ function World:saveLevel(outPath)
 
     table.insert(out.entities, {type="spawn", x=self.spawnX, y=self.spawnY})
 
-    love.filesystem.write("test.lua", serialize.tstr(out))
+    love.filesystem.write(outPath, serialize.tstr(out))
 end
 
 function World:advancedPhysicsDebug()
@@ -836,7 +844,7 @@ function World:getTile(x, y)
     end
 end
 
-function World:getCoordinateRectangle(x, y, w, h, clamp) -- todo: add layer parameter
+function World:getCoordinateRectangle(x, y, w, h, clamp)
     local lx, rx, ty, by
 
     if w < 0 then

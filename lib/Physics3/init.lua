@@ -25,6 +25,7 @@ Physics3.Layer = require(current_folder .. ".Layer")
 Physics3.World = require(current_folder .. ".World")
 Physics3.PhysObj = require(current_folder .. ".PhysObj")
 Physics3.Tile = require(current_folder .. ".Tile")
+Physics3.Cell = require(current_folder .. ".Cell")
 Physics3.TileMap = require(current_folder .. ".TileMap")
 Physics3.Tracer = require(current_folder .. ".Tracer")
 

@@ -3,6 +3,7 @@ Tile:include(Physics3collisionMixin)
 
 function Tile:initialize(tileMap, img, x, y, num, props, path)
 	self.tileMap = tileMap
+	self.tileSize = self.tileMap and self.tileMap.tileSize or 16
 	self.x = x
 	self.y = y
 	self.num = num
@@ -21,7 +22,7 @@ function Tile:initialize(tileMap, img, x, y, num, props, path)
 
 		self.quads = {}
 
-		for qx = 1, (self.img:getWidth()+1)/self.tileMap.tileSize do
+		for qx = 1, (self.img:getWidth()+1)/self.tileSize do
 			table.insert(self.quads, love.graphics.newQuad((qx-1)*17, 0, 16, 16, self.img:getWidth(), self.img:getHeight()))
 		end
 

@@ -20,7 +20,7 @@ function Erase:update(dt)
         local layer = self.editor.activeLayer
 
         if layer:inMap(x, y) then
-            layer:setCoordinate(x, y, false)
+            layer:setCoordinate(x, y, nil)
             layer:optimize()
         end
     end

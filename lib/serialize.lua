@@ -16,6 +16,7 @@ local lua51_keywords =
 }
 
 local tstr, tstr_cat
+
 do
   local function impl(t, cat, visited)
     local t_type = type(t)
@@ -23,7 +24,7 @@ do
       if not visited[t] then
         visited[t] = true
 
-        cat("return{")
+        cat("{")
 
         -- Serialize numeric indices
 
@@ -107,6 +108,7 @@ do
   tstr = function(t)
     local buf = {}
     local cat = function(v) buf[#buf + 1] = v end
+    cat("return")
     impl(t, cat, {})
     return table_concat(buf)
   end

@@ -36,8 +36,9 @@ local stampMaps = {
         map = {
             {4, 5, 6},
             {12, 13, 14},
+            {nil, nil, nil},
         },
-        paddings = {1, 1, 1, 1}, -- clockwise from top (like in css)
+        paddings = {2, 1, 0, 1}, -- clockwise from top (like in css)
     }
 }
 

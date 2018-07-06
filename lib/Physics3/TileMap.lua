@@ -47,13 +47,7 @@ function TileMap:initialize(path, name)
 				map[x] = {}
 
 				for y = 1, h do
-					local tile = self.tiles[stampMap.map[y][x]]
-
-					if tile then
-						map[x][y] = tile
-					else
-						map[x][y] = false
-					end
+					map[x][y] = self.tiles[stampMap.map[y][x]]
 				end
 			end
 

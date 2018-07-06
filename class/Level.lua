@@ -30,7 +30,7 @@ function Level:loadLevel(data)
     self.spawnLine = 0
     self.spawnI = 1
 
-    self.blockBounces = {}
+    self.activeCells = {}
 
     self.spawnList = {}
     -- Parse entities
@@ -80,7 +80,7 @@ end
 
 function Level:update(dt)
     self.timeLeft = math.max(0, self.timeLeft-(60/42)*dt)
-    updateGroup(self.blockBounces, dt)
+    updateGroup(self.activeCells, dt)
 
     prof.push("World")
     Physics3.World.update(self, dt)
@@ -210,15 +210,17 @@ function Level:updateCamera(dt)
     end
 end
 
-function Level:bumpBlock(x, y)
-    local Tile = self:getTile(x, y)
-    if Tile.breakable or Tile.coinBlock then
-        local blockBounce = BlockBounce:new(x, y)
+function Level:bumpBlock(cell)
+    local tile = cell.tile
 
-        table.insert(self.blockBounces, blockBounce)
+    if tile.breakable or tile.props.holdsItems then
+        cell:bounce()
+        table.insert(self.activeCells, cell)
 
-        if Tile.coinBlock then
-            self:setCoordinate(x, y, 113)
+        if tile.props.turnsInto then
+            local turnIntoTile = tile.tileMap.tiles[tile.props.turnsInto]
+
+            cell.tile = turnIntoTile
         end
     end
 end

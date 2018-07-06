@@ -6,6 +6,7 @@ local Portal = require((...):gsub('%.World$', '') .. ".portal.Portal")
 local World = class("Physics3.World")
 
 local fakeTileInstance = Tile:new()
+local fakeCellInstance = Cell:new(fakeTileInstance)
 
 function World:initialize()
     self.tileSize = 16 --lol hardcode
@@ -534,7 +535,7 @@ function World:checkCollision(x, y, obj, vector)
 
                     else
                         if ny > p.y1 and ny <= p.y1+2 then -- point is "on" the line of the portal
-                            return fakeTileInstance
+                            return fakeCellInstance
                         elseif ny > p.y1 then
                             return false
                         end
@@ -546,10 +547,10 @@ function World:checkCollision(x, y, obj, vector)
 
     -- World
     for _, layer in ipairs(self.layers) do
-        local tile = layer:checkCollision(x, y, obj, vector)
+        local cell = layer:checkCollision(x, y, obj, vector)
 
-        if tile then
-            return tile
+        if cell then
+            return cell
         end
     end
 

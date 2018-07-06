@@ -28,7 +28,7 @@ function Tracer:trace()
 			xRounded = math.floor(x)
 		end
 
-		col = self.physObj.World:checkCollision(xRounded, yRounded, self.physObj, self.vectorNormalized)
+		col = self.physObj.world:checkCollision(xRounded, yRounded, self.physObj, self.vectorNormalized)
 		if col then
 			return xRounded, yRounded, col
 		end

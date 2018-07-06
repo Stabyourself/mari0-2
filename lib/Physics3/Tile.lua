@@ -1,5 +1,4 @@
 local Tile = class("Physics3.Tile")
-Tile:include(Physics3collisionMixin)
 
 function Tile:initialize(tileMap, img, x, y, num, props, path)
 	self.tileMap = tileMap

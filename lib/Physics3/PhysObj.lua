@@ -267,8 +267,8 @@ function PhysObj:resolveCollisions()
 			end
 			obj:topColResolve(self)
 
-			if type(obj) == "table" and obj:isInstanceOf(Physics3.Tile) then -- update the object's surfaceAngle
-				self.surfaceAngle = obj.angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
+			if type(obj) == "table" and obj:isInstanceOf(Physics3.Cell) then -- update the object's surfaceAngle
+				self.surfaceAngle = obj.tile.angle -- todo: May be wrong if colliding pixel is right underneath a slope's end!
 			else
 				self.surfaceAngle = 0
 			end

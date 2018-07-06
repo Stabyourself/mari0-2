@@ -56,14 +56,14 @@ function Layer:checkCollision(x, y, obj, vector)
     local tileX, tileY = self.world:worldToCoordinate(x, y)
 
     if self:inMap(tileX, tileY) then
-        local tile = self:getTile(tileX, tileY)
+        local cell = self:getCell(tileX, tileY)
 
-        if tile then
+        if cell.tile then
             local inTileX = math.fmod(x, 16)
             local inTileY = math.fmod(y, 16)
 
-            if tile:checkCollision(inTileX, inTileY, obj, vector) then
-                return tile
+            if cell.tile:checkCollision(inTileX, inTileY, obj, vector) then
+                return cell
             end
         end
     end

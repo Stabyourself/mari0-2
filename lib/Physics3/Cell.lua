@@ -11,7 +11,7 @@ function Cell:draw(x, y)
     end
 
     if self.coin then
-        game.level.coinTile:draw(x, y)
+        game.mappack.coinTile:draw(x, y)
     end
 end
 

@@ -17,12 +17,6 @@ return {
                 {216,  40,   0},
                 {  0,   0,   0}
             },
-
-            defaultPalette = {
-                {252, 188, 176},
-                {216,  40,   0},
-                {  0,   0,   0}
-            }
         },
 
         ["smb3.animation"] = {
@@ -111,6 +105,7 @@ return {
         ["misc.portalGun"] = {},
         ["misc.stomps"] = {},
         ["misc.kicks"] = {},
-        ["misc.isHurtByContact"] = {}
+        ["misc.isHurtByContact"] = {},
+        ["misc.collectsCoins"] = {},
     }
 }

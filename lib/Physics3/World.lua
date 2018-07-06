@@ -1,6 +1,7 @@
 local serialize = require "lib.serialize"
 local Cell = require((...):gsub('%.World$', '') .. ".Cell")
 local Tile = require((...):gsub('%.World$', '') .. ".Tile")
+local TileMap = require((...):gsub('%.World$', '') .. ".TileMap")
 local Portal = require((...):gsub('%.World$', '') .. ".portal.Portal")
 local World = class("Physics3.World")
 
@@ -299,7 +300,7 @@ function World:loadLevel(data)
 
     -- Load used tileMaps
     for _, tileMap in ipairs(data.tileMaps) do
-        table.insert(self.tileMaps, Physics3.TileMap:new("tilemaps/" .. tileMap, tileMap))
+        table.insert(self.tileMaps, TileMap:new("tilemaps/" .. tileMap, tileMap))
     end
 
     -- Load lookup

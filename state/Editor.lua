@@ -53,6 +53,7 @@ function Editor:initialize(level)
 end
 
 function Editor:load()
+    updateSizes()
     -- The level must be loaded at this point!
     self:setActiveLayer(1)
     self:setActiveTileMap(1)
@@ -242,7 +243,7 @@ end
 
 function Editor:draw()
     prof.push("Editor")
-    self.level.camera:attach()
+    self.level.camera:attach(CAMERAOFFSETX, CAMERAOFFSETY)
 
     local xl, yt = self.level:cameraToWorld(0, 0)
     local xr, yb = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)

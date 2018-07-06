@@ -6,7 +6,7 @@ return {
     ["d"] = "right",
     ["s"] = "down",
     ["w"] = "up",
-    ["space"] = {"jump", "editor.tool.entity"},
+    ["space"] = {"jump"},--, "editor.tool.entity"},
     ["lshift"] = {"run", "editor.line", "editor.select.add"},
     ["rshift"] = {"run", "editor.line", "editor.select.add"},
     ["r"] = {"closePortals", "editor.tool.paint"},

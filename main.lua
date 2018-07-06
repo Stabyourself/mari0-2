@@ -8,7 +8,7 @@ function love.load()
         vsync = VAR("vsync"),
         resizable = true,
         msaa = msaa,
-        minwidth = 232*VAR("scale"),
+        minwidth = 243*VAR("scale"),
         minheight = 165*VAR("scale"),
     })
 
@@ -37,6 +37,7 @@ function love.load()
     controls3.setCmdTable(require "controls")
 
     -- Loaders
+    SETTINGS = require "settingsLoader"
     require "actorTemplateLoader"
     require "componentLoader"
 
@@ -66,7 +67,7 @@ function love.load()
     love.resize(400*VAR("scale"), 224*VAR("scale"))
 
     -- Alright let's go do the stuff
-    game = Game:new()
+    game = Game:new("smb3", 1)
 
     gameStateManager:loadState(game)
     gameStateManager:addState(Editor:new(game.level))
@@ -195,15 +196,15 @@ function love.quit()
 end
 
 function updateSizes()
+    local Editor = require "state.Editor" -- super bad, replace
+
     CAMERAWIDTH = SCREENWIDTH
     CAMERAHEIGHT = SCREENHEIGHT
 
+    -- Remove the UI's height if present
     if not game or game.uiVisible then
         CAMERAHEIGHT = CAMERAHEIGHT-VAR("uiLineHeight")-VAR("uiHeight")
     end
-
-    WIDTH = math.ceil(CAMERAWIDTH/VAR("tileSize"))
-    HEIGHT = math.ceil(CAMERAHEIGHT/VAR("tileSize"))
 
     RIGHTSCROLLBORDER = VAR("cameraScrollRightBorder")
     LEFTSCROLLBORDER = VAR("cameraScrollLeftBorder")

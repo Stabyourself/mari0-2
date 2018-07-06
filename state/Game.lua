@@ -1,24 +1,33 @@
 local Smb3Ui = require "class.Smb3Ui"
+local Player = require "class.Player"
 local Level = require "class.Level"
+local Mappack = require "class.Mappack"
 
 local Game = class("Game")
+
+function Game:initialize(mappack, playerCount)
+    -- Create player objects
+    self.players = {}
+    for i = 1, playerCount do
+        table.insert(self.players, Player:new(i, SETTINGS.players[i]))
+    end
+
+    self.mappack = Mappack:new(mappack)
+end
 
 function Game:load()
     gameState = "game"
 
-    self.level = Level:new("levels/1-1.lua")
+    -- Load the first level
+    self.level = self.mappack:startLevel()
+
+    self.uiVisible = true -- should this be part of Game?
 
     smb3ui = Smb3Ui:new()
-    self.uiVisible = true
-
-    self.timeLeft = 400
-
-    love.graphics.setBackgroundColor(self.level.backgroundColor)
 end
 
 function Game:update(dt)
     prof.push("Game")
-    self.timeLeft = math.max(0, self.timeLeft-(60/42)*dt)
 
     self.level:update(dt)
 
@@ -42,11 +51,11 @@ function Game:draw()
 
     prof.push("UI")
     if self.uiVisible then
-        smb3ui.time = math.floor(love.timer.getFPS())--math.ceil(self.timeLeft)
-        smb3ui.pMeter = self.level.marios[1].pMeter or 0
-        smb3ui.score = 160291
-        smb3ui.lives = 10
-        smb3ui.coins = 23
+        smb3ui.time = math.ceil(self.level.timeLeft)
+        smb3ui.pMeter = self.players[1].actor.pMeter or 0
+        smb3ui.score = self.players[1].score
+        smb3ui.lives = self.players[1].lives
+        smb3ui.coins = self.players[1].coins
         smb3ui.world = 1
         smb3ui:draw()
     end

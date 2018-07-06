@@ -2,7 +2,7 @@ local Actor = class("Actor", Physics3.PhysObj)
 local ActorState = require "class.ActorState"
 local ActorEvent = require "class.ActorEvent"
 
-function Actor:__tostring ()
+function Actor:__tostring()
     return string.format("Actor (%s)", self.actorTemplate.name)
 end
 

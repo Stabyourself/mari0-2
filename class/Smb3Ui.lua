@@ -34,7 +34,6 @@ function Smb3Ui:initialize()
 
     self.element = {}
 
-
     self.element.worldImg = Gui3.Image:new("img/ui/world.png", 1, 2)
     self.element.world = Gui3.Text:new("", 33, 2)
 
@@ -48,7 +47,7 @@ function Smb3Ui:initialize()
 
     self.element.score = Gui3.Text:new("", 49, 10)
 
-    self.element.time = Gui3.Text:new("", 113, 10)
+    self.element.time = Gui3.Text:new("", 112, 10)
 
 
     self.uiBox:addChild(self.element.worldImg)

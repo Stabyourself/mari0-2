@@ -1,6 +1,11 @@
 local Component = require "class.Component"
 local portalGun = class("misc.portalGun", Component)
 
+portalGun.defaultColors = {
+    Color3.fromHSV(200/360, 0.76, 0.99),
+    Color3.fromHSV(30/360, 0.87, 0.91),
+}
+
 function portalGun:initialize(actor, args)
     Component.initialize(self, actor, args)
 
@@ -8,11 +13,6 @@ function portalGun:initialize(actor, args)
     self.actor.portalGunAngle = 0
 
     self.portals = {}
-    self.portalColor = {
-        Color3.fromHSV(200/360, 0.76, 0.99),
-        Color3.fromHSV(30/360, 0.87, 0.91),
-        Color3.fromHSV(30/360, 0.87, 0.91),
-    }
 end
 
 function portalGun:closePortals()
@@ -33,6 +33,8 @@ function portalGun:click(dt, actorEvent, button)
         local crosshair = hasCrosshair.crosshair
 
         if crosshair.target.valid then
+            local color = self.actor.player and self.actor.player.portalColors and self.actor.player.portalColors[button] or self.defaultColors[button]
+
             local portal = self.actor.world:attemptPortal(
                 crosshair.target.layer,
                 crosshair.target.tileX,
@@ -40,7 +42,7 @@ function portalGun:click(dt, actorEvent, button)
                 crosshair.target.blockSide,
                 crosshair.target.worldX,
                 crosshair.target.worldY,
-                self.portalColor[button],
+                color,
                 self.portals[button])
 
             if portal then

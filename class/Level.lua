@@ -9,7 +9,7 @@ function Level:initialize(path)
 
     self:loadLevel(data)
 
-    self.coinTile = Physics3.Tile:new(nil, nil, nil, nil, nil, require("img.smb3.coin"), "img/smb3/")
+    self.timeLeft = 400
 
     self.camera.target = self.marios[1]
 end
@@ -25,10 +25,8 @@ function Level:loadLevel(data)
     self.backgroundColor[2] = self.backgroundColor[2]/255
     self.backgroundColor[3] = self.backgroundColor[3]/255
 
-    -- Camera stuff
-    self.camera = Camera.new(CAMERAWIDTH/2, CAMERAHEIGHT/2, CAMERAWIDTH, CAMERAHEIGHT)
+    love.graphics.setBackgroundColor(self.backgroundColor)
 
-    self.camera.rot = 0
     self.spawnLine = 0
     self.spawnI = 1
 
@@ -58,21 +56,35 @@ function Level:loadLevel(data)
 
     local x, y = self:coordinateToWorld(self.spawnX-.5, self.spawnY)
 
-    local mario = Actor:new(self, x, y, actorTemplates.smb3_raccoon)
+    for i = 1, #game.players do
+        local player = game.players[i]
 
-    table.insert(self.marios, mario)
-    table.insert(self.actors, mario)
+        local mario = Actor:new(self, x, y, actorTemplates.smb3_raccoon)
+        mario.player = player
+        player.actor = mario
 
+        -- apply settings like character palette and portal colors
+        if player.palette then
+            mario.palette = player.palette
+        end
 
-    self:spawnActors(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
+        table.insert(self.marios, mario)
+        table.insert(self.actors, mario)
+    end
+
+    self.camera = Camera.new(CAMERAWIDTH/2, CAMERAHEIGHT/2, CAMERAWIDTH, CAMERAHEIGHT)
+    self.camera:lookAt(self.marios[1].x, self.marios[1].y)
+
+    -- self:spawnActors(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end
 
 function Level:update(dt)
+    self.timeLeft = math.max(0, self.timeLeft-(60/42)*dt)
     updateGroup(self.blockBounces, dt)
 
     prof.push("World")
     Physics3.World.update(self, dt)
-    self.coinTile:update(dt)
+    game.mappack.coinTile:update(dt)
     prof.pop()
 
     self:updateCamera(dt)
@@ -85,10 +97,10 @@ function Level:update(dt)
     end
     prof.pop()
 
-    local newSpawnLine = self.camera.x/self.tileSize+WIDTH+VAR("enemiesSpawnAhead")+2
-    if newSpawnLine > self.spawnLine then
-        self:spawnActors(newSpawnLine)
-    end
+    -- local newSpawnLine = self.camera.x/self.tileSize+WIDTH+VAR("enemiesSpawnAhead")+2
+    -- if newSpawnLine > self.spawnLine then
+    --     self:spawnActors(newSpawnLine)
+    -- end
 end
 
 function Level:draw()
@@ -211,6 +223,11 @@ function Level:bumpBlock(x, y)
     end
 end
 
+function Level:collectCoin(layer, x, y, actor)
+    layer.map[x][y].coin = false
+    actor.player.coins = actor.player.coins + 1
+end
+
 function Level:objVisible(x, y, w, h)
     local lx, ty = self.camera:worldCoords(0, 0)
     local rx, by = self.camera:worldCoords(CAMERAWIDTH, CAMERAHEIGHT)
@@ -221,7 +238,7 @@ end
 
 function Level:resize(w, h)
     self.camera.w = w
-    self.camera.h = h
+    self.camera.h = CAMERAHEIGHT
 end
 
 return Level

@@ -5,9 +5,9 @@ function TileMap:initialize(path, name)
 	self.path = path .. "/"
 	self.name = name
 
-	local tileMapCode = love.filesystem.read(self.path .. "props.lua")
+	local tileMapCode = love.filesystem.read(self.path .. "settings.lua")
 
-	assert(tileMapCode, string.format("Map tried to tell me that it uses the tilemap \"%s\" but we all know that's bullshit because that tilemap's props doesn't exist.", name))
+	assert(tileMapCode, string.format("Map tried to tell me that it uses the tilemap \"%s\" but we all know that's bullshit because that tilemap's settings.lua doesn't exist.", name))
 
     self.data = sandbox.run(tileMapCode, {env={
 		VAR = VAR

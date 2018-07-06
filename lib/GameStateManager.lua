@@ -37,4 +37,14 @@ function GameStateManager:event(event, ...)
     end
 end
 
+function GameStateManager:hasActiveState(stateClass)
+    for _, state in ipairs(self.activeStates) do
+        if state.class == stateClass then
+            return true
+        end
+    end
+
+    return false
+end
+
 return GameStateManager

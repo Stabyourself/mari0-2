@@ -171,4 +171,28 @@ function Tile:getAverageColor()
 	return self.averageColor
 end
 
+function Tile:getSideAngle(side)
+	local point = side*2-1
+	local nextPoint = point+2
+
+	if nextPoint > #self.collision then
+		nextPoint = 1
+	end
+
+	return math.atan2(self.collision[nextPoint+1] - self.collision[point+1], self.collision[nextPoint] - self.collision[point])
+end
+
+function Tile:sidePortalable(side)
+	if not self.props.nonPortalable then
+		return true
+
+	elseif type(self.props.nonPortalable) == "boolean" then
+		return not self.props.nonPortalable
+
+	elseif type(self.props.nonPortalable) == "table" then
+		return not self.props.nonPortalable[side]
+
+	end
+end
+
 return Tile

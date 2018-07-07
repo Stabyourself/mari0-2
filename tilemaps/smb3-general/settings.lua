@@ -26,6 +26,7 @@ tiles[5] = {
 
 tiles[6] = {
     collision = templates.cube,
+    nonPortalable = true,
     exclusiveCollision = 2,
     img = "smm_thing_2.png",
     delays = {8/60},
@@ -38,6 +39,7 @@ tiles[13] = {
 
 tiles[14] = {
     collision = templates.cube,
+    nonPortalable = true,
     exclusiveCollision = 2,
     img = "smm_thing_4.png",
     delays = {8/60},
@@ -48,6 +50,8 @@ local cubes = {3, 4, 9, 10, 11, 12, 17, 18, 19, 20}
 for _, v in ipairs(cubes) do
     tiles[v] = {collision = templates.cube}
 end
+
+tiles[3].nonPortalable = {true, false, false, false}
 
 local stampMaps = {
     {

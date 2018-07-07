@@ -994,7 +994,8 @@ local windMill = {
 }
 
 local function walkSide(self, layer, tile, tileX, tileY, side, dir)
-    local nextX, nextY, angle, nextAngle, nextTileX, nextTileY, nextSide, x, y
+    local nextX, nextY, angle, nextAngle, nextTileX, nextTileY, nextSide
+    local x, y = 0, 0
     local first = true
 
     local found
@@ -1153,11 +1154,13 @@ local function walkSide(self, layer, tile, tileX, tileY, side, dir)
                             local points = nextTile.collision
 
                             for i = 1, #points, 2 do
-                                -- check whether it's a platform and a wrong side
-                                if  not nextTile.props.exclusiveCollision
-                                    or nextTile.props.exclusiveCollision == side then
-
-                                    if points[i] == x and points[i+1] == y then
+                                if points[i] == x and points[i+1] == y then
+                                    -- check whether it's a platform and a wrong side
+                                    if nextTile.props.exclusiveCollision and nextTile.props.exclusiveCollision ~= side then
+                                        -- not valid
+                                    elseif not nextTile:sidePortalable((i+1)/2) then --todo: Buggy
+                                        -- not valid either!
+                                    else
                                         found = true
                                         side = (i+1)/2
                                         tile = nextTile
@@ -1190,6 +1193,10 @@ function World:checkPortalSurface(layer, tileX, tileY, side, worldX, worldY, ign
         return false
     end
 
+    if not tile:sidePortalable(side) then
+        return false
+    end
+
     local startX, startY = walkSide(self, layer, tile, tileX, tileY, side, "anticlockwise")
     local endX, endY = walkSide(self, layer, tile, tileX, tileY, side, "clockwise")
 
@@ -1198,7 +1205,7 @@ function World:checkPortalSurface(layer, tileX, tileY, side, worldX, worldY, ign
 
 
     -- Do some magic to determine whether there's portals blocking off sections of our portal surface
-    local angle = math.atan2(endY-startY, endX-startX)
+    local angle = tile:getSideAngle(side)
 
     for _, p in ipairs(self.portals) do
         if p ~= ignoreP then

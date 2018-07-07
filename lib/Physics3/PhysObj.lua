@@ -15,7 +15,7 @@ function PhysObj:initialize(world, x, y, width, height)
 	self.angle = 0
 
     self.surfaceAngle = 0
-	self.onGround = false
+	self.onGround = true
 
 	self.isGroundFor = {}
 

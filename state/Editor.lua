@@ -24,7 +24,7 @@ Editor.toolClasses = {
 }
 
 Editor.scaleMin = 0.1/VAR("scale")
-Editor.scaleMax = 1
+Editor.scaleMax = 3
 
 Editor.selectImg = love.graphics.newImage("img/editor/selection-preview.png")
 Editor.selectQuad = {

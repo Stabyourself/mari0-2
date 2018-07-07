@@ -619,6 +619,22 @@ function World:getHeight()
     return self:getYEnd() - self:getYStart() + 1
 end
 
+local function rayCastGetColSide(side, stepX, stepY)
+    if side == "ver" then
+        if stepX > 0 then
+            return 4
+        else
+            return 2
+        end
+    else
+        if stepY > 0 then
+            return 1
+        else
+            return 3
+        end
+    end
+end
+
 function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/raycasting.html - thanks!
     local rayPosX = x+1
     local rayPosY = y+1
@@ -690,11 +706,20 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
                     end
                 else
                     wasInMap = true
+
                     if layer:inMap(mapX, mapY) then
                         local tile = layer:getTile(mapX, mapY)
+
                         if tile and tile.collision then
-                            if tile.collision == VAR("tileTemplates").cube then
+                            if  tile.props.exclusiveCollision and
+                                (tile.props.exclusiveCollision ~= rayCastGetColSide(side, stepX, stepY) or
+                                firstCheck) then
+                                -- don't collide when coming from the wrong side in exclusiveCollision
+                                -- also don't collide if we are inside an exclusiveCollision
+
+                            elseif tile.collision == VAR("tileTemplates").cube then
                                 cubeCol = true
+
                             else
 
                                 -- complicated polygon stuff
@@ -760,23 +785,15 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
                         absX = absX + hitDist
                     end
 
-                    if side == "ver" then
-                        if stepX > 0 then
-                            side = 4
-                        else
-                            side = 2
-                            absX = absX + 1
-                        end
-                    else
-                        if stepY > 0 then
-                            side = 1
-                        else
-                            side = 3
-                            absY = absY + 1
-                        end
+                    local colSide = rayCastGetColSide(side, stepX, stepY)
+
+                    if colSide == 2 then
+                        absX = absX + 1
+                    elseif colSide == 3 then
+                        absY = absY + 1
                     end
 
-                    return layer, mapX, mapY, absX, absY, side
+                    return layer, mapX, mapY, absX, absY, colSide
                 end
             end
         end
@@ -1136,11 +1153,15 @@ local function walkSide(self, layer, tile, tileX, tileY, side, dir)
                             local points = nextTile.collision
 
                             for i = 1, #points, 2 do
-                                if points[i] == x and points[i+1] == y then
-                                    -- Make sure the angle of this side is the same
-                                    found = true
-                                    side = (i+1)/2
-                                    tile = nextTile
+                                -- check whether it's a platform and a wrong side
+                                if  not nextTile.props.exclusiveCollision
+                                    or nextTile.props.exclusiveCollision == side then
+
+                                    if points[i] == x and points[i+1] == y then
+                                        found = true
+                                        side = (i+1)/2
+                                        tile = nextTile
+                                    end
                                 end
                             end
                         end

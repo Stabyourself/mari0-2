@@ -96,12 +96,32 @@ function Tile:checkCollision(x, y, obj, vector, cellX, cellY)
 		return false
 	end
 
-    if self.props.exclusiveCollision then
-        if  obj.prevY+obj.height > (cellY-1)*16 or
-            self.props.exclusiveCollision[1] ~= vector.x or
-            self.props.exclusiveCollision[2] ~= vector.y then
-            return false
-        end
+	if self.props.exclusiveCollision then -- override collision with a false maybe
+		if self.props.exclusiveCollision == 1 then
+			if  obj.prevY+obj.height > (cellY-1)*16 or
+				vector.x ~= 0 or
+				vector.y ~= 1 then
+				return false
+			end
+		elseif self.props.exclusiveCollision == 2 then
+			if  obj.prevX < (cellX)*16 or
+				vector.x ~= -1 or
+				vector.y ~= 0 then
+				return false
+			end
+		elseif self.props.exclusiveCollision == 3 then
+			if  obj.prevY < (cellY)*16 or
+				vector.x ~= 0 or
+				vector.y ~= -1 then
+				return false
+			end
+		elseif self.props.exclusiveCollision == 4 then
+			if  obj.prevX+obj.width > (cellX-1)*16 or
+				vector.x ~= 1 or
+				vector.y ~= 0 then
+				return false
+			end
+		end
     end
 
 	if self.collision == VAR("tileTemplates").cube then -- optimization for cubes

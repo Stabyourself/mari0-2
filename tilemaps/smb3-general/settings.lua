@@ -18,6 +18,31 @@ tiles[2] = {
     holdsItems = true,
 }
 
+
+tiles[5] = {
+    img = "smm_thing_1.png",
+    delays = {8/60},
+}
+
+tiles[6] = {
+    collision = templates.cube,
+    exclusiveCollision = 2,
+    img = "smm_thing_2.png",
+    delays = {8/60},
+}
+
+tiles[13] = {
+    img = "smm_thing_3.png",
+    delays = {8/60},
+}
+
+tiles[14] = {
+    collision = templates.cube,
+    exclusiveCollision = 2,
+    img = "smm_thing_4.png",
+    delays = {8/60},
+}
+
 local cubes = {3, 4, 9, 10, 11, 12, 17, 18, 19, 20}
 
 for _, v in ipairs(cubes) do
@@ -33,6 +58,15 @@ local stampMaps = {
             {17, 18},
         },
         paddings = {1, 0, 0, 0}, -- clockwise from top (like in css)
+    },
+
+    {
+        name = "1way",
+        type = "simple",
+        map = {
+            {5, 6},
+            {13, 14},
+        },
     }
 }
 

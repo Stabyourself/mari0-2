@@ -71,13 +71,14 @@ function Editor:load()
 
     -- MENU BAR
     self.menuBar = Gui3.Canvas:new(0, 0, SCREENWIDTH, 14)
-    self.menuBar.background = {1, 1, 1}
+    self.menuBar.background = {1, 1, 1, VAR("editor").barAlpha}
 
     self.canvas:addChild(self.menuBar)
 
 
 
     self.fileDropdown = Gui3.Dropdown:new(0, 0, "file")
+    self.fileDropdown.button.color.background = {0, 0, 0, 0}
 
     self.menuBar:addChild(self.fileDropdown)
 
@@ -91,6 +92,7 @@ function Editor:load()
     -- WINDOW
 
     self.newWindowDropdown = Gui3.Dropdown:new(38, 0, "window")
+    self.newWindowDropdown.button.color.background = {0, 0, 0, 0}
 
     self.menuBar:addChild(self.newWindowDropdown)
 
@@ -107,6 +109,7 @@ function Editor:load()
     -- VIEW
 
     local viewDropdown = Gui3.Dropdown:new(92, 0, "view")
+    viewDropdown.button.color.background = {0, 0, 0, 0}
 
     self.menuBar:addChild(viewDropdown)
 
@@ -132,17 +135,24 @@ function Editor:load()
 
     self:updateScaleSlider()
 
-    self.scaleBar:addChild(Gui3.Button:new(0, 0, "-", false, 3, function() self:zoom(-1) end))
-    self.scaleBar:addChild(Gui3.Button:new(w+20, 0, "+", false, 3, function() self:zoom(1) end))
+    local minusButton = Gui3.Button:new(0, 0, "-", false, 3, function() self:zoom(-1) end)
+    minusButton.color.background = {0, 0, 0, 0}
+    self.scaleBar:addChild(minusButton)
 
-    self.scaleBar:addChild(Gui3.Button:new(w+34, 0, "1:1", false, 3, function() self:resetZoom() end))
+    local plusButton = Gui3.Button:new(w+20, 0, "+", false, 3, function() self:zoom(1) end)
+    plusButton.color.background = {0, 0, 0, 0}
+    self.scaleBar:addChild(plusButton)
+
+    local oneToOneButton = Gui3.Button:new(w+34, 0, "1:1", false, 3, function() self:resetZoom() end)
+    oneToOneButton.color.background = {0, 0, 0, 0}
+    self.scaleBar:addChild(oneToOneButton)
 
 
 
 
     -- TOOL BAR
     self.toolbar = Gui3.Canvas:new(0, 14, 14, CAMERAHEIGHT-14)
-    self.toolbar.background = {255, 255, 255}
+    self.toolbar.background = {1, 1, 1, VAR("editor").barAlpha}
     self.canvas:addChild(self.toolbar)
 
     self.toolButtons = {}
@@ -150,11 +160,13 @@ function Editor:load()
     local y = 0
     for i, tool in ipairs(self.toolbarOrder) do
         local button = Gui3.Button:new(0, y, self.toolbarImg[i], false, 2, function(button) self:selectTool(tool) end)
+        button.color.background = {0, 0, 0, 0}
 
         self.toolButtons[tool] = button
 
-        button.children[1].color = {0, 0, 0, 1}
+        button.children[1].color = {0, 0, 0, 0.8}
         self.toolbar:addChild(button)
+
 
         y = y + 14
     end
@@ -362,10 +374,10 @@ function Editor:selectTool(toolName)
     end
 
     for _, toolButton in pairs(self.toolButtons) do
-        toolButton.color.background = {1, 1, 1}
+        toolButton.color.background = {0, 0, 0, 0}
     end
 
-    self.toolButtons[toolName].color.background = {0.75, 0.75, 0.75}
+    self.toolButtons[toolName].color.background = {0, 0, 0, 0.25}
 end
 
 function Editor:newWindow(windowClass, button)

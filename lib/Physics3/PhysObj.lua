@@ -232,6 +232,14 @@ function PhysObj:checkCollisions()
 end
 
 function PhysObj:resolveCollisions()
+	if VAR("tracerDebug") then
+		for _, group in pairs(self.tracers) do
+			for _, tracer in ipairs(group) do
+				tracer.traceLen = 0
+			end
+		end
+	end
+
 	local x, y, obj
 
 	if self.speed[1] <= 0 then
@@ -342,8 +350,10 @@ function PhysObj:getStoodOn(obj)
 end
 
 function PhysObj:debugDraw(xOff, yOff)
-	love.graphics.setColor(1, 0, 0)
-	love.graphics.rectangle("line", self.x+.5, self.y+.5, self.width-1, self.height-1)
+	if not VAR("debug").tracerDebug then
+		love.graphics.setColor(1, 0, 0)
+		love.graphics.rectangle("line", self.x+.5, self.y+.5, self.width-1, self.height-1)
+	end
 
 	love.graphics.setColor(0, 1, 0, 0.5)
 	for j, w in ipairs(self.tracers.right) do

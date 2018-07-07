@@ -237,14 +237,18 @@ function normalizeAngle(a)
     return a
 end
 
-local function combineTableCall(var, t) -- basically makes var["some.dot.separated.string"] into var.some.dot.separated.string
+local function combineTableCallRecursive(var, t)
     local ct = table.remove(t, 1)
 
     if #t == 0 then
         return var[ct]
     else
-        return combineTableCall(var[ct], t)
+        return combineTableCallRecursive(var[ct], t)
     end
+end
+
+function combineTableCall(var, s) -- basically makes var["some.dot.separated.string"] into var.some.dot.separated.string
+    return combineTableCallRecursive(var, s:split("."))
 end
 
 function getTileBorders(tiles, offsetX, offsetY)

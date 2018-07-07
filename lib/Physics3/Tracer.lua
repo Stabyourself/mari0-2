@@ -7,6 +7,7 @@ function Tracer:initialize(physObj, x, y, vector)
 	self.vector = vector
 	self.vectorNormalized = self.vector:normalized()
 	self.len = self.vector:len()
+	self.tracedLength = 0
 end
 
 function Tracer:trace()
@@ -30,18 +31,20 @@ function Tracer:trace()
 
 		col = self.physObj.world:checkCollision(xRounded, yRounded, self.physObj, self.vectorNormalized)
 		if col then
+			self.tracedLength = i
 			return xRounded, yRounded, col
 		end
 
 		i = i + 1
 	end
+	self.tracedLength = self.len
 end
 
 function Tracer:debugDraw()
 	local angle = self.vector:angleTo()
 
-	local x = self.x+0.5
-	local y = self.y+0.5
+	local x = self.x
+	local y = self.y
 
 	x = x + self.physObj.x
 	y = y + self.physObj.y
@@ -50,10 +53,19 @@ function Tracer:debugDraw()
 	y = math.round(y)
 
 	love.graphics.push()
-	love.graphics.translate(x, y)
+	love.graphics.translate(x+.5, y+.5)
 	love.graphics.rotate(angle)
 
-	love.graphics.rectangle("fill", 0, -.5, self.len, 1)
+	love.graphics.rectangle("fill", -.5, -.5, self.len, 1)
+	if VAR("debug").tracerDebug then
+		local r, g, b, a = love.graphics.getColor()
+
+		love.graphics.setColor(1, 0, 0)
+		love.graphics.rectangle("fill", -.5, -.5, self.tracedLength, 1)
+
+		love.graphics.setColor(r, g, b, a)
+	end
+
 	love.graphics.pop()
 end
 

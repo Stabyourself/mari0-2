@@ -120,6 +120,8 @@ return {
     },
 
     editor = {
-        cameraSpeed = 300
+        cameraSpeed = 300,
+        barSize = 14,
+        barAlpha = 0.7,
     }
 }

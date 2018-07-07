@@ -1,6 +1,8 @@
 --Mari0 2 - MIT License.
 require "loop"
 
+local Game, Editor
+
 function love.load()
     require "util"
 
@@ -45,8 +47,8 @@ function love.load()
     require "cheats"
 
     -- States
-    local Game = require "state.Game"
-    local Editor = require "state.Editor"
+    Game = require "state.Game"
+    Editor = require "state.Editor"
 
     fontOutlined = love.graphics.newImageFont("img/font-outlined.png",
         " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$.,:;!?_-<>=+*\\/'%∩⇔→⇒◔×")
@@ -196,8 +198,6 @@ function love.quit()
 end
 
 function updateSizes()
-    local Editor = require "state.Editor" -- super bad, replace
-
     CAMERAWIDTH = SCREENWIDTH
     CAMERAHEIGHT = SCREENHEIGHT
 

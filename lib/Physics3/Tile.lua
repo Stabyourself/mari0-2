@@ -91,17 +91,18 @@ function Tile:cacheCollisions()
 	end
 end
 
-function Tile:checkCollision(x, y, obj, vector)
+function Tile:checkCollision(x, y, obj, vector, cellX, cellY)
 	if not self.collision then
 		return false
 	end
 
-	if self.props.exclusiveCollision then
-		if  self.props.exclusiveCollision[1] ~= vector.x or
-			self.props.exclusiveCollision[2] ~= vector.y then
-			return false
-		end
-	end
+    if self.props.exclusiveCollision then
+        if  obj.prevY+obj.height > (cellY-1)*16 or
+            self.props.exclusiveCollision[1] ~= vector.x or
+            self.props.exclusiveCollision[2] ~= vector.y then
+            return false
+        end
+    end
 
 	if self.collision == VAR("tileTemplates").cube then -- optimization for cubes
 		return true

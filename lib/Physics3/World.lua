@@ -45,6 +45,9 @@ function World:update(dt)
 		obj:update(dt)
         prof.pop()
 
+        obj.prevX = obj.x
+        obj.prevY = obj.y
+
         obj.frameMovementX = obj.speed[1] * dt
         obj.frameMovementY = obj.speed[2] * dt
 

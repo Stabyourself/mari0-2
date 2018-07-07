@@ -10,7 +10,7 @@ Physics3collisionMixin = {
     hasComponent = function() end
 }
 
-Physics3.TRACER_BOTTOM_SPACING = 1--8 -- How far apart the downwards tracers are
+Physics3.TRACER_BOTTOM_SPACING = 2--8 -- How far apart the downwards tracers are
 Physics3.TRACER_BOTTOM_EXTEND = 8 -- How far down below the hitbox the downtracers go, for smoothly walking down slopes
 Physics3.TRACER_BOTTOM_DIST = 6 -- How far away the side tracers are from the bottom
 Physics3.TRACER_BOTTOM_SIDE_SPACING = 1 -- How far away the bottom tracers are from the edge

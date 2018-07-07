@@ -8,14 +8,27 @@ function Tracer:initialize(physObj, x, y, vector)
 	self.vectorNormalized = self.vector:normalized()
 	self.len = self.vector:len()
 	self.tracedLength = 0
+
+	self:cacheCoordinates()
 end
 
-function Tracer:trace()
+function Tracer:cacheCoordinates()
+	self.coordinateCache = {}
+
+	for i = 1, self.len do
+		local x = self.x + self.vectorNormalized.x*i
+		local y = self.y + self.vectorNormalized.y*i
+
+		self.coordinateCache[i] = {x, y}
+	end
+end
+
+function Tracer:trace(stopAt)
 	local i = 1
 
 	while i <= self.len do
-		local x = self.x + self.physObj.x + self.vectorNormalized.x*i -- todo: these could be cached (definitely do this)
-		local y = self.y + self.physObj.y + self.vectorNormalized.y*i
+		local x = self.coordinateCache[i][1] + self.physObj.x
+		local y = self.coordinateCache[i][2] + self.physObj.y
 
 		if self.vector.y < 0 then -- don't ask me why
 			yRounded = math.ceil(y)

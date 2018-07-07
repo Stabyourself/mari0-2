@@ -164,7 +164,6 @@ function Editor:load()
 
         self.toolButtons[tool] = button
 
-        button.children[1].color = {0, 0, 0, 0.8}
         self.toolbar:addChild(button)
 
 

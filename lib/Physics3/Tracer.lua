@@ -49,8 +49,8 @@ function Tracer:debugDraw()
 	x = x + self.physObj.x
 	y = y + self.physObj.y
 
-	x = math.round(x)
-	y = math.round(y)
+	x = math.floor(x)
+	y = math.floor(y)
 
 	love.graphics.push()
 	love.graphics.translate(x+.5, y+.5)

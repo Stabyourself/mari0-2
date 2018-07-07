@@ -232,10 +232,10 @@ function PhysObj:checkCollisions()
 end
 
 function PhysObj:resolveCollisions()
-	if VAR("tracerDebug") then
+	if VAR("debug").tracerDebug then
 		for _, group in pairs(self.tracers) do
 			for _, tracer in ipairs(group) do
-				tracer.traceLen = 0
+				tracer.tracedLength = 0
 			end
 		end
 	end

@@ -113,7 +113,8 @@ function Editor:load()
 
     self.menuBar:addChild(viewDropdown)
 
-    viewDropdown.box:addChild(Gui3.Checkbox:new(0, 0, "free camera", 1, function(checkbox) self:toggleFreeCam(checkbox.value) end))
+    self.freeCameraCheckbox = Gui3.Checkbox:new(0, 0, "free camera", 1, function(checkbox) self:toggleFreeCam(checkbox.value) end)
+    viewDropdown.box:addChild(self.freeCameraCheckbox)
     viewDropdown.box:addChild(Gui3.Checkbox:new(0, 11, "draw grid", 1, function(checkbox) self:toggleGrid(checkbox.value) end))
     viewDropdown.box:addChild(Gui3.Checkbox:new(0, 22, "hide ui", 1, function(checkbox) self:toggleUI(checkbox.value) end))
 
@@ -331,6 +332,8 @@ function Editor:updateScaleSlider()
 end
 
 function Editor:toggleFreeCam(on)
+    self.freeCameraCheckbox.value = on
+
     if on then
         self.level.camera.target = nil
         self.freeCamera = true

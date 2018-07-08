@@ -51,7 +51,7 @@ for _, v in ipairs(cubes) do
     tiles[v] = {collision = templates.cube}
 end
 
-tiles[3].nonPortalable = {true, false, false, false}
+tiles[3].nonPortalable = {false, true, false, true}
 
 local stampMaps = {
     {

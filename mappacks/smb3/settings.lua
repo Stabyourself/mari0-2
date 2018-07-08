@@ -1,6 +1,6 @@
 return {
     name = "It's the Super Mario Brothers Super Show!",
-    main = "slope-test.lua",
+    main = "1-1.lua",
 
     coin = {
         delays = {8/60},

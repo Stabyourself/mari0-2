@@ -82,7 +82,7 @@ function World:checkPortaling(obj, oldX, oldY)
         if p.open then
             local iX, iY = linesIntersect(oldX+obj.width/2, oldY+obj.height/2, obj.x+obj.width/2, obj.y+obj.height/2, p.x1, p.y1, p.x2, p.y2)
 
-            if iX then
+            if iX and sideOfLine(obj.x+obj.width/2, obj.y+obj.height/2, p.x1, p.y1, p.x2, p.y2) < 0 then -- don't portal when getting into portals from behind
                 local x, y, velocityX, velocityY = obj.x+obj.width/2, obj.y+obj.height/2, obj.speed[1], obj.speed[2]
                 local angle = math.atan2(velocityY, velocityX)
                 local speed = math.sqrt(velocityX^2+velocityY^2)
@@ -993,7 +993,7 @@ local windMill = {
     -1, 0
 }
 
-local function walkSide(self, layer, tile, tileX, tileY, side, dir)
+local function walkSide(self, layer, tile, tileX, tileY, side, dir) -- needs a rewrite.
     local nextX, nextY, angle, nextAngle, nextTileX, nextTileY, nextSide
     local x, y = 0, 0
     local first = true
@@ -1146,7 +1146,7 @@ local function walkSide(self, layer, tile, tileX, tileY, side, dir)
                 tileX = nextTileX
                 tileY = nextTileY
 
-                if not checkTile or not checkTile.collision then
+                if not checkTile or not checkTile.collision then -- make sure the potential next tile doesn't have a block blocking it
                     --check if next tile has a point on the same spot as nextX/nextY
                     if layer:inMap(tileX, tileY) then
                         local nextTile = layer:getTile(tileX, tileY)
@@ -1155,10 +1155,20 @@ local function walkSide(self, layer, tile, tileX, tileY, side, dir)
 
                             for i = 1, #points, 2 do
                                 if points[i] == x and points[i+1] == y then
+                                    local nextBlockSide = (i+1)/2
+
+                                    if dir == "anticlockwise" then
+                                        nextBlockSide = nextBlockSide - 1
+
+                                        if nextBlockSide == 0 then
+                                            nextBlockSide = #nextTile.collision/2
+                                        end
+                                    end
+
                                     -- check whether it's a platform and a wrong side
                                     if nextTile.props.exclusiveCollision and nextTile.props.exclusiveCollision ~= side then
                                         -- not valid
-                                    elseif not nextTile:sidePortalable((i+1)/2) then --todo: Buggy
+                                    elseif not nextTile:sidePortalable(nextBlockSide) then
                                         -- not valid either!
                                     else
                                         found = true

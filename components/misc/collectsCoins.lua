@@ -17,7 +17,7 @@ function collectsCoins:checkPos(x, y)
             local cell = layer:getCell(coordX, coordY)
 
             if cell.coin then
-                self.actor.world:collectCoin(layer, coordX, coordY, self.actor)
+                self.actor.world:collectCoin(self.actor, layer, coordX, coordY)
             end
         end
     end

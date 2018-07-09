@@ -1,3 +1,4 @@
+local PortalProjectile = require "class.PortalProjectile"
 local Component = require "class.Component"
 local portalGun = class("misc.portalGun", Component)
 
@@ -59,6 +60,15 @@ function portalGun:click(dt, actorEvent, button)
                     self.portals[button].timer = self.portals[button].connectsTo.timer
                 end
             end
+
+            -- Create projectile
+            table.insert(self.actor.world.portalProjectiles, PortalProjectile:new(
+                crosshair.origin.x,
+                crosshair.origin.y,
+                crosshair.target.worldX,
+                crosshair.target.worldY,
+                color
+            ))
         end
     end
 end

@@ -12,6 +12,7 @@ function Game:initialize(mappack, playerCount)
         table.insert(self.players, Player:new(i, SETTINGS.players[i]))
     end
 
+    -- Load the mappack
     self.mappack = Mappack:new(mappack)
 end
 
@@ -31,16 +32,18 @@ function Game:update(dt)
 
     self.level:update(dt)
 
-    if self.level.marios[1].y > self.level:getYEnd()*self.level.tileSize+.5 then
-        self.level.marios[1].y = -1
-    end
-
     prof.push("UI")
     if self.uiVisible then
+        smb3ui.time = love.timer.getFPS()--math.ceil(self.level.timeLeft)
+        smb3ui.pMeter = self.players[1].actor.pMeter or 0
+        smb3ui.score = self.players[1].score
+        smb3ui.lives = self.players[1].lives
+        smb3ui.coins = self.players[1].coins
+        smb3ui.world = 1
         smb3ui:update(dt)
     end
-    prof.pop()
-    prof.pop()
+    prof.pop("UI")
+    prof.pop("Game")
 end
 
 function Game:draw()
@@ -51,16 +54,10 @@ function Game:draw()
 
     prof.push("UI")
     if self.uiVisible then
-        smb3ui.time = love.timer.getFPS()--math.ceil(self.level.timeLeft)
-        smb3ui.pMeter = self.players[1].actor.pMeter or 0
-        smb3ui.score = self.players[1].score
-        smb3ui.lives = self.players[1].lives
-        smb3ui.coins = self.players[1].coins
-        smb3ui.world = 1
         smb3ui:draw()
     end
-    prof.pop()
-    prof.pop()
+    prof.pop("UI")
+    prof.pop("Game")
 end
 
 function Game:resize(w, h)

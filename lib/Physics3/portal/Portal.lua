@@ -2,12 +2,12 @@ PortalThing = require((...):gsub('%.Portal$', '') .. ".PortalThing")
 PortalParticle = require((...):gsub('%.Portal$', '') .. ".PortalParticle")
 local Portal = class("Portal")
 
-Portal.baseImg = love.graphics.newImage("img/portal-base.png")
-Portal.glowImg = love.graphics.newImage("img/portal-glow.png")
+local baseImg = love.graphics.newImage("img/portal-base.png")
+local glowImg = love.graphics.newImage("img/portal-glow.png")
 
-Portal.thingImg = love.graphics.newImage("img/portal-thing.png")
-Portal.thingSmallImg = love.graphics.newImage("img/portal-thing-small.png")
-Portal.thingMediumImg = love.graphics.newImage("img/portal-thing-medium.png")
+local thingImg = love.graphics.newImage("img/portal-thing.png")
+local thingSmallImg = love.graphics.newImage("img/portal-thing-small.png")
+local thingMediumImg = love.graphics.newImage("img/portal-thing-medium.png")
 
 local PORTALANIMATIONTIME = 1.5
 local PORTALMEDIUMLAG = 0.06
@@ -37,16 +37,16 @@ function Portal:initialize(world, x1, y1, x2, y2, color)
 
     for i = 1, PORTALTHINGS do
         for j = 1, 3 do
-            local img = self.thingImg
+            local img = thingImg
             local offset = (i-1)*PORTALTHINGDIFF
 
             if j == 2 then
-                img = self.thingMediumImg
+                img = thingMediumImg
                 offset = offset - math.pi*PORTALMEDIUMLAG
             end
 
             if j == 3 then
-                img = self.thingSmallImg
+                img = thingSmallImg
                 offset = offset - math.pi*PORTALSMALLLAG
             end
 
@@ -117,7 +117,7 @@ function Portal:draw(side)
 
         if self.open then
             love.graphics.setColor(1, 1, 1, glowA)
-            love.graphics.draw(self.glowImg, 0, 0, 0, math.max(0, self.size*self.openProgress-2), 1, .5, 16)
+            love.graphics.draw(glowImg, 0, 0, 0, math.max(0, self.size*self.openProgress-2), 1, .5, 16)
         end
 
     else
@@ -126,7 +126,7 @@ function Portal:draw(side)
         end
 
         love.graphics.setColor(self.color:rgb())
-        love.graphics.draw(self.baseImg, 0, 0, 0, self.size*self.openProgress, 1, .5, 1)
+        love.graphics.draw(baseImg, 0, 0, 0, self.size*self.openProgress, 1, .5, 1)
     end
 
     local mult = (self.size/2*self.openProgress - 2)

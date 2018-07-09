@@ -167,7 +167,6 @@ function Editor:load()
 
         self.toolbar:addChild(button)
 
-
         y = y + 14
     end
 
@@ -338,7 +337,7 @@ function Editor:toggleFreeCam(on)
         self.level.camera.target = nil
         self.freeCamera = true
     else
-        self.level.camera.target = self.level.marios[1]
+        self.level.camera.target = game.players[1].actor
         self.freeCamera = false
     end
 end

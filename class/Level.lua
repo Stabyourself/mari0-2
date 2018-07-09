@@ -11,7 +11,7 @@ function Level:initialize(path)
 
     self.timeLeft = 400
 
-    self.camera.target = self.marios[1]
+    self.camera.target = game.players[1].actor
 end
 
 function Level:loadLevel(data)
@@ -30,7 +30,8 @@ function Level:loadLevel(data)
     self.spawnLine = 0
     self.spawnI = 1
 
-    self.activeCells = {}
+    self.activeCells = {} -- These cells will have :update called on them until they remove themselves from this list. Used for block bouncing.
+    self.portalProjectiles = {} -- Portal projectiles, duh.
 
     self.spawnList = {}
     -- Parse entities
@@ -52,7 +53,6 @@ function Level:loadLevel(data)
     table.sort(self.spawnList, function(a, b) return a.x<b.x end)
 
     self.actors = {}
-    self.marios = {}
 
     local x, y = self:coordinateToWorld(self.spawnX-.5, self.spawnY)
 
@@ -68,19 +68,22 @@ function Level:loadLevel(data)
             mario.palette = player.palette
         end
 
-        table.insert(self.marios, mario)
         table.insert(self.actors, mario)
     end
 
     self.camera = Camera.new(CAMERAWIDTH/2, CAMERAHEIGHT/2, CAMERAWIDTH, CAMERAHEIGHT)
-    self.camera:lookAt(self.marios[1].x, self.marios[1].y)
+    self.camera:lookAt(game.players[1].actor.x, game.players[1].actor.y)
 
     -- self:spawnActors(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
 end
 
 function Level:update(dt)
     self.timeLeft = math.max(0, self.timeLeft-(60/42)*dt) -- that's 42.86% more second, per second!
+
     updateGroup(self.activeCells, dt)
+    updateGroup(self.portalProjectiles, dt)
+
+    print(#self.portalProjectiles)
 
     prof.push("World")
     Physics3.World.update(self, dt)
@@ -97,6 +100,10 @@ function Level:update(dt)
     end
     prof.pop()
 
+    if game.players[1].actor.y > self:getYEnd()*self.tileSize+.5 then
+        game.players[1].actor.y = -1
+    end
+
     -- local newSpawnLine = self.camera.x/self.tileSize+WIDTH+VAR("enemiesSpawnAhead")+2
     -- if newSpawnLine > self.spawnLine then
     --     self:spawnActors(newSpawnLine)
@@ -110,25 +117,29 @@ function Level:draw()
     Physics3.World.draw(self)
     prof.pop()
 
+    for _, portalProjectile in ipairs(self.portalProjectiles) do
+        portalProjectile:draw()
+    end
+
     self.camera:detach()
 end
 
 function Level:cmdpressed(cmds)
     if cmds["jump"] then
-        self.marios[1]:event("jump")
+        game.players[1].actor:event("jump")
     end
 
     if cmds["run"] then
-        self.marios[1]:event("action")
+        game.players[1].actor:event("action")
     end
 
     if cmds["closePortals"] then
-        self.marios[1]:event("closePortals")
+        game.players[1].actor:event("closePortals")
     end
 
     if cmds["debug.star"] then -- debug
-        self.marios[1]:removeComponent("smb3.star")
-        self.marios[1]:addComponent("smb3.star")
+        game.players[1].actor:removeComponent("smb3.star")
+        game.players[1].actor:addComponent("smb3.star")
     end
 end
 
@@ -210,10 +221,11 @@ function Level:updateCamera(dt)
     end
 end
 
-function Level:bumpBlock(cell)
+function Level:bumpBlock(cell, actor)
     local tile = cell.tile
 
     if tile.breakable or tile.props.holdsItems then
+        -- Make it bounce
         cell:bounce()
         table.insert(self.activeCells, cell)
 
@@ -222,11 +234,19 @@ function Level:bumpBlock(cell)
 
             cell.tile = turnIntoTile
         end
+
+        -- Check what's inside
+        local item = tile.props.defaultItem
+        if item == "coin" then
+            self:collectCoin(actor)
+        end
     end
 end
 
-function Level:collectCoin(layer, x, y, actor)
-    layer.map[x][y].coin = false
+function Level:collectCoin(actor, layer, x, y)
+    if layer then
+        layer.map[x][y].coin = false
+    end
     actor.player.coins = actor.player.coins + 1
 end
 

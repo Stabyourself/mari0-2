@@ -494,7 +494,7 @@ function World:advancedPhysicsDebug()
             for y = 0, CAMERAHEIGHT-1 do
                 local worldX = math.round(self.camera.x-CAMERAWIDTH/2+x)
                 local worldY = math.round(self.camera.y-CAMERAHEIGHT/2+y)
-                if self:checkCollision(worldX, worldY, self.marios[1]) then
+                if self:checkCollision(worldX, worldY, game.players[1].actor) then
                     self.advancedPhysicsDebugImgData:setPixel(x, y, 1, 1, 1, 1)
                 end
             end

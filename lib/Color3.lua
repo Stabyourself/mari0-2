@@ -38,7 +38,7 @@ function Color:lighten(i)
 
     s = (1-i)*s
 
-    return Color.fromHSV(h, s, v, a)
+    return Color.HSVtoRGB(h, s, v, a)
 end
 
 function Color.HSVtoRGB(h, s, v, a)

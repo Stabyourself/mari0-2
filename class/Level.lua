@@ -83,7 +83,7 @@ function Level:update(dt)
     updateGroup(self.activeCells, dt)
     updateGroup(self.portalProjectiles, dt)
 
-    print(#self.portalProjectiles)
+    -- print(#self.portalProjectiles)
 
     prof.push("World")
     Physics3.World.update(self, dt)

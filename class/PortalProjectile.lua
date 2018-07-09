@@ -4,11 +4,13 @@ local PortalProjectile = class("PortalProjectile")
 local projectileImg = love.graphics.newImage("img/portal-projectile.png")
 
 PortalProjectile.speed = 1500
-PortalProjectile.nodeEvery = 20 -- every X pixels, one node
+PortalProjectile.nodeEvery = 10 -- every X pixels, one node
+PortalProjectile.nodeSineOffset = 0.5
 PortalProjectile.helixes = 2
+PortalProjectile.helixWidth = 3
 
-function PortalProjectile:initialize(startX, startY, endX, endY, color)
-    print(color)
+function PortalProjectile:initialize(level, startX, startY, endX, endY, color)
+    self.level = level
     self.startX = startX
     self.startY = startY
     self.endX = endX
@@ -25,6 +27,7 @@ function PortalProjectile:initialize(startX, startY, endX, endY, color)
     self.y = 0
 
     self.angle = math.atan2(self.diffY, self.diffX)
+    self.nodeAngle = self.angle+math.pi*0.5
     self.nodeDiffX = math.cos(self.angle)*self.nodeEvery
     self.nodeDiffY = math.sin(self.angle)*self.nodeEvery
 
@@ -34,39 +37,64 @@ function PortalProjectile:initialize(startX, startY, endX, endY, color)
 
     self.nodes = {}
     self.latestNode = -1
+
+    self.helixNodes = {}
+    for h = 1, self.helixes do
+        self.helixNodes[h] = {}
+    end
+end
+
+function PortalProjectile:makeNode(i)
+    -- calculate x, y
+    local baseX = self.startX + i*self.nodeDiffX
+    local baseY = self.startY + i*self.nodeDiffY
+
+    -- mek ned
+    for h = 1, self.helixes do
+        local nodeR = (math.pi*2*(h/self.helixes) + self.nodeSineOffset*i)
+
+        local dist = math.sin(nodeR)*self.helixWidth
+        local x = baseX + math.cos(self.nodeAngle)*dist
+        local y = baseY + math.sin(self.nodeAngle)*dist
+
+        local node = PortalProjectileNode:new(x, y, self.color, self.helixNodes[h], i)
+
+        table.insert(self.nodes, node)
+        table.insert(self.helixNodes[h], node)
+    end
 end
 
 function PortalProjectile:update(dt)
     self.t = self.t + dt
-    self.progress = math.min(1, Easing.linear(self.t, 0, 1, self.flightTime))
+    if self.progress < 1 then
+        self.progress = Easing.linear(self.t, 0, 1, self.flightTime)
 
-    local oldX = self.x
-    local oldY = self.y
+        local oldX = self.x
+        local oldY = self.y
 
-    self.x = self.startX + self.diffX * self.progress
-    self.y = self.startY + self.diffY * self.progress
+        self.x = self.startX + self.diffX * self.progress
+        self.y = self.startY + self.diffY * self.progress
 
-    -- create any sidehoes
-    -- get the last node that should be there
-    local newLatestNode = math.floor(self.progress*self.distance / self.nodeEvery)
+        -- create any sidehoes
+        -- get the last node that should be there
+        local newLatestNode = math.floor(self.progress*self.distance / self.nodeEvery)
 
-    for i = self.latestNode+1, newLatestNode do
-        -- calculate x, y
-        local x = self.startX + i*self.nodeDiffX
-        local y = self.startY + i*self.nodeDiffY
+        for i = self.latestNode+1, newLatestNode do
+            self:makeNode(i)
+        end
 
-        -- mek ned
-        local node = PortalProjectileNode:new(x, y, self.angle, i)
-        -- node.parent = self.nodes[] -- maybe
-        table.insert(self.nodes, node)
+        self.latestNode = newLatestNode
+
+        if self.progress >= 1 then
+            -- insert last position into nodes
+            self:makeNode(self.distance/self.nodeEvery)
+        end
     end
-
-    self.latestNode = newLatestNode
 
     -- Update the existing nodes
     updateGroup(self.nodes, dt)
 
-    return self.progress >= 1 and #self.nodes == 0
+    return self.t > self.flightTime + 1
 end
 
 local coordinates = {}
@@ -78,21 +106,9 @@ function PortalProjectile:draw()
     end
 
     -- connect the dots!
-    if #self.nodes >= 1 then -- need a node to correctly draw a line
-        for i = 1, self.helixes do
-            iClearTable(coordinates)
-
-            for _, node in ipairs(self.nodes) do
-                local x, y = node:getPosition(i, self.helixes)
-                table.insert(coordinates, x)
-                table.insert(coordinates, y)
-            end
-
-            -- insert the current position for good luck
-            table.insert(coordinates, self.x)
-            table.insert(coordinates, self.y)
-
-            love.graphics.line(coordinates)
+    for _, node in ipairs(self.nodes) do
+        if self.level:objVisible(node.x, node.y, 0, 0) then
+            node:draw()
         end
     end
 end

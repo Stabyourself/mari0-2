@@ -63,6 +63,7 @@ function portalGun:click(dt, actorEvent, button)
 
             -- Create projectile
             table.insert(self.actor.world.portalProjectiles, PortalProjectile:new(
+                self.actor.world,
                 crosshair.origin.x,
                 crosshair.origin.y,
                 crosshair.target.worldX,

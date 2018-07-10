@@ -3,7 +3,7 @@ local PortalProjectile = class("PortalProjectile")
 
 local projectileImg = love.graphics.newImage("img/portal-projectile.png")
 
-PortalProjectile.speed = 1500
+PortalProjectile.speed = 3000--math.huge
 PortalProjectile.nodeEvery = 10 -- every X pixels, one node
 PortalProjectile.nodeSineOffset = 0.5
 PortalProjectile.helixes = 2
@@ -77,7 +77,7 @@ function PortalProjectile:update(dt)
 
         -- create any sidehoes
         -- get the last node that should be there
-        local newLatestNode = math.floor(self.progress*self.distance / self.nodeEvery)
+        local newLatestNode = math.floor(math.min(1, self.progress)*self.distance / self.nodeEvery)
 
         for i = self.latestNode+1, newLatestNode do
             self:makeNode(i)

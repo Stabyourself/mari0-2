@@ -245,7 +245,7 @@ function Editor:update(dt)
             x = x/16 - self.level:getXStart()
             y = y/16 - self.level:getYStart()
 
-            window:updateBorder(x*3, y*3, CAMERAWIDTH/16+1, CAMERAHEIGHT/16+1)
+            --x*3, y*3, CAMERAWIDTH/16+1, CAMERAHEIGHT/16+1
         end
     end
     prof.pop()
@@ -749,18 +749,10 @@ function Editor:updateMinimap()
     end
 
     self.minimapImg = love.graphics.newImage(self.minimapImgData)
-
-    -- update all minimap windows
-
-    for _, window in ipairs(self.windows) do
-        if window:isInstanceOf(self.windowClasses.minimap) then
-            window:updateImg(self.minimapImg)
-        end
-    end
 end
 
 function Editor:drawMinimap()
-    love.graphics.draw(self.minimapImg)
+    love.graphics.draw(self.minimapImg, 0, 0, 0, 3, 3)
 end
 
 return Editor

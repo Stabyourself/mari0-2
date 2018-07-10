@@ -38,10 +38,22 @@ function PortalProjectile:initialize(level, startX, startY, endX, endY, color)
     self.nodes = {}
     self.latestNode = -1
 
+    self.lastNodes = {}
     self.helixNodes = {}
     for h = 1, self.helixes do
         self.helixNodes[h] = {}
+        self.lastNodes[h] = PortalProjectileNode:new(self.x, self.y, self.color)
     end
+end
+
+function PortalProjectile:getPointOffset(i, h)
+    local nodeR = (math.pi*2*(h/self.helixes) + self.nodeSineOffset*i)
+
+    local dist = math.sin(nodeR)*self.helixWidth
+    local x = math.cos(self.nodeAngle)*dist
+    local y = math.sin(self.nodeAngle)*dist
+
+    return x, y
 end
 
 function PortalProjectile:makeNode(i)
@@ -51,13 +63,12 @@ function PortalProjectile:makeNode(i)
 
     -- mek ned
     for h = 1, self.helixes do
-        local nodeR = (math.pi*2*(h/self.helixes) + self.nodeSineOffset*i)
+        local xAdd, yAdd = self:getPointOffset(i, h)
 
-        local dist = math.sin(nodeR)*self.helixWidth
-        local x = baseX + math.cos(self.nodeAngle)*dist
-        local y = baseY + math.sin(self.nodeAngle)*dist
+        local x = baseX + xAdd
+        local y = baseY + yAdd
 
-        local node = PortalProjectileNode:new(x, y, self.color, self.helixNodes[h], i)
+        local node = PortalProjectileNode:new(x, y, self.color, self.helixNodes[h], i, self.lastNodes[h])
 
         table.insert(self.nodes, node)
         table.insert(self.helixNodes[h], node)
@@ -67,7 +78,7 @@ end
 function PortalProjectile:update(dt)
     self.t = self.t + dt
     if self.progress < 1 then
-        self.progress = Easing.linear(self.t, 0, 1, self.flightTime)
+        self.progress = math.min(1, Easing.linear(self.t, 0, 1, self.flightTime))
 
         local oldX = self.x
         local oldY = self.y
@@ -77,7 +88,8 @@ function PortalProjectile:update(dt)
 
         -- create any sidehoes
         -- get the last node that should be there
-        local newLatestNode = math.floor(math.min(1, self.progress)*self.distance / self.nodeEvery)
+        local currentI = math.min(1, self.progress)*self.distance / self.nodeEvery
+        local newLatestNode = math.floor(currentI)
 
         for i = self.latestNode+1, newLatestNode do
             self:makeNode(i)
@@ -85,9 +97,12 @@ function PortalProjectile:update(dt)
 
         self.latestNode = newLatestNode
 
-        if self.progress >= 1 then
-            -- insert last position into nodes
-            self:makeNode(self.distance/self.nodeEvery)
+        -- Update lastNode
+        for h = 1, self.helixes do
+            local xAdd, yAdd = self:getPointOffset(currentI, h)
+
+            self.lastNodes[h].x = self.x + xAdd
+            self.lastNodes[h].y = self.y + yAdd
         end
     end
 
@@ -100,8 +115,8 @@ end
 local coordinates = {}
 
 function PortalProjectile:draw()
-    love.graphics.setColor(self.color:rgb())
-    if self.progress < 1 then
+    if self.progress < 1 then -- as long as the projectile is moving, draw it
+        love.graphics.setColor(self.color:rgb())
         love.graphics.draw(projectileImg, self.x, self.y, 0, 1, 1, 4, 4)
     end
 

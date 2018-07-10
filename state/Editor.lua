@@ -194,7 +194,6 @@ function Editor:load()
 end
 
 function Editor:update(dt)
-    self:updateMinimap()
     prof.push("Editor")
     prof.push("UI")
     self.canvas:update(dt)
@@ -596,8 +595,6 @@ function Editor:loadLevel(path)
     self.level:loadLevel(data)
 
     self.activeLayer = self.level.layers[1]
-
-    self:updateMinimap()
 end
 
 function Editor:clearSelection()
@@ -636,6 +633,8 @@ function Editor:saveState()
     table.insert(self.editorStates, 1, EditorState:new(self))
 
     self.editorState = 1
+
+    self:updateMinimap()
 end
 
 function Editor:undo()

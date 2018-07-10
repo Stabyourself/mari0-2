@@ -84,7 +84,6 @@ function Paint:mousepressed(x, y, button)
         end
 
         self.editor:saveState()
-        self.editor:updateMinimap()
 
         self.lastX = coordX
         self.lastY = coordY
@@ -104,7 +103,6 @@ function Paint:mousereleased(x, y, button)
         self.penDown = false
 
         self.editor:saveState()
-        self.editor:updateMinimap()
     end
 end
 

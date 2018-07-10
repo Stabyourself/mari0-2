@@ -10,8 +10,6 @@ function Crosshair:initialize(obj)
 end
 
 function Crosshair:update(dt)
-    self.t = self.t + dt
-
     prof.push("Raycast")
     local layer, tileX, tileY, worldX, worldY, blockSide = self.obj.world:rayCast(
         self.origin.x/self.obj.world.tileSize,
@@ -73,6 +71,14 @@ function Crosshair:update(dt)
 end
 
 function Crosshair:draw()
+
+end
+
+
+
+local LineCrosshair = class("LineCrosshair", Crosshair)
+
+function LineCrosshair:draw()
     if self.target.valid then
         if self.portalPossible then
             love.graphics.setColor(0, 1, 0)
@@ -95,8 +101,16 @@ DottedCrosshair.dotSize = 1
 DottedCrosshair.fadeInDistance = 16
 DottedCrosshair.fadeInLength = 12
 
-function DottedCrosshair:initialize(mario)
-    Crosshair.initialize(self, mario)
+function DottedCrosshair:initialize(actor)
+    self.t = 0
+
+    Crosshair.initialize(self, actor)
+end
+
+function DottedCrosshair:update(dt)
+    self.t = self.t + dt
+
+    Crosshair.update(self, dt)
 end
 
 function DottedCrosshair:draw()
@@ -134,4 +148,4 @@ function DottedCrosshair:draw()
     love.graphics.draw(self.targetImg, self.target.worldX, self.target.worldY, self.target.angle, 1, 1, 4, 8)
 end
 
-return {Crosshair = Crosshair, DottedCrosshair = DottedCrosshair}
+return {Crosshair = Crosshair, LineCrosshair = LineCrosshair, DottedCrosshair = DottedCrosshair}

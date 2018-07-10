@@ -6,7 +6,7 @@ PortalProjectileNode.speedChange = 100
 PortalProjectileNode.lineMax = 15
 PortalProjectileNode.lineMin = 5
 PortalProjectileNode.maxAlpha = 1
-PortalProjectileNode.connectWith = 2
+PortalProjectileNode.connectNumber = 2
 
 function PortalProjectileNode.getAlpha(dist)
     if dist > PortalProjectileNode.lineMax then
@@ -18,7 +18,7 @@ function PortalProjectileNode.getAlpha(dist)
     end
 end
 
-function PortalProjectileNode:initialize(x, y, color, nodes, i)
+function PortalProjectileNode:initialize(x, y, color, nodes, i, lastNode)
     self.x = x
     self.y = y
     self.color = Color3.fromRGB(color:lighten(love.math.random(0, 80)/100))
@@ -28,6 +28,7 @@ function PortalProjectileNode:initialize(x, y, color, nodes, i)
 
     self.nodes = nodes
     self.i = i
+    self.lastNode = lastNode
 
     self.t = 0
 end
@@ -49,25 +50,26 @@ function PortalProjectileNode:draw()
         local r, g, b = self.color:rgb()
         local fadeA = (1-self.t/self.duration) * self.maxAlpha
 
-        for i = self.i+1, self.i+1+self.connectWith do
-            local node = self.nodes[i]
-
-            if node then
-                local dist = math.sqrt((self.x-node.x)*(self.x-node.x) + (self.y-node.y)*(self.y-node.y))
-
-                local a = self.getAlpha(dist)
-
-                if a then
-                    a = a * fadeA
-
-                    love.graphics.setColor(r, g, b, a)
-                    love.graphics.line(self.x, self.y, node.x, node.y)
-                end
-            end
+        for i = self.i+1, math.min(#self.nodes, self.i+1+self.connectNumber) do
+            self:connectWith(self.nodes[i], r, g, b, fadeA)
         end
+        self:connectWith(self.lastNode, r, g, b, fadeA)
 
         love.graphics.setColor(r, g, b, fadeA)
         love.graphics.rectangle("fill", self.x-.5, self.y-.5, 1, 1)
+    end
+end
+
+function PortalProjectileNode:connectWith(node, r, g, b, a)
+    local dist = math.sqrt((self.x-node.x)*(self.x-node.x) + (self.y-node.y)*(self.y-node.y))
+
+    local distA = self.getAlpha(dist)
+
+    if distA then
+        a = a * distA
+
+        love.graphics.setColor(r, g, b, a)
+        love.graphics.line(self.x, self.y, node.x, node.y)
     end
 end
 

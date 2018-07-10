@@ -194,6 +194,7 @@ function Editor:load()
 end
 
 function Editor:update(dt)
+    self:updateMinimap()
     prof.push("Editor")
     prof.push("UI")
     self.canvas:update(dt)
@@ -731,22 +732,22 @@ function Editor:updateMinimap()
     local width = xEnd - xStart + 1
     local height = yEnd - yStart + 1
 
-    self.minimapImgData = love.image.newImageData(width, height)
-
-    for y = 1, height do
-        for x = 1, width do
-            local tileX = xStart + x - 1
-            local tileY = yStart + y - 1
-
-            local tile = self.level:getTile(tileX, tileY)
-
-            if tile then
-                self.minimapImgData:setPixel(x-1, y-1, unpack(tile:getAverageColor()))
-            else
-                self.minimapImgData:setPixel(x-1, y-1, unpack(self.level.backgroundColor))
-            end
-        end
+    if not self.minimapImgData then
+        self.minimapImgData = love.image.newImageData(width, height)
     end
+
+    self.minimapImgData:mapPixel(function (x, y)
+        local tileX = xStart + x
+        local tileY = yStart + y
+
+        local tile = self.level:getTile(tileX, tileY)
+
+        if tile then
+            return unpack(tile:getAverageColor())
+        else
+            return unpack(self.level.backgroundColor)
+        end
+    end)
 
     self.minimapImg = love.graphics.newImage(self.minimapImgData)
 end

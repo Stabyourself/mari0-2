@@ -212,24 +212,6 @@ function pointInTriangle(x, y, t) -- Credits to https://stackoverflow.com/questi
     return s >= 0 and t >= 0 and (s + t) <= 2 * A * sign
 end
 
-function paletteSwap(imgData, swaps)
-    for y = 0, imgData:getHeight()-1 do
-        for x = 0, imgData:getWidth()-1 do
-            for _, swap in ipairs(swaps) do
-                local r, g, b, a = imgData:getPixel(x, y)
-
-                if r == swap[1][1] and g == swap[1][2] and b == swap[1][3] then
-                    imgData:setPixel(x, y, swap[2][1], swap[2][2], swap[2][3], a)
-
-                    break
-                end
-            end
-        end
-    end
-
-    return imgData
-end
-
 function normalizeAngle(a)
 	a = math.fmod(a+math.pi, math.pi*2)-math.pi
     a = math.fmod(a-math.pi, math.pi*2)+math.pi

@@ -488,17 +488,19 @@ end
 
 function World:advancedPhysicsDebug()
     if not self.advancedPhysicsDebugImg or true then
-        self.advancedPhysicsDebugImgData = love.image.newImageData(CAMERAWIDTH, CAMERAHEIGHT)
-
-        for x = 0, CAMERAWIDTH-1 do
-            for y = 0, CAMERAHEIGHT-1 do
-                local worldX = math.round(self.camera.x-CAMERAWIDTH/2+x)
-                local worldY = math.round(self.camera.y-CAMERAHEIGHT/2+y)
-                if self:checkCollision(worldX, worldY, game.players[1].actor) then
-                    self.advancedPhysicsDebugImgData:setPixel(x, y, 1, 1, 1, 1)
-                end
-            end
+        if not self.advancedPhysicsDebugImgData then
+            self.advancedPhysicsDebugImgData = love.image.newImageData(CAMERAWIDTH, CAMERAHEIGHT)
         end
+
+        self.advancedPhysicsDebugImgData:mapPixel(function (x, y)
+            local worldX = math.round(self.camera.x-CAMERAWIDTH/2+x)
+            local worldY = math.round(self.camera.y-CAMERAHEIGHT/2+y)
+            if self:checkCollision(worldX, worldY, game.players[1].actor) then
+                return 1, 1, 1, 1
+            else
+                return 1, 1, 1, 0
+            end
+        end)
 
         self.advancedPhysicsDebugImg = love.graphics.newImage(self.advancedPhysicsDebugImgData)
     end

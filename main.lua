@@ -102,6 +102,7 @@ local function setColorBasedOn(key)
 end
 
 function love.draw()
+    paletteShader.on({{0, 0, 0, 1}}, {{1, 0, 0, 1}})
     prof.push("draw")
     love.graphics.scale(VAR("scale"), VAR("scale"))
 

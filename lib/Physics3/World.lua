@@ -556,6 +556,10 @@ function World:checkCollision(x, y, obj, vector)
         end
     end
 
+    if x < 0 or x >= self:getXEnd()*16 then -- todo: bad for performance due to recalculation of XEnd!
+        return fakeCellInstance
+    end
+
     -- World
     for _, layer in ipairs(self.layers) do
         local cell = layer:checkCollision(x, y, obj, vector)

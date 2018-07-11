@@ -15,7 +15,8 @@ function PortalThing:draw(side, color, mult)
     if  side == "foreground" and self.a <= math.pi*0.5 and self.a > -math.pi*0.5 or
         side == "background" and (self.a > math.pi*0.5 or self.a <= -math.pi*0.5) then
         --darken based on distance to "front"
-        local darken = math.abs(self.a)/math.pi*0.6
+        local darken = math.abs(self.a)/math.pi*0.8
+
         love.graphics.setColor(color:darken(darken))
 
         local x = math.sin(self.a)

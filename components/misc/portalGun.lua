@@ -3,8 +3,8 @@ local Component = require "class.Component"
 local portalGun = class("misc.portalGun", Component)
 
 portalGun.defaultColors = {
-    Color3.fromHSV(200/360, 0.76, 0.99),
-    Color3.fromHSV(30/360, 0.87, 0.91),
+    Color3.fromHSL(200/360, 0.97, 0.61),
+    Color3.fromHSL(30/360, 0.81, 0.51),
 }
 
 function portalGun:initialize(actor, args)

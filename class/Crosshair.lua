@@ -80,7 +80,7 @@ local LineCrosshair = class("LineCrosshair", Crosshair)
 
 function LineCrosshair:draw()
     if self.target.valid then
-        if self.portalPossible then
+        if self.target.portalPossible then
             love.graphics.setColor(0, 1, 0)
         else
             love.graphics.setColor(1, 0, 0)

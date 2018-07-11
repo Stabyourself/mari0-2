@@ -94,7 +94,7 @@ function Portal:update(dt)
         end
     end
 
-    -- Update the things (the ting goes boom kakakakaka)
+    -- Update the things
 
     local a = math.fmod(self.timer, PORTALANIMATIONTIME)/PORTALANIMATIONTIME*math.pi*2
 

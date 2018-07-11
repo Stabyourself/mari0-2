@@ -187,8 +187,6 @@ function Editor:load()
 
     self.pastePos = {1, 1}
 
-    self:updateMinimap()
-
     self:toggleGrid(false)
     self:toggleFreeCam(false)
 end

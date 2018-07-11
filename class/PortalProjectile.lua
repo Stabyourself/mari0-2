@@ -7,7 +7,6 @@ PortalProjectile.speed = 3000--math.huge
 PortalProjectile.nodeEvery = 10 -- every X pixels, one node
 PortalProjectile.nodeSineOffset = 0.5
 PortalProjectile.helixes = 2
-PortalProjectile.helixWidth = 3
 
 function PortalProjectile:initialize(level, startX, startY, endX, endY, color)
     self.level = level
@@ -27,7 +26,6 @@ function PortalProjectile:initialize(level, startX, startY, endX, endY, color)
     self.y = 0
 
     self.angle = math.atan2(self.diffY, self.diffX)
-    self.nodeAngle = self.angle+math.pi*0.5
     self.nodeDiffX = math.cos(self.angle)*self.nodeEvery
     self.nodeDiffY = math.sin(self.angle)*self.nodeEvery
 
@@ -38,37 +36,22 @@ function PortalProjectile:initialize(level, startX, startY, endX, endY, color)
     self.nodes = {}
     self.latestNode = -1
 
-    self.lastNodes = {}
+    self.fakeLastNodes = {}
     self.helixNodes = {}
     for h = 1, self.helixes do
         self.helixNodes[h] = {}
-        self.lastNodes[h] = PortalProjectileNode:new(self.x, self.y, self.color)
+        self.fakeLastNodes[h] = PortalProjectileNode:new(self.x, self.y, self.angle, h, 0, self.color)
     end
 end
 
-function PortalProjectile:getPointOffset(i, h)
-    local nodeR = (math.pi*2*(h/self.helixes) + self.nodeSineOffset*i)
-
-    local dist = math.sin(nodeR)*self.helixWidth
-    local x = math.cos(self.nodeAngle)*dist
-    local y = math.sin(self.nodeAngle)*dist
-
-    return x, y
-end
-
-function PortalProjectile:makeNode(i)
+function PortalProjectile:makeNode(i, isLastNode)
     -- calculate x, y
-    local baseX = self.startX + i*self.nodeDiffX
-    local baseY = self.startY + i*self.nodeDiffY
+    local x = self.startX + i*self.nodeDiffX
+    local y = self.startY + i*self.nodeDiffY
 
     -- mek ned
     for h = 1, self.helixes do
-        local xAdd, yAdd = self:getPointOffset(i, h)
-
-        local x = baseX + xAdd
-        local y = baseY + yAdd
-
-        local node = PortalProjectileNode:new(x, y, self.color, self.helixNodes[h], i, self.lastNodes[h])
+        local node = PortalProjectileNode:new(x, y, self.angle, h, (math.pi*2*(h/self.helixes) + self.nodeSineOffset*i), self.color, self.helixNodes[h], i, isLastNode)
 
         table.insert(self.nodes, node)
         table.insert(self.helixNodes[h], node)
@@ -78,7 +61,7 @@ end
 function PortalProjectile:update(dt)
     self.t = self.t + dt
     if self.progress < 1 then
-        self.progress = math.min(1, Easing.linear(self.t, 0, 1, self.flightTime))
+        self.progress = Easing.linear(self.t, 0, 1, self.flightTime)
 
         local oldX = self.x
         local oldY = self.y
@@ -97,19 +80,30 @@ function PortalProjectile:update(dt)
 
         self.latestNode = newLatestNode
 
-        -- Update lastNode
-        for h = 1, self.helixes do
-            local xAdd, yAdd = self:getPointOffset(currentI, h)
+        if self.progress >= 1 then
+            -- Create the last node
+            self:makeNode(currentI, true)
 
-            self.lastNodes[h].x = self.x + xAdd
-            self.lastNodes[h].y = self.y + yAdd
+            for h = 1, self.helixes do
+                -- Remove the fake last node because we now have a real one
+                self.fakeLastNodes[h] = nil
+            end
+        else
+            -- Update fakeLastNode
+            for h = 1, self.helixes do
+                self.fakeLastNodes[h].helixR = (math.pi*2*(h/self.helixes) + self.nodeSineOffset*currentI)
+                local xAdd, yAdd = self.fakeLastNodes[h]:getHelixOffset()
+
+                self.fakeLastNodes[h].x = self.x + xAdd
+                self.fakeLastNodes[h].y = self.y + yAdd
+            end
         end
     end
 
     -- Update the existing nodes
     updateGroup(self.nodes, dt)
 
-    return self.t > self.flightTime + 1
+    return self.progress >= 1 and #self.nodes == 0
 end
 
 local coordinates = {}
@@ -123,7 +117,7 @@ function PortalProjectile:draw()
     -- connect the dots!
     for _, node in ipairs(self.nodes) do
         if self.level:objVisible(node.x, node.y, 0, 0) then
-            node:draw()
+            node:draw(self.fakeLastNodes[node.h])
         end
     end
 end

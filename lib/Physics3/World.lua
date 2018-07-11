@@ -157,6 +157,12 @@ function World:draw()
     end
     prof.pop()
 
+    prof.push("Behind objects")
+    if self.drawBehindObjects then
+        self:drawBehindObjects()
+    end
+    prof.pop()
+
     prof.push("Objects")
     -- Objects
     love.graphics.setColor(1, 1, 1)

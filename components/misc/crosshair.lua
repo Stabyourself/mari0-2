@@ -1,5 +1,5 @@
 local Component = require "class.Component"
-local DottedCrosshair = require("class.Crosshair").DottedCrosshair
+local DottedCrosshair = require("class.Crosshair").Crosshair
 local hasCrosshair = class("misc.hasCrosshair", Component)
 
 function hasCrosshair:initialize(actor, args)

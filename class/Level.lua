@@ -117,11 +117,13 @@ function Level:draw()
     Physics3.World.draw(self)
     prof.pop()
 
+    self.camera:detach()
+end
+
+function Level:drawBehindObjects()
     for _, portalProjectile in ipairs(self.portalProjectiles) do
         portalProjectile:draw()
     end
-
-    self.camera:detach()
 end
 
 function Level:cmdpressed(cmds)

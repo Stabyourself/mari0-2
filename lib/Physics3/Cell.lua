@@ -4,11 +4,11 @@ Cell:include(Physics3collisionMixin)
 Cell.bounceTime = 10/60
 Cell.bounceHeight = 10
 
-function Cell.bounceEase(a, b, c, d)
-    if a < d/2 then
-        return Easing.outQuad(a, b, c, d/2)
+function Cell.bounceEase(t, b, c, d)
+    if t < d/2 then
+        return Easing.outQuad(t, b, c, d/2)
     else
-        return Easing.inQuad(a-d/2, c, b-c, d/2)
+        return Easing.inQuad(t-d/2, c, b-c, d/2)
     end
 end
 

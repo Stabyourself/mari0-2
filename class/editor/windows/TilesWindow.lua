@@ -1,7 +1,5 @@
 local TilesWindow = class("TilesWindow")
 
--- DEFINITELY NOT TODO: make windows minimizable
-
 TilesWindow.x = 14
 TilesWindow.y = 14
 TilesWindow.width = 8*17+15

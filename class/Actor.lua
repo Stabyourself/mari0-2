@@ -154,32 +154,6 @@ function Actor:loadActorTemplate(actorTemplate)
 end
 
 function Actor:topCollision(obj2)
-
-    -- this part goes into "bumps blocks" or something
-
-    -- if obj2:isInstanceOf(Block) then
-    --     -- See if there's a better matching block (because Actor jumped near the edge of a block)
-    --     local toCheck = 0
-    --     local x, y = obj2.blockX, obj2.blockY
-
-    --     if self.x+self.width/2 > obj2.x+obj2.width then
-    --         toCheck = 1
-    --     elseif self.x+self.width/2 < obj2.x then
-    --         toCheck = -1
-    --     end
-
-    --     if toCheck ~= 0 then
-    --         if game.level:getTile(x+toCheck, y).collision then
-    --             x = x + toCheck
-    --         end
-    --     end
-
-    --     -- Todo: Do this
-    -- end
-
-    -- self.speed[2] = VAR("blockHitForce")
-
-    -- game.level:bumpBlock(x, y)
     self:event("topCollision", 0, obj2)
 end
 

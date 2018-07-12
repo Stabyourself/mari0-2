@@ -10,11 +10,8 @@ local MAXSPEEDS = {90, 150, 210}
 
 local FRICTION = 140.625 -- amount of speed that is substracted when not pushing buttons
 -- local FRICTIONICE = 42.1875 -- duh
--- local FRICTIONFLYSMALL = 56.25
--- local FRICTIONFLYBIG = 225
 
 local FRICTIONSKID = 450 -- turnaround speed
--- local FRICTIONSKIDFLY = 675 -- turnaround speed while flying
 -- local FRICTIONSKIDICE = 182.8125 -- turnaround speed on ice
 
 local PMETERTIMEUP = 8/60

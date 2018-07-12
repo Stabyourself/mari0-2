@@ -45,7 +45,9 @@ function Actor:event(eventName, dt, ...)
 
     for _, component in ipairs(self.components) do
         if component[eventName] then
+            prof.push(tostring(component.class) .. " " .. eventName)
             component[eventName](component, dt, self.actorEvent[eventName], ...)
+            prof.pop()
         end
     end
 

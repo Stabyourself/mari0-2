@@ -250,6 +250,15 @@ function Editor:update(dt)
     prof.pop()
 end
 
+local stencilXStart
+local stencilYStart
+local stencilXEnd
+local stencilYEnd
+
+local function candyStencil()
+    love.graphics.rectangle("fill", stencilXStart, stencilYStart, stencilXEnd-stencilXStart, stencilYEnd-stencilYStart)
+end
+
 function Editor:draw()
     prof.push("Editor")
     self.level.camera:attach(CAMERAOFFSETX, CAMERAOFFSETY)
@@ -259,15 +268,13 @@ function Editor:draw()
 
     -- Map bounds graphics
     prof.push("Candy")
-    love.graphics.stencil(function()
-        local xStart = (self.level:getXStart()-1)*16
-        local yStart = (self.level:getYStart()-1)*16
+    stencilXStart = (self.level:getXStart()-1)*16
+    stencilYStart = (self.level:getYStart()-1)*16
+    stencilXEnd = (self.level:getXEnd())*16
+    stencilYEnd = (self.level:getYEnd())*16
 
-        local xEnd = (self.level:getXEnd())*16
-        local yEnd = (self.level:getYEnd())*16
+    love.graphics.stencil(candyStencil)
 
-        love.graphics.rectangle("fill", xStart, yStart, xEnd-xStart, yEnd-yStart)
-    end)
     love.graphics.setStencilTest("notequal", 1)
 
     self.mapBoundsQuad:setViewport(self.level.camera.x%8, self.level.camera.y%8, xr-xl, yb-yt)

@@ -142,13 +142,29 @@ function World:checkPortaling(obj, oldX, oldY)
     return false
 end
 
+local function emptyStencil() end
+
+local outStencilP
+local function outStencil()
+    outStencilP.connectsTo:stencilRectangle("out")
+end
+
+local inStencilP
+local function inStencil()
+    inStencilP:stencilRectangle("in")
+end
+
+local inPortals = {}
+
 function World:draw()
     prof.push("Layers")
     -- Layers
     for i = #self.layers, 1, -1 do -- draw layers in reverse order (1 on top)
         self.layers[i]:draw()
+    end
 
-        if VAR("debug").layers then
+    if VAR("debug").layers then
+        for i = #self.layers, 1, -1 do
             self.layers[i]:debugDraw()
         end
     end
@@ -184,10 +200,10 @@ function World:draw()
             quadX = quadX + obj.centerX*2-obj.quadWidth
         end
 
-        love.graphics.stencil(function() end, "replace")
+        love.graphics.stencil(emptyStencil, "replace")
 
         -- Portal duplication
-        local inPortals = {}
+        iClearTable(inPortals)
 
         for _, p in ipairs(self.portals) do
             if p.open then
@@ -206,7 +222,8 @@ function World:draw()
                 xScale = -1
             end
 
-            love.graphics.stencil(function() p.connectsTo:stencilRectangle("out") end, "replace")
+            outStencilP = p
+            love.graphics.stencil(outStencil, "replace")
             love.graphics.setStencilTest("greater", 0)
 
             if VAR("debug").portalStencils then
@@ -233,11 +250,10 @@ function World:draw()
         end
 
         -- Actual position
-        love.graphics.stencil(function() end, "replace", 0, false)
+        love.graphics.stencil(emptyStencil, "replace", 0, false)
         for _, p in ipairs(inPortals) do
-            love.graphics.stencil(function()
-                p:stencilRectangle("in")
-            end, "replace", 1, true)
+            inStencilP = p
+            love.graphics.stencil(inStencil, "replace", 1, true)
         end
 
         if VAR("debug").portalStencils then
@@ -1224,8 +1240,10 @@ function World:checkPortalSurface(layer, tileX, tileY, side, worldX, worldY, ign
         return false
     end
 
+    prof.push("walkSide")
     local startX, startY = walkSide(self, layer, tile, tileX, tileY, side, "anticlockwise")
     local endX, endY = walkSide(self, layer, tile, tileX, tileY, side, "clockwise")
+    prof.pop()
 
     startX, startY = self:coordinateToWorld(startX, startY)
     endX, endY = self:coordinateToWorld(endX, endY)

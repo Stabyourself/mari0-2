@@ -10,7 +10,9 @@ end
 function ActorEvent:clear(name)
     self.name = name
     clearTable(self.binds)
-    clearTable(self.values)
+    for i, _ in pairs(self.values) do
+        clearTable(self.values[i])
+    end
     self.returns = nil
 end
 
@@ -57,7 +59,7 @@ function ActorEvent:setValue(name, value, priority)
         self.values[name] = {}
     end
 
-    table.insert(self.values[name], {value=value, priority=priority or 1})
+    table.insert(self.values[name], {value=value, priority=priority or 1}) -- todo: generates trash
 end
 
 return ActorEvent

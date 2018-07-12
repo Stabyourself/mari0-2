@@ -40,11 +40,12 @@ function Layer:draw()
     xEnd = math.clamp(xEnd, self:getXStart(), self:getXEnd())
     yEnd = math.clamp(yEnd, self:getYStart(), self:getYEnd())
 
+    local xOffset = math.ceil(self.xOffset)
+    local yOffset = math.ceil(self.yOffset)
+
     for x = xStart, xEnd do
         for y = yStart, yEnd do
-            if self:inMap(x, y) then
-                self:getCell(x, y):draw((x-1)*16+math.ceil(self.xOffset), (y-1)*16+math.ceil(self.yOffset))
-            end
+            self:getCell(x, y):draw((x-1)*16+xOffset, (y-1)*16+yOffset)
         end
     end
 end
@@ -60,8 +61,8 @@ function Layer:checkCollision(x, y, obj, vector)
         local tile = cell.tile
 
         if tile then
-            local inCellX = math.fmod(x, 16)
-            local inCellY = math.fmod(y, 16)
+            local inCellX = x%16
+            local inCellY = y%16
 
             if tile:checkCollision(inCellX, inCellY, obj, vector, cellX, cellY) then
                 return cell

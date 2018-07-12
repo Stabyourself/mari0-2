@@ -64,11 +64,11 @@ end
 
 function Tile:cacheCollisions()
 	if not self.collision or self.collision == VAR("tileTemplates").cube then
-		-- don't need to calculate collisions for this
+		-- don't need to calculate collisions for this (will never get checked on a pixel basis)
 		return
 	end
 
-	if self.collision and type(self.collision) == "table" then
+	if type(self.collision) == "table" then
 		self.collisionTriangulated = love.math.triangulate(self.collision)
 	end
 
@@ -127,9 +127,6 @@ function Tile:checkCollision(x, y, obj, vector, cellX, cellY)
 	if self.collision == VAR("tileTemplates").cube then -- optimization for cubes
 		return true
 	else
-		x = math.floor(x)
-		y = math.floor(y)
-
 		return self.collisionCache[x][y]
 	end
 end

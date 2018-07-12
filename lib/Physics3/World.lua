@@ -92,10 +92,13 @@ function World:checkPortaling(obj, oldX, oldY)
                 obj.x = outX
                 obj.y = outY
 
+                if outAngle < -math.pi*0.25 and outAngle > -math.pi*0.75 then -- todo: questionable way to ensure player makes it out of floorPortals
+                    speed = math.max(180, speed)
+                end
+
                 obj.speed[1] = math.cos(outAngle)*speed
                 obj.speed[2] = math.sin(outAngle)*speed
 
-                -- todo: do something to ensure the player makes it out of floor portals
 
                 obj.angle = normalizeAngle(obj.angle + angleDiff)
 

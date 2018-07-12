@@ -17,7 +17,7 @@ function floating:initialize(actor, args)
     self.actor.floatAnimationTimer = 0
 
     self.actor:registerState("float", function(actor, actorState)
-        if actorState.timer >= FLOATTIME then
+        if actor.speed[2] < 0 or actorState.timer >= FLOATTIME then
             return "fall"
         end
     end)

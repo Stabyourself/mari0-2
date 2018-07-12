@@ -99,7 +99,7 @@ DottedCrosshair.targetImg = love.graphics.newImage("img/crosshair-target.png")
 DottedCrosshair.dotDistance = 16
 DottedCrosshair.dotSize = 1
 DottedCrosshair.fadeInDistance = 16
-DottedCrosshair.fadeInLength = 12
+DottedCrosshair.fadeInLength = 4
 
 function DottedCrosshair:initialize(actor)
     self.t = 0
@@ -108,7 +108,7 @@ function DottedCrosshair:initialize(actor)
 end
 
 function DottedCrosshair:update(dt)
-    self.t = self.t + dt
+    self.t = (self.t + dt)%1
 
     Crosshair.update(self, dt)
 end
@@ -118,16 +118,19 @@ function DottedCrosshair:draw()
         return
     end
 
-    local dotCount = (self.length+self.dotSize)/self.dotDistance
+    -- Dots
+    local dotCount = (self.length-self.dotSize*.5)/self.dotDistance
+    local diffX = math.cos(self.angle)*self.dotDistance
+    local diffY = math.sin(self.angle)*self.dotDistance
 
     for i = 0, dotCount do
-        local factor = 1/dotCount*(i+self.t%1)
+        local tweenedI = i+self.t
 
-        if factor <= 1 - (self.dotSize/2)/self.length then
-            local x = self.origin.x+(self.target.worldX-self.origin.x)*factor
-            local y = self.origin.y+(self.target.worldY-self.origin.y)*factor
+        if tweenedI < dotCount then
+            local x = self.origin.x+diffX*tweenedI
+            local y = self.origin.y+diffY*tweenedI
 
-            local a = math.clamp(((factor*(self.length+self.dotSize))-self.fadeInDistance)/self.fadeInDistance, 0, 1)
+            local a = math.min(1, (tweenedI*self.dotDistance-self.fadeInDistance)/self.fadeInLength)
 
             if self.target.portalPossible then
                 love.graphics.setColor(0, 0.88, 0, a)
@@ -139,6 +142,7 @@ function DottedCrosshair:draw()
         end
     end
 
+    -- Target
     if self.target.portalPossible then
         love.graphics.setColor(0, 0.88, 0, a)
     else

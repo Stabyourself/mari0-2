@@ -283,9 +283,9 @@ function World:draw()
 end
 
 function drawObject(obj, x, y, r, sx, sy, cx, cy)
-    -- if obj.imgPalette and obj.palette then
-    --     paletteShader.on(obj.imgPalette, obj.palette)
-    -- end
+    if obj.imgPalette and obj.palette then
+        paletteShader.on(obj.imgPalette, obj.palette)
+    end
 
     if obj.quad then
         love.graphics.draw(obj.img, obj.quad, x, y, r, sx, sy, cx, cy)
@@ -293,9 +293,9 @@ function drawObject(obj, x, y, r, sx, sy, cx, cy)
         love.graphics.draw(obj.img, x, y, r, sx, sy, cx, cy)
     end
 
-    -- if obj.imgPalette and obj.palette then
-    --     paletteShader.off()
-    -- end
+    if obj.imgPalette and obj.palette then
+        paletteShader.off()
+    end
 end
 
 function World:addObject(PhysObj)

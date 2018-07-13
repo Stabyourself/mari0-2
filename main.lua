@@ -1,4 +1,5 @@
 --Mari0 2 - MIT License.
+-- require "errorhandler"
 require "loop"
 
 local Game, Editor
@@ -18,7 +19,6 @@ function love.load()
     love.window.setIcon(love.image.newImageData("img/icon.png"))
 
     love.graphics.setDefaultFilter("nearest", "nearest")
-
     -- Libs
     utf8 = require "utf8"
     class = require "lib.middleclass"
@@ -72,13 +72,12 @@ function love.load()
     game = Game:new("smb3", 1)
 
     gameStateManager:loadState(game)
-    -- gameStateManager:addState(Editor:new(game.level))
+    gameStateManager:addState(Editor:new(game.level))
 end
 
 function love.update(dt)
     require("lib/lovebird").update()
 
-    prof.push("frame")
     prof.push("update")
     dt = math.min(1/30, dt) -- Min 30 FPS
 
@@ -133,7 +132,6 @@ function love.draw()
         love.graphics.draw(funkyImg, love.graphics.getWidth(), 0, 0, 1, 1, 340)
     end
     prof.pop("draw")
-    prof.pop("frame")
 end
 
 function love.keypressed(key)

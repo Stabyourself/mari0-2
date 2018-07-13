@@ -1,4 +1,5 @@
 -- Controls library thing for Mari0 2. Feel free to use it, MIT License
+-- Mainly because none of the libs I found had modifiers
 
 local controls3 = {}
 local cmds = {}

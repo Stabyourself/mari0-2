@@ -181,12 +181,12 @@ function Editor:load()
 
     self.editorStates = {}
     self.editorState = 1
-    self:saveState()
 
     self.mapBoundsQuad = love.graphics.newQuad(0, 0, 8, 8, 8, 8)
 
     self.pastePos = {1, 1}
 
+    self:mapChanged()
     self:toggleGrid(false)
     self:toggleFreeCam(false)
 end
@@ -419,7 +419,7 @@ function Editor:cmdpressed(cmd)
         if self.selection then
             self.selection:delete()
 
-            self:saveState()
+            self:mapChanged()
         end
 
         if self.floatingSelection then
@@ -462,7 +462,7 @@ function Editor:cmdpressed(cmd)
             self.floatingSelection = FloatingSelection:new(self, self.clipboard, {self.pastePos[1], self.pastePos[2]})
             self.selection = nil
 
-            self:saveState()
+            self:mapChanged()
         end
 
     elseif cmd["editor.save"] then
@@ -630,7 +630,7 @@ function Editor:intersectSelection(selection)
     end
 end
 
-function Editor:saveState()
+function Editor:mapChanged()
     for i = 1, self.editorState-1 do
         table.remove(self.editorStates, 1)
     end
@@ -665,7 +665,7 @@ end
 
 function Editor:unFloatSelection()
     if self.floatingSelection then
-        self:saveState()
+        self:mapChanged()
 
         self.floatingSelection:unFloat()
         self.selection = self.floatingSelection:getSelection()

@@ -74,6 +74,10 @@ function Crosshair:draw()
 
 end
 
+function Crosshair:shoot()
+
+end
+
 
 
 local LineCrosshair = class("LineCrosshair", Crosshair)
@@ -100,15 +104,32 @@ DottedCrosshair.dotDistance = 16
 DottedCrosshair.dotSize = 1
 DottedCrosshair.fadeInDistance = 16
 DottedCrosshair.fadeInLength = 4
+DottedCrosshair.shootTime = 0.8
+DottedCrosshair.colorTime = 3
+DottedCrosshair.validColor = Color3:new(0, 0.88, 0)
+DottedCrosshair.invalidColor = Color3:new(1, 0, 0)
 
 function DottedCrosshair:initialize(actor)
     self.t = 0
+
+    self.shootTimer = self.shootTime
 
     Crosshair.initialize(self, actor)
 end
 
 function DottedCrosshair:update(dt)
-    self.t = (self.t + dt)%1
+    local shootTimeModifier = 0
+    if self.shootTimer < self.colorTime then
+        self.shootTimer = self.shootTimer + dt
+        shootTimeModifier = Easing.outQuad(math.min(self.shootTime, self.shootTimer), 5, -5, self.shootTime)
+
+        if self.shootTimer >= self.colorTime then
+            self.shootTimer = self.colorTime
+            self.overrideColor = nil
+        end
+    end
+
+    self.t = (self.t + dt + shootTimeModifier*dt)%1
 
     Crosshair.update(self, dt)
 end
@@ -132,11 +153,23 @@ function DottedCrosshair:draw()
 
             local a = math.min(1, (tweenedI*self.dotDistance-self.fadeInDistance)/self.fadeInLength)
 
+            local color
+
             if self.target.portalPossible then
-                love.graphics.setColor(0, 0.88, 0, a)
+                color = self.validColor
             else
-                love.graphics.setColor(1, 0, 0, a)
+                color = self.invalidColor
             end
+
+            if self.overrideColor then
+                local fade = Easing.outQuad(self.shootTimer, 1, -1, self.colorTime)
+
+                r, g, b = color:fadeTo(self.overrideColor, fade)
+            else
+                r, g, b = color:rgb()
+            end
+
+            love.graphics.setColor(r, g, b, a)
 
             love.graphics.rectangle("fill", x-self.dotSize/2, y-self.dotSize/2, self.dotSize, self.dotSize)
         end
@@ -150,6 +183,11 @@ function DottedCrosshair:draw()
     end
 
     love.graphics.draw(self.targetImg, self.target.worldX, self.target.worldY, self.target.angle, 1, 1, 4, 8)
+end
+
+function DottedCrosshair:shoot(color)
+    self.shootTimer = 0
+    self.overrideColor = color
 end
 
 return {Crosshair = Crosshair, LineCrosshair = LineCrosshair, DottedCrosshair = DottedCrosshair}

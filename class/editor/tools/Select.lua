@@ -104,7 +104,7 @@ function Select:mousereleased(x, y, button)
             self.editor:clearSelection()
         end
 
-        self.editor:saveState()
+        self.editor:mapChanged()
 
         self.pressing = false
     end

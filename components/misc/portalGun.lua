@@ -70,6 +70,9 @@ function portalGun:click(dt, actorEvent, button)
                 crosshair.target.worldY,
                 color
             ))
+
+            -- Animate crosshair if it wants to
+            crosshair:shoot(color)
         end
     end
 end

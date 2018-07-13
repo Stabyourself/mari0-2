@@ -82,7 +82,7 @@ end
 function Stamp:stamp(x, y, w, h)
     self.stampMap:stamp(self.editor.activeLayer, x, y, w, h)
 
-    self.editor:saveState()
+    self.editor:mapChanged()
 end
 
 return Stamp

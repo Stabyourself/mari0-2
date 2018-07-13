@@ -65,7 +65,7 @@ function Fill:mousereleased(x, y, button)
 
         if x == self.pressingPos[1] and y == self.pressingPos[2] then
             self:fillTiles(self.toFill, self.editor.tools.paint.tile)
-            self.editor:saveState()
+            self.editor:mapChanged()
         end
     end
 

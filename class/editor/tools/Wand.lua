@@ -73,7 +73,7 @@ function Wand:mousereleased(x, y, button)
                     self.editor:replaceSelection(tiles)
                 end
 
-                self.editor:saveState()
+                self.editor:mapChanged()
             end
         end
     end

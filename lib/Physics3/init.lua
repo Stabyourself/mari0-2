@@ -1,4 +1,6 @@
--- Physics libary thing with pixel collisions. Feel free to use it, MIT License
+-- Physics libary thing with pixel collisions,
+-- modified for Mari0 2 (to the point of having to backport it if I wanna use it somewhere else).
+-- Feel free to use it, MIT License
 
 local Physics3 = {}
 

@@ -40,7 +40,7 @@ end
 
 function Erase:mousereleased(x, y, button)
     if self.penDown then
-        self.editor:saveState()
+        self.editor:mapChanged()
         self.penDown = false
     end
 end

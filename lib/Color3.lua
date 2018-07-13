@@ -18,7 +18,7 @@ function Color:initialize(r, g, b, a)
     self.r = r
     self.g = g
     self.b = b
-    self.a = a
+    self.a = a or 1
 end
 
 function Color:rgb()
@@ -43,6 +43,15 @@ function Color:lighten(i)
     l = l + (1-l)*i
 
     return Color.HSLtoRGB(h, s, l, a)
+end
+
+function Color:fadeTo(color2, i)
+    local r = self.r+(color2.r-self.r)*i
+    local g = self.g+(color2.g-self.g)*i
+    local b = self.b+(color2.b-self.b)*i
+    local a = self.a+(color2.a-self.a)*i
+
+    return r, g, b, a
 end
 
 local function hue2rgb(p, q, t)

@@ -6,8 +6,6 @@ function Mappack:initialize(name)
     self.path = "mappacks/" .. name .. "/"
 
     self:loadSettings("settings.lua")
-
-    self.coinTile = Physics3.Tile:new(nil, nil, nil, nil, nil, self.settings.coin, self.path)
 end
 
 function Mappack:loadSettings(settingsPath)

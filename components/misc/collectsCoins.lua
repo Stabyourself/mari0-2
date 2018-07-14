@@ -14,9 +14,9 @@ function collectsCoins:checkPos(x, y)
 
     for _, layer in ipairs(self.actor.world.layers) do
         if layer:inMap(coordX, coordY) then
-            local cell = layer:getCell(coordX, coordY)
+            local tile = layer:getTile(coordX, coordY)
 
-            if cell.coin then
+            if tile and tile.props.coin then
                 self.actor.world:collectCoin(self.actor, layer, coordX, coordY)
             end
         end

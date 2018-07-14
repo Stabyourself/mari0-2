@@ -14,7 +14,6 @@ end
 
 function Cell:initialize(tile)
     self.tile = tile
-    self.coin = false
 
     self.bounceTimer = self.bounceTime
 end
@@ -36,10 +35,6 @@ function Cell:draw(x, y)
         end
 
         self.tile:draw(x, y-off*self.bounceHeight)
-    end
-
-    if self.coin then
-        game.mappack.coinTile:draw(x, y)
     end
 end
 

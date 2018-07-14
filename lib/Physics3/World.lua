@@ -373,13 +373,6 @@ function World:loadLevel(data)
             end
         end
 
-        -- propagate map with coins
-        if dataLayer.coins then
-            for _, coin in ipairs(dataLayer.coins) do
-                map[coin[1]][coin[2]].coin = coin[3] or 1
-            end
-        end
-
         self.layers[i] = Layer:new(self, layerX, layerY, width, height, map)
     end
 end

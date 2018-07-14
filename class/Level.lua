@@ -87,7 +87,6 @@ function Level:update(dt)
 
     prof.push("World")
     Physics3.World.update(self, dt)
-    game.mappack.coinTile:update(dt)
     prof.pop()
 
     self:updateCamera(dt)
@@ -247,7 +246,7 @@ end
 
 function Level:collectCoin(actor, layer, x, y)
     if layer then
-        layer.map[x][y].coin = false
+        layer.map[x][y].tile = nil
     end
     actor.player.coins = actor.player.coins + 1
 end

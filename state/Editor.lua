@@ -224,8 +224,8 @@ function Editor:update(dt)
     end
 
     -- Limit camera position so you can't lose the level
-    self.level.camera.x = math.clamp(self.level.camera.x, self.level:getXStart()*16, self.level:getXEnd()*16)
-    self.level.camera.y = math.clamp(self.level.camera.y, self.level:getYStart()*16, self.level:getYEnd()*16)
+    self.level.camera.x = math.clamp(self.level.camera.x, (self.level:getXStart()-1)*16, self.level:getXEnd()*16)
+    self.level.camera.y = math.clamp(self.level.camera.y, (self.level:getYStart()-1)*16, self.level:getYEnd()*16)
 
     prof.push("Selection")
     if self.selection then

@@ -3,28 +3,34 @@ local tiles = {}
 local templates = VAR("tileTemplates")
 
 tiles[1] = {
+    img = "coin.png",
+    delays = {8/60},
+    coin = true,
+}
+
+tiles[2] = {
     collision = templates.cube,
-    img = "coinblock1.png",
+    img = "coinblock.png",
     delays = {8/60},
     holdsItems = true,
     defaultItem = "coin", -- ?
     turnsInto = 4,
 }
 
-tiles[2] = {
+tiles[3] = {
     collision = templates.cube,
-    img = "brick1.png",
+    img = "brick.png",
     delays = {8/60},
     holdsItems = true,
 }
 
 
-tiles[5] = {
+tiles[7] = {
     img = "smm_thing_1.png",
     delays = {8/60},
 }
 
-tiles[6] = {
+tiles[8] = {
     collision = templates.cube,
     nonPortalable = true,
     exclusiveCollision = 2,
@@ -32,12 +38,12 @@ tiles[6] = {
     delays = {8/60},
 }
 
-tiles[13] = {
+tiles[15] = {
     img = "smm_thing_3.png",
     delays = {8/60},
 }
 
-tiles[14] = {
+tiles[16] = {
     collision = templates.cube,
     nonPortalable = true,
     exclusiveCollision = 2,
@@ -45,7 +51,7 @@ tiles[14] = {
     delays = {8/60},
 }
 
-local cubes = {3, 4, 9, 10, 11, 12, 17, 18, 19, 20}
+local cubes = {4, 5, 9, 10, 11, 12, 17, 18, 19, 20}
 
 for _, v in ipairs(cubes) do
     tiles[v] = {collision = templates.cube}
@@ -68,8 +74,8 @@ local stampMaps = {
         name = "1way",
         type = "simple",
         map = {
-            {5, 6},
-            {13, 14},
+            {7, 8},
+            {15, 16},
         },
     }
 }

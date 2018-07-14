@@ -2,11 +2,10 @@ local TilesWindow = class("TilesWindow")
 
 TilesWindow.x = 14
 TilesWindow.y = 14
-TilesWindow.width = 8*17+15
+TilesWindow.width = 8*17+21
 TilesWindow.height = 200
-
-local tileMapImageW = 7*17-1
-local tileMapImageH = 2*17-1
+TilesWindow.tileWidth = 8
+TilesWindow.tileHeight = 2
 
 function TilesWindow:initialize(editor)
     self.editor = editor
@@ -34,11 +33,23 @@ function TilesWindow:goToMenu()
     for i, tileMap in ipairs(self.level.tileMaps) do
         local thumb = tileMap.thumbImg or tileMap.img
 
-        local tileMapButton = Gui3.Button:new(0, 0, {tileMap.name, {img = thumb, h = tileMapImageH}}, true, 0,
+        local tileMapButton = Gui3.Button:new(0, 0, {tileMap.name,
+            function()
+                local i = 1
+                for y = 1, self.tileHeight do
+                    for x = 1, self.tileWidth do
+                        if tileMap.tiles[i] then
+                            tileMap.tiles[i]:draw((x-1)*17, (y-1)*17)
+                            i = i + 1
+                        end
+                    end
+                end
+            end
+            }, true, 0,
             function()
                 self:goToTileMap(tileMap)
             end,
-            tileMapImageW)
+            self.tileWidth*17-1, self.tileHeight*17-1+9)
         self.element:addChild(tileMapButton)
     end
 

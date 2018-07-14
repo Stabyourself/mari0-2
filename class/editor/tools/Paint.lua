@@ -5,6 +5,7 @@ function Paint:initialize(editor)
 
     self.level = self.editor.level
     self.penDown = false
+    self.tileI = 1
     self.tile = self.level.tileMaps[1].tiles[1]
 end
 

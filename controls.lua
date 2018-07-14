@@ -21,7 +21,7 @@ return {
 
     ["^s"] = "editor.save",
 
-    ["lctrl"] = {"editor.select.subtract", "editor.pipette"},
+    ["lctrl"] = {"editor.select.subtract", "editor.pipette", "editor.mouseWheelScale"},
     ["rctrl"] = {"editor.select.subtract", "editor.pipette"},
     ["lalt"] = "editor.wand.global",
     ["ralt"] = "editor.wand.global",

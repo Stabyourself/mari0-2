@@ -3,25 +3,16 @@ local Selection = require "class.editor.Selection"
 local FloatingSelection = require "class.editor.FloatingSelection"
 local Editor = class("Editor")
 
-Editor.toolbarOrder = {"entity", "paint", "erase", "move", "select", "wand", "fill", "stamp"}
+Editor.toolbarOrder = {"Entity", "Paint", "Erase", "Move", "Select", "Wand", "Fill", "Stamp", "Portal"}
 Editor.toolbarImg = {}
+Editor.toolClasses = {}
 
 for _, toolName in ipairs(Editor.toolbarOrder) do
+    Editor.toolClasses[toolName] = require("class.editor.tools." .. toolName)
     table.insert(Editor.toolbarImg, love.graphics.newImage("img/editor/" .. toolName .. ".png"))
 end
 
 Editor.checkerboardImg = love.graphics.newImage("img/editor/checkerboard.png")
-
-Editor.toolClasses = {
-    entity = require("class.editor.tools.Entity"),
-    paint = require("class.editor.tools.Paint"),
-    select = require("class.editor.tools.Select"),
-    move = require("class.editor.tools.Move"),
-    fill = require("class.editor.tools.Fill"),
-    stamp = require("class.editor.tools.Stamp"),
-    wand = require("class.editor.tools.Wand"),
-    erase = require("class.editor.tools.Erase"),
-}
 
 Editor.scaleMin = 0.1/VAR("scale")
 Editor.scaleMax = 3
@@ -61,7 +52,7 @@ function Editor:load()
     self.tools = {}
 
     for toolName, toolClass in pairs(self.toolClasses) do
-        self.tools[toolName] = toolClass:new(self)
+        self.tools[string.lower(toolName)] = toolClass:new(self)
     end
 
     self.canvas = Gui3.Canvas:new(0, 0, SCREENWIDTH, SCREENHEIGHT)
@@ -160,10 +151,10 @@ function Editor:load()
 
     local y = 0
     for i, tool in ipairs(self.toolbarOrder) do
-        local button = Gui3.Button:new(0, y, self.toolbarImg[i], false, 2, function(button) self:selectTool(tool) end)
+        local button = Gui3.Button:new(0, y, self.toolbarImg[i], false, 2, function(button) self:selectTool(string.lower(tool)) end)
         button.color.background = {0, 0, 0, 0}
 
-        self.toolButtons[tool] = button
+        self.toolButtons[string.lower(tool)] = button
 
         self.toolbar:addChild(button)
 
@@ -529,6 +520,15 @@ function Editor:mousemoved(x, y)
 end
 
 function Editor:wheelmoved(x, y)
+    -- Zooming
+    if controls3.cmdDown("editor.mouseWheelScale") then
+        if y ~= 0 then
+            self:zoom(y, true)
+        end
+
+        return true
+    end
+
     if self.canvas:wheelmoved(x, y) then
         return true
     end
@@ -537,8 +537,21 @@ function Editor:wheelmoved(x, y)
         return true
     end
 
-    if y ~= 0 then
-        self:zoom(y, true)
+    -- Tile scrolling
+    if self.tool == self.tools.paint or self.tool == self.tools.fill then
+        local tileMap = self.tools.paint.tile.tileMap
+        local num = self.tools.paint.tile.num
+        local max = #tileMap.tiles
+
+        num = num - y
+
+        if num < 1 then
+            num = max
+        elseif num > max then
+            num = 1
+        end
+
+        self:selectTile(tileMap.tiles[num])
     end
 end
 
@@ -691,7 +704,7 @@ function Editor:drawSizeHelp(w, h, glue)
         textY = y-8
     end
 
-    love.graphics.print(s, textX, textY, 0, 1, r)
+    love.graphics.print(s, textX, textY)
 
     self.level.camera:attach()
 end
@@ -754,10 +767,41 @@ function Editor:updateMinimap()
     end)
 
     self.minimapImg = love.graphics.newImage(self.minimapImgData)
+
+    -- Update existing minimap windows
+    for _, window in ipairs(self.windows) do
+        if window:isInstanceOf(self.windowClasses.minimap) then
+            window.minimapDraw.w = width*3
+            window.minimapDraw.h = height*3
+        end
+    end
 end
 
 function Editor:drawMinimap()
     love.graphics.draw(self.minimapImg, 0, 0, 0, 3, 3)
+
+    local lx, ty = self.level:cameraToWorld(0, 0)
+    local rx, by = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)
+
+    love.graphics.push()
+    love.graphics.scale(3, 3)
+    love.graphics.rectangle("line", lx/16-.5, ty/16-.5, (rx-lx)/16+1, (by-ty+1)/16+1)
+    love.graphics.pop()
+end
+
+function Editor:clickMinimap(x, y, button)
+    x = x/3
+    y = y/3
+
+    x, y = self.level:coordinateToWorld(x, y)
+
+    if button == 1 then
+        self.level.camera:lookAt(x, y)
+        self:toggleFreeCam(true)
+    elseif button == 2 then
+        game.players[1].actor.x = x
+        game.players[1].actor.y = y
+    end
 end
 
 return Editor

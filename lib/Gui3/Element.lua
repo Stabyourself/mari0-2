@@ -338,6 +338,11 @@ function Gui3.Element:mousepressed(x, y, button)
         toReturn = true
     end
 
+    -- custom hook
+    if self.hookmousepressed then
+        self.hookmousepressed(x, y, button)
+    end
+
     for i = #self.children, 1, -1 do
         local v = self.children[i]
 

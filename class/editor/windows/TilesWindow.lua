@@ -76,6 +76,12 @@ function TilesWindow:goToTileMap(tileMap)
             self.editor:selectTile(self.tileMap.tiles[i])
         end
     )
+
+    -- select tile if the tilemap is the same
+    if tileMap == self.editor.tools.paint.tile.tileMap then -- select it
+        self.tileListTileGrid.selected = self.editor.tools.paint.tile.num
+    end
+
     self.element:addChild(self.tileListTileGrid)
     self.element.autoArrangeChildren = false
 end

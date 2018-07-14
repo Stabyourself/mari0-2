@@ -161,6 +161,8 @@ function DottedCrosshair:draw()
                 color = self.invalidColor
             end
 
+            local r, g, b
+
             if self.overrideColor then
                 local fade = Easing.outQuad(self.shootTimer, 1, -1, self.colorTime)
 

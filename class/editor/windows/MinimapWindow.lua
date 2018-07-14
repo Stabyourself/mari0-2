@@ -7,19 +7,18 @@ MinimapWindow.height = 105
 
 MinimapWindow.scale = 3
 MinimapWindow.borderWidth = 3
-MinimapWindow.padding = 0
 
 function MinimapWindow:initialize(editor)
     self.editor = editor
     self.level = self.editor.level
 
-    local height = 16 + self.editor.minimapImg:getHeight()*self.scale + self.padding*2
+    local height = 16 + self.editor.minimapImg:getHeight()*self.scale
 
     if self.editor.minimapImg:getWidth()*self.scale > self.width then -- accomodate the scrollbar
         height = height + 8
     end
 
-    self.element = Gui3.Box:new(self.x, self.y, self.width + self.padding*2, height)
+    self.element = Gui3.Box:new(self.x, self.y, self.width, height)
     self.element.draggable = true
     self.element.resizeable = true
     self.element.closeable = true
@@ -30,9 +29,10 @@ function MinimapWindow:initialize(editor)
 
     self.element.background = self.editor.checkerboardImg
 
-    self.subDraw = Gui3.SubDraw:new(function() self.editor:drawMinimap() end, self.padding, self.padding, 100, 100)
+    self.minimapDraw = Gui3.SubDraw:new(function() self.editor:drawMinimap() end, 0, 0, self.editor.minimapImg:getWidth()*self.scale, self.editor.minimapImg:getHeight()*self.scale)
+    self.minimapDraw.hookmousepressed = function(...) self.editor:clickMinimap(...) end
 
-    self.element:addChild(self.subDraw)
+    self.element:addChild(self.minimapDraw)
 end
 
 return MinimapWindow

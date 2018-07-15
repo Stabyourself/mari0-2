@@ -98,7 +98,7 @@ function Gui3.Button:initialize(x, y, content, border, padding, func, sizeX, siz
 end
 
 function Gui3.Button:getCollision(x, y)
-    return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < self.h
+    return x >= 0 and x < self.w and y >= 0 and y < self.h
 end
 
 function Gui3.Button:draw(level)
@@ -111,7 +111,7 @@ function Gui3.Button:draw(level)
 
         if self.pressing then
             img = self.gui.img.buttonActive
-        elseif self:getCollision(self.mouse[1], self.mouse[2]) then
+        elseif self.mouse[1] and self:getCollision(self.mouse[1], self.mouse[2]) then
             img = self.gui.img.buttonHover
         end
 
@@ -132,7 +132,7 @@ function Gui3.Button:draw(level)
 
         if self.pressing then
             love.graphics.setColor(self.color.active)
-        elseif self:getCollision(self.mouse[1], self.mouse[2]) then
+        elseif self.mouse[1] and self:getCollision(self.mouse[1], self.mouse[2]) then
             love.graphics.setColor(self.color.hover)
         end
 

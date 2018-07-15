@@ -68,7 +68,7 @@ function Editor:load()
 
 
 
-    self.fileDropdown = Gui3.Dropdown:new(0, 0, "file")
+    self.fileDropdown = Gui3.Dropdown:new(0, 0, "file", self.canvas)
     self.fileDropdown.button.color.background = {0, 0, 0, 0}
 
     self.menuBar:addChild(self.fileDropdown)
@@ -82,7 +82,7 @@ function Editor:load()
 
     -- WINDOW
 
-    self.newWindowDropdown = Gui3.Dropdown:new(38, 0, "window")
+    self.newWindowDropdown = Gui3.Dropdown:new(38, 0, "window", self.canvas)
     self.newWindowDropdown.button.color.background = {0, 0, 0, 0}
 
     self.menuBar:addChild(self.newWindowDropdown)
@@ -99,7 +99,7 @@ function Editor:load()
 
     -- VIEW
 
-    local viewDropdown = Gui3.Dropdown:new(92, 0, "view")
+    local viewDropdown = Gui3.Dropdown:new(92, 0, "view", self.canvas)
     viewDropdown.button.color.background = {0, 0, 0, 0}
 
     self.menuBar:addChild(viewDropdown)
@@ -186,6 +186,7 @@ function Editor:update(dt)
     prof.push("Editor")
     prof.push("UI")
     self.canvas:update(dt)
+    self.canvas:rootmousemoved(self.level:getMouse())
     prof.pop()
 
     prof.push("Tool update")
@@ -493,7 +494,7 @@ function Editor:cmdpressed(cmd)
 end
 
 function Editor:mousepressed(x, y, button)
-    if self.canvas:mousepressed(x, y, button) then -- don't do tool stuff if the click was on a GUI element
+    if self.canvas:rootmousepressed(x, y, button) then
         return true
     end
 
@@ -503,7 +504,9 @@ function Editor:mousepressed(x, y, button)
 end
 
 function Editor:mousereleased(x, y, button)
-    self.canvas:mousereleased(x, y, button)
+    if self.canvas:rootmousereleased(x, y, button) then
+        return true
+    end
 
     if self.tool.mousereleased then
         self.tool:mousereleased(x, y, button)
@@ -613,7 +616,6 @@ function Editor:loadLevel(path)
     self.fileDropdown:toggle(false)
 
     local mapCode = love.filesystem.read(path)
-    print(mapCode)
     local data = sandbox.run(mapCode)
     self.level:loadLevel(data)
 

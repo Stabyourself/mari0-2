@@ -17,8 +17,8 @@ function Gui3.TileGrid:initialize(x, y, tileMap, func)
     self.selected = nil
 end
 
-function Gui3.TileGrid:update(dt, x, y, mouseBlocked, absX, absY)
-    Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
+function Gui3.TileGrid:update(dt, absX, absY)
+    Gui3.Element.update(self, dt, absX, absY)
 
     local maxWidth = self.parent:getInnerWidth()
 
@@ -33,10 +33,6 @@ function Gui3.TileGrid:updateSize()
 end
 
 function Gui3.TileGrid:getCollision(x, y)
-    if self.mouseBlocked then
-        return false
-    end
-
     local tileX = math.floor(x/(self.size[1]+self.gutter[1]))+1
     local tileY = math.floor(y/(self.size[2]+self.gutter[2]))+1
 
@@ -56,7 +52,10 @@ end
 function Gui3.TileGrid:draw(level)
     Gui3.Element.translate(self)
 
-    local mouseTile = self:getCollision(self.mouse[1], self.mouse[2])
+    local mouseTile
+    if self.mouse[1] then
+        mouseTile = self:getCollision(self.mouse[1], self.mouse[2])
+    end
 
     local topY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]))
     local bottomY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]) + (self.parent:getInnerHeight())/(self.size[2]+self.gutter[2]))

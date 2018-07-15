@@ -26,7 +26,7 @@ function Gui3.Checkbox:initialize(x, y, s, padding, func, val)
 end
 
 function Gui3.Checkbox:getCollision(x, y)
-    return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < self.h
+    return x >= 0 and x < self.w and y >= 0 and y < self.h
 end
 
 function Gui3.Checkbox:draw(level)

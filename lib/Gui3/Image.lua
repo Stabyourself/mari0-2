@@ -1,6 +1,8 @@
 local Gui3 = ...
 Gui3.Image = class("Gui3.Image", Gui3.Element)
 
+Gui3.Image.noMouseEvents = true
+
 function Gui3.Image:initialize(img, x, y, quad, scale)
     if type(img) == "string" then
         self.img = love.graphics.newImage(img)

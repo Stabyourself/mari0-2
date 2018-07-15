@@ -15,8 +15,6 @@ function Gui3.Element:initialize(x, y, w, h)
     self.w = w
     self.h = h
 
-    self.absPos = {0, 0}
-
     self.scrollable = {false, false}
     self.hasScrollbar = {false, false}
     self.scrolling = {false, false}
@@ -29,6 +27,7 @@ function Gui3.Element:initialize(x, y, w, h)
     self.sizeMin = {0, 0}
 
     self.dragPos = {0, 0}
+    self.dragStart = {0, 0}
     self.resizePos = {0, 0}
 
     self.mouse = {0, 0}
@@ -36,7 +35,6 @@ function Gui3.Element:initialize(x, y, w, h)
     self.childBox = {0, 0, self.w, self.h}
 
     self.visible = true
-    self.mouseBlocked = true
 
     self.children = {}
 
@@ -49,10 +47,7 @@ function Gui3.Element:resize(w, h)
     self.w = w
     self.h = h
 
-    self.childBox[1] = 0
-    self.childBox[2] = 0
-    self.childBox[3] = self.w
-    self.childBox[4] = self.h
+    self:sizeChanged()
 end
 
 function Gui3.Element:addChild(element)
@@ -77,15 +72,11 @@ function Gui3.Element:clearChildren()
 end
 
 function Gui3.Element:getMouseZone(t, x, y, boxX, boxY, boxW, boxH)
-    if self.visible then
+    if self.visible and not self.noMouseEvents then
         boxX, boxY, boxW, boxH = intersectRectangles(x, y, self.w, self.h, boxX, boxY, boxW, boxH)
 
-        if self.class == Gui3.SubDraw then
-            print(boxX, boxY, self.w, self.h)
-        end
-
         if boxX and boxW > 0 and boxH > 0 then
-            table.insert(t, {x=boxX, y=boxY, w=boxW, h=boxH, element=self})
+            table.insert(t, {x=boxX, y=boxY, w=boxW, h=boxH, offsetX=x, offsetY=y, element=self})
 
             boxX, boxY, boxW, boxH = intersectRectangles(x+self.childBox[1], y+self.childBox[2], self:getInnerWidth(), self:getInnerHeight(), boxX, boxY, boxW, boxH)
 
@@ -102,12 +93,11 @@ function Gui3.Element:getMouseZone(t, x, y, boxX, boxY, boxW, boxH)
             end
         end
     end
-
-    return t
 end
 
-function Gui3.Element:update(dt, x, y, mouseBlocked, absX, absY)
-
+function Gui3.Element:mousemoved(x, y, diffX, diffY)
+    self.mouse[1] = x
+    self.mouse[2] = y
     -- Update scroll bar visibility
     self.hasScrollbar[1] = false
     self.hasScrollbar[2] = false
@@ -133,8 +123,8 @@ function Gui3.Element:update(dt, x, y, mouseBlocked, absX, absY)
 
     if self.draggable then
         if self.dragging then
-            self.x = self.parent.mouse[1]-self.parent.childBox[1]-self.dragPos[1]+self.parent.scroll[1]
-            self.y = self.parent.mouse[2]-self.parent.childBox[2]-self.dragPos[2]+self.parent.scroll[2]
+            self.x = self.x + diffX
+            self.y = self.y + diffY
         end
     end
 
@@ -143,8 +133,8 @@ function Gui3.Element:update(dt, x, y, mouseBlocked, absX, absY)
             local w = self.w
             local h = self.h
 
-            self.w = self.parent.mouse[1]-self.parent.childBox[1]-self.x+self.resizePos[1]+self.parent.scroll[1]
-            self.h = self.parent.mouse[2]-self.parent.childBox[2]-self.y+self.resizePos[2]+self.parent.scroll[2]
+            self.w = self.w + diffX
+            self.h = self.h + diffY
 
             if not self.parent.scrollable[1] then
                 self.w = math.min(self.parent:getInnerWidth()-self.x-self.posMax[1], self.w)
@@ -163,11 +153,11 @@ function Gui3.Element:update(dt, x, y, mouseBlocked, absX, absY)
     --limit x, y, w and h
     --lower
 
-    self.w = math.max(self.sizeMin[1], self.w)
-    self.h = math.max(self.sizeMin[2], self.h)
+    -- self.w = math.max(self.sizeMin[1], self.w)
+    -- self.h = math.max(self.sizeMin[2], self.h)
 
-    self.x = math.max(self.posMin[1], self.x)
-    self.y = math.max(self.posMin[2], self.y)
+    -- self.x = math.max(self.posMin[1], self.x)
+    -- self.y = math.max(self.posMin[2], self.y)
 
     if self.resizeable and self.parent then
         --upper
@@ -198,55 +188,16 @@ function Gui3.Element:update(dt, x, y, mouseBlocked, absX, absY)
     end
 
     self:limitScroll()
+end
 
-    if x then -- child element
-        self.absPos[1] = absX
-        self.absPos[2] = absY
-    else -- root
-        x, y = love.mouse.getPosition()
-        x, y = x/VAR("scale"), y/VAR("scale")
-
-        mouseBlocked = false
-
-        self.absPos[1] = self.x
-        self.absPos[2] = self.y
-    end
-
+function Gui3.Element:mouseentered(x, y)
     self.mouse[1] = x
     self.mouse[2] = y
-    self.mouseBlocked = mouseBlocked or not self.visible
+end
 
-    local childMouseBlocked = self.mouseBlocked
-
-    if self.clip then
-        if  self.mouse[1] < self.childBox[1] or self.mouse[1] >= self.childBox[1]+self:getInnerWidth() or
-            self.mouse[2] < self.childBox[2] or self.mouse[2] >= self.childBox[2]+self:getInnerHeight() then
-            childMouseBlocked = true
-        end
-    end
-
-    local siblingsBlocked = false
-
-    for i = #self.children, 1, -1 do
-        local v = self.children[i]
-
-        if v.update then
-            local childX = self.mouse[1]-self.childBox[1]-v.x+self.scroll[1]
-            local childY = self.mouse[2]-self.childBox[2]-v.y+self.scroll[2]
-
-            local childAbsX = self.absPos[1]+v.x-self.scroll[1]+self.childBox[1]
-            local childAbsY = self.absPos[2]+v.y-self.scroll[2]+self.childBox[2]
-
-            local b = v:update(dt, childX, childY, childMouseBlocked, childAbsX, childAbsY)
-
-            if v.visible and b then
-                siblingsBlocked = true
-                childMouseBlocked = true
-            end
-        end
-    end
-
-    return (not self.clip and siblingsBlocked) or (self.mouse[1] > 0 and self.mouse[1] <= self.w and self.mouse[2] > 0 and self.mouse[2] <= self.h)
+function Gui3.Element:mouseleft(x, y)
+    self.mouse[1] = nil
+    self.mouse[2] = nil
 end
 
 function Gui3.Element:limitScroll()
@@ -267,12 +218,12 @@ function Gui3.Element:unTranslate()
 end
 
 function Gui3.Element:draw()
-    local scissorX, scissorY, scissorW, scissorH
+    -- local scissorX, scissorY, scissorW, scissorH
 
-    if self.clip then
-        scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
-        love.graphics.intersectScissor((self.absPos[1]+self.childBox[1])*VAR("scale"), (self.absPos[2]+self.childBox[2])*VAR("scale"), math.round(self.childBox[3]*VAR("scale")), math.round(self.childBox[4]*VAR("scale")))
-    end
+    -- if self.clip then
+    --     scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
+    --     love.graphics.intersectScissor((self.absPos[1]+self.childBox[1])*VAR("scale"), (self.absPos[2]+self.childBox[2])*VAR("scale"), math.round(self.childBox[3]*VAR("scale")), math.round(self.childBox[4]*VAR("scale")))
+    -- end
 
     love.graphics.translate(-self.scroll[1]+self.childBox[1], -self.scroll[2]+self.childBox[2])
 
@@ -284,9 +235,9 @@ function Gui3.Element:draw()
 
     love.graphics.translate(self.scroll[1]-self.childBox[1], self.scroll[2]-self.childBox[2])
 
-    if self.clip then
-        love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
-    end
+    -- if self.clip then
+    --     love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
+    -- end
 
     for i = 1, 2 do
         if self.scrollable[i] and self.hasScrollbar[i] then
@@ -296,7 +247,7 @@ function Gui3.Element:draw()
 
             if self.scrolling[i] then
                 img = self.gui.img.scrollbarActive
-            elseif self:scrollCollision(i, self.mouse[1], self.mouse[2]) then
+            elseif self.mouse[1] and self:scrollCollision(i, self.mouse[1], self.mouse[2]) then
                 img = self.gui.img.scrollbarHover
             end
 
@@ -356,88 +307,48 @@ function Gui3.Element:getInnerWidth()
 end
 
 function Gui3.Element:mousepressed(x, y, button)
-    local toReturn = false
-
     if self.scrollable[1] and self.hasScrollbar[1] and self:scrollCollision(1, x, y) then
         self.scrolling[1] = true
         self.scrollingDragOffset[1] = x-self:getScrollbarPos(1)
-
-        toReturn = true
     end
 
     if self.scrollable[2] and self.hasScrollbar[2] and self:scrollCollision(2, x, y) then
         self.scrolling[2] = true
         self.scrollingDragOffset[2] = y-self:getScrollbarPos(2)
-
-        toReturn = true
     end
 
     -- custom hook
     if self.hookmousepressed then
         self.hookmousepressed(x, y, button)
     end
-
-    for i = #self.children, 1, -1 do
-        local v = self.children[i]
-
-        if v.mousepressed then
-            local lx = x-self.childBox[1]-v.x+self.scroll[1]
-            local ly = y-self.childBox[2]-v.y+self.scroll[2]
-
-            local b = v:mousepressed(lx, ly, button)
-
-            if b then
-                toReturn = true
-            end
-
-            if lx >= 0 and lx < v.w and ly >= 0 and ly < v.h and not v.mouseBlocked then
-                -- push that element to the end
-                if v.movesToTheFront then
-                    table.insert(self.children, table.remove(self.children, i))
-                end
-
-                toReturn = true
-            end
-        end
-    end
-
-    return toReturn
 end
 
 function Gui3.Element:mousereleased(x, y, button)
     self.scrolling[1] = false
     self.scrolling[2] = false
-
-    for _, child in ipairs(self.children) do
-        if child.mousereleased then
-            child:mousereleased(x-self.childBox[1]-child.x+self.scroll[1], y-self.childBox[2]-child.y+self.scroll[2], button)
-        end
-    end
 end
 
 function Gui3.Element:wheelmoved(x, y)
-    if not self.mouseBlocked then
-        if self.hasScrollbar[2] and y ~= 0 then
-            self.scroll[2] = self.scroll[2] - y*17
-            self:limitScroll()
+    if self.hasScrollbar[2] and y ~= 0 then
+        self.scroll[2] = self.scroll[2] - y*17
+        self:limitScroll()
 
-            return true
-        end
+        return true
+    end
 
-        -- scroll horizontally if there's no y scrolling
-        if not self.hasScrollbar[2] and self.hasScrollbar[1] and y ~= 0 then
-            self.scroll[1] = self.scroll[1] - y*17
-            self:limitScroll()
+    -- scroll horizontally if there's no y scrolling
+    if not self.hasScrollbar[2] and self.hasScrollbar[1] and y ~= 0 then
+        self.scroll[1] = self.scroll[1] - y*17
+        self:limitScroll()
 
-            return true
-        end
+        return true
+    end
 
-        if self.hasScrollbar[1] and x ~= 0 then
-            self.scroll[1] = self.scroll[1] - x*17
-            self:limitScroll()
+    if self.hasScrollbar[1] and x ~= 0 then
+        self.scroll[1] = self.scroll[1] - x*17
+        self:limitScroll()
 
-            return true
-        end
+        return true
     end
 
     for _, child in ipairs(self.children) do
@@ -479,6 +390,18 @@ function Gui3.Element:autoSize()
     self.childBox[4] = h
 end
 
-function Gui3.Element:sizeChanged() end
+function Gui3.Element:sizeChanged()
+    if self.childPadding then
+        self.childBox[1] = self.childPadding[1]
+        self.childBox[2] = self.childPadding[2]
+        self.childBox[3] = self.w-self.childPadding[1]-self.childPadding[3]
+        self.childBox[4] = self.h-self.childPadding[2]-self.childPadding[4]
+    else
+        self.childBox[1] = 0
+        self.childBox[2] = 0
+        self.childBox[3] = self.w
+        self.childBox[4] = self.h
+    end
+end
 
 function Gui3.Element:onAssign() end

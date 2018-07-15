@@ -3,6 +3,11 @@ Gui3.Box = class("Gui3.Box", Gui3.Element)
 
 Gui3.Box.movesToTheFront = true
 
+Gui3.Box.childPaddingDraggable = {3, 12, 3, 4}
+Gui3.Box.childPaddingStatic = {2, 3, 2, 3}
+Gui3.Box.sizeMinDraggable = {19, 29}
+Gui3.Box.sizeMinStatic = {17, 19}
+
 function Gui3.Box:initialize(x, y, w, h)
     Gui3.Element.initialize(self, x, y, w, h)
 
@@ -18,30 +23,25 @@ function Gui3.Box:initialize(x, y, w, h)
     self.posMax[2] = -4
 
     self.childBox = {2, 3, self.w-4, self.h-6}
+
+    self:setDraggable(false)
 end
 
-function Gui3.Box:update(dt, x, y, mouseBlocked, absX, absY)
-    local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
+function Gui3.Box:setDraggable(draggable)
+    self.draggable = draggable
 
     if self.draggable then
-        self.sizeMin[1] = 19
-        self.sizeMin[2] = 29
-
-        self.childBox[1] = 3
-        self.childBox[2] = 12
-        self.childBox[3] = self.w-6
-        self.childBox[4] = self.h-16
+        self.childPadding = self.childPaddingDraggable
+        self.sizeMin = self.sizeMinDraggable
     else
-        self.sizeMin[1] = 17
-        self.sizeMin[2] = 19
-
-        self.childBox[1] = 2
-        self.childBox[2] = 3
-        self.childBox[3] = self.w-4
-        self.childBox[4] = self.h-6
+        self.childPadding = self.childPaddingStatic
+        self.sizeMin = self.sizeMinStatic
     end
 
-    return ret
+    self.childBox[1] = self.childPadding[1]
+    self.childBox[2] = self.childPadding[2]
+    self.childBox[3] = self.w-self.childPadding[1]-self.childPadding[3]
+    self.childBox[4] = self.h-self.childPadding[2]-self.childPadding[4]
 end
 
 function Gui3.Box:draw(level)
@@ -73,12 +73,12 @@ function Gui3.Box:draw(level)
 
     if self.title then
         local scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
-        love.graphics.intersectScissor(
-            (self.absPos[1]+3)*VAR("scale"),
-            (self.absPos[2]+2)*VAR("scale"),
-            (self.w-16)*VAR("scale"),
-            8*VAR("scale")
-        )
+        -- love.graphics.intersectScissor(
+        --     (self.absPos[1]+3)*VAR("scale"),
+        --     (self.absPos[2]+2)*VAR("scale"),
+        --     (self.w-16)*VAR("scale"),
+        --     8*VAR("scale")
+        -- )
 
         love.graphics.print(self.title, 3, 2)
 
@@ -89,7 +89,7 @@ function Gui3.Box:draw(level)
         local closeImg = self.gui.img.boxClose
         if self.closing then
             closeImg = self.gui.img.boxCloseActive
-        elseif self:closeCollision(self.mouse[1], self.mouse[2]) then
+        elseif self.mouse[1] and self:closeCollision(self.mouse[1], self.mouse[2]) then
             closeImg = self.gui.img.boxCloseHover
         end
 
@@ -102,7 +102,7 @@ function Gui3.Box:draw(level)
         local resizeImg = self.gui.img.boxResize
         if self.resizing then
             resizeImg = self.gui.img.boxResizeActive
-        elseif self:resizeCornerCollision(self.mouse[1], self.mouse[2]) then
+        elseif self.mouse[1] and self:resizeCornerCollision(self.mouse[1], self.mouse[2]) then
             resizeImg = self.gui.img.boxResizeHover
         end
 
@@ -119,19 +119,19 @@ function Gui3.Box:draw(level)
 end
 
 function Gui3.Box:titleBarCollision(x, y)
-    return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < 12
+    return x >= 0 and x < self.w and y >= 0 and y < 12
 end
 
 function Gui3.Box:resizeCornerCollision(x, y)
-    return not self.mouseBlocked and x >= self.w-11 and x < self.w-3 and y >= self.h-12 and y < self.h-4
+    return x >= self.w-11 and x < self.w-3 and y >= self.h-12 and y < self.h-4
 end
 
 function Gui3.Box:closeCollision(x, y)
-    return not self.mouseBlocked and x >= self.w-12 and x < self.w-3 and y >= 2 and y < 11
+    return x >= self.w-12 and x < self.w-3 and y >= 2 and y < 11
 end
 
 function Gui3.Box:collision(x, y)
-    return not self.mouseBlocked and x >= 0 and x < self.w and y >= 0 and y < self.h
+    return x >= 0 and x < self.w and y >= 0 and y < self.h
 end
 
 function Gui3.Box:mousepressed(x, y, button)
@@ -141,6 +141,8 @@ function Gui3.Box:mousepressed(x, y, button)
         self.resizePos[1] = self.w-x
         self.resizePos[2] = self.h-y
 
+        self.exclusiveMouse = true
+
     elseif self.closeable and self:closeCollision(x, y) then
         self.closing = true
 
@@ -148,7 +150,10 @@ function Gui3.Box:mousepressed(x, y, button)
         self.dragging = true
         self.dragPos[1] = x
         self.dragPos[2] = y
+        self.dragStart[1] = self.x
+        self.dragStart[2] = self.y
 
+        self.exclusiveMouse = true
     end
 
     return Gui3.Element.mousepressed(self, x, y, button)
@@ -157,6 +162,7 @@ end
 function Gui3.Box:mousereleased(x, y, button)
     self.dragging = false
     self.resizing = false
+    self.exclusiveMouse = false
 
     if self.closing then
         if self:closeCollision(x, y) then
@@ -170,6 +176,8 @@ function Gui3.Box:mousereleased(x, y, button)
 end
 
 function Gui3.Box:sizeChanged()
+    Gui3.Element.sizeChanged(self)
+
     if self.autoArrangeChildren then
         self:arrangeChildren()
     end

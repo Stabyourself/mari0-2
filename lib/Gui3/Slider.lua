@@ -37,11 +37,11 @@ function Gui3.Slider:initialize(min, max, x, y, w, showValue, func)
     }
 end
 
-function Gui3.Slider:update(dt, x, y, mouseBlocked, absX, absY)
-    local ret = Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
+function Gui3.Slider:mousemoved(x, y)
+    local ret = Gui3.Element.mousemoved(self, x, y)
 
     if self.dragging then
-        local pos = (self.mouse[1]-self.dragX-self.barOffset)/(self.barWidth)
+        local pos = (x-self.dragX-self.barOffset)/(self.barWidth)
 
         pos = math.clamp(pos, 0, 1)
 
@@ -70,7 +70,7 @@ end
 function Gui3.Slider:getCollision(x, y)
     local sliderX = self:getPosX()
 
-    return not self.mouseBlocked and x >= sliderX-2 and x < sliderX+2 and y >= 0 and y < 8
+    return x >= sliderX-2 and x < sliderX+2 and y >= 0 and y < 8
 end
 
 function Gui3.Slider:getPosX()
@@ -92,7 +92,7 @@ function Gui3.Slider:draw(level)
 
     if self.dragging then
         img = self.gui.img.sliderActive
-    elseif self:getCollision(self.mouse[1], self.mouse[2]) then
+    elseif self.mouse[1] and self:getCollision(self.mouse[1], self.mouse[2]) then
         img = self.gui.img.sliderHover
     end
 
@@ -109,12 +109,14 @@ function Gui3.Slider:mousepressed(x, y, button)
     if self:getCollision(x, y) then
         self.dragging = true
         self.dragX = x-self:getPosX()
+        self.exclusiveMouse = true
     end
 
     return Gui3.Element.mousepressed(self, x, y, button)
 end
 function Gui3.Slider:mousereleased(x, y, button)
     self.dragging = false
+    self.exclusiveMouse = false
 
     Gui3.Element.mousereleased(self, x, y, button)
 end

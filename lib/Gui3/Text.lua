@@ -1,6 +1,8 @@
 local Gui3 = ...
 Gui3.Text = class("Gui3.Text", Gui3.Element)
 
+Gui3.Text.noMouseEvents = true
+
 function Gui3.Text:initialize(s, x, y)
     self.s = s
     self.text = love.graphics.newText(fontOutlined, s)

@@ -19,7 +19,7 @@ function MinimapWindow:initialize(editor)
     end
 
     self.element = Gui3.Box:new(self.x, self.y, self.width, height)
-    self.element.draggable = true
+    self.element:setDraggable(true)
     self.element.resizeable = true
     self.element.closeable = true
     self.element.scrollable = {true, true}

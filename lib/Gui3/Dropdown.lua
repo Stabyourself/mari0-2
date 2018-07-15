@@ -1,18 +1,18 @@
 local Gui3 = ...
 Gui3.Dropdown = class("Gui3.Dropdown", Gui3.Element)
 
-function Gui3.Dropdown:initialize(x, y, s)
+function Gui3.Dropdown:initialize(x, y, s, boxCanvas)
     self.button = Gui3.Button:new(0, 0, s, false, 3, function() self:toggle() end)
     self.button.color.normal = {1, 1, 1, 0}
 
-    self.box = Gui3.Box:new(0, 14, 50, 100)
+    self.box = Gui3.Box:new(x, y+14, 50, 100)
     self.box.background = {255, 255, 255}
     self.box.visible = false
 
     Gui3.Element.initialize(self, x, y, self.button.w, self.button.h)
 
     self:addChild(self.button)
-    self:addChild(self.box)
+    boxCanvas:addChild(self.box)
 end
 
 function Gui3.Dropdown:onAssign()
@@ -33,10 +33,7 @@ function Gui3.Dropdown:toggle(status)
 end
 
 function Gui3.Dropdown:mousepressed(x, y, button)
-    local toReturn = Gui3.Element.mousepressed(self, x, y, button)
-    if not toReturn then
-        self.box.visible = false
-    end
+    Gui3.Element.mousepressed(self, x, y, button)
 
     return toReturn
 end

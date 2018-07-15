@@ -24,3 +24,17 @@ end
 function Gui3.Canvas:update(dt, x, y, mouseBlocked, absX, absY)
     Gui3.Element.update(self, dt, x, y, mouseBlocked, absX, absY)
 end
+
+function Gui3.Canvas:debugDraw()
+    local regions = {}
+
+    self:getMouseZone(regions, 0, 0, 0, 0, self.w, self.h)
+
+    for i = 2, #regions do
+        local region = regions[i]
+        local r, g, b = region.element.debugColor:rgb()
+        love.graphics.setColor(r, g, b, 0.9)
+        love.graphics.rectangle("fill", region.x, region.y, region.w, region.h)
+    end
+    love.graphics.setColor(1, 1, 1, 1)
+end

@@ -10,8 +10,8 @@ function Color.fromHSV(h, s, v, a)
     return Color:new(Color.HSVtoRGB(h, s, v, a or 1))
 end
 
-function Color.fromHSL(h, s, v, a)
-    return Color:new(Color.HSLtoRGB(h, s, v, a or 1))
+function Color.fromHSL(h, s, l, a)
+    return Color:new(Color.HSLtoRGB(h, s, l, a or 1))
 end
 
 function Color:initialize(r, g, b, a)

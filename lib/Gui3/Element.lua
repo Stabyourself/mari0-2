@@ -39,6 +39,10 @@ function Gui3.Element:initialize(x, y, w, h)
     self.mouseBlocked = true
 
     self.children = {}
+
+    if VAR("debug").canvas then
+        self.debugColor = Color3.fromHSL(love.math.random(), 1, 0.5)
+    end
 end
 
 function Gui3.Element:resize(w, h)
@@ -70,6 +74,36 @@ end
 
 function Gui3.Element:clearChildren()
     iClearTable(self.children)
+end
+
+function Gui3.Element:getMouseZone(t, x, y, boxX, boxY, boxW, boxH)
+    if self.visible then
+        boxX, boxY, boxW, boxH = intersectRectangles(x, y, self.w, self.h, boxX, boxY, boxW, boxH)
+
+        if self.class == Gui3.SubDraw then
+            print(boxX, boxY, self.w, self.h)
+        end
+
+        if boxX and boxW > 0 and boxH > 0 then
+            table.insert(t, {x=boxX, y=boxY, w=boxW, h=boxH, element=self})
+
+            boxX, boxY, boxW, boxH = intersectRectangles(x+self.childBox[1], y+self.childBox[2], self:getInnerWidth(), self:getInnerHeight(), boxX, boxY, boxW, boxH)
+
+            if boxX then
+                for _, child in ipairs(self.children) do
+                    child:getMouseZone(
+                        t,
+                        x+child.x-self.scroll[1]+self.childBox[1],
+                        y+child.y-self.scroll[2]+self.childBox[2],
+                        boxX, boxY,
+                        boxW, boxH
+                    )
+                end
+            end
+        end
+    end
+
+    return t
 end
 
 function Gui3.Element:update(dt, x, y, mouseBlocked, absX, absY)

@@ -212,6 +212,21 @@ function pointInTriangle(x, y, t) -- Credits to https://stackoverflow.com/questi
     return s >= 0 and t >= 0 and (s + t) <= 2 * A * sign
 end
 
+function intersectRectangles(x1, y1, w1, h1, x2, y2, w2, h2)
+    local x, y, w, h
+
+    x = math.max(x1, x2)
+    y = math.max(y1, y2)
+    w = math.min(x1+w1, x2+w2) - math.max(x1, x2)
+    h = math.min(y1+h1, y2+h2) - math.max(y1, y2)
+
+    if w < 0 or h < 0 then
+        return false
+    end
+
+    return x, y, w, h
+end
+
 function normalizeAngle(a)
 	a = math.fmod(a+math.pi, math.pi*2)-math.pi
     a = math.fmod(a-math.pi, math.pi*2)+math.pi

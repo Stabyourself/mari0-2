@@ -9,7 +9,7 @@ function Gui3.Dropdown:initialize(x, y, s)
     self.box.background = {255, 255, 255}
     self.box.visible = false
 
-    Gui3.Element.initialize(self, x, y, #s*8, 8)
+    Gui3.Element.initialize(self, x, y, self.button.w, self.button.h)
 
     self:addChild(self.button)
     self:addChild(self.box)

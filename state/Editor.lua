@@ -314,6 +314,11 @@ function Editor:draw()
 
     prof.push("UI")
     self.canvas:draw()
+
+    if VAR("debug").canvas then
+        self.canvas:debugDraw()
+    end
+
     prof.pop()
     prof.pop()
 end

@@ -404,4 +404,17 @@ function Gui3.Element:sizeChanged()
     end
 end
 
+function Gui3.Element:mouseRegionChanged()
+    self:getRoot():updateMouseRegions()
+end
+
+function Gui3.Element:getRoot()
+    local el = self
+    while el.parent do
+        el = el.parent
+    end
+
+    return el
+end
+
 function Gui3.Element:onAssign() end

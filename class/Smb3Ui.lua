@@ -97,10 +97,6 @@ function Smb3Ui:update(dt)
     self.element.score:setString(self:getScoreText())
     self.element.time:setString(self:getTimeText())
     prof.pop()
-
-    prof.push("canvas")
-    self.canvas:update(dt)
-    prof.pop()
 end
 
 function Smb3Ui:draw()

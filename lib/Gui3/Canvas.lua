@@ -26,11 +26,6 @@ function Gui3.Canvas:draw(level)
     Gui3.Element.unTranslate(self)
 end
 
-function Gui3.Canvas:update(dt, absX, absY)
-    self:updateMouseRegions()
-    -- Gui3.Element.update(self, dt, absX, absY)
-end
-
 function Gui3.Canvas:updateMouseRegions()
     self.mouseRegions = {}
 

@@ -161,7 +161,7 @@ function Editor:load()
         y = y + 14
     end
 
-
+    self.canvas:updateMouseRegions()
 
 
     self:selectTool("paint")
@@ -185,7 +185,6 @@ end
 function Editor:update(dt)
     prof.push("Editor")
     prof.push("UI")
-    self.canvas:update(dt)
     self.canvas:rootmousemoved(self.level:getMouse())
     prof.pop()
 

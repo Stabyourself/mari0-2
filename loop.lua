@@ -31,10 +31,10 @@ function love.run()
 		love.graphics.clear(love.graphics.getBackgroundColor())
 
 		love.draw()
+		prof.pop("frame")
 
 		love.graphics.present()
 
-		prof.pop("frame")
 		love.timer.sleep(0.001)
 	end
 end

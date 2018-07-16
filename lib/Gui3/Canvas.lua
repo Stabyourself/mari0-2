@@ -101,6 +101,7 @@ function Gui3.Canvas:rootmousereleased(x, y, button)
 
                 if pointInRectangle(x, y, region.x, region.y, region.w, region.h) then
                     region.element:mouseentered(x-region.offsetX, y-region.offsetY, button)
+                    self.lastMouseRegion = region
 
                     return true
                 end
@@ -115,6 +116,22 @@ function Gui3.Canvas:rootmousereleased(x, y, button)
 
                 return true
             end
+        end
+    end
+end
+
+function Gui3.Canvas:rootwheelmoved(x, y)
+    local mouseX, mouseY = game.level:getMouse()
+
+    print(mouseX, mouseY)
+
+    for i = #self.mouseRegions, 2, -1 do -- 1 is this canvas, and mouse clicks should go through it
+        local region = self.mouseRegions[i]
+
+        if pointInRectangle(mouseX, mouseY, region.x, region.y, region.w, region.h) then
+            region.element:wheelmoved(x, y)
+
+            return true
         end
     end
 end

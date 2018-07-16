@@ -108,8 +108,6 @@ function Layer:getTile(x, y)
 end
 
 function Layer:setCoordinate(x, y, tile)
-    assert(self:inMap(x, y), string.format("Tried to set out-of-bounds coordinate %s, %s. Stop that.", x, y))
-
     self.map[x-self.x][y-self.y].tile = tile
 end
 

@@ -383,7 +383,7 @@ function Editor:selectTool(toolName)
         toolButton:updateRender()
     end
 
-    self.toolButtons[toolName].color.background = {0, 0, 0, 0.25}
+    self.toolButtons[toolName].color.background = {0, 0, 0, 0.5}
 end
 
 function Editor:newWindow(windowClass, button)
@@ -509,9 +509,7 @@ function Editor:mousepressed(x, y, button)
 end
 
 function Editor:mousereleased(x, y, button)
-    if self.canvas:rootmousereleased(x, y, button) then
-        return true
-    end
+    self.canvas:rootmousereleased(x, y, button)
 
     if self.tool.mousereleased then
         self.tool:mousereleased(x, y, button)
@@ -542,7 +540,7 @@ function Editor:wheelmoved(x, y)
         return true
     end
 
-    if self.canvas:wheelmoved(x, y) then
+    if self.canvas:rootwheelmoved(x, y) then
         return true
     end
 

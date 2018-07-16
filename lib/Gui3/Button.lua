@@ -94,8 +94,8 @@ function Gui3.Button:initialize(x, y, content, border, padding, func, sizeX, siz
     self.color = {
         background = {1, 1, 1},
         normal = {0, 0, 0, 0},
-        hover = {0, 0, 0, 0.25},
-        active = {0, 0, 0, 0.375},
+        hover = {0, 0, 0, 0.5},
+        active = {0, 0, 0, 0.6},
     }
 end
 

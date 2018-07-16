@@ -42,5 +42,6 @@ function Gui3.Dropdown:autoSize()
 
     for _, child in ipairs(self.box.children) do
         child.w = self.box.childBox[3]
+        child:sizeChanged()
     end
 end

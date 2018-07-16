@@ -240,7 +240,7 @@ function Gui3.Element:render()
     if self.needsReRender then
         local canvas = love.graphics.getCanvas()
         love.graphics.setCanvas(self.canvas)
-        love.graphics.clear()
+        love.graphics.clear(1, 1, 1, 0)
 
         self:draw()
 
@@ -383,6 +383,7 @@ function Gui3.Element:wheelmoved(x, y)
     if self.hasScrollbar[2] and y ~= 0 then
         self.scroll[2] = self.scroll[2] - y*17
         self:limitScroll()
+        self:updateRender()
 
         return true
     end
@@ -391,6 +392,7 @@ function Gui3.Element:wheelmoved(x, y)
     if not self.hasScrollbar[2] and self.hasScrollbar[1] and y ~= 0 then
         self.scroll[1] = self.scroll[1] - y*17
         self:limitScroll()
+        self:updateRender()
 
         return true
     end
@@ -398,19 +400,9 @@ function Gui3.Element:wheelmoved(x, y)
     if self.hasScrollbar[1] and x ~= 0 then
         self.scroll[1] = self.scroll[1] - x*17
         self:limitScroll()
+        self:updateRender()
 
         return true
-    end
-
-    for _, child in ipairs(self.children) do
-        if child.wheelmoved then
-            if  child.mouse[1] > 0 and child.mouse[1] < child.w and
-                child.mouse[2] > 0 and child.mouse[2] < child.h then
-                if child:wheelmoved(x, y, button) then
-                    return true
-                end
-            end
-        end
     end
 end
 

@@ -33,6 +33,7 @@ function MinimapWindow:initialize(editor)
     self.minimapDraw.hookmousepressed = function(...) self.editor:clickMinimap(...) end
 
     self.element:addChild(self.minimapDraw)
+    self.element:mouseRegionChanged()
 end
 
 return MinimapWindow

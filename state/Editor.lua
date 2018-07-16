@@ -1,7 +1,7 @@
 local EditorState = require "class.editor.EditorState"
 local Selection = require "class.editor.Selection"
 local FloatingSelection = require "class.editor.FloatingSelection"
-local Editor = class("Editor")
+local Editor = class("Editor") -- todo make it local again
 
 Editor.toolbarOrder = {"Entity", "Paint", "Erase", "Move", "Select", "Wand", "Fill", "Stamp", "Portal"}
 Editor.toolbarImg = {}
@@ -161,8 +161,6 @@ function Editor:load()
         y = y + 14
     end
 
-    self.canvas:updateMouseRegions()
-
 
     self:selectTool("paint")
 
@@ -180,11 +178,13 @@ function Editor:load()
     self:mapChanged()
     self:toggleGrid(false)
     self:toggleFreeCam(false)
+    self:toggleUI(false)
 end
 
 function Editor:update(dt)
     prof.push("Editor")
     prof.push("UI")
+    self.canvas:update(dt)
     self.canvas:rootmousemoved(self.level:getMouse())
     prof.pop()
 
@@ -251,6 +251,7 @@ local function candyStencil()
 end
 
 function Editor:draw()
+    love.graphics.print(love.timer.getFPS(), 100, 100)
     prof.push("Editor")
     self.level.camera:attach(CAMERAOFFSETX, CAMERAOFFSETY)
 
@@ -313,7 +314,12 @@ function Editor:draw()
     self.level.camera:detach()
 
     prof.push("UI")
-    self.canvas:draw()
+
+    love.graphics.setColor(1, 1, 1)
+    self.canvas:rootDraw(0, 0)
+
+    love.graphics.draw(self.toolbar.canvas, 50, 50)
+    love.graphics.draw(self.toolButtons.paint.canvas, 90, 50)
 
     if VAR("debug").canvas then
         self.canvas:debugDraw()
@@ -352,6 +358,7 @@ function Editor:toggleUI(on)
         game.uiVisible = not on
         updateSizes()
         self.toolbar.h = CAMERAHEIGHT-14
+        self.toolbar:sizeChanged()
         self.level.camera.h = CAMERAHEIGHT
 
         local offset = (VAR("uiLineHeight")+VAR("uiHeight"))/2/self.level.camera.scale
@@ -377,6 +384,7 @@ function Editor:selectTool(toolName)
 
     for _, toolButton in pairs(self.toolButtons) do
         toolButton.color.background = {0, 0, 0, 0}
+        toolButton:updateRender()
     end
 
     self.toolButtons[toolName].color.background = {0, 0, 0, 0.25}
@@ -397,10 +405,12 @@ function Editor:selectTile(tile)
 
     for _, window in ipairs(self.windows) do
         if window:isInstanceOf(self.windowClasses.tiles) then
-            if window.tileMap ~= tile.tileMap then -- deselect it
-                window.tileListTileGrid.selected = false
-            else -- select the same tile that was selected
-                window.tileListTileGrid.selected = tile.num
+            if window.tileListTileGrid then -- not in the category selection
+                if window.tileMap ~= tile.tileMap then -- deselect it
+                    window.tileListTileGrid.selected = false
+                else -- select the same tile that was selected
+                    window.tileListTileGrid.selected = tile.num
+                end
             end
         end
     end
@@ -567,7 +577,7 @@ function Editor:zoom(i, toMouse)
 
     if i > 0 then -- out
         zoom = 1.1^i
-    else
+    else -- in!
         zoom = 1/(1.1^-i)
     end
 

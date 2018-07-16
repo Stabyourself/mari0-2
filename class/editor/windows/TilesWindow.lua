@@ -84,6 +84,7 @@ function TilesWindow:goToTileMap(tileMap)
 
     self.element:addChild(self.tileListTileGrid)
     self.element.autoArrangeChildren = false
+    self.element:sizeChanged()
 end
 
 return TilesWindow

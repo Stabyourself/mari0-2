@@ -59,7 +59,7 @@ function ActorEvent:setValue(name, value, priority)
         self.values[name] = {}
     end
 
-    table.insert(self.values[name], {value=value, priority=priority or 1}) -- todo: generates trash
+    table.insert(self.values[name], {value=value, priority=priority or 1}) -- todo: generates trash every frame
 end
 
 return ActorEvent

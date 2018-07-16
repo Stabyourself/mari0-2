@@ -10,11 +10,7 @@ function Gui3.SubDraw:initialize(func, x, y, w, h)
 end
 
 function Gui3.SubDraw:draw(level)
-    Gui3.Element.translate(self)
-
     Gui3.Element.draw(self, level)
 
     self.func()
-
-    Gui3.Element.unTranslate(self)
 end

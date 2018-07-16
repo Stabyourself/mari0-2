@@ -91,7 +91,7 @@ function Smb3Ui:update(dt)
     prof.push("concats")
     self.element.world:setString(self:getWorldText())
     self.element.pMeter:setString(self:getPMeterText())
-    self.element.pMeterImg.quad = pMeterQuad[self:getPMeterStatus()]
+    self.element.pMeterImg:setQuad(pMeterQuad[self:getPMeterStatus()])
     self.element.coins:setString(self:getCoinsText())
     self.element.lives:setString(self:getLivesText())
     self.element.score:setString(self:getScoreText())
@@ -100,7 +100,7 @@ function Smb3Ui:update(dt)
 end
 
 function Smb3Ui:draw()
-    self.canvas:draw()
+    self.canvas:rootDraw()
 end
 
 function Smb3Ui:getWorldText()

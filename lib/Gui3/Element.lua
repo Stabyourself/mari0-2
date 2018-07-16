@@ -30,13 +30,16 @@ function Gui3.Element:initialize(x, y, w, h)
     self.dragStart = {0, 0}
     self.resizePos = {0, 0}
 
-    self.mouse = {0, 0}
-
-    self.childBox = {0, 0, self.w, self.h}
+    self.mouse = {nil, nil}
 
     self.visible = true
 
     self.children = {}
+
+    self.childBox = {}
+
+    self.needsReRender = true
+    self:sizeChanged()
 
     if VAR("debug").canvas then
         self.debugColor = Color3.fromHSL(love.math.random(), 1, 0.5)
@@ -57,12 +60,15 @@ function Gui3.Element:addChild(element)
     table.insert(self.children, element)
 
     element:onAssign()
+
+    self:updateScrollbars()
 end
 
 function Gui3.Element:removeChild(element)
     for i, child in ipairs(self.children) do
         if child == element then
             table.remove(self.children, i)
+            self:mouseRegionChanged()
         end
     end
 end
@@ -95,14 +101,11 @@ function Gui3.Element:getMouseZone(t, x, y, boxX, boxY, boxW, boxH)
     end
 end
 
-function Gui3.Element:mousemoved(x, y, diffX, diffY)
-    self.mouse[1] = x
-    self.mouse[2] = y
-    -- Update scroll bar visibility
+function Gui3.Element:updateScrollbars()
+    self.childrenW, self.childrenH = self:getChildrenSize()
+
     self.hasScrollbar[1] = false
     self.hasScrollbar[2] = false
-
-    self.childrenW, self.childrenH = self:getChildrenSize()
 
     if self.scrollable[1] or self.scrollable[2] then
         if self.scrollable[1] and self.childrenW > self:getInnerWidth() then
@@ -121,10 +124,21 @@ function Gui3.Element:mousemoved(x, y, diffX, diffY)
         self.scrollbarSize[2] = math.max(4, (self:getInnerHeight()/self.childrenH)*(self.childBox[4]-self.scrollbarSpace))
     end
 
+    self:limitScroll()
+end
+
+function Gui3.Element:mousemoved(x, y, diffX, diffY)
+    self.childrenW, self.childrenH = self:getChildrenSize()
+
+    self.mouse[1] = x
+    self.mouse[2] = y
+
     if self.draggable then
         if self.dragging then
             self.x = self.x + diffX
             self.y = self.y + diffY
+
+            self:positionChanged()
         end
     end
 
@@ -153,11 +167,11 @@ function Gui3.Element:mousemoved(x, y, diffX, diffY)
     --limit x, y, w and h
     --lower
 
-    -- self.w = math.max(self.sizeMin[1], self.w)
-    -- self.h = math.max(self.sizeMin[2], self.h)
+    self.w = math.max(self.sizeMin[1], self.w)
+    self.h = math.max(self.sizeMin[2], self.h)
 
-    -- self.x = math.max(self.posMin[1], self.x)
-    -- self.y = math.max(self.posMin[2], self.y)
+    self.x = math.max(self.posMin[1], self.x)
+    self.y = math.max(self.posMin[2], self.y)
 
     if self.resizeable and self.parent then
         --upper
@@ -177,6 +191,8 @@ function Gui3.Element:mousemoved(x, y, diffX, diffY)
 
         factor = math.clamp(factor, 0, 1)
         self.scroll[1] = factor*(self.childrenW-self:getInnerWidth())
+        self:limitScroll()
+        self:mouseRegionChanged()
     end
 
 
@@ -185,6 +201,8 @@ function Gui3.Element:mousemoved(x, y, diffX, diffY)
 
         factor = math.clamp(factor, 0, 1)
         self.scroll[2] = factor*(self.childrenH-self:getInnerHeight())
+        self:limitScroll()
+        self:mouseRegionChanged()
     end
 
     self:limitScroll()
@@ -208,37 +226,44 @@ function Gui3.Element:limitScroll()
     self.scroll[2] = math.max(0, self.scroll[2])
 end
 
-function Gui3.Element:translate()
-    love.graphics.push()
-    love.graphics.translate(self.x, self.y)
+function Gui3.Element:render()
+    if self.needsReRender then
+        local canvas = love.graphics.getCanvas()
+        love.graphics.setCanvas(self.canvas)
+        love.graphics.clear()
+
+        self:draw()
+
+        love.graphics.setCanvas(canvas)
+
+        self.needsReRender = false
+    end
 end
 
-function Gui3.Element:unTranslate()
+function Gui3.Element:rootDraw()
+    love.graphics.push()
+    love.graphics.origin()
+
+    self:render()
+
     love.graphics.pop()
+
+    love.graphics.draw(self.canvas, self.x, self.y)
 end
 
 function Gui3.Element:draw()
-    -- local scissorX, scissorY, scissorW, scissorH
-
-    -- if self.clip then
-    --     scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
-    --     love.graphics.intersectScissor((self.absPos[1]+self.childBox[1])*VAR("scale"), (self.absPos[2]+self.childBox[2])*VAR("scale"), math.round(self.childBox[3]*VAR("scale")), math.round(self.childBox[4]*VAR("scale")))
-    -- end
-
-    love.graphics.translate(-self.scroll[1]+self.childBox[1], -self.scroll[2]+self.childBox[2])
-
+    -- Children
     for _, child in ipairs(self.children) do
-        if child.visible then
-            child:draw()
+        if child.visible and child.canvas then
+            child:render()
+
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.draw(child.canvas, child.x-self.scroll[1]+self.childBox[1], child.y-self.scroll[2]+self.childBox[2])
         end
     end
 
-    love.graphics.translate(self.scroll[1]-self.childBox[1], self.scroll[2]-self.childBox[2])
 
-    -- if self.clip then
-    --     love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
-    -- end
-
+    -- Scrollbars
     for i = 1, 2 do
         if self.scrollable[i] and self.hasScrollbar[i] then
             local pos = self:getScrollbarPos(i)
@@ -310,12 +335,18 @@ function Gui3.Element:mousepressed(x, y, button)
     if self.scrollable[1] and self.hasScrollbar[1] and self:scrollCollision(1, x, y) then
         self.scrolling[1] = true
         self.scrollingDragOffset[1] = x-self:getScrollbarPos(1)
+        self.exclusiveMouse = true
     end
 
     if self.scrollable[2] and self.hasScrollbar[2] and self:scrollCollision(2, x, y) then
         self.scrolling[2] = true
         self.scrollingDragOffset[2] = y-self:getScrollbarPos(2)
+        self.exclusiveMouse = true
     end
+
+    -- rearrange UI elements
+    -- todo: only move to front if not at the front?
+    self:moveToFront()
 
     -- custom hook
     if self.hookmousepressed then
@@ -326,6 +357,8 @@ end
 function Gui3.Element:mousereleased(x, y, button)
     self.scrolling[1] = false
     self.scrolling[2] = false
+
+    self.exclusiveMouse = false
 end
 
 function Gui3.Element:wheelmoved(x, y)
@@ -363,6 +396,22 @@ function Gui3.Element:wheelmoved(x, y)
     end
 end
 
+function Gui3.Element:moveToFront()
+    if self.parent then
+        if self.movesToFront then
+            for i = 1, #self.parent.children do
+                if self.parent.children[i] == self then
+                    table.insert(self.parent.children, table.remove(self.parent.children, i))
+                end
+            end
+        end
+
+        self.parent:moveToFront()
+
+        self:mouseRegionChanged()
+    end
+end
+
 function Gui3.Element:getChildrenSize()
     local w = 0
     local h = 0
@@ -386,11 +435,16 @@ function Gui3.Element:autoSize()
     self.w = self.childBox[1]*2+w
     self.h = self.childBox[2]*2+h
 
-    self.childBox[3] = w
-    self.childBox[4] = h
+    self:sizeChanged()
+end
+
+function Gui3.Element:positionChanged()
+    self:mouseRegionChanged()
+    self.parent:updateRender()
 end
 
 function Gui3.Element:sizeChanged()
+    -- Update childBox
     if self.childPadding then
         self.childBox[1] = self.childPadding[1]
         self.childBox[2] = self.childPadding[2]
@@ -402,10 +456,25 @@ function Gui3.Element:sizeChanged()
         self.childBox[3] = self.w
         self.childBox[4] = self.h
     end
+
+    -- Update canvas
+    if not self.canvas or self.canvas:getWidth() ~= self.w or self.canvas:getHeight() ~= self.h then -- canvas isn't current anymore
+        if self.w > 0 and self.h > 0 then -- but not 0 px wide or tall
+            self.canvas = love.graphics.newCanvas(self.w, self.h)
+        end
+    end
+
+    self:updateScrollbars()
+    self:mouseRegionChanged()
+    self:updateRender()
 end
 
 function Gui3.Element:mouseRegionChanged()
-    self:getRoot():updateMouseRegions()
+    local root = self:getRoot()
+
+    if root.updateMouseRegions then
+        root:updateMouseRegions()
+    end
 end
 
 function Gui3.Element:getRoot()
@@ -415,6 +484,14 @@ function Gui3.Element:getRoot()
     end
 
     return el
+end
+
+function Gui3.Element:updateRender()
+    self.needsReRender = true
+
+    if self.parent then
+        self.parent:updateRender()
+    end
 end
 
 function Gui3.Element:onAssign() end

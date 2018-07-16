@@ -77,13 +77,15 @@ function Gui3.Button:initialize(x, y, content, border, padding, func, sizeX, siz
         h = sizeY
     end
 
-    self.childBox = {self.padding, self.padding, w, h}
+    self.childPadding = {self.padding, self.padding, self.padding, self.padding}
 
     w = w + self.padding*2
     h = h + self.padding*2
 
     self.w = w
     self.h = h
+
+    self:sizeChanged()
 
     self.func = func
 
@@ -101,9 +103,7 @@ function Gui3.Button:getCollision(x, y)
     return x >= 0 and x < self.w and y >= 0 and y < self.h
 end
 
-function Gui3.Button:draw(level)
-    Gui3.Element.translate(self)
-
+function Gui3.Button:draw()
     love.graphics.setColor(1, 1, 1)
 
     if self.border then
@@ -141,14 +141,13 @@ function Gui3.Button:draw(level)
 
     love.graphics.setColor(1, 1, 1)
 
-    Gui3.Element.draw(self, level)
-
-    Gui3.Element.unTranslate(self)
+    Gui3.Element.draw(self)
 end
 
 function Gui3.Button:mousepressed(x, y, button)
     if self:getCollision(x, y) then
         self.pressing = true
+        self:updateRender()
     end
 
     return Gui3.Element.mousepressed(self, x, y, button)

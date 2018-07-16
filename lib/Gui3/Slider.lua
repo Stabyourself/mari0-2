@@ -78,8 +78,6 @@ function Gui3.Slider:getPosX()
 end
 
 function Gui3.Slider:draw(level)
-    Gui3.Element.translate(self)
-
     Gui3.Element.draw(self, level)
 
     love.graphics.setColor(self.color.bar)
@@ -101,8 +99,6 @@ function Gui3.Slider:draw(level)
     love.graphics.draw(img, self:getPosX(), 0, 0, 1, 1, 4)
 
     love.graphics.setColor(1, 1, 1)
-
-    Gui3.Element.unTranslate(self)
 end
 
 function Gui3.Slider:mousepressed(x, y, button)

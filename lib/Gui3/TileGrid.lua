@@ -50,8 +50,6 @@ function Gui3.TileGrid:getCollision(x, y)
 end
 
 function Gui3.TileGrid:draw(level)
-    Gui3.Element.translate(self)
-
     local mouseTile
     if self.mouse[1] then
         mouseTile = self:getCollision(self.mouse[1], self.mouse[2])
@@ -90,8 +88,6 @@ function Gui3.TileGrid:draw(level)
     end
 
     Gui3.Element.draw(self, level)
-
-    Gui3.Element.unTranslate(self)
 end
 
 function Gui3.TileGrid:mousepressed(x, y, button)

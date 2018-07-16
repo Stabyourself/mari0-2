@@ -1,7 +1,7 @@
 local Gui3 = ...
 Gui3.Canvas = class("Gui3.Canvas", Gui3.Element)
 
-Gui3.Canvas.movesToTheFront = true
+Gui3.Canvas.movesToFront = true
 
 function Gui3.Canvas:initialize(x, y, w, h)
     Gui3.Element.initialize(self, x, y, w, h)
@@ -13,51 +13,60 @@ function Gui3.Canvas:initialize(x, y, w, h)
 
     self.lastMouseX = 0
     self.lastMouseY = 0
+
+    self.mouseRegionsOutdated = true
 end
 
 function Gui3.Canvas:draw(level)
-    Gui3.Element.translate(self)
-
     love.graphics.setColor(self.background)
     love.graphics.rectangle("fill", 0, 0, self.w, self.h)
 
     Gui3.Element.draw(self, level)
-
-    Gui3.Element.unTranslate(self)
 end
 
 function Gui3.Canvas:updateMouseRegions()
-    self.mouseRegions = {}
+    self.mouseRegionsOutdated = true
+end
 
-    self:getMouseZone(self.mouseRegions, 0, 0, 0, 0, self.w, self.h)
+function Gui3.Canvas:update(dt)
+    if self.mouseRegionsOutdated then
+        print("Remouse")
+        self.mouseRegions = {}
+
+        self:getMouseZone(self.mouseRegions, 0, 0, 0, 0, self.w, self.h)
+
+        self.mouseRegionsOutdated = false
+    end
 end
 
 function Gui3.Canvas:rootmousemoved(x, y)
     local diffX = x-self.lastMouseX
     local diffY = y-self.lastMouseY
 
-    self.lastMouseX = x
-    self.lastMouseY = y
+    if diffX ~= 0 or diffY ~= 0 then
+        self.lastMouseX = x
+        self.lastMouseY = y
 
-    if self.lastMouseRegion then
-        self.lastMouseRegion.element:mousemoved(x-self.lastMouseRegion.offsetX, y-self.lastMouseRegion.offsetY, diffX, diffY)
-    end
+        if self.lastMouseRegion then
+            self.lastMouseRegion.element:mousemoved(x-self.lastMouseRegion.offsetX, y-self.lastMouseRegion.offsetY, diffX, diffY)
+        end
 
-    if not self.lastMouseRegion or not self.lastMouseRegion.element.exclusiveMouse then
-        for i = #self.mouseRegions, 2, -1 do -- 1 is this canvas, and mouse clicks should go through it
-            local region = self.mouseRegions[i]
+        if not self.lastMouseRegion or not self.lastMouseRegion.element.exclusiveMouse then
+            for i = #self.mouseRegions, 2, -1 do -- 1 is this canvas, and mouse clicks should go through it
+                local region = self.mouseRegions[i]
 
-            if pointInRectangle(x, y, region.x, region.y, region.w, region.h) then
-                if region ~= self.lastMouseRegion then
-                    if self.lastMouseRegion then
-                        self.lastMouseRegion.element:mouseleft(x-self.lastMouseRegion.offsetX, y-self.lastMouseRegion.offsetY)
+                if pointInRectangle(x, y, region.x, region.y, region.w, region.h) then
+                    if region ~= self.lastMouseRegion then
+                        if self.lastMouseRegion then
+                            self.lastMouseRegion.element:mouseleft(x-self.lastMouseRegion.offsetX, y-self.lastMouseRegion.offsetY)
+                        end
+                        region.element:mouseentered(x-region.offsetX, y-region.offsetY)
+
+                        self.lastMouseRegion = region
                     end
-                    region.element:mouseentered(x-region.offsetX, y-region.offsetY)
 
-                    self.lastMouseRegion = region
+                    return true
                 end
-
-                return true
             end
         end
     end

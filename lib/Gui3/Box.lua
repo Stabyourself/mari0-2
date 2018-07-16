@@ -1,7 +1,7 @@
 local Gui3 = ...
 Gui3.Box = class("Gui3.Box", Gui3.Element)
 
-Gui3.Box.movesToTheFront = true
+Gui3.Box.movesToFront = true
 
 Gui3.Box.childPaddingDraggable = {3, 12, 3, 4}
 Gui3.Box.childPaddingStatic = {2, 3, 2, 3}
@@ -45,8 +45,6 @@ function Gui3.Box:setDraggable(draggable)
 end
 
 function Gui3.Box:draw(level)
-    Gui3.Element.translate(self)
-
     if type(self.background) == "table" then
         love.graphics.setColor(self.background)
         love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
@@ -60,6 +58,7 @@ function Gui3.Box:draw(level)
 
 
     love.graphics.setColor(1, 1, 1)
+    Gui3.Element.draw(self, level)
 
     -- Border
     local borderImg = self.gui.img.box
@@ -96,8 +95,6 @@ function Gui3.Box:draw(level)
         love.graphics.draw(closeImg, self.w-12, 2)
     end
 
-    Gui3.Element.draw(self, level)
-
     if self.resizeable then
         local resizeImg = self.gui.img.boxResize
         if self.resizing then
@@ -114,8 +111,6 @@ function Gui3.Box:draw(level)
 
         love.graphics.draw(resizeImg, x, y)
     end
-
-    Gui3.Element.unTranslate(self)
 end
 
 function Gui3.Box:titleBarCollision(x, y)
@@ -162,7 +157,6 @@ end
 function Gui3.Box:mousereleased(x, y, button)
     self.dragging = false
     self.resizing = false
-    self.exclusiveMouse = false
 
     if self.closing then
         if self:closeCollision(x, y) then

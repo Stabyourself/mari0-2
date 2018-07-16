@@ -30,15 +30,13 @@ function Gui3.Checkbox:getCollision(x, y)
 end
 
 function Gui3.Checkbox:draw(level)
-    Gui3.Element.translate(self)
-
     love.graphics.setColor(1, 1, 1)
 
     local img = self.gui.img.checkbox
 
     if self.pressing then
         img = self.gui.img.checkboxActive
-    elseif self:getCollision(self.mouse[1], self.mouse[2]) then
+    elseif self.mouse[1] and self:getCollision(self.mouse[1], self.mouse[2]) then
         img = self.gui.img.checkboxHover
     end
 
@@ -51,8 +49,6 @@ function Gui3.Checkbox:draw(level)
     love.graphics.draw(img, self.padding, self.padding)
 
     Gui3.Element.draw(self, level)
-
-    Gui3.Element.unTranslate(self)
 end
 
 function Gui3.Checkbox:mousepressed(x, y, checkbox)

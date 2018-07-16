@@ -19,8 +19,6 @@ function Gui3.Image:initialize(img, x, y, quad, scale)
 end
 
 function Gui3.Image:draw(level)
-    Gui3.Element.translate(self)
-
     Gui3.Element.draw(self, level)
 
     love.graphics.setColor(self.color)
@@ -32,6 +30,11 @@ function Gui3.Image:draw(level)
     end
 
     love.graphics.setColor(1, 1, 1)
+end
 
-    Gui3.Element.unTranslate(self)
+function Gui3.Image:setQuad(quad)
+    if self.quad ~= quad then
+        self.quad = quad
+        self:updateRender()
+    end
 end

@@ -38,12 +38,14 @@ function Gui3.Element:initialize(x, y, w, h)
 
     self.childBox = {}
 
+    self.childrenW, self.childrenH = self:getChildrenSize()
     self.needsReRender = true
     self:sizeChanged()
 
     if VAR("debug").canvas then
         self.debugColor = Color3.fromHSL(love.math.random(), 1, 0.5)
     end
+
 end
 
 function Gui3.Element:resize(w, h)
@@ -187,25 +189,33 @@ function Gui3.Element:mousemoved(x, y, diffX, diffY)
     end
 
     if self.scrolling[1] then
+        local oldScroll = self.scroll[1]
         local factor = ((self.mouse[1]-self.scrollingDragOffset[1]-self.childBox[1])/(self.childBox[3]-self.scrollbarSize[1]-self.scrollbarSpace))
 
         factor = math.clamp(factor, 0, 1)
         self.scroll[1] = factor*(self.childrenW-self:getInnerWidth())
         self:limitScroll()
-        self:mouseRegionChanged()
+
+        if self.scroll[1] ~= oldScroll then
+            self:mouseRegionChanged()
+            self:updateRender()
+        end
     end
 
 
     if self.scrolling[2] then
+        local oldScroll = self.scroll[2]
         local factor = ((self.mouse[2]-self.scrollingDragOffset[2]-self.childBox[2])/(self.childBox[4]-self.scrollbarSize[2]-self.scrollbarSpace))
 
         factor = math.clamp(factor, 0, 1)
         self.scroll[2] = factor*(self.childrenH-self:getInnerHeight())
         self:limitScroll()
-        self:mouseRegionChanged()
-    end
 
-    self:limitScroll()
+        if self.scroll[2] ~= oldScroll then
+            self:mouseRegionChanged()
+            self:updateRender()
+        end
+    end
 end
 
 function Gui3.Element:mouseentered(x, y)
@@ -243,6 +253,10 @@ end
 function Gui3.Element:rootDraw()
     love.graphics.push()
     love.graphics.origin()
+
+    if self.needsReRender then
+        print("Root needed rerender " .. love.timer.getTime())
+    end
 
     self:render()
 
@@ -355,8 +369,12 @@ function Gui3.Element:mousepressed(x, y, button)
 end
 
 function Gui3.Element:mousereleased(x, y, button)
-    self.scrolling[1] = false
-    self.scrolling[2] = false
+    if self.scrolling[1] or self.scrolling[2] then
+        self.scrolling[1] = false
+        self.scrolling[2] = false
+
+        self:updateRender()
+    end
 
     self.exclusiveMouse = false
 end
@@ -409,6 +427,7 @@ function Gui3.Element:moveToFront()
         self.parent:moveToFront()
 
         self:mouseRegionChanged()
+        self.parent:updateRender()
     end
 end
 
@@ -460,10 +479,11 @@ function Gui3.Element:sizeChanged()
     -- Update canvas
     if not self.canvas or self.canvas:getWidth() ~= self.w or self.canvas:getHeight() ~= self.h then -- canvas isn't current anymore
         if self.w > 0 and self.h > 0 then -- but not 0 px wide or tall
-            self.canvas = love.graphics.newCanvas(self.w, self.h)
+            self.canvas = love.graphics.newCanvas(math.ceil(self.w), math.ceil(self.h))
         end
     end
 
+    self:limitScroll()
     self:updateScrollbars()
     self:mouseRegionChanged()
     self:updateRender()

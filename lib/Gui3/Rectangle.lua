@@ -1,6 +1,8 @@
 local Gui3 = ...
 Gui3.Rectangle = class("Gui3.Rectangle", Gui3.Element)
 
+Gui3.Rectangle.noMouseEvents = true
+
 Gui3.Rectangle.scale = 3
 
 function Gui3.Rectangle:initialize(x, y, w, h)

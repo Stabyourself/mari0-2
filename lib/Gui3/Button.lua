@@ -99,10 +99,6 @@ function Gui3.Button:initialize(x, y, content, border, padding, func, sizeX, siz
     }
 end
 
-function Gui3.Button:getCollision(x, y)
-    return x >= 0 and x < self.w and y >= 0 and y < self.h
-end
-
 function Gui3.Button:draw()
     love.graphics.setColor(1, 1, 1)
 
@@ -111,7 +107,7 @@ function Gui3.Button:draw()
 
         if self.pressing then
             img = self.gui.img.buttonActive
-        elseif self.mouse[1] and self:getCollision(self.mouse[1], self.mouse[2]) then
+        elseif self.mouse[1] then
             img = self.gui.img.buttonHover
         end
 
@@ -132,7 +128,7 @@ function Gui3.Button:draw()
 
         if self.pressing then
             love.graphics.setColor(self.color.active)
-        elseif self.mouse[1] and self:getCollision(self.mouse[1], self.mouse[2]) then
+        elseif self.mouse[1] then
             love.graphics.setColor(self.color.hover)
         end
 
@@ -145,22 +141,39 @@ function Gui3.Button:draw()
 end
 
 function Gui3.Button:mousepressed(x, y, button)
-    if self:getCollision(x, y) then
-        self.pressing = true
-        self:updateRender()
-    end
+    self.pressing = true
+    self.exclusiveMouse = true
+    self:updateRender()
 
     return Gui3.Element.mousepressed(self, x, y, button)
 end
 
+function Gui3.Button:getCollision(x, y)
+    return x >= 0 and x < self.w and y >= 0 and y < self.h
+end
+
 function Gui3.Button:mousereleased(x, y, button)
-    if self.pressing and self:getCollision(x, y) then
+    if self.pressing and self:getCollision(self.mouse[1], self.mouse[2]) then
         if self.func then
             self.func(self)
         end
+
+        self:updateRender()
     end
 
     self.pressing = false
 
     Gui3.Element.mousereleased(self, x, y, button)
+end
+
+function Gui3.Button:mouseentered(x, y)
+    Gui3.Element.mouseentered(self, x, y)
+
+    self:updateRender()
+end
+
+function Gui3.Button:mouseleft(x, y)
+    Gui3.Element.mouseleft(self, x, y)
+
+    self:updateRender()
 end

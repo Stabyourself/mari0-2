@@ -25,10 +25,6 @@ function Gui3.Checkbox:initialize(x, y, s, padding, func, val)
     self.value = val == nil and false or val
 end
 
-function Gui3.Checkbox:getCollision(x, y)
-    return x >= 0 and x < self.w and y >= 0 and y < self.h
-end
-
 function Gui3.Checkbox:draw(level)
     love.graphics.setColor(1, 1, 1)
 
@@ -36,7 +32,7 @@ function Gui3.Checkbox:draw(level)
 
     if self.pressing then
         img = self.gui.img.checkboxActive
-    elseif self.mouse[1] and self:getCollision(self.mouse[1], self.mouse[2]) then
+    elseif self.mouse[1] then
         img = self.gui.img.checkboxHover
     end
 
@@ -52,23 +48,42 @@ function Gui3.Checkbox:draw(level)
 end
 
 function Gui3.Checkbox:mousepressed(x, y, checkbox)
-    if self:getCollision(x, y) then
-        self.pressing = true
-    end
+    self.pressing = true
+    self:updateRender()
+    self.exclusiveMouse = true
 
-    return Gui3.Element.mousepressed(self, x, y, checkbox)
+    return true
+end
+
+function Gui3.Checkbox:getCollision(x, y)
+    return x >= 0 and x < self.w and y >= 0 and y < self.h
 end
 
 function Gui3.Checkbox:mousereleased(x, y, checkbox)
-    if self.pressing and self:getCollision(x, y) then
+    if self.pressing and self:getCollision(self.mouse[1], self.mouse[2]) then
         self.value = not self.value
 
         if self.func then
             self.func(self)
         end
+
+        self:updateRender()
     end
 
+    self.exclusiveMouse = false
     self.pressing = false
 
-    return Gui3.Element.mousereleased(self, x, y, checkbox)
+    return true
+end
+
+function Gui3.Checkbox:mouseentered(x, y)
+    Gui3.Element.mouseentered(self, x, y)
+
+    self:updateRender()
+end
+
+function Gui3.Checkbox:mouseleft(x, y)
+    Gui3.Element.mouseleft(self, x, y)
+
+    self:updateRender()
 end

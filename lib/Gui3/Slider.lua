@@ -41,18 +41,13 @@ function Gui3.Slider:mousemoved(x, y)
     local ret = Gui3.Element.mousemoved(self, x, y)
 
     if self.dragging then
-        local pos = (x-self.dragX-self.barOffset)/(self.barWidth)
+        local prevVal = self.val
+        local newVal = (x-self.dragX-self.barOffset)/(self.barWidth)
 
-        pos = math.clamp(pos, 0, 1)
+        newVal = math.clamp(newVal, 0, 1)
 
-        self.val = pos
-
-        if self.showValue then
-            self.text:setString(tostring(math.round(self:getValue())))
-        end
-
-        if self.func then
-            self.func(self:getValue())
+        if newVal ~= prevVal then
+            self:setValue(newVal*(self.max-self.min)+self.min)
         end
     end
 
@@ -63,8 +58,20 @@ function Gui3.Slider:getValue()
     return self.min + (self.max-self.min)*self.val
 end
 
-function Gui3.Slider:setValue(val)
-    self.val = (val-self.min)/(self.max-self.min)
+function Gui3.Slider:setValue(newVal)
+    if newVal ~= self.val then
+        self.val = (newVal-self.min)/(self.max-self.min)
+
+        if self.showValue then
+            self.text:setString(tostring(math.round(self:getValue())))
+        end
+
+        if self.func then
+            self.func(self:getValue())
+        end
+
+        self:updateRender()
+    end
 end
 
 function Gui3.Slider:getCollision(x, y)
@@ -105,14 +112,17 @@ function Gui3.Slider:mousepressed(x, y, button)
     if self:getCollision(x, y) then
         self.dragging = true
         self.dragX = x-self:getPosX()
+
         self.exclusiveMouse = true
+        self:updateRender()
     end
 
-    return Gui3.Element.mousepressed(self, x, y, button)
+    Gui3.Element.mousepressed(self, x, y, button)
 end
+
 function Gui3.Slider:mousereleased(x, y, button)
     self.dragging = false
-    self.exclusiveMouse = false
+    self:updateRender()
 
     Gui3.Element.mousereleased(self, x, y, button)
 end

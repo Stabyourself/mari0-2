@@ -178,7 +178,7 @@ function Editor:load()
     self:mapChanged()
     self:toggleGrid(false)
     self:toggleFreeCam(false)
-    self:toggleUI(false)
+    self:toggleUI(true)
 end
 
 function Editor:update(dt)
@@ -251,7 +251,6 @@ local function candyStencil()
 end
 
 function Editor:draw()
-    love.graphics.print(love.timer.getFPS(), 100, 100)
     prof.push("Editor")
     self.level.camera:attach(CAMERAOFFSETX, CAMERAOFFSETY)
 
@@ -317,9 +316,6 @@ function Editor:draw()
 
     love.graphics.setColor(1, 1, 1)
     self.canvas:rootDraw(0, 0)
-
-    love.graphics.draw(self.toolbar.canvas, 50, 50)
-    love.graphics.draw(self.toolButtons.paint.canvas, 90, 50)
 
     if VAR("debug").canvas then
         self.canvas:debugDraw()

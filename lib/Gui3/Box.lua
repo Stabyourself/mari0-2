@@ -160,13 +160,18 @@ function Gui3.Box:mousereleased(x, y, button)
 
     if self.closing then
         if self:closeCollision(x, y) then
-            self.parent:removeChild(self)
+            self:close()
         else
             self.closing = false
         end
     end
 
     Gui3.Element.mousereleased(self, x, y, button)
+end
+
+function Gui3.Box:close()
+    self.parent:removeChild(self)
+    self.parent:updateRender()
 end
 
 function Gui3.Box:sizeChanged()

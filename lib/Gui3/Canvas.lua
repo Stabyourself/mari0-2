@@ -30,7 +30,6 @@ end
 
 function Gui3.Canvas:update(dt)
     if self.mouseRegionsOutdated then
-        print("Remouse")
         self.mouseRegions = {}
 
         self:getMouseZone(self.mouseRegions, 0, 0, 0, 0, self.w, self.h)
@@ -56,10 +55,11 @@ function Gui3.Canvas:rootmousemoved(x, y)
                 local region = self.mouseRegions[i]
 
                 if pointInRectangle(x, y, region.x, region.y, region.w, region.h) then
-                    if region ~= self.lastMouseRegion then
+                    if not self.lastMouseRegion or region.element ~= self.lastMouseRegion.element then
                         if self.lastMouseRegion then
                             self.lastMouseRegion.element:mouseleft(x-self.lastMouseRegion.offsetX, y-self.lastMouseRegion.offsetY)
                         end
+
                         region.element:mouseentered(x-region.offsetX, y-region.offsetY)
 
                         self.lastMouseRegion = region
@@ -67,6 +67,11 @@ function Gui3.Canvas:rootmousemoved(x, y)
 
                     return true
                 end
+            end
+            -- no region was entered
+            if self.lastMouseRegion then
+                self.lastMouseRegion.element:mouseleft(x-self.lastMouseRegion.offsetX, y-self.lastMouseRegion.offsetY)
+                self.lastMouseRegion = nil
             end
         end
     end
@@ -85,8 +90,22 @@ function Gui3.Canvas:rootmousepressed(x, y, button)
 end
 
 function Gui3.Canvas:rootmousereleased(x, y, button)
-    if self.lastMouseRegion.element.exclusiveMouse then
+    if self.lastMouseRegion and self.lastMouseRegion.element.exclusiveMouse then
         self.lastMouseRegion.element:mousereleased(x-self.lastMouseRegion.offsetX, y-self.lastMouseRegion.offsetY, button)
+        if not pointInRectangle(x, y, self.lastMouseRegion.x, self.lastMouseRegion.y, self.lastMouseRegion.w, self.lastMouseRegion.h) then -- mouse left the region since
+            self.lastMouseRegion.element:mouseleft(x-self.lastMouseRegion.offsetX, y-self.lastMouseRegion.offsetY, button)
+            self.lastMouseRegion = nil
+
+            for i = #self.mouseRegions, 2, -1 do -- 1 is this canvas, and mouse clicks should go through it
+                local region = self.mouseRegions[i]
+
+                if pointInRectangle(x, y, region.x, region.y, region.w, region.h) then
+                    region.element:mouseentered(x-region.offsetX, y-region.offsetY, button)
+
+                    return true
+                end
+            end
+        end
     else
         for i = #self.mouseRegions, 2, -1 do -- 1 is this canvas, and mouse clicks should go through it
             local region = self.mouseRegions[i]

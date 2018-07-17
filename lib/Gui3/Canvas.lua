@@ -17,11 +17,11 @@ function Gui3.Canvas:initialize(x, y, w, h)
     self.mouseRegionsOutdated = true
 end
 
-function Gui3.Canvas:draw(level)
+function Gui3.Canvas:draw()
     love.graphics.setColor(self.background)
     love.graphics.rectangle("fill", 0, 0, self.w, self.h)
 
-    Gui3.Element.draw(self, level)
+    Gui3.Element.draw(self)
 end
 
 function Gui3.Canvas:updateMouseRegions()

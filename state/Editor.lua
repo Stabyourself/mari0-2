@@ -401,11 +401,11 @@ function Editor:selectTile(tile)
 
     for _, window in ipairs(self.windows) do
         if window:isInstanceOf(self.windowClasses.tiles) then
-            if window.tileListTileGrid then -- not in the category selection
+            if window.tileGrid then -- not in the category selection
                 if window.tileMap ~= tile.tileMap then -- deselect it
-                    window.tileListTileGrid.selected = false
+                    window.tileGrid.selected = false
                 else -- select the same tile that was selected
-                    window.tileListTileGrid.selected = tile.num
+                    window.tileGrid:setSelected(tile.num)
                 end
             end
         end
@@ -783,6 +783,7 @@ function Editor:updateMinimap()
         if window:isInstanceOf(self.windowClasses.minimap) then
             window.minimapDraw.w = width*3
             window.minimapDraw.h = height*3
+            window.minimapDraw:sizeChanged()
         end
     end
 end

@@ -25,7 +25,7 @@ function Gui3.Checkbox:initialize(x, y, s, padding, func, val)
     self.value = val == nil and false or val
 end
 
-function Gui3.Checkbox:draw(level)
+function Gui3.Checkbox:draw()
     love.graphics.setColor(1, 1, 1)
 
     local img = self.gui.img.checkbox
@@ -44,7 +44,7 @@ function Gui3.Checkbox:draw(level)
 
     love.graphics.draw(img, self.padding, self.padding)
 
-    Gui3.Element.draw(self, level)
+    Gui3.Element.draw(self)
 end
 
 function Gui3.Checkbox:mousepressed(x, y, checkbox)

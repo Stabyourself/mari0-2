@@ -17,19 +17,21 @@ function Gui3.TileGrid:initialize(x, y, tileMap, func)
     self.selected = nil
 end
 
-function Gui3.TileGrid:update(dt, absX, absY)
-    Gui3.Element.update(self, dt, absX, absY)
+function Gui3.TileGrid:mousemoved(x, y)
+    -- local maxWidth = self.parent:getInnerWidth()
 
-    local maxWidth = self.parent:getInnerWidth()
+    -- self.perRow = math.max(1, math.floor((maxWidth-self.x)/(self.size[1]+self.gutter[1])))
 
-    self.perRow = math.max(1, math.floor((maxWidth-self.x)/(self.size[1]+self.gutter[1])))
+    -- self:updateSize()
 
-    self:updateSize()
+    Gui3.Element.mousemoved(self, x, y)
 end
 
 function Gui3.TileGrid:updateSize()
     self.w = self.perRow*(self.size[1]+self.gutter[1])-self.gutter[1]
     self.h = math.ceil(#self.tiles/self.perRow)*(self.size[2]+self.gutter[2])
+
+    self:sizeChanged()
 end
 
 function Gui3.TileGrid:getCollision(x, y)
@@ -49,7 +51,7 @@ function Gui3.TileGrid:getCollision(x, y)
     end
 end
 
-function Gui3.TileGrid:draw(level)
+function Gui3.TileGrid:draw()
     local mouseTile
     if self.mouse[1] then
         mouseTile = self:getCollision(self.mouse[1], self.mouse[2])
@@ -87,7 +89,13 @@ function Gui3.TileGrid:draw(level)
         Gui3.drawBox(self.gui.img.box, Gui3.boxQuad, x-2, y-3, 20, 22)
     end
 
-    Gui3.Element.draw(self, level)
+    Gui3.Element.draw(self)
+end
+
+function Gui3.TileGrid:setSelected(i)
+    self.selected = i
+    self:updateRender()
+    print("!")
 end
 
 function Gui3.TileGrid:mousepressed(x, y, button)

@@ -14,12 +14,12 @@ function Gui3.Rectangle:initialize(x, y, w, h)
     Gui3.Element.initialize(self, x, y, self.w, self.h)
 end
 
-function Gui3.Rectangle:draw(level)
-    Gui3.Element.draw(self, level)
-
+function Gui3.Rectangle:draw()
     love.graphics.scale(self.scale)
     love.graphics.rectangle("line", 0.5, 0.5, self.w, self.h)
     love.graphics.scale(1/self.scale)
+
+    Gui3.Element.draw(self)
 end
 
 return Gui3.Rectangle

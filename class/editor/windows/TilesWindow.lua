@@ -34,17 +34,21 @@ function TilesWindow:goToMenu()
         local thumb = tileMap.thumbImg or tileMap.img
 
         local tileMapButton = Gui3.Button:new(0, 0, {tileMap.name,
-            function()
-                local i = 1
-                for y = 1, self.tileHeight do
-                    for x = 1, self.tileWidth do
-                        if tileMap.tiles[i] then
-                            tileMap.tiles[i]:draw((x-1)*17, (y-1)*17)
-                            i = i + 1
+            {
+                func = function()
+                    local i = 1
+                    for y = 1, self.tileHeight do
+                        for x = 1, self.tileWidth do
+                            if tileMap.tiles[i] then
+                                tileMap.tiles[i]:draw((x-1)*17, (y-1)*17)
+                                i = i + 1
+                            end
                         end
                     end
-                end
-            end
+                end,
+                w = self.tileWidth*17-1,
+                h = self.tileHeight*17-1,
+            }
             }, true, 0,
             function()
                 self:goToTileMap(tileMap)
@@ -69,9 +73,9 @@ function TilesWindow:goToTileMap(tileMap)
     backButton.ignoreForParentSize = true
     self.element:addChild(backButton)
 
-    self.tileListTileGrid = Gui3.TileGrid:new(1, 16, self.tileMap,
+    self.tileGrid = Gui3.TileGrid:new(1, 16, self.tileMap,
         function(TileGrid, i)
-            TileGrid.selected = i
+            TileGrid:setSelected(i)
 
             self.editor:selectTile(self.tileMap.tiles[i])
         end
@@ -79,10 +83,10 @@ function TilesWindow:goToTileMap(tileMap)
 
     -- select tile if the tilemap is the same
     if tileMap == self.editor.tools.paint.tile.tileMap then -- select it
-        self.tileListTileGrid.selected = self.editor.tools.paint.tile.num
+        self.tileGrid:setSelected(self.editor.tools.paint.tile.num)
     end
 
-    self.element:addChild(self.tileListTileGrid)
+    self.element:addChild(self.tileGrid)
     self.element.autoArrangeChildren = false
     self.element:sizeChanged()
 end

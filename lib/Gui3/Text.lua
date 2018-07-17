@@ -24,8 +24,8 @@ function Gui3.Text:setString(s)
     end
 end
 
-function Gui3.Text:draw(level)
-    Gui3.Element.draw(self, level)
+function Gui3.Text:draw()
+    Gui3.Element.draw(self)
 
     love.graphics.draw(self.text, 0, 0)
 end

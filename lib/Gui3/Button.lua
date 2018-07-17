@@ -21,8 +21,10 @@ function Gui3.Button:addImage(img, y)
     self:addChild(Gui3.Image:new(img, 0, y))
 end
 
-function Gui3.Button:addSubDraw(func, y)
-    self:addChild(Gui3.SubDraw:new(func, 0, y))
+function Gui3.Button:addSubDraw(func, y, w, h)
+    local subDraw = Gui3.SubDraw:new(func, 0, y, w, h)
+    subDraw.noMouseEvents = true
+    self:addChild(subDraw)
 end
 
 function Gui3.Button:initialize(x, y, content, border, padding, func, sizeX, sizeY)
@@ -50,19 +52,15 @@ function Gui3.Button:initialize(x, y, content, border, padding, func, sizeX, siz
             elY = elY + 9
             maxW = math.max(maxW, #el*8)
 
-        elseif type(el) == "userdata" then -- simple image
+        elseif type(el) == "userdata" then -- image
             self:addImage(el, elY)
 
             elY = elY + el:getHeight()+1
             maxW = math.max(maxW, el:getWidth())
 
-        elseif type(el) == "table" then -- advanced image
-            self:addImage(el.img, elY)
+        elseif type(el) == "table" then -- subDraw
+            self:addSubDraw(el.func, elY, el.w, el.h)
 
-            elY = elY + ((el.h + 1) or (el.img:getHeight())+1)
-            maxW = math.max(maxW, (el.clipX or el.img:getWidth()))
-        elseif type(el) == "function" then -- subdraw
-            self:addSubDraw(el, elY)
         end
     end
 

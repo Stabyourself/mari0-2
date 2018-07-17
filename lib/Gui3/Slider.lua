@@ -84,9 +84,7 @@ function Gui3.Slider:getPosX()
     return self.val*(self.barWidth)+self.barOffset
 end
 
-function Gui3.Slider:draw(level)
-    Gui3.Element.draw(self, level)
-
+function Gui3.Slider:draw()
     love.graphics.setColor(self.color.bar)
 
     love.graphics.draw(self.gui.img.sliderBar, sliderQuad[1], 0, 0)
@@ -106,6 +104,8 @@ function Gui3.Slider:draw(level)
     love.graphics.draw(img, self:getPosX(), 0, 0, 1, 1, 4)
 
     love.graphics.setColor(1, 1, 1)
+
+    Gui3.Element.draw(self)
 end
 
 function Gui3.Slider:mousepressed(x, y, button)

@@ -44,7 +44,7 @@ function Gui3.Box:setDraggable(draggable)
     self.childBox[4] = self.h-self.childPadding[2]-self.childPadding[4]
 end
 
-function Gui3.Box:draw(level)
+function Gui3.Box:draw()
     if type(self.background) == "table" then
         love.graphics.setColor(self.background)
         love.graphics.rectangle("fill", self.childBox[1], self.childBox[2], self.childBox[3], self.childBox[4])
@@ -58,7 +58,7 @@ function Gui3.Box:draw(level)
 
 
     love.graphics.setColor(1, 1, 1)
-    Gui3.Element.draw(self, level)
+    Gui3.Element.draw(self)
 
     -- Border
     local borderImg = self.gui.img.box
@@ -151,7 +151,7 @@ function Gui3.Box:mousepressed(x, y, button)
         self.exclusiveMouse = true
     end
 
-    return Gui3.Element.mousepressed(self, x, y, button)
+    Gui3.Element.mousepressed(self, x, y, button)
 end
 
 function Gui3.Box:mousereleased(x, y, button)

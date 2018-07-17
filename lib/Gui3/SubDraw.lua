@@ -3,14 +3,14 @@ Gui3.SubDraw = class("Gui3.SubDraw", Gui3.Element)
 
 function Gui3.SubDraw:initialize(func, x, y, w, h)
     self.func = func
-    self.w = w or 0
-    self.h = h or 0
+    self.w = w
+    self.h = h
 
     Gui3.Element.initialize(self, x, y, self.w, self.h)
 end
 
-function Gui3.SubDraw:draw(level)
-    Gui3.Element.draw(self, level)
-
+function Gui3.SubDraw:draw()
     self.func()
+
+    Gui3.Element.draw(self)
 end

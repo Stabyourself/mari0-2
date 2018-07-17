@@ -800,12 +800,12 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
                     local absY = mapY-1
 
                     if side == "ver" then
-                        local dist = (mapX - rayPosX + (1 - stepX) / 2) / rayDirX;
+                        local dist = (mapX - rayPosX + (1 - stepX) / 2) / rayDirX
                         hitDist = rayPosY + dist * rayDirY - math.floor(mapY)
 
                         absY = absY + hitDist
                     else
-                        local dist = (mapY - rayPosY + (1 - stepY) / 2) / rayDirY;
+                        local dist = (mapY - rayPosY + (1 - stepY) / 2) / rayDirY
                         hitDist = rayPosX + dist * rayDirX - math.floor(mapX)
 
                         absX = absX + hitDist
@@ -827,8 +827,8 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
         -- jump to next map square, OR in x-direction, OR in y-direction
         if sideDistX < sideDistY then
             sideDistX = sideDistX + deltaDistX
-            mapX = mapX + stepX;
-            side = "ver";
+            mapX = mapX + stepX
+            side = "ver"
         else
             sideDistY = sideDistY + deltaDistY
             mapY = mapY + stepY

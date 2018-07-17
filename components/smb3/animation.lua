@@ -23,7 +23,7 @@ function animation:initialize(actor, args)
     self.actor.frames = self.frames
     self.actor.frameCounts = {}
 
-    for y = 1, 5 do
+    for y = 1, 9 do
         self.actor.quadList[y] = {}
         local x = 0
 
@@ -56,20 +56,20 @@ function animation:initialize(actor, args)
 end
 
 function animation:postUpdate(dt)
-    if self.actor.hasPortalGun then -- look towards portalGunAngle
-        if math.abs(self.actor.portalGunAngle-self.actor.angle) <= math.pi*.5 then
-            self.actor.animationDirection = 1
-        else
-            self.actor.animationDirection = -1
-        end
+    -- if self.actor.hasPortalGun then -- look towards portalGunAngle
+    --     if math.abs(self.actor.portalGunAngle-self.actor.angle) <= math.pi*.5 then
+    --         self.actor.animationDirection = 1
+    --     else
+    --         self.actor.animationDirection = -1
+    --     end
 
-    else -- look towards last pressed direction
+    -- else -- look towards last pressed direction
         if controls3.cmdDown("left") then
             self.actor.animationDirection = -1
         elseif controls3.cmdDown("right") then
             self.actor.animationDirection = 1
         end
-    end
+    -- end
 
     local frame = false
 
@@ -245,27 +245,26 @@ end
 
 function getAngleFrame(actor)
     if not actor.hasPortalGun then
-        return 5
+        return 9
     end
 
     local angle = actor.portalGunAngle-actor.angle
 
-    if angle > math.pi*.5 then
-        angle = math.pi - angle
-    elseif angle < -math.pi*.5 then
-        angle = -math.pi - angle
+    if actor.animationDirection == -1 then
+        angle = -angle + math.pi
+        angle = normalizeAngle(angle)
     end
 
-    if angle < -math.pi*0.375 then
-        return 1
-    elseif angle < -math.pi*0.125 then
-        return 2
-    elseif angle < math.pi*0.125  then
-        return 3
-    elseif angle < math.pi*0.375 then
-        return 4
-    else -- Downward frame looks dumb
-        return 4
+    for i = 0, 8 do
+        if angle < -math.pi*(0.875-i*0.25) then
+            local out = 7+i
+
+            if out > 8 then
+                out = out - 8
+            end
+
+            return out
+        end
     end
 end
 

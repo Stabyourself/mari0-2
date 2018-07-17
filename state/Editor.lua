@@ -178,7 +178,7 @@ function Editor:load()
     self:mapChanged()
     self:toggleGrid(false)
     self:toggleFreeCam(false)
-    self:toggleUI(true)
+    self:toggleUI(false)
 end
 
 function Editor:update(dt)

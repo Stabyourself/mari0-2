@@ -79,19 +79,32 @@ function Gui3.Element:clearChildren()
     iClearTable(self.children)
 end
 
-function Gui3.Element:getMouseZone(t, x, y, boxX, boxY, boxW, boxH)
+function Gui3.Element:getMouseZone(t, index, x, y, boxX, boxY, boxW, boxH)
     if self.visible and not self.noMouseEvents then
         boxX, boxY, boxW, boxH = intersectRectangles(x, y, self.w, self.h, boxX, boxY, boxW, boxH)
 
         if boxX and boxW > 0 and boxH > 0 then
-            table.insert(t, {x=boxX, y=boxY, w=boxW, h=boxH, offsetX=x, offsetY=y, element=self})
+            if not t[index] then
+                t[index] = {}
+            end
+
+            t[index].x = boxX
+            t[index].y = boxY
+            t[index].w = boxW
+            t[index].h = boxH
+            t[index].offsetX = x
+            t[index].offsetY = y
+            t[index].element = self
+
+            index = index + 1
 
             boxX, boxY, boxW, boxH = intersectRectangles(x+self.childBox[1], y+self.childBox[2], self:getInnerWidth(), self:getInnerHeight(), boxX, boxY, boxW, boxH)
 
             if boxX then
                 for _, child in ipairs(self.children) do
-                    child:getMouseZone(
+                    index = child:getMouseZone(
                         t,
+                        index,
                         x+child.x-self.scroll[1]+self.childBox[1],
                         y+child.y-self.scroll[2]+self.childBox[2],
                         boxX, boxY,
@@ -101,6 +114,8 @@ function Gui3.Element:getMouseZone(t, x, y, boxX, boxY, boxW, boxH)
             end
         end
     end
+
+    return index
 end
 
 function Gui3.Element:updateScrollbars()

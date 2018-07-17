@@ -30,9 +30,13 @@ end
 
 function Gui3.Canvas:update(dt)
     if self.mouseRegionsOutdated then
-        self.mouseRegions = {}
+        prof.push("getMouseZone")
+        local lastIndex = self:getMouseZone(self.mouseRegions, 1, 0, 0, 0, 0, self.w, self.h)
+        prof.pop("getMouseZone")
 
-        self:getMouseZone(self.mouseRegions, 0, 0, 0, 0, self.w, self.h)
+        for i = #self.mouseRegions, lastIndex+1, -1 do
+            self.mouseRegions[i] = nil
+        end
 
         self.mouseRegionsOutdated = false
     end

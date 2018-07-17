@@ -95,7 +95,6 @@ end
 function Gui3.TileGrid:setSelected(i)
     self.selected = i
     self:updateRender()
-    print("!")
 end
 
 function Gui3.TileGrid:mousepressed(x, y, button)

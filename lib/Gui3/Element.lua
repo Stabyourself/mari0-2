@@ -84,7 +84,7 @@ function Gui3.Element:getMouseZone(t, index, x, y, boxX, boxY, boxW, boxH)
         boxX, boxY, boxW, boxH = intersectRectangles(x, y, self.w, self.h, boxX, boxY, boxW, boxH)
 
         if boxX and boxW > 0 and boxH > 0 then
-            if not t[index] then
+            if not t[index] then -- this whole thing saves up on memory.
                 t[index] = {}
             end
 
@@ -268,9 +268,8 @@ end
 function Gui3.Element:rootDraw()
     love.graphics.push()
     love.graphics.origin()
-
     if self.needsReRender then
-        print("Root needed rerender " .. love.timer.getTime())
+        print("Rerender @ " .. love.timer.getTime())
     end
 
     self:render()

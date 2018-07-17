@@ -20,6 +20,7 @@ function GameStateManager:addState(state)
 end
 
 function GameStateManager:event(event, ...)
+    prof.push(event)
     local from, to, step = 1, #self.activeStates, 1
 
     if self.reversedEvents[event] then
@@ -35,6 +36,7 @@ function GameStateManager:event(event, ...)
             end
         end
     end
+    prof.pop(event)
 end
 
 function GameStateManager:hasActiveState(stateClass)

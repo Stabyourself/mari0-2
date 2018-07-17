@@ -34,7 +34,7 @@ function Gui3.Canvas:update(dt)
         local lastIndex = self:getMouseZone(self.mouseRegions, 1, 0, 0, 0, 0, self.w, self.h)
         prof.pop("getMouseZone")
 
-        for i = #self.mouseRegions, lastIndex+1, -1 do
+        for i = #self.mouseRegions, lastIndex, -1 do
             self.mouseRegions[i] = nil
         end
 
@@ -126,8 +126,6 @@ end
 
 function Gui3.Canvas:rootwheelmoved(x, y)
     local mouseX, mouseY = game.level:getMouse()
-
-    print(mouseX, mouseY)
 
     for i = #self.mouseRegions, 2, -1 do -- 1 is this canvas, and mouse clicks should go through it
         local region = self.mouseRegions[i]

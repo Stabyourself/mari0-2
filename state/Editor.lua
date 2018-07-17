@@ -658,7 +658,9 @@ function Editor:mapChanged()
         table.remove(self.editorStates, 1)
     end
 
+    prof.push("new editorState")
     table.insert(self.editorStates, 1, EditorState:new(self))
+    prof.pop("new editorState")
 
     self.editorState = 1
 
@@ -751,6 +753,7 @@ function Editor:pipette()
 end
 
 function Editor:updateMinimap()
+    prof.push("updateMinimap")
     local yStart = self.level:getYStart()
     local yEnd = self.level:getYEnd()
     local xStart = self.level:getXStart()
@@ -786,6 +789,7 @@ function Editor:updateMinimap()
             window.minimapDraw:sizeChanged()
         end
     end
+    prof.pop("updateMinimap")
 end
 
 function Editor:drawMinimap()

@@ -25,9 +25,8 @@ function love.load()
     sandbox = require "lib.sandbox"
     Easing = require "lib.Easing"
     prof = require "lib.jprof.jprof"
+    prof.enabled(false)
     paletteShader = require "lib.paletteShader"
-
-    prof.enabled(true)
 
     -- Self written libs
     Color3 = require "lib.Color3"
@@ -73,23 +72,24 @@ function love.load()
 
     gameStateManager:loadState(game)
     gameStateManager:addState(Editor:new(game.level))
+
+    prof.enabled(true)
 end
 
 function love.update(dt)
-    require("lib/lovebird").update()
+    if VAR("debug").lovebird then
+        require("lib/lovebird").update()
+    end
 
-    prof.push("update")
     dt = math.min(1/30, dt) -- Min 30 FPS
 
     dt = FrameDebug3.update(dt)
 
     if not dt then
-        prof.pop("update")
         return
     end
 
     gameStateManager:event("update", dt)
-    prof.pop("update")
 end
 
 local function setColorBasedOn(key)
@@ -101,7 +101,6 @@ local function setColorBasedOn(key)
 end
 
 function love.draw()
-    prof.push("draw")
     love.graphics.scale(VAR("scale"), VAR("scale"))
 
     gameStateManager:event("draw")
@@ -131,7 +130,6 @@ function love.draw()
     if funkyImg then
         love.graphics.draw(funkyImg, love.graphics.getWidth(), 0, 0, 1, 1, 340)
     end
-    prof.pop("draw")
 end
 
 function love.keypressed(key)

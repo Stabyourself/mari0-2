@@ -21,77 +21,92 @@ return {
 
         ["smb3.animation"] = {
             frames = {
-                "idle",
+                {
+                    type = "8-dir",
+                    plusNoGun = true,
+                    x = 1,
+                    y = 1,
+                    names = {
+                        "idle",
 
-                "run",
-                "run",
-                "run",
-                "run",
+                        "run",
+                        "run",
+                        "run",
+                        "run",
 
-                "sprint",
-                "sprint",
-                "sprint",
-                "sprint",
+                        "skid",
 
-                "skid",
+                        "jump",
 
-                "jump",
+                        "fall",
 
-                "fall",
+                        "float",
+                        "float",
+                        "float",
 
-                "fly",
-                "fly",
-                "fly",
+                        "duck",
 
-                "float",
-                "float",
-                "float",
+                        "swim",
+                        "swim",
+                        "swim",
+                        "swim",
+                    },
+                },
 
-                "die",
+                {
+                    type = "1-dir",
+                    plusNoGun = true,
+                    x = 1,
+                    y = 10,
+                    names = {
+                        "sprint",
+                        "sprint",
+                        "sprint",
+                        "sprint",
 
-                "duck",
+                        "fly",
+                        "fly",
+                        "fly",
 
-                "buttSlide",
+                        "die",
 
-                "swim",
-                "swim",
-                "swim",
-                "swim",
+                        "buttSlide",
 
-                "swimUp",
-                "swimUp",
-                "swimUp",
+                        "swimUp",
+                        "swimUp",
 
-                "spin",
-                "spin",
-                "spin",
-                "spin",
+                        "spin",
+                        "spin",
+                        "spin",
+                        "spin",
 
-                "spinAir",
-                "spinAir",
-                "spinAir",
-                "spinAir",
+                        "spinAir",
+                        "spinAir",
+                        "spinAir",
+                        "spinAir",
 
-                "holdIdle",
+                        "holdIdle",
 
-                "holdRun",
-                "holdRun",
-                "holdRun",
-                "holdRun",
+                        "holdRun",
+                        "holdRun",
+                        "holdRun",
+                        "holdRun",
 
-                "kick",
+                        "kick",
 
-                "climb",
-                "climb",
+                        "climb",
+                        "climb",
 
-                "somerSault",
-                "somerSault",
-                "somerSault",
-                "somerSault",
-                "somerSault",
-                "somerSault",
-                "somerSault",
-                "somerSault",
+                        "somerSault",
+                        "somerSault",
+                        "somerSault",
+                        "somerSault",
+                        "somerSault",
+                        "somerSault",
+                        "somerSault",
+                        "somerSault",
+                    }
+                }
             }
         },
         ["smb3.movement"] = {},

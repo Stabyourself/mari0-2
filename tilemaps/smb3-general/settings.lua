@@ -14,7 +14,7 @@ tiles[2] = {
     delays = {8/60},
     holdsItems = true,
     defaultItem = "coin", -- ?
-    turnsInto = 4,
+    turnsInto = 5,
 }
 
 tiles[3] = {

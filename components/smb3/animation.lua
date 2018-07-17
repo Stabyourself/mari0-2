@@ -16,43 +16,84 @@ local SOMERSAULTTIME = 2/60
 
 local SHOOTTIME = 12/60
 
+local function assignQuad(actor, x, y, name, angle)
+    local quad = love.graphics.newQuad(
+        (x-1)*actor.quadWidth,
+        (y-1)*actor.quadHeight,
+        actor.quadWidth,
+        actor.quadHeight,
+        actor.img:getWidth(),
+        actor.img:getHeight())
+
+        print(name, angle, x, y)
+
+    if actor.quadList[name][angle] then
+        if type(actor.quadList[name][angle]) ~= "table" then
+            actor.quadList[name][angle] = {actor.quadList[name][angle]}
+        end
+
+        table.insert(actor.quadList[name][angle], quad)
+    else
+        actor.quadList[name][angle] = quad
+    end
+end
+
 function animation:initialize(actor, args)
     Component.initialize(self, actor, args)
 
     self.actor.quadList = {}
-    self.actor.frames = self.frames
     self.actor.frameCounts = {}
 
-    for y = 1, 9 do
-        self.actor.quadList[y] = {}
-        local x = 0
+    local lineBreak = actor.img:getWidth()/actor.quadWidth
 
-        for _, name in ipairs(self.actor.frames) do
-            local quad = love.graphics.newQuad(
-                x*self.actor.quadWidth,
-                (y-1)*self.actor.quadHeight,
-                self.actor.quadWidth,
-                self.actor.quadHeight,
-                self.actor.img:getWidth(),
-                self.actor.img:getHeight())
+    for _, frameTable in ipairs(self.frames) do
+        local x = 1
+        local y = 1
 
-            if self.actor.quadList[y][name] then
-                if type(self.actor.quadList[y][name]) ~= "table" then
-                    self.actor.quadList[y][name] = {self.actor.quadList[y][name]}
-                end
-
-                table.insert(self.actor.quadList[y][name], quad)
-                self.actor.frameCounts[name] = self.actor.frameCounts[name] + 1
-            else
-                self.actor.quadList[y][name] = quad
-                self.actor.frameCounts[name] = 1
+        for _, name in ipairs(frameTable.names) do
+            if not self.actor.quadList[name] then
+                self.actor.quadList[name] = {}
             end
 
+            local noGunFrameY
+
+            if frameTable.type == "8-dir" then
+                for angleY = 1, 8 do
+                    assignQuad(self.actor, frameTable.x+x-1, frameTable.y+y+angleY-2, name, angleY)
+                end
+
+                noGunFrameY = 9
+
+            elseif frameTable.type == "1-dir" then
+                assignQuad(self.actor, frameTable.x+x-1, frameTable.y+y-1, name, 1)
+
+                for y = 2, 8 do
+                    self.actor.quadList[name][y] = self.actor.quadList[name][1]
+                end
+
+                noGunFrameY = 2
+            end
+
+            if frameTable.plusNoGun then
+                assignQuad(self.actor, frameTable.x+x-1, frameTable.y+(noGunFrameY-1)*y, name, "noGun")
+            end
+
+            if not actor.frameCounts[name] then
+                actor.frameCounts[name] = 0
+            end
+
+            actor.frameCounts[name] = actor.frameCounts[name] + 1
+
             x = x + 1
+
+            if x > lineBreak then
+                x = frameTable.x
+                y = y + noGunFrameY
+            end
         end
     end
 
-    self.actor.quad = self.actor.quadList[3].idle
+    self.actor.quad = self.actor.quadList.idle[3]
 end
 
 function animation:postUpdate(dt)
@@ -126,7 +167,7 @@ function animation:postUpdate(dt)
         self.actor.animationState = "float"
 
     elseif self.actor.state.name == "jump" or self.actor.state.name == "fall" then
-        if not self.actor.quadList.canFly and self.actor.pMeter == VAR("pMeterTicks") then
+        if not self.actor.quadList.canFly and self.actor.pMeter == VAR("pMeterTicks") then -- todo wtf
             self.actor.animationState = "fly"
         elseif (not self.actor.quadList.canFly and self.actor.maxSpeedJump == MAXSPEEDS[3]) or self.actor.flying then
             self.actor.animationState = "fly"
@@ -231,9 +272,9 @@ function animation:postUpdate(dt)
 
     -- Make sure to properly use the tables if it's an animationState with frames
     if frame then
-        self.actor.quad = self.actor.quadList[getAngleFrame(self.actor)][self.actor.animationState][frame]
+        self.actor.quad = self.actor.quadList[self.actor.animationState][getAngleFrame(self.actor)][frame]
     else
-        self.actor.quad = self.actor.quadList[getAngleFrame(self.actor)][self.actor.animationState]
+        self.actor.quad = self.actor.quadList[self.actor.animationState][getAngleFrame(self.actor)]
     end
 
     assert(type(self.actor.quad) == "userdata", string.format(
@@ -245,7 +286,7 @@ end
 
 function getAngleFrame(actor)
     if not actor.hasPortalGun then
-        return 9
+        return "noGun"
     end
 
     local angle = actor.portalGunAngle-actor.angle

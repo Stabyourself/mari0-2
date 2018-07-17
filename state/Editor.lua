@@ -106,8 +106,12 @@ function Editor:load()
 
     self.freeCameraCheckbox = Gui3.Checkbox:new(0, 0, "free camera", 1, function(checkbox) self:toggleFreeCam(checkbox.value) end)
     viewDropdown.box:addChild(self.freeCameraCheckbox)
-    viewDropdown.box:addChild(Gui3.Checkbox:new(0, 11, "draw grid", 1, function(checkbox) self:toggleGrid(checkbox.value) end))
-    viewDropdown.box:addChild(Gui3.Checkbox:new(0, 22, "hide ui", 1, function(checkbox) self:toggleUI(checkbox.value) end))
+
+    self.gridCheckbox = Gui3.Checkbox:new(0, 11, "draw grid", 1, function(checkbox) self:toggleGrid(checkbox.value) end)
+    viewDropdown.box:addChild(self.gridCheckbox)
+
+    self.toggleUICheckbox = Gui3.Checkbox:new(0, 22, "hide ui", 1, function(checkbox) self:toggleUI(checkbox.value) end)
+    viewDropdown.box:addChild(self.toggleUICheckbox)
 
     viewDropdown:autoSize()
 
@@ -178,7 +182,7 @@ function Editor:load()
     self:mapChanged()
     self:toggleGrid(false)
     self:toggleFreeCam(false)
-    self:toggleUI(false)
+    self:toggleUI(true)
 end
 
 function Editor:update(dt)
@@ -342,23 +346,26 @@ function Editor:toggleFreeCam(on)
 end
 
 function Editor:toggleGrid(on)
+    self.gridCheckbox.value = on
     self.showGrid = on
 end
 
-function Editor:toggleUI(on)
-    if game.uiVisible ~= not on then
-        game.uiVisible = not on
+function Editor:toggleUI(hidden)
+    if game.uiVisible ~= not hidden then
+        game.uiVisible = not hidden
         updateSizes()
         self.toolbar.h = CAMERAHEIGHT-14
         self.toolbar:sizeChanged()
         self.level.camera.h = CAMERAHEIGHT
 
+        self.toggleUICheckbox.value = hidden
+
         local offset = (VAR("uiLineHeight")+VAR("uiHeight"))/2/self.level.camera.scale
 
-        if on then
-            self.level.camera:move(0, offset)
-        else
+        if off then
             self.level.camera:move(0, -offset)
+        else
+            self.level.camera:move(0, offset)
         end
     end
 end

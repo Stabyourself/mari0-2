@@ -74,7 +74,7 @@ function love.load()
     game = Game:new("smb3", 1)
 
     gameStateManager:loadState(game)
-    -- gameStateManager:addState(Editor:new(game.level))
+    gameStateManager:addState(Editor:new(game.level))
 
     prof.enabled(true)
 end

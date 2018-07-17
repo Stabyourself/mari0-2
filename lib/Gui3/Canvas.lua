@@ -30,6 +30,10 @@ end
 
 function Gui3.Canvas:update(dt)
     if self.mouseRegionsOutdated then
+        if VAR("debug").reMouses then
+            print("Remouse @ " .. love.timer.getTime())
+        end
+
         prof.push("getMouseZone")
         local lastIndex = self:getMouseZone(self.mouseRegions, 1, 0, 0, 0, 0, self.w, self.h)
         prof.pop("getMouseZone")

@@ -317,10 +317,6 @@ function Editor:draw()
     love.graphics.setColor(1, 1, 1)
     self.canvas:rootDraw(0, 0)
 
-    if VAR("debug").canvas then
-        self.canvas:debugDraw()
-    end
-
     prof.pop()
     prof.pop()
 end

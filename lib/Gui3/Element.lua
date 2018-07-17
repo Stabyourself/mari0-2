@@ -268,7 +268,7 @@ end
 function Gui3.Element:rootDraw()
     love.graphics.push()
     love.graphics.origin()
-    if self.needsReRender then
+    if self.needsReRender and VAR("debug").reRenders then
         print("Rerender @ " .. love.timer.getTime())
     end
 
@@ -277,6 +277,10 @@ function Gui3.Element:rootDraw()
     love.graphics.pop()
 
     love.graphics.draw(self.canvas, self.x, self.y)
+
+    if VAR("debug").canvas then
+        self:debugDraw()
+    end
 end
 
 function Gui3.Element:draw()

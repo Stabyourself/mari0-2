@@ -24,9 +24,12 @@ function love.load()
     class = require "lib.middleclass"
     sandbox = require "lib.sandbox"
     Easing = require "lib.Easing"
+    paletteShader = require "lib.paletteShader"
+    if VAR("debug").jprof then
+        PROF_CAPTURE = true
+    end
     prof = require "lib.jprof.jprof"
     prof.enabled(false)
-    paletteShader = require "lib.paletteShader"
 
     -- Self written libs
     Color3 = require "lib.Color3"

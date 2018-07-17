@@ -1,24 +1,37 @@
-PROF_CAPTURE = false
-
 return {
     debug = {
+        -- Physics stuff
         actorHitBox = false,
-        actorQuad = false,
-        actorState = false,
-
+        tracerDebug = false,
+        standingOn = false,
         physicsAdvanced = false,
 
+        -- Actor stuff
+        actorQuad = false,
+        actorState = false,
+        actorComponents = false,
+
+        -- Portal stuff
         portalVector = false,
         portalStencils = false,
 
-        input = false,
+        -- UI stuff
+        canvas = false,
+        reRenders = false,
+        reMouses = false,
+
+        -- Misc stuff
+        input = true,
+        layers = false,
+        jprof = false,
+        lovebird = false,
     },
 
     noEnemies = false,
     musicDisabled = true,
     volume = 1,
     scale = 3,
-    vsync = true,
+    vsync = false,
     msaa = 0,
 
     ffKeys = {
@@ -29,6 +42,11 @@ return {
 
         {
             key="-",
+            val=0.1
+        },
+
+        {
+            key=".",
             val=0.1
         }
     }

@@ -15,16 +15,35 @@ function Gui3.TileGrid:initialize(x, y, tileMap, func)
     self:updateSize()
 
     self.selected = nil
+    self.hoveringTile = nil
 end
 
 function Gui3.TileGrid:mousemoved(x, y)
-    -- local maxWidth = self.parent:getInnerWidth()
 
-    -- self.perRow = math.max(1, math.floor((maxWidth-self.x)/(self.size[1]+self.gutter[1])))
-
-    -- self:updateSize()
+    self:setHoveringTile(self:getCollision(self.mouse[1], self.mouse[2]))
 
     Gui3.Element.mousemoved(self, x, y)
+end
+
+function Gui3.TileGrid:parentScrollChanged()
+    self:updateRender()
+end
+
+function Gui3.TileGrid:parentSizeChanged()
+    local maxWidth = self.parent:getInnerWidth()
+    local newPerRow = math.max(1, math.floor((maxWidth-self.x)/(self.size[1]+self.gutter[1])))
+
+    if newPerRow ~= self.perRow then
+        self.perRow = newPerRow
+        self:updateSize()
+    end
+end
+
+function Gui3.TileGrid:setHoveringTile(hoveringTile)
+    if hoveringTile ~= self.hoveringTile then
+        self.hoveringTile = hoveringTile
+        self:updateRender()
+    end
 end
 
 function Gui3.TileGrid:updateSize()
@@ -52,11 +71,6 @@ function Gui3.TileGrid:getCollision(x, y)
 end
 
 function Gui3.TileGrid:draw()
-    local mouseTile
-    if self.mouse[1] then
-        mouseTile = self:getCollision(self.mouse[1], self.mouse[2])
-    end
-
     local topY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]))
     local bottomY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]) + (self.parent:getInnerHeight())/(self.size[2]+self.gutter[2]))
 
@@ -70,7 +84,7 @@ function Gui3.TileGrid:draw()
 
                 self.tiles[tileNum]:draw(x, y)
 
-                if tileNum == mouseTile then
+                if tileNum == self.hoveringTile then
                     love.graphics.setColor(1, 1, 1, 0.7)
                     love.graphics.rectangle("fill", x, y, self.size[1], self.size[2])
                     love.graphics.setColor(1, 1, 1, 1)
@@ -104,5 +118,11 @@ function Gui3.TileGrid:mousepressed(x, y, button)
         self.func(self, col)
     end
 
-    return Gui3.Element.mousepressed(self, x, y, button)
+    Gui3.Element.mousepressed(self, x, y, button)
+end
+
+function Gui3.TileGrid:mouseleft()
+    Gui3.Element.mouseleft(self)
+
+    self:setHoveringTile(false)
 end

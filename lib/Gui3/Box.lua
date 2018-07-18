@@ -24,6 +24,9 @@ function Gui3.Box:initialize(x, y, w, h)
 
     self.childBox = {2, 3, self.w-4, self.h-6}
 
+    self.closeHover = false
+    self.resizeHover = false
+
     self:setDraggable(false)
 end
 
@@ -88,7 +91,7 @@ function Gui3.Box:draw()
         local closeImg = self.gui.img.boxClose
         if self.closing then
             closeImg = self.gui.img.boxCloseActive
-        elseif self.mouse[1] and self:closeCollision(self.mouse[1], self.mouse[2]) then
+        elseif self.closeHover then
             closeImg = self.gui.img.boxCloseHover
         end
 
@@ -99,7 +102,7 @@ function Gui3.Box:draw()
         local resizeImg = self.gui.img.boxResize
         if self.resizing then
             resizeImg = self.gui.img.boxResizeActive
-        elseif self.mouse[1] and self:resizeCornerCollision(self.mouse[1], self.mouse[2]) then
+        elseif self.resizeHover then
             resizeImg = self.gui.img.boxResizeHover
         end
 
@@ -129,6 +132,34 @@ function Gui3.Box:collision(x, y)
     return x >= 0 and x < self.w and y >= 0 and y < self.h
 end
 
+function Gui3.Box:mousemoved(x, y, diffX, diffY)
+    Gui3.Element.mousemoved(self, x, y, diffX, diffY)
+
+    self:setCloseHover(self:closeCollision(self.mouse[1], self.mouse[2]))
+    self:setResizeHover(self:resizeCornerCollision(self.mouse[1], self.mouse[2]))
+end
+
+function Gui3.Box:mouseleft(x, y)
+    Gui3.Element.mouseleft(self, x, y)
+
+    self:setCloseHover(false)
+    self:setResizeHover(false)
+end
+
+function Gui3.Box:setCloseHover(closeHover)
+    if closeHover ~= self.closeHover then
+        self.closeHover = closeHover
+        self:updateRender()
+    end
+end
+
+function Gui3.Box:setResizeHover(resizeHover)
+    if resizeHover ~= self.resizeHover then
+        self.resizeHover = resizeHover
+        self:updateRender()
+    end
+end
+
 function Gui3.Box:mousepressed(x, y, button)
     -- Check resize before the rest because reasons
     if self.resizeable and self:resizeCornerCollision(x, y) then
@@ -137,9 +168,11 @@ function Gui3.Box:mousepressed(x, y, button)
         self.resizePos[2] = self.h-y
 
         self.exclusiveMouse = true
+        self:updateRender()
 
     elseif self.closeable and self:closeCollision(x, y) then
         self.closing = true
+        self:updateRender()
 
     elseif self.draggable and self:titleBarCollision(x, y) then
         self.dragging = true
@@ -156,13 +189,18 @@ end
 
 function Gui3.Box:mousereleased(x, y, button)
     self.dragging = false
-    self.resizing = false
+
+    if self.resizing then
+        self.resizing = false
+        self:updateRender()
+    end
 
     if self.closing then
         if self:closeCollision(x, y) then
             self:close()
         else
             self.closing = false
+            self:updateRender()
         end
     end
 

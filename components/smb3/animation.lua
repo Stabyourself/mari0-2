@@ -25,8 +25,6 @@ local function assignQuad(actor, x, y, name, angle)
         actor.img:getWidth(),
         actor.img:getHeight())
 
-        print(name, angle, x, y)
-
     if actor.quadList[name][angle] then
         if type(actor.quadList[name][angle]) ~= "table" then
             actor.quadList[name][angle] = {actor.quadList[name][angle]}

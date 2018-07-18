@@ -69,6 +69,7 @@ function Gui3.Canvas:rootmousemoved(x, y)
                         end
 
                         region.element:mouseentered(x-region.offsetX, y-region.offsetY)
+                        region.element:mousemoved(x-region.offsetX, y-region.offsetY, 0, 0)
 
                         self.lastMouseRegion = region
                     end
@@ -108,7 +109,8 @@ function Gui3.Canvas:rootmousereleased(x, y, button)
                 local region = self.mouseRegions[i]
 
                 if pointInRectangle(x, y, region.x, region.y, region.w, region.h) then
-                    region.element:mouseentered(x-region.offsetX, y-region.offsetY, button)
+                    region.element:mouseentered(x-region.offsetX, y-region.offsetY)
+                    region.element:mousemoved(x-region.offsetX, y-region.offsetY, 0, 0)
                     self.lastMouseRegion = region
 
                     return true

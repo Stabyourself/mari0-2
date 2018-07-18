@@ -12,6 +12,8 @@ function Tile:initialize(tileMap, img, x, y, num, props, path)
 	self.type = self.props.type or "normal"
 	self.angle = self.props.angle or 0
 
+	self.frameChangedCallbacks = {}
+
 	self.collision = self.props.collision or false
 
 	self:cacheCollisions()
@@ -27,6 +29,7 @@ function Tile:initialize(tileMap, img, x, y, num, props, path)
 
 		self.timer = 0
 		self.frame = 1
+		self.animated = true
 
 		self.quad = self.quads[self.frame]
 	elseif img then
@@ -39,6 +42,7 @@ function Tile:initialize(tileMap, img, x, y, num, props, path)
 			self.img:getWidth(),
 			self.img:getHeight()
 		)
+		self.animated = false
 	end
 end
 
@@ -59,6 +63,8 @@ function Tile:update(dt)
 		end
 
 		self.quad = self.quads[self.frame]
+
+		self:frameChanged()
 	end
 end
 
@@ -189,6 +195,12 @@ function Tile:sidePortalable(side)
 	elseif type(self.props.nonPortalable) == "table" then
 		return not self.props.nonPortalable[side]
 
+	end
+end
+
+function Tile:frameChanged() -- todo
+	for _, callback in ipairs(self.frameChangedCallbacks) do
+		callback()
 	end
 end
 

@@ -38,6 +38,8 @@ function Gui3.Element:initialize(x, y, w, h)
 
     self.childBox = {}
 
+    self.scrollbarHover = {false, false}
+
     self.childrenW, self.childrenH = self:getChildrenSize()
     self.needsReRender = true
     self:sizeChanged()
@@ -45,7 +47,6 @@ function Gui3.Element:initialize(x, y, w, h)
     if VAR("debug").canvas then
         self.debugColor = Color3.fromHSL(love.math.random(), 1, 0.5)
     end
-
 end
 
 function Gui3.Element:resize(w, h)
@@ -181,6 +182,14 @@ function Gui3.Element:mousemoved(x, y, diffX, diffY)
         end
     end
 
+    -- update scrollbar hover states
+    for i = 1, 2 do
+        if self.scrollable[i] and self.hasScrollbar[i] then
+            self:setScrollbarHover(i, self:scrollCollision(i, self.mouse[1], self.mouse[2]))
+        end
+    end
+
+
     --limit x, y, w and h
     --lower
 
@@ -212,11 +221,11 @@ function Gui3.Element:mousemoved(x, y, diffX, diffY)
         self:limitScroll()
 
         if self.scroll[1] ~= oldScroll then
+            self:scrollChanged()
             self:mouseRegionChanged()
             self:updateRender()
         end
     end
-
 
     if self.scrolling[2] then
         local oldScroll = self.scroll[2]
@@ -227,8 +236,17 @@ function Gui3.Element:mousemoved(x, y, diffX, diffY)
         self:limitScroll()
 
         if self.scroll[2] ~= oldScroll then
+            self:scrollChanged()
             self:mouseRegionChanged()
             self:updateRender()
+        end
+    end
+end
+
+function Gui3.Element:scrollChanged()
+    for _, child in ipairs(self.children) do
+        if child.parentScrollChanged then
+            child:parentScrollChanged()
         end
     end
 end
@@ -241,6 +259,17 @@ end
 function Gui3.Element:mouseleft(x, y)
     self.mouse[1] = nil
     self.mouse[2] = nil
+
+    for i = 1, 2 do
+        self:setScrollbarHover(i, false)
+    end
+end
+
+function Gui3.Element:setScrollbarHover(i, hovering)
+    if hovering ~= self.scrollbarHover[i] then
+        self.scrollbarHover[i] = hovering
+        self:updateRender()
+    end
 end
 
 function Gui3.Element:limitScroll()
@@ -304,7 +333,7 @@ function Gui3.Element:draw()
 
             if self.scrolling[i] then
                 img = self.gui.img.scrollbarActive
-            elseif self.mouse[1] and self:scrollCollision(i, self.mouse[1], self.mouse[2]) then
+            elseif self.scrollbarHover[i] then
                 img = self.gui.img.scrollbarHover
             end
 
@@ -368,12 +397,14 @@ function Gui3.Element:mousepressed(x, y, button)
         self.scrolling[1] = true
         self.scrollingDragOffset[1] = x-self:getScrollbarPos(1)
         self.exclusiveMouse = true
+        self:updateRender()
     end
 
     if self.scrollable[2] and self.hasScrollbar[2] and self:scrollCollision(2, x, y) then
         self.scrolling[2] = true
         self.scrollingDragOffset[2] = y-self:getScrollbarPos(2)
         self.exclusiveMouse = true
+        self:updateRender()
     end
 
     -- rearrange UI elements
@@ -493,6 +524,12 @@ function Gui3.Element:sizeChanged()
         end
     end
 
+    for _, child in ipairs(self.children) do
+        if child.parentSizeChanged then
+            child:parentSizeChanged()
+        end
+    end
+
     self:limitScroll()
     self:updateScrollbars()
     self:mouseRegionChanged()
@@ -517,10 +554,12 @@ function Gui3.Element:getRoot()
 end
 
 function Gui3.Element:updateRender()
-    self.needsReRender = true
+    if not self.needReRender then
+        self.needsReRender = true
 
-    if self.parent then
-        self.parent:updateRender()
+        if self.parent then
+            self.parent:updateRender()
+        end
     end
 end
 

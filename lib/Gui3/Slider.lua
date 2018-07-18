@@ -35,10 +35,12 @@ function Gui3.Slider:initialize(min, max, x, y, w, showValue, func)
         bar = {1, 1, 1},
         slider = {1, 1, 1},
     }
+
+    self.hovering = false
 end
 
 function Gui3.Slider:mousemoved(x, y)
-    local ret = Gui3.Element.mousemoved(self, x, y)
+    Gui3.Element.mousemoved(self, x, y)
 
     if self.dragging then
         local prevVal = self.val
@@ -51,7 +53,14 @@ function Gui3.Slider:mousemoved(x, y)
         end
     end
 
-    return ret
+    self:setHovering(self:getCollision(self.mouse[1], self.mouse[2]))
+end
+
+function Gui3.Slider:setHovering(hovering)
+    if hovering ~= self.hovering then
+        self.hovering = hovering
+        self:updateRender()
+    end
 end
 
 function Gui3.Slider:getValue()
@@ -95,7 +104,7 @@ function Gui3.Slider:draw()
 
     if self.dragging then
         img = self.gui.img.sliderActive
-    elseif self.mouse[1] and self:getCollision(self.mouse[1], self.mouse[2]) then
+    elseif self.hovering then
         img = self.gui.img.sliderHover
     end
 
@@ -121,8 +130,10 @@ function Gui3.Slider:mousepressed(x, y, button)
 end
 
 function Gui3.Slider:mousereleased(x, y, button)
-    self.dragging = false
-    self:updateRender()
+    if self.dragging then
+        self.dragging = false
+        self:updateRender()
+    end
 
     Gui3.Element.mousereleased(self, x, y, button)
 end

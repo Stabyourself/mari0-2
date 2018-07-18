@@ -30,6 +30,8 @@ function TilesWindow:goToMenu()
     self.element.title = "tiles"
 
     -- populate element with a button for each tileMap
+    self.reRenderFunctions = {}
+
     for i, tileMap in ipairs(self.level.tileMaps) do
         local thumb = tileMap.thumbImg or tileMap.img
 
@@ -54,6 +56,22 @@ function TilesWindow:goToMenu()
                 self:goToTileMap(tileMap)
             end,
             self.tileWidth*17-1, self.tileHeight*17-1+9)
+
+        -- Somehow bind tileMapButton to any animated tile?
+        -- function reRender()
+        --     tileMapButton.children[2]:updateRender()
+        -- end
+
+        -- local i = 1
+        -- for y = 1, self.tileHeight do
+        --     for x = 1, self.tileWidth do
+        --         local tile = tileMap.tiles[i]
+        --         if tile and tile.animated then
+        --             table.insert(tile.frameChangedCallbacks, reRender) -- todo: tiles never forget a callback, bad for memory
+        --         end
+        --     end
+        -- end
+
         self.element:addChild(tileMapButton)
     end
 

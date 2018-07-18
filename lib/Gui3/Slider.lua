@@ -59,7 +59,9 @@ end
 function Gui3.Slider:setHovering(hovering)
     if hovering ~= self.hovering then
         self.hovering = hovering
-        self:updateRender()
+        if not self.dragging then
+            self:updateRender()
+        end
     end
 end
 

@@ -160,28 +160,6 @@ function Gui3.Element:mousemoved(x, y, diffX, diffY)
         end
     end
 
-    if self.resizeable then
-        if self.resizing then
-            local w = self.w
-            local h = self.h
-
-            self.w = self.w + diffX
-            self.h = self.h + diffY
-
-            if not self.parent.scrollable[1] then
-                self.w = math.min(self.parent:getInnerWidth()-self.x-self.posMax[1], self.w)
-            end
-
-            if not self.parent.scrollable[2] then
-                self.h = math.min(self.parent:getInnerHeight()-self.y-self.posMax[2], self.h)
-            end
-
-            if (self.w ~= w or self.h ~= h) then
-                self:sizeChanged()
-            end
-        end
-    end
-
     -- update scrollbar hover states
     for i = 1, 2 do
         if self.scrollable[i] and self.hasScrollbar[i] then
@@ -212,35 +190,42 @@ function Gui3.Element:mousemoved(x, y, diffX, diffY)
         end
     end
 
-    if self.scrolling[1] then
-        local oldScroll = self.scroll[1]
-        local factor = ((self.mouse[1]-self.scrollingDragOffset[1]-self.childBox[1])/(self.childBox[3]-self.scrollbarSize[1]-self.scrollbarSpace))
+    for i = 1, 2 do
+        if self.scrolling[i] then
+            local oldScroll = self.scroll[i]
+            local factor = ((self.mouse[i]-self.scrollingDragOffset[i]-self.childBox[i])/(self.childBox[i+2]-self.scrollbarSize[i]-self.scrollbarSpace))
 
-        factor = math.clamp(factor, 0, 1)
-        self.scroll[1] = factor*(self.childrenW-self:getInnerWidth())
-        self:limitScroll()
+            factor = math.clamp(factor, 0, 1)
 
-        if self.scroll[1] ~= oldScroll then
-            self:scrollChanged()
-            self:mouseRegionChanged()
-            self:updateRender()
+            local newScroll
+
+            if i == 1 then
+                newScroll = factor*(self.childrenW-self:getInnerWidth())
+            else
+                newScroll = factor*(self.childrenH-self:getInnerHeight())
+            end
+
+            self.scroll[i] = newScroll
+            self:limitScroll()
+
+            if self.scroll[i] ~= oldScroll then
+                self:scrollChanged()
+            end
         end
     end
 
-    if self.scrolling[2] then
-        local oldScroll = self.scroll[2]
-        local factor = ((self.mouse[2]-self.scrollingDragOffset[2]-self.childBox[2])/(self.childBox[4]-self.scrollbarSize[2]-self.scrollbarSpace))
+    -- if self.scrolling[2] then
+    --     local oldScroll = self.scroll[2]
+    --     local factor = ((self.mouse[2]-self.scrollingDragOffset[2]-self.childBox[2])/(self.childBox[4]-self.scrollbarSize[2]-self.scrollbarSpace))
 
-        factor = math.clamp(factor, 0, 1)
-        self.scroll[2] = factor*(self.childrenH-self:getInnerHeight())
-        self:limitScroll()
+    --     factor = math.clamp(factor, 0, 1)
+    --     self.scroll[2] = factor*(self.childrenH-self:getInnerHeight())
+    --     self:limitScroll()
 
-        if self.scroll[2] ~= oldScroll then
-            self:scrollChanged()
-            self:mouseRegionChanged()
-            self:updateRender()
-        end
-    end
+    --     if self.scroll[2] ~= oldScroll then
+    --         self:scrollChanged()
+    --     end
+    -- end
 end
 
 function Gui3.Element:scrollChanged()
@@ -249,6 +234,9 @@ function Gui3.Element:scrollChanged()
             child:parentScrollChanged()
         end
     end
+
+    self:mouseRegionChanged()
+    self:updateRender()
 end
 
 function Gui3.Element:mouseentered(x, y)
@@ -268,7 +256,10 @@ end
 function Gui3.Element:setScrollbarHover(i, hovering)
     if hovering ~= self.scrollbarHover[i] then
         self.scrollbarHover[i] = hovering
-        self:updateRender()
+
+        if not self.scrolling[i] then
+            self:updateRender()
+        end
     end
 end
 
@@ -397,6 +388,7 @@ function Gui3.Element:mousepressed(x, y, button)
         self.scrolling[1] = true
         self.scrollingDragOffset[1] = x-self:getScrollbarPos(1)
         self.exclusiveMouse = true
+
         self:updateRender()
     end
 
@@ -404,6 +396,7 @@ function Gui3.Element:mousepressed(x, y, button)
         self.scrolling[2] = true
         self.scrollingDragOffset[2] = y-self:getScrollbarPos(2)
         self.exclusiveMouse = true
+
         self:updateRender()
     end
 
@@ -430,26 +423,38 @@ end
 
 function Gui3.Element:wheelmoved(x, y)
     if self.hasScrollbar[2] and y ~= 0 then
+        local oldScroll = self.scroll[2]
         self.scroll[2] = self.scroll[2] - y*17
         self:limitScroll()
-        self:updateRender()
+
+        if self.scroll[2] ~= oldScroll then
+            self:scrollChanged()
+        end
 
         return true
     end
 
     -- scroll horizontally if there's no y scrolling
     if not self.hasScrollbar[2] and self.hasScrollbar[1] and y ~= 0 then
+        local oldScroll = self.scroll[1]
         self.scroll[1] = self.scroll[1] - y*17
         self:limitScroll()
-        self:updateRender()
+
+        if self.scroll[1] ~= oldScroll then
+            self:scrollChanged()
+        end
 
         return true
     end
 
     if self.hasScrollbar[1] and x ~= 0 then
+        local oldScroll = self.scroll[1]
         self.scroll[1] = self.scroll[1] - x*17
         self:limitScroll()
-        self:updateRender()
+
+        if self.scroll[1] ~= oldScroll then
+            self:scrollChanged()
+        end
 
         return true
     end
@@ -520,7 +525,7 @@ function Gui3.Element:sizeChanged()
     -- Update canvas
     if not self.canvas or self.canvas:getWidth() ~= self.w or self.canvas:getHeight() ~= self.h then -- canvas isn't current anymore
         if self.w > 0 and self.h > 0 then -- but not 0 px wide or tall
-            self.canvas = love.graphics.newCanvas(math.ceil(self.w), math.ceil(self.h))
+            self.canvas = love.graphics.newCanvas(self.w, self.h)
         end
     end
 

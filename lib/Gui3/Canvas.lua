@@ -47,6 +47,9 @@ function Gui3.Canvas:update(dt)
 end
 
 function Gui3.Canvas:rootmousemoved(x, y)
+    x = math.floor(x)
+    y = math.floor(y)
+
     local diffX = x-self.lastMouseX
     local diffY = y-self.lastMouseY
 
@@ -87,6 +90,9 @@ function Gui3.Canvas:rootmousemoved(x, y)
 end
 
 function Gui3.Canvas:rootmousepressed(x, y, button)
+    x = math.floor(x)
+    y = math.floor(y)
+
     for i = #self.mouseRegions, 2, -1 do -- 1 is this canvas, and mouse clicks should go through it
         local region = self.mouseRegions[i]
 
@@ -99,6 +105,9 @@ function Gui3.Canvas:rootmousepressed(x, y, button)
 end
 
 function Gui3.Canvas:rootmousereleased(x, y, button)
+    x = math.floor(x)
+    y = math.floor(y)
+
     if self.lastMouseRegion and self.lastMouseRegion.element.exclusiveMouse then
         self.lastMouseRegion.element:mousereleased(x-self.lastMouseRegion.offsetX, y-self.lastMouseRegion.offsetY, button)
         if not pointInRectangle(x, y, self.lastMouseRegion.x, self.lastMouseRegion.y, self.lastMouseRegion.w, self.lastMouseRegion.h) then -- mouse left the region since

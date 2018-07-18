@@ -798,13 +798,13 @@ end
 function Editor:drawMinimap()
     love.graphics.draw(self.minimapImg, 0, 0, 0, 3, 3)
 
-    local lx, ty = self.level:cameraToWorld(0, 0)
-    local rx, by = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)
+    -- local lx, ty = self.level:cameraToWorld(0, 0)
+    -- local rx, by = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)
 
-    love.graphics.push()
-    love.graphics.scale(3, 3)
-    love.graphics.rectangle("line", lx/16-.5, ty/16-.5, (rx-lx)/16+1, (by-ty+1)/16+1)
-    love.graphics.pop()
+    -- love.graphics.push()
+    -- love.graphics.scale(3, 3)
+    -- love.graphics.rectangle("line", lx/16-.5, ty/16-.5, (rx-lx)/16+1, (by-ty+1)/16+1)
+    -- love.graphics.pop()
 end
 
 function Editor:clickMinimap(x, y, button)

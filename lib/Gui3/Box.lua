@@ -135,6 +135,28 @@ end
 function Gui3.Box:mousemoved(x, y, diffX, diffY)
     Gui3.Element.mousemoved(self, x, y, diffX, diffY)
 
+    if self.resizeable then
+        if self.resizing then
+            local w = self.w
+            local h = self.h
+
+            self.w = self.w + diffX
+            self.h = self.h + diffY
+
+            if not self.parent.scrollable[1] then
+                self.w = math.min(self.parent:getInnerWidth()-self.x-self.posMax[1], self.w)
+            end
+
+            if not self.parent.scrollable[2] then
+                self.h = math.min(self.parent:getInnerHeight()-self.y-self.posMax[2], self.h)
+            end
+
+            if (self.w ~= w or self.h ~= h) then
+                self:sizeChanged()
+            end
+        end
+    end
+
     self:setCloseHover(self:closeCollision(self.mouse[1], self.mouse[2]))
     self:setResizeHover(self:resizeCornerCollision(self.mouse[1], self.mouse[2]))
 end
@@ -149,14 +171,20 @@ end
 function Gui3.Box:setCloseHover(closeHover)
     if closeHover ~= self.closeHover then
         self.closeHover = closeHover
-        self:updateRender()
+
+        if not self.closing then
+            self:updateRender()
+        end
     end
 end
 
 function Gui3.Box:setResizeHover(resizeHover)
     if resizeHover ~= self.resizeHover then
         self.resizeHover = resizeHover
-        self:updateRender()
+
+        if not self.resizing then
+            self:updateRender()
+        end
     end
 end
 
@@ -172,6 +200,8 @@ function Gui3.Box:mousepressed(x, y, button)
 
     elseif self.closeable and self:closeCollision(x, y) then
         self.closing = true
+
+        self.exclusiveMouse = true
         self:updateRender()
 
     elseif self.draggable and self:titleBarCollision(x, y) then

@@ -11,7 +11,7 @@ function stomps:bottomCollision(dt, actorEvent, obj2)
         self.actor.speed[2] = -getRequiredSpeed(VAR("enemyBounceHeight"))
 
         actorEvent:bind("after", function(actor)
-            actor:switchState("fall") -- smb3.movement would love to set us to idle, but we can't have that
+            actor:switchState("falling") -- smb3.movement would love to set us to idle, but we can't have that
         end)
 
         actorEvent.returns = true

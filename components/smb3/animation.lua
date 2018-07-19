@@ -6,7 +6,6 @@ animation.argList = {
 }
 
 local MAXSPEEDS = {90, 150, 210}
-local ANIMATIONSPEEDS = {1/4*60, 1/3*60, 1/2*60, 1*60}
 
 local FLYANIMATIONTIME = 4/60
 
@@ -113,7 +112,7 @@ function animation:postUpdate(dt)
     local frame = false
 
     if  self.actor.spinning and
-        (not self.actor.starred or (self.actor.state.name ~= "jump" and self.actor.state.name ~= "fall"))  then
+        (not self.actor.starred or (self.actor.state.name ~= "jumping" and self.actor.state.name ~= "falling"))  then
         if self.actor.onGround then
             self.actor.animationState = "spin"
         else
@@ -126,7 +125,7 @@ function animation:postUpdate(dt)
         frame = 1+math.floor(math.fmod(self.actor.spinTimer, self.actor.frameCounts.spin*SPINFRAMETIME)/SPINFRAMETIME)
 
     elseif  self.actor.shooting and
-            (not self.actor.starred or (self.actor.state.name ~= "jump" and self.actor.state.name ~= "fall")) then
+            (not self.actor.starred or (self.actor.state.name ~= "jumping" and self.actor.state.name ~= "falling")) then
         if self.actor.onGround then
             self.actor.animationState = "shoot"
         else
@@ -138,33 +137,47 @@ function animation:postUpdate(dt)
     elseif self.actor.ducking then
         self.actor.animationState = "duck"
 
-    elseif not self.actor.state or self.actor.state.name == "idle" then
-        self.actor.animationState = "idle"
+    elseif self.actor.state.name == "grounded" then
+        if self.actor.speed[1] == 0 then
+            self.actor.animationState = "idle"
 
-    elseif self.actor.state.name == "skid" then
-        self.actor.animationState = "skid"
+        elseif self.actor.speed[1] > 0 then
+            if controls3.cmdDown("left") and not self.actor.underWater then
+                self.actor.animationState = "skid"
+            else
+                if math.abs(self.actor.speed[1]) >= MAXSPEEDS[3] then
+                    self.actor.animationState = "sprint"
+                else
+                    self.actor.animationState = "run"
+                end
+            end
 
-    elseif self.actor.state.name == "stop" or self.actor.state.name == "run" then
-        if math.abs(self.actor.speed[1]) >= MAXSPEEDS[3] then
-            self.actor.animationState = "sprint"
-        else
-            self.actor.animationState = "run"
+        elseif self.actor.speed[1] < 0 then
+            if controls3.cmdDown("right") and not self.actor.underWater then
+                self.actor.animationState = "skid"
+            else
+                if math.abs(self.actor.speed[1]) >= MAXSPEEDS[3] then
+                    self.actor.animationState = "sprint"
+                else
+                    self.actor.animationState = "run"
+                end
+            end
         end
 
     elseif  self.actor.flying and
-            (self.actor.state.name == "jump" or self.actor.state.name == "fly" or self.actor.state.name == "fall") then
+            (self.actor.state.name == "jumping" or self.actor.state.name == "flying" or self.actor.state.name == "falling") then
         self.actor.animationState = "fly"
 
-    elseif self.actor.state.name == "buttSlide" then
+    elseif self.actor.state.name == "buttSliding" then
         self.actor.animationState = "buttSlide"
 
     elseif self.actor.starred and self.actor.frameCounts.somerSault then
         self.actor.animationState = "somerSault"
 
-    elseif self.actor.state.name == "float" then
+    elseif self.actor.state.name == "floating" then
         self.actor.animationState = "float"
 
-    elseif self.actor.state.name == "jump" or self.actor.state.name == "fall" then
+    elseif self.actor.state.name == "jumping" or self.actor.state.name == "falling" then
         if not self.actor.quadList.canFly and self.actor.pMeter == VAR("pMeterTicks") then -- todo wtf
             self.actor.animationState = "fly"
         elseif (not self.actor.quadList.canFly and self.actor.maxSpeedJump == MAXSPEEDS[3]) or self.actor.flying then
@@ -182,22 +195,12 @@ function animation:postUpdate(dt)
 
     -- Running animation
     if (self.actor.animationState == "run" or self.actor.animationState == "sprint") then
-        local animationspeed
+        local animationspeed = (7-math.clamp(math.floor(math.abs(self.actor.speed[1])/60*16/8), 0, 6))/60 -- frametime is between 1 and 7 frames
 
-        if math.abs(self.actor.speed[1]) >= MAXSPEEDS[3] then -- sprint speed
-            animationspeed = ANIMATIONSPEEDS[4]
-        elseif math.abs(self.actor.speed[1]) > MAXSPEEDS[2] then -- sprint speed
-            animationspeed = ANIMATIONSPEEDS[3]
-        elseif math.abs(self.actor.speed[1]) > MAXSPEEDS[1] then -- sprint speed
-            animationspeed = ANIMATIONSPEEDS[2]
-        else
-            animationspeed = ANIMATIONSPEEDS[1]
-        end
+        self.actor.runAnimationTimer = self.actor.runAnimationTimer + dt
 
-        self.actor.runAnimationTimer = self.actor.runAnimationTimer + animationspeed*dt
-
-        while self.actor.runAnimationTimer > 1 do
-            self.actor.runAnimationTimer = self.actor.runAnimationTimer - 1
+        while self.actor.runAnimationTimer > animationspeed do
+            self.actor.runAnimationTimer = self.actor.runAnimationTimer - animationspeed
             self.actor.runAnimationFrame = self.actor.runAnimationFrame + 1
 
             local runFrames = self.actor.frameCounts.run

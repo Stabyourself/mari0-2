@@ -7,6 +7,7 @@ function Actor:__tostring()
 end
 
 function Actor:initialize(world, x, y, actorTemplate)
+    self.underWater = false
     self.actorTemplate = actorTemplate
 
     local width = self.actorTemplate.width

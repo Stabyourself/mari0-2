@@ -213,19 +213,6 @@ function Gui3.Element:mousemoved(x, y, diffX, diffY)
             end
         end
     end
-
-    -- if self.scrolling[2] then
-    --     local oldScroll = self.scroll[2]
-    --     local factor = ((self.mouse[2]-self.scrollingDragOffset[2]-self.childBox[2])/(self.childBox[4]-self.scrollbarSize[2]-self.scrollbarSpace))
-
-    --     factor = math.clamp(factor, 0, 1)
-    --     self.scroll[2] = factor*(self.childrenH-self:getInnerHeight())
-    --     self:limitScroll()
-
-    --     if self.scroll[2] ~= oldScroll then
-    --         self:scrollChanged()
-    --     end
-    -- end
 end
 
 function Gui3.Element:scrollChanged()
@@ -307,13 +294,12 @@ function Gui3.Element:draw()
     -- Children
     for _, child in ipairs(self.children) do
         if child.visible and child.canvas then
-            child:render()
+            child:render() -- rerender children if necessary
 
             love.graphics.setColor(1, 1, 1)
             love.graphics.draw(child.canvas, child.x-self.scroll[1]+self.childBox[1], child.y-self.scroll[2]+self.childBox[2])
         end
     end
-
 
     -- Scrollbars
     for i = 1, 2 do
@@ -465,6 +451,8 @@ function Gui3.Element:moveToFront()
         if self.movesToFront then
             for i = 1, #self.parent.children do
                 if self.parent.children[i] == self then
+                    -- moving the whole chain of elements to the end of their parents' children arrays
+                    -- causes them to get drawn on top and have priority for mouse stuff
                     table.insert(self.parent.children, table.remove(self.parent.children, i))
                 end
             end

@@ -11,12 +11,37 @@ local MAXSPEEDS = {90, 150, 210}
 local FRICTION = 140.625 -- amount of speed that is substracted when not pushing buttons
 -- local FRICTIONICE = 42.1875 -- duh
 
-local FRICTIONSKID = 450 -- turnaround speed
--- local FRICTIONSKIDICE = 182.8125 -- turnaround speed on ice
+local SKIDACCELERATION = 450 -- turnaround speed
+-- local SKIDACCELERATIONICE = 182.8125 -- turnaround speed on ice
 
 local PMETERTIMEUP = 8/60
 local PMETERTIMEDOWN = 24/60
 local PMETERTIMEMARGIN = 16/60
+
+local UW_MAXWALKSPEED = 30
+local UW_WALKACCELERATION = 225
+local UW_WALKFRICTION = 168.75
+local UW_SKIDACCELERATION = 225
+
+local UW_MINSURFACESPEED = -45
+local UW_SURFACEJUMPFORCE = -191.25
+
+local UW_GRAVITY = 30 -- applied when moving downwards
+local UW_SWIMGRAVITY = 60 -- applied when moving upwards
+local UW_SWIMFORCE = -116.25 -- can be done every other frame
+local UW_MAXSWIMSPEED = 0 -- how fast mario can be moving DOWN after a swim
+local UW_MINSWIMSPEED = -120 -- how fast mario can be moving UP after a swim
+
+local UW_SWIMACCELERATION = 42.1875
+local UW_SWIMFRICTION = 28.125
+local UW_SWIMSKIDACCELERATION = 112.5
+
+-- Underwater:
+-- Mario is underwater when his center is in a water tile.
+-- Even when swimming above the top water tile, he will stay under water unless jumping with UP held
+-- While in underwater mode and not in water (reaching the surface without jumping out) he can't swim up until re-entering a water tile
+-- Leaving a watertile without jumping out sets his speed to UW_SURFACESPEED
+-- Leaving a watertile with jumping out sets his speed to a minimum of UW_MINSURFACESPEED
 
 -- local DOWNHILLWALKBONUS = 7.5
 
@@ -25,7 +50,7 @@ function movement:initialize(actor, args)
 
     self.actor.jumping = false
 
-    self.actor.animationState = "idle"
+    self.actor.animationState = "grounded"
 
     self.actor.animationDirection = 1
 
@@ -42,58 +67,18 @@ function movement:initialize(actor, args)
     self.actor.shooting = false
     self.actor.shootTimer = 0
 
-    self.actor:registerState("idle", function(actor)
-        if controls3.cmdDown("right") or controls3.cmdDown("left") then
-            return "run"
-        end
+    self.actor:registerState("grounded", function(actor)
 
-        if self.actor.speed[1] ~= 0 then
-            return "stop"
-        end
     end)
 
-    self.actor:registerState("stop", function(actor)
-        if controls3.cmdDown("right") or controls3.cmdDown("left") then
-            return "run"
-        end
-
-        if self.actor.speed[1] == 0 then
-            return "idle"
-        end
-    end)
-
-    self.actor:registerState("run", function(actor)
-        if not controls3.cmdDown("right") and not controls3.cmdDown("left") then
-            return "stop"
-        end
-
-        if  self.actor.speed[1] > 0 and controls3.cmdDown("left") or
-            self.actor.speed[1] < 0 and controls3.cmdDown("right") then
-            return "skid"
-        end
-    end)
-
-    self.actor:registerState("skid", function(actor)
-        if self.actor.speed[1] == 0 then
-            return "idle"
-        end
-
-        if  (self.actor.speed[1] < 0 and controls3.cmdDown("left") and not controls3.cmdDown("right")) or
-            (self.actor.speed[1] > 0 and controls3.cmdDown("right") and not controls3.cmdDown("right")) or
-            (self.actor.speed[1] > 0 and not controls3.cmdDown("left")) or
-            (self.actor.speed[1] < 0 and not controls3.cmdDown("right")) then
-            return "run"
-        end
-    end)
-
-    self.actor:registerState("fall", function(actor)
+    self.actor:registerState("falling", function(actor)
         if controls3.cmdDown("jump") and self.actor.speed[2] < JUMPGRAVITYUNTIL then
-            return "jump"
+            return "jumping"
         end
         -- otherwise handled by bottomCollision
     end)
 
-    self.actor.state = ActorState:new(self.actor, "idle", self.actor.states.idle) -- maybe change this so it's a method on actor?
+    self.actor.state = ActorState:new(self.actor, "grounded", self.actor.states.grounded) -- maybe change this so it's a method on actor?
 end
 
 function movement:update(dt, actorEvent)
@@ -105,12 +90,14 @@ function movement:update(dt, actorEvent)
         end
     end
 
-    if self.actor.state.name == "stop" then
-        self.actor:friction(dt, FRICTION)
-    end
+    if self.actor.state.name == "grounded" then
+        if not controls3.cmdDown("left") and not controls3.cmdDown("right") then
+            self.actor:friction(dt, FRICTION)
+        end
 
-    if self.actor.state.name == "run" then
         local maxSpeed = 0
+        local acceleration = ACCELERATION
+        local friction = FRICTION
 
         if controls3.cmdDown("left") or controls3.cmdDown("right") then
             maxSpeed = MAXSPEEDS[1]
@@ -124,25 +111,31 @@ function movement:update(dt, actorEvent)
             maxSpeed = MAXSPEEDS[3]
         end
 
-        if not self.actor.onGround then
-            maxSpeed = self.actor.maxSpeedJump or MAXSPEEDS[1]
+        if self.actor.underWater then
+            maxSpeed = UW_MAXWALKSPEED
+            acceleration = UW_WALKACCELERATION
+            fricton = UW_WALKFRICTION
         end
 
         -- Normal left/right acceleration
-        accelerate(dt, self.actor, ACCELERATION, maxSpeed)
+        accelerate(dt, self.actor, acceleration, maxSpeed)
 
         if math.abs(self.actor.speed[1]) > maxSpeed then
-            self.actor:friction(dt, FRICTION)
+            self.actor:friction(dt, friction)
         end
+
+        local skidAcceleration = SKIDACCELERATION
+
+        if self.actor.underWater then
+            skidAcceleration = UW_SKIDACCELERATION
+        end
+
+        skid(dt, self.actor, skidAcceleration)
     end
 
-    if self.actor.state.name == "skid" then
-        skid(dt, self.actor, FRICTIONSKID)
-    end
-
-    if not self.actor.flying and (self.actor.state.name == "jump" or self.actor.state.name == "fall") then
+    if not self.actor.flying and (self.actor.state.name == "jumping" or self.actor.state.name == "falling") then
         accelerate(dt, self.actor, ACCELERATION, self.actor.maxSpeedJump or MAXSPEEDS[1])
-        skid(dt, self.actor, FRICTIONSKID)
+        skid(dt, self.actor, SKIDACCELERATION)
     end
 
     -- P meter
@@ -190,7 +183,6 @@ function movement:update(dt, actorEvent)
         self.actor.flyTimer = 0
     end
 
-
     -- self.actor.speed[1] = self.actor.groundSpeedX
 
     -- Adjust speed[1] if going downhill or uphill
@@ -214,13 +206,13 @@ function movement:update(dt, actorEvent)
 end
 
 function movement:bottomCollision()
-    if self.actor.state.name == "jump" or self.actor.state.name == "fall" then
-        self.actor:switchState("idle")
+    if self.actor.state.name == "jumping" or self.actor.state.name == "falling" then
+        self.actor:switchState("grounded")
     end
 end
 
 function movement:startFall()
-    self.actor:switchState("fall")
+    self.actor:switchState("falling")
 end
 
 function skid(dt, actor, friction)

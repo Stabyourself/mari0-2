@@ -1,5 +1,5 @@
 -- Font thing for Mari0 2. Feel free to use it, MIT License
--- Also actually not used anymore because imagefonts, while not supporting &stuff; perform better
+-- Also actually not used anymore because imagefonts, while not supporting &stuff; (or maybe because, hah), perform better
 
 local Font3 = class("Font3")
 

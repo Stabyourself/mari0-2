@@ -19,10 +19,9 @@ function Gui3.TileGrid:initialize(x, y, tileMap, func)
 end
 
 function Gui3.TileGrid:mousemoved(x, y)
+    Gui3.Element.mousemoved(self, x, y)
 
     self:setHoveringTile(self:getCollision(self.mouse[1], self.mouse[2]))
-
-    Gui3.Element.mousemoved(self, x, y)
 end
 
 function Gui3.TileGrid:parentScrollChanged()

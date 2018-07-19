@@ -13,15 +13,15 @@ local JUMPGRAVITYUNTIL = -120
 function jumping:initialize(actor, args)
     Component.initialize(self, actor, args)
 
-    self.actor:registerState("jump", function(actor)
+    self.actor:registerState("jumping", function(actor)
         if not controls3.cmdDown("jump") or actor.speed[2] >= JUMPGRAVITYUNTIL then
-            return "fall"
+            return "falling"
         end
     end)
 end
 
 function jumping:update(dt, actorEvent)
-    if self.actor.state.name == "jump" then
+    if self.actor.state.name == "jumping" then
         actorEvent:setValue("gravity", VAR("gravityJumping"), 10)
     end
 end
@@ -56,7 +56,7 @@ function jumping:jump(dt, actorEvent)
 
         self.actor.maxSpeedJump = maxSpeedJump
 
-        self.actor:switchState("jump")
+        self.actor:switchState("jumping")
     end
 end
 

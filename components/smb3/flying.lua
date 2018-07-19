@@ -20,20 +20,20 @@ function flying:initialize(actor, args)
     self.actor.flyAnimationFrame = 1
     self.actor.flyAnimationTimer = 0
 
-    self.actor:registerState("fly", function(actor, actorState)
+    self.actor:registerState("flying", function(actor, actorState)
         if not actor.flying then
-            return "fall"
+            return "falling"
         end
 
         if actorState.timer >= FLYINGUPTIME then
-            return "fall"
+            return "falling"
         end
     end)
 end
 
 function flying:jump()
     if not self.actor.cache.onGround and self.actor.flying then
-        self.actor:switchState("fly")
+        self.actor:switchState("flying")
         self.actor.flyAnimationFrame = 1
     end
 
@@ -53,8 +53,8 @@ function flying:update(dt, actorEvent)
         end
     end
 
-    if  (self.actor.flying and (self.actor.state.name == "jump" or self.actor.state.name == "fall")) or
-    self.actor.state.name == "fly" then
+    if  (self.actor.flying and (self.actor.state.name == "jumping" or self.actor.state.name == "falling")) or
+    self.actor.state.name == "flying" then
         if math.abs(self.actor.speed[1]) > MAXSPEEDFLY then
             if  self.actor.speed[1] > 0 and controls3.cmdDown("right") or
                 self.actor.speed[1] < 0 and controls3.cmdDown("left") then
@@ -64,7 +64,7 @@ function flying:update(dt, actorEvent)
             end
         end
 
-        if self.actor.state.name == "fly" then
+        if self.actor.state.name == "flying" then
             accelerate(dt, self.actor, ACCELERATION, MAXSPEEDFLY)
             self.actor.speed[2] = FLYINGASCENSION
             actorEvent:setValue("gravity", 0, 10)

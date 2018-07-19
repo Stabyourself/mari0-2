@@ -9,9 +9,9 @@ function ducking:initialize(actor, args)
 
     self.actor.ducking = false
 
-    self.actor:registerState("buttSlide", function(actor)
+    self.actor:registerState("buttSliding", function(actor)
         if controls3.cmdDown("right") or controls3.cmdDown("left") or (actor.speed[1] == 0 and actor.surfaceAngle == 0) then
-            return "idle"
+            return "grounded"
         end
     end)
 end
@@ -23,9 +23,9 @@ function ducking:update(dt)
         if  controls3.cmdDown("down") and
             not controls3.cmdDown("left") and
             not controls3.cmdDown("right") and
-            self.actor.state.name ~= "buttSlide" then
+            self.actor.state.name ~= "buttSliding" then
             if self.actor.surfaceAngle ~= 0 then -- check if buttslide
-                self.actor:switchState("buttSlide")
+                self.actor:switchState("buttSliding")
 
                 if self.actor.surfaceAngle > 0 then
                     self.actor.speed[1] = math.max(0, self.actor.speed[1])
@@ -54,7 +54,7 @@ function ducking:update(dt)
         end
     end
 
-    if self.actor.state.name == "buttSlide" then
+    if self.actor.state.name == "buttSliding" then
         local buttAcceleration = BUTTACCELERATION * (self.actor.surfaceAngle/(math.pi/8))
 
         self.actor.speed[1] = self.actor.speed[1] + buttAcceleration*dt

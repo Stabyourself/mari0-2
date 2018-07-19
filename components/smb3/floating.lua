@@ -16,15 +16,15 @@ function floating:initialize(actor, args)
     self.actor.floatAnimationFrame = 1
     self.actor.floatAnimationTimer = 0
 
-    self.actor:registerState("float", function(actor, actorState)
+    self.actor:registerState("floating", function(actor, actorState)
         if actor.speed[2] < 0 or actorState.timer >= FLOATTIME then
-            return "fall"
+            return "falling"
         end
     end)
 end
 
 function floating:update(dt)
-    if self.actor.state.name == "float" then
+    if self.actor.state.name == "floating" then
         if math.abs(self.actor.speed[1]) > MAXSPEEDFLY then
             if  self.actor.speed[1] > 0 and controls3.cmdDown("right") or
                 self.actor.speed[1] < 0 and controls3.cmdDown("left") then
@@ -44,15 +44,15 @@ end
 
 function floating:jump()
     if not self.actor.flying and not self.actor.onGround and self.actor.speed[2] > 0 then
-        self.actor:switchState("float")
+        self.actor:switchState("floating")
         self.actor.floatAnimationTimer = 0
         self.actor.floatAnimationFrame = 1
     end
 end
 
 function floating:bottomCollision()
-    if self.actor.state.name == "float" then
-        self.actor:switchState("idle")
+    if self.actor.state.name == "floating" then
+        self.actor:switchState("grounded")
     end
 end
 

@@ -396,6 +396,11 @@ function Editor:newWindow(windowClass, button)
 end
 
 function Editor:selectTile(tile)
+    if not tile then
+        self:selectTool("erase")
+        return
+    end
+
     if self.tool ~= self.tools.paint and self.tool ~= self.tools.fill then
         self:selectTool("paint")
     end
@@ -405,8 +410,9 @@ function Editor:selectTile(tile)
     for _, window in ipairs(self.windows) do
         if window:isInstanceOf(self.windowClasses.tiles) then
             if window.tileGrid then -- not in the category selection
+                print(window.tileMap, tile.tileMap)
                 if window.tileMap ~= tile.tileMap then -- deselect it
-                    window.tileGrid.selected = false
+                    window.tileGrid:setSelected(nil)
                 else -- select the same tile that was selected
                     window.tileGrid:setSelected(tile.num)
                 end
@@ -743,15 +749,7 @@ function Editor:pipette()
     if layer:inMap(coordX, coordY) then
         local tile = layer:getTile(coordX, coordY)
 
-        if tile then
-            self.tools.paint.tile = tile
-
-            if self.tool ~= self.tools["fill"] then
-                self:selectTool("paint")
-            end
-        else
-            self:selectTool("erase")
-        end
+        self:selectTile(tile)
     end
 end
 

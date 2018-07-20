@@ -50,6 +50,10 @@ return {
                         "swim",
                         "swim",
                         "swim",
+
+                        "swimUp",
+                        "swimUp",
+                        "swimUp",
                     },
                 },
 
@@ -71,10 +75,6 @@ return {
                         "die",
 
                         "buttSlide",
-
-                        "swimUp",
-                        "swimUp",
-                        "swimUp",
 
                         "spin",
                         "spin",

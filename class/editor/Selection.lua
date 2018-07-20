@@ -167,7 +167,7 @@ function Selection:delete()
         end
     end
 
-    layer:optimize()
+    layer:optimizeSize()
 end
 
 function Selection:getStampMap()

@@ -7,7 +7,6 @@ function Actor:__tostring()
 end
 
 function Actor:initialize(world, x, y, actorTemplate)
-    self.underWater = true
     self.actorTemplate = actorTemplate
 
     local width = self.actorTemplate.width
@@ -46,7 +45,11 @@ function Actor:event(eventName, dt, ...)
 
     for _, component in ipairs(self.components) do
         if component[eventName] then
+
             prof.push(tostring(component.class) .. " " .. eventName)
+            if eventName == "enterWater" then
+                print(component, eventName)
+            end
             component[eventName](component, dt, self.actorEvent[eventName], ...)
             prof.pop()
         end

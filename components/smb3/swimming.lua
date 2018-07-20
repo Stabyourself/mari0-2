@@ -26,6 +26,19 @@ function swimming:initialize(actor, args)
 end
 
 function swimming:update(dt, actorEvent)
+    local tileX, tileY = self.actor.world:worldToCoordinate(self.actor.x+self.actor.width/2, self.actor.y+self.actor.height/2)
+    local tile
+
+    if self.actor.world:inMap(tileX, tileY) then
+        tile = self.actor.world:getTile(tileX, tileY)
+    end
+
+    if tile then
+        self:setUnderWater(tile.props.water)
+    else
+        self:setUnderWater(false)
+    end
+
     if self.actor.state.name == "swimming" then
         if not controls3.cmdDown("left") and not controls3.cmdDown("right") then
             self.actor:friction(dt, UW_SWIMFRICTION)
@@ -42,6 +55,18 @@ function swimming:update(dt, actorEvent)
         end
 
         actorEvent:setValue("gravity", gravity, 10)
+    end
+end
+
+function swimming:setUnderWater(underWater)
+    if underWater ~= self.actor.underWater then
+        self.actor.underWater = underWater
+
+        if self.actor.underWater then
+            self.actor:event("enterWater")
+        else
+            self.actor:event("leaveWater")
+        end
     end
 end
 
@@ -77,6 +102,15 @@ function swimming:startFall()
     if self.actor.underWater then
         self.actor:switchState("swimming")
     end
+end
+
+function swimming:enterWater()
+    self.actor.speed[2] = math.min(0, self.actor.speed[2])
+    self.actor:switchState("swimming")
+end
+
+function swimming:leaveWater()
+    self.actor:switchState("falling")
 end
 
 return swimming

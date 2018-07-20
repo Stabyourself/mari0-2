@@ -26,28 +26,55 @@ function Layer:update(dt)
     end
 end
 
-function Layer:draw()
-    local lx, ty = self.world:cameraToCoordinate(0, 0)
+function Layer:render()
+    local lx, ty = self.world:cameraToCoordinate(-16, -16)
     local rx, by = self.world:cameraToCoordinate(CAMERAWIDTH, CAMERAHEIGHT)
-    local xStart = lx-1
+    local xStart = lx
     local xEnd = rx
 
-    local yStart = ty-1
+    local yStart = ty
     local yEnd = by
+
+    local w = xEnd-xStart+1
+    local h = yEnd-yStart+1
+
+    self.canvasX = xStart
+    self.canvasY = yStart
 
     xStart = math.clamp(xStart, self:getXStart(), self:getXEnd())
     yStart = math.clamp(yStart, self:getYStart(), self:getYEnd())
     xEnd = math.clamp(xEnd, self:getXStart(), self:getXEnd())
     yEnd = math.clamp(yEnd, self:getYStart(), self:getYEnd())
 
-    local xOffset = math.ceil(self.xOffset)
-    local yOffset = math.ceil(self.yOffset)
+    if not self.canvas or self.canvas:getWidth() ~= w*16 or self.canvas:getHeight() ~= h*16 then
+        self.canvas = love.graphics.newCanvas(w*16, h*16)
+    end
 
+    love.graphics.setCanvas(self.canvas)
+    love.graphics.push()
+    love.graphics.setScissor()
+    love.graphics.origin()
+    love.graphics.clear()
     for x = xStart, xEnd do
         for y = yStart, yEnd do
-            self:getCell(x, y):draw((x-1)*16+xOffset, (y-1)*16+yOffset)
+            if self:inMap(x, y) then
+                self:getCell(x, y):draw((x-self.canvasX-1)*16, (y-self.canvasY-1)*16)
+            end
         end
     end
+    love.graphics.pop()
+    love.graphics.setCanvas()
+end
+
+function Layer:draw()
+    if not self.canvas then
+        self:render()
+    end
+
+    local x = math.ceil(self.xOffset)+self.canvasX*16
+    local y = math.ceil(self.yOffset)+self.canvasY*16
+
+    love.graphics.draw(self.canvas, x, y)
 end
 
 function Layer:checkCollision(x, y, obj, vector)
@@ -111,7 +138,7 @@ function Layer:setCoordinate(x, y, tile)
     self.map[x-self.x][y-self.y].tile = tile
 end
 
-function Layer:optimize() -- cuts a layer to its content and moves it instead
+function Layer:optimizeSize() -- cuts a layer to its content and moves it instead
     -- left
     local x = self:getXStart()
     local found = false

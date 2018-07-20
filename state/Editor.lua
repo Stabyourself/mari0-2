@@ -74,7 +74,7 @@ function Editor:load()
     self.menuBar:addChild(self.fileDropdown)
 
     self.fileDropdown.box:addChild(Gui3.Button:new(0, 0, "save", false, 1, function(button) self:saveLevel() end))
-    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("levels/1-1.lua") end))
+    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("mappacks/smb3/1-1.lua") end))
 
     self.fileDropdown:autoSize()
 
@@ -166,7 +166,7 @@ function Editor:load()
     end
 
 
-    self:selectTool("paint")
+    self:selectTool("portal")
 
     self.gridImg = love.graphics.newImage("img/grid.png")
     self.gridImg:setWrap("repeat", "repeat")
@@ -482,7 +482,7 @@ function Editor:cmdpressed(cmd)
         self:saveLevel()
 
     elseif cmd["editor.load"] then
-        self:loadLevel("levels/1-1.lua")
+        self:loadLevel("mappacks/smb3/1-1.lua")
 
     elseif cmd["editor.select.clear"] then
         if self.selection then
@@ -621,7 +621,7 @@ end
 function Editor:saveLevel()
     self.fileDropdown:toggle(false)
 
-    self.level:saveLevel("levels/1-1.lua")
+    self.level:saveLevel("mappacks/smb3/1-1.lua")
 end
 
 function Editor:loadLevel(path)

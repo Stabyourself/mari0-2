@@ -104,6 +104,7 @@ local function setColorBasedOn(key)
 end
 
 function love.draw()
+    love.graphics.push()
     love.graphics.scale(VAR("scale"), VAR("scale"))
 
     gameStateManager:event("draw")
@@ -128,7 +129,7 @@ function love.draw()
         love.graphics.setColor(1, 1, 1)
     end
 
-    love.graphics.scale(1/VAR("scale"), 1/VAR("scale"))
+    love.graphics.pop()
 
     if funkyImg then
         love.graphics.draw(funkyImg, love.graphics.getWidth(), 0, 0, 1, 1, 340)

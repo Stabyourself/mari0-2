@@ -21,7 +21,7 @@ function Erase:update(dt)
 
         if layer:inMap(x, y) then
             layer:setCoordinate(x, y, nil)
-            layer:optimize()
+            layer:optimizeSize()
         end
     end
 end

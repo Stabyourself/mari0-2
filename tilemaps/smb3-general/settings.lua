@@ -59,6 +59,10 @@ end
 
 tiles[3].nonPortalable = {false, true, false, true}
 
+tiles[6] = {
+    water = true,
+}
+
 local stampMaps = {
     {
         name = "pipe",

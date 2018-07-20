@@ -117,7 +117,7 @@ function FloatingSelection:unFloat()
         end
     end
 
-    layer:optimize()
+    layer:optimizeSize()
 end
 
 function FloatingSelection:startDrag(x, y)

@@ -27,7 +27,7 @@ function jumping:update(dt, actorEvent)
 end
 
 function jumping:jump(dt, actorEvent)
-    if self.actor.cache.onGround then
+    if self.actor.cache.onGround and not self.actor.underWater then
         self.actor.onGround = false
 
         self.actor.jumping = true

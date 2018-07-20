@@ -74,6 +74,7 @@ return {
 
                         "swimUp",
                         "swimUp",
+                        "swimUp",
 
                         "spin",
                         "spin",
@@ -105,6 +106,14 @@ return {
                         "somerSault",
                         "somerSault",
                         "somerSault",
+
+                        "shoot",
+                        "shoot",
+                        "shoot",
+
+                        "shootAir",
+                        "shootAir",
+                        "shootAir",
                     }
                 }
             }
@@ -112,6 +121,7 @@ return {
         ["smb3.movement"] = {},
         ["smb3.jumping"] = {},
         ["smb3.flying"] = {},
+        ["smb3.swimming"] = {},
         ["smb3.ducking"] = {},
         ["smb3.floating"] = {},
         ["smb3.spinning"] = {},

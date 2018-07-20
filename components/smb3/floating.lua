@@ -43,7 +43,7 @@ function floating:update(dt)
 end
 
 function floating:jump()
-    if not self.actor.flying and not self.actor.onGround and self.actor.speed[2] > 0 then
+    if not self.actor.flying and not self.actor.onGround and not self.actor.underWater and self.actor.speed[2] > 0 then
         self.actor:switchState("floating")
         self.actor.floatAnimationTimer = 0
         self.actor.floatAnimationFrame = 1

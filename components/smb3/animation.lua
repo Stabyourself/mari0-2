@@ -8,11 +8,8 @@ animation.argList = {
 local MAXSPEEDS = {90, 150, 210}
 
 local FLYANIMATIONTIME = 4/60
-
 local SPINFRAMETIME = 4/60
-
 local SOMERSAULTTIME = 2/60
-
 local SHOOTTIME = 12/60
 
 local function assignQuad(actor, x, y, name, angle)
@@ -40,6 +37,15 @@ function animation:initialize(actor, args)
 
     self.actor.quadList = {}
     self.actor.frameCounts = {}
+
+    self.actor.runAnimationFrame = 1
+    self.actor.runAnimationTimer = 0
+
+    self.actor.somerSaultFrame = 2
+    self.actor.somerSaultFrameTimer = 0
+
+    self.actor.swimAnimationFrame = 1
+    self.actor.swimAnimationTimer = 0
 
     local lineBreak = actor.img:getWidth()/actor.quadWidth
 
@@ -111,18 +117,24 @@ function animation:postUpdate(dt)
 
     local frame = false
 
+    self.actor.animationState = "idle"
+
     if  self.actor.spinning and
         (not self.actor.starred or (self.actor.state.name ~= "jumping" and self.actor.state.name ~= "falling"))  then
+        local frameCount
+
         if self.actor.onGround then
             self.actor.animationState = "spin"
+            frameCount = self.actor.frameCounts.spin
         else
             self.actor.animationState = "spinAir"
+            frameCount = self.actor.frameCounts.spinAir
         end
 
         self.actor.animationDirection = self.actor.spinDirection
 
         -- calculate spin frame from spinTimer
-        frame = 1+math.floor(math.fmod(self.actor.spinTimer, self.actor.frameCounts.spin*SPINFRAMETIME)/SPINFRAMETIME)
+        frame = 1+math.floor(math.fmod(self.actor.spinTimer, frameCount*SPINFRAMETIME)/SPINFRAMETIME)
 
     elseif  self.actor.shooting and
             (not self.actor.starred or (self.actor.state.name ~= "jumping" and self.actor.state.name ~= "falling")) then
@@ -190,23 +202,55 @@ function animation:postUpdate(dt)
             end
         end
 
+    elseif self.actor.state.name == "swimming" then
+        local frameCount
+
+        if self.actor.upSwimCycles > 0 then
+            self.actor.animationState = "swimUp"
+            frameCount = self.actor.frameCounts.swimUp
+        else
+            self.actor.animationState = "swim"
+            frameCount = self.actor.frameCounts.swim
+        end
+
+        local animationSpeed
+        if self.actor.speed[1] == 0 and self.actor.animationState == "swim" then
+            animationSpeed = 16/60
+        else
+            animationSpeed = (7-math.min(math.floor(math.abs(self.actor.speed[1])/60*16/8), 6))/60 -- frametime is between 1 and 7 frames
+        end
+
+        self.actor.swimAnimationTimer = self.actor.swimAnimationTimer + dt
+
+        while self.actor.swimAnimationTimer > animationSpeed do
+            self.actor.swimAnimationTimer = self.actor.swimAnimationTimer - animationSpeed
+            self.actor.swimAnimationFrame = self.actor.swimAnimationFrame + 1
+
+            if self.actor.swimAnimationFrame > frameCount then
+                self.actor.swimAnimationFrame = self.actor.swimAnimationFrame - frameCount
+
+                if self.actor.animationState == "swimUp" then
+                    self.actor.upSwimCycles = math.max(0, self.actor.upSwimCycles - 1)
+                end
+            end
+        end
+
+        frame = self.actor.swimAnimationFrame
     end
 
 
     -- Running animation
     if (self.actor.animationState == "run" or self.actor.animationState == "sprint") then
-        local animationspeed = (7-math.clamp(math.floor(math.abs(self.actor.speed[1])/60*16/8), 0, 6))/60 -- frametime is between 1 and 7 frames
+        local animationSpeed = (7-math.min(math.floor(math.abs(self.actor.speed[1])/60*16/8), 6))/60 -- frametime is between 1 and 7 frames
 
         self.actor.runAnimationTimer = self.actor.runAnimationTimer + dt
 
-        while self.actor.runAnimationTimer > animationspeed do
-            self.actor.runAnimationTimer = self.actor.runAnimationTimer - animationspeed
+        while self.actor.runAnimationTimer > animationSpeed do
+            self.actor.runAnimationTimer = self.actor.runAnimationTimer - animationSpeed
             self.actor.runAnimationFrame = self.actor.runAnimationFrame + 1
 
-            local runFrames = self.actor.frameCounts.run
-
-            if self.actor.runAnimationFrame > runFrames then
-                self.actor.runAnimationFrame = self.actor.runAnimationFrame - runFrames
+            if self.actor.runAnimationFrame > self.actor.frameCounts.run then
+                self.actor.runAnimationFrame = self.actor.runAnimationFrame - self.actor.frameCounts.run
             end
         end
 

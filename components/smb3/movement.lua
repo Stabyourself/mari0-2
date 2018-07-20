@@ -23,19 +23,6 @@ local UW_WALKACCELERATION = 225
 local UW_WALKFRICTION = 168.75
 local UW_SKIDACCELERATION = 225
 
-local UW_MINSURFACESPEED = -45
-local UW_SURFACEJUMPFORCE = -191.25
-
-local UW_GRAVITY = 30 -- applied when moving downwards
-local UW_SWIMGRAVITY = 60 -- applied when moving upwards
-local UW_SWIMFORCE = -116.25 -- can be done every other frame
-local UW_MAXSWIMSPEED = 0 -- how fast mario can be moving DOWN after a swim
-local UW_MINSWIMSPEED = -120 -- how fast mario can be moving UP after a swim
-
-local UW_SWIMACCELERATION = 42.1875
-local UW_SWIMFRICTION = 28.125
-local UW_SWIMSKIDACCELERATION = 112.5
-
 -- Underwater:
 -- Mario is underwater when his center is in a water tile.
 -- Even when swimming above the top water tile, he will stay under water unless jumping with UP held
@@ -57,12 +44,6 @@ function movement:initialize(actor, args)
     self.actor.pMeter = 0
     self.actor.pMeterTimer = 0
     self.actor.pMeterTime = 8/60
-
-    self.actor.runAnimationFrame = 1
-    self.actor.runAnimationTimer = 0
-
-    self.actor.somerSaultFrame = 2
-    self.actor.somerSaultFrameTimer = 0
 
     self.actor.shooting = false
     self.actor.shootTimer = 0
@@ -212,7 +193,9 @@ function movement:bottomCollision()
 end
 
 function movement:startFall()
-    self.actor:switchState("falling")
+    if not self.actor.underWater then
+        self.actor:switchState("falling")
+    end
 end
 
 function skid(dt, actor, friction)

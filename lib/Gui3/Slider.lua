@@ -50,6 +50,10 @@ function Gui3.Slider:mousemoved(x, y)
 
         if newVal ~= prevVal then
             self:setValue(newVal*(self.max-self.min)+self.min)
+
+            if self.func then
+                self.func(self:getValue())
+            end
         end
     end
 
@@ -75,10 +79,6 @@ function Gui3.Slider:setValue(newVal)
 
         if self.showValue then
             self.text:setString(tostring(math.round(self:getValue())))
-        end
-
-        if self.func then
-            self.func(self:getValue())
         end
 
         self:updateRender()

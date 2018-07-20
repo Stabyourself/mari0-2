@@ -21,7 +21,7 @@ function spinning:update(dt)
 end
 
 function spinning:action()
-    if not self.actor.spinning and not controls3.cmdDown("down") then -- Make sure it's not colliding with any of the other states
+    if not self.actor.spinning and not controls3.cmdDown("down") and not self.actor.underWater then -- Make sure it's not colliding with any of the other states
         self.actor.spinning = true
         self.actor.spinTimer = 0
         self.actor.spinDirection = self.actor.animationDirection

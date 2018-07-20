@@ -47,6 +47,13 @@ function Gui3.Checkbox:draw()
     Gui3.Element.draw(self)
 end
 
+function Gui3.Checkbox:setValue(val)
+    if val ~= self.value then
+        self.value = val
+        self:updateRender()
+    end
+end
+
 function Gui3.Checkbox:mousepressed(x, y, checkbox)
     self.pressing = true
     self:updateRender()
@@ -61,13 +68,11 @@ end
 
 function Gui3.Checkbox:mousereleased(x, y, checkbox)
     if self.pressing and self:getCollision(self.mouse[1], self.mouse[2]) then
-        self.value = not self.value
+        self:setValue(not self.value)
 
         if self.func then
             self.func(self)
         end
-
-        self:updateRender()
     end
 
     self.exclusiveMouse = false

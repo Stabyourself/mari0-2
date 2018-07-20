@@ -129,7 +129,7 @@ function Editor:load()
 
     self.scaleBar:addChild(self.scaleSlider)
 
-    self:updateScaleSlider()
+    self:changeScale(self.level.camera.scale)
 
     local minusButton = Gui3.Button:new(0, 0, "-", false, 3, function() self:zoom(-1) end)
     minusButton.color.background = {0, 0, 0, 0}
@@ -327,10 +327,12 @@ end
 
 function Editor:changeScale(val)
     self.level.camera:zoomTo(val)
+    self.scaleSlider:setValue(val)
+    self:toggleFreeCam(true)
 end
 
-function Editor:updateScaleSlider()
-    self.scaleSlider:setValue(self.level.camera.scale)
+function Editor:sliderChanged(val)
+    self:changeScale(val)
 end
 
 function Editor:toggleFreeCam(on)
@@ -597,13 +599,11 @@ function Editor:zoom(i, toMouse)
     end
 
     self.level.camera:zoom(zoom, x, y)
-
-    self:updateScaleSlider()
+    self:toggleFreeCam(true)
 end
 
 function Editor:resetZoom()
-    self.level.camera:zoomTo(1/VAR("scale"))
-    self:updateScaleSlider()
+    self:changeScale(1/VAR("scale"))
 end
 
 function Editor:resize(w, h)

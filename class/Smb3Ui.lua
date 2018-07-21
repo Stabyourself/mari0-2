@@ -100,7 +100,10 @@ function Smb3Ui:update(dt)
 end
 
 function Smb3Ui:draw()
+    love.graphics.push()
+    love.graphics.origin()
     self.canvas:rootDraw()
+    love.graphics.pop()
 end
 
 function Smb3Ui:getWorldText()

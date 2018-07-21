@@ -319,7 +319,10 @@ function Editor:draw()
     prof.push("UI")
 
     love.graphics.setColor(1, 1, 1)
-    self.canvas:rootDraw(0, 0)
+    love.graphics.push()
+    love.graphics.origin()
+    self.canvas:rootDraw()
+    love.graphics.pop()
 
     prof.pop()
     prof.pop()
@@ -755,46 +758,98 @@ end
 
 function Editor:updateMinimap()
     prof.push("updateMinimap")
-    local yStart = self.level:getYStart()
-    local yEnd = self.level:getYEnd()
-    local xStart = self.level:getXStart()
-    local xEnd = self.level:getXEnd()
+    if VAR("minimapType") == "realistic" then
+        local minimapScale = 2*VAR("scale")
 
-    local width = xEnd - xStart + 1
-    local height = yEnd - yStart + 1
+        local yStart = self.level:getYStart()
+        local yEnd = self.level:getYEnd()
+        local xStart = self.level:getXStart()
+        local xEnd = self.level:getXEnd()
 
-    if not self.minimapImgData then
-        self.minimapImgData = love.image.newImageData(width, height)
-    end
+        local width = xEnd - xStart + 1
+        local height = yEnd - yStart + 1
 
-    self.minimapImgData:mapPixel(function (x, y)
-        local tileX = xStart + x
-        local tileY = yStart + y
-
-        local tile = self.level:getTile(tileX, tileY)
-
-        if tile then
-            return unpack(tile:getAverageColor())
-        else
-            return unpack(self.level.backgroundColor)
+        if not self.minimapCanvas then
+            self.minimapCanvas = love.graphics.newCanvas(width*minimapScale, height*minimapScale)
         end
-    end)
 
-    self.minimapImg = love.graphics.newImage(self.minimapImgData)
+        love.graphics.setCanvas(self.minimapCanvas)
+        love.graphics.clear()
+        love.graphics.push()
+        love.graphics.origin()
+        love.graphics.scale(minimapScale/16)
 
-    -- Update existing minimap windows
-    for _, window in ipairs(self.windows) do
-        if window:isInstanceOf(self.windowClasses.minimap) then
-            window.minimapDraw.w = width*3
-            window.minimapDraw.h = height*3
-            window.minimapDraw:sizeChanged()
+        for x = xStart, xEnd do
+            for y = yStart, yEnd do
+                local cell = self.level.layers[1]:getCell(x, y)
+
+                cell:draw((x-1)*16, (y-1)*16)
+            end
         end
+
+        love.graphics.pop()
+        love.graphics.setCanvas()
+
+        self.minimapImg = self.minimapCanvas
+        self.minimapScale = 1
+
+        -- Update existing minimap windows
+        for _, window in ipairs(self.windows) do
+            if window:isInstanceOf(self.windowClasses.minimap) then
+                window.minimapDraw.w = self.minimapCanvas:getWidth()
+                window.minimapDraw.h = self.minimapCanvas:getHeight()
+                window.minimapDraw:sizeChanged()
+            end
+        end
+        prof.pop("updateMinimap")
+    elseif VAR("minimapType") == "blocky" then
+        prof.push("updateMinimap")
+        local yStart = self.level:getYStart()
+        local yEnd = self.level:getYEnd()
+        local xStart = self.level:getXStart()
+        local xEnd = self.level:getXEnd()
+
+        local width = xEnd - xStart + 1
+        local height = yEnd - yStart + 1
+
+        if not self.minimapImgData then
+            self.minimapImgData = love.image.newImageData(width, height)
+        end
+
+        self.minimapImgData:mapPixel(function (x, y)
+            local tileX = xStart + x
+            local tileY = yStart + y
+
+            local tile = self.level:getTile(tileX, tileY)
+
+            if tile then
+                if VAR("blockyMinimapSource") == "average" then
+                    return unpack(tile:getAverageColor())
+                elseif VAR("blockyMinimapSource") == "prominent" then
+                    return unpack(tile:getProminentColor())
+                end
+            else
+                return unpack(self.level.backgroundColor)
+            end
+        end)
+
+        self.minimapImg = love.graphics.newImage(self.minimapImgData)
+        self.minimapScale = VAR("scale")*3
+
+        -- Update existing minimap windows
+        for _, window in ipairs(self.windows) do
+            if window:isInstanceOf(self.windowClasses.minimap) then
+                window.minimapDraw.w = width
+                window.minimapDraw.h = height
+                window.minimapDraw:sizeChanged()
+            end
+        end
+        prof.pop("updateMinimap")
     end
-    prof.pop("updateMinimap")
 end
 
 function Editor:drawMinimap()
-    love.graphics.draw(self.minimapImg, 0, 0, 0, 3, 3)
+    love.graphics.draw(self.minimapImg, 0, 0, 0, self.minimapScale/VAR("scale"), self.minimapScale/VAR("scale"))
 
     -- local lx, ty = self.level:cameraToWorld(0, 0)
     -- local rx, by = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)

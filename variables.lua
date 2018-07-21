@@ -3,9 +3,10 @@ return {
     scale = 1,
     volume = 1,
 
-    tileSize = 16, -- Not fully implemented because typing tileSize a lot is too much work
     uiHeight = 38, -- Move these to SMB3UI?
     uiLineHeight = 1,
+
+    canvasExtra = 0,
 
     gravity = 1125,
     gravityJumping = 225, --gravity while jumping (Only for mario)
@@ -35,6 +36,9 @@ return {
     cameraScrollDownBorder = 25,
 
     cameraScrollRate = 300,
+
+    minimapType = "blocky", -- realistic, blocky
+    blockyMinimapSource = "prominent", -- average, prominent
 
     tileTemplates = {
         cube = {

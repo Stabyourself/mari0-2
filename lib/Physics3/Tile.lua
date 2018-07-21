@@ -174,6 +174,62 @@ function Tile:getAverageColor()
 	return self.averageColor
 end
 
+function Tile:getProminentColor()
+	if not self.prominentColor then
+		local tr, tg, tb = 0, 0, 0
+
+		local colorTable = {}
+
+		for y = 0, 15 do
+			for x = 0, 15 do
+				local r, g, b, a = self.tileMap.imgData:getPixel((self.x-1)*17+x, (self.y-1)*17+y)
+
+				local colorString = string.format("%s,%s,%s,%s", r, g, b, a)
+
+				if colorTable[colorString] then
+					colorTable[colorString] = colorTable[colorString] + 1
+				else
+					colorTable[colorString] = 1
+				end
+			end
+		end
+
+		local most = 0
+		local result
+		for colorString, count in pairs(colorTable) do
+			if count > most then
+				if colorString ~= "0,0,0,1" then
+					most = count
+					result = colorString
+				end
+			end
+		end
+
+		if not result then
+			if colorTable["0,0,0,1"] then
+				result = "0,0,0,1"
+			else
+				self.prominentColor = game.level.backgroundColor
+			end
+		end
+
+			local r, g, b, a = unpack(result:split(","))
+
+			self.prominentColor = {
+				tonumber(r),
+				tonumber(g),
+				tonumber(b),
+				tonumber(a),
+			}
+
+		if self.prominentColor[4] == 0 then
+			self.prominentColor = game.level.backgroundColor
+		end
+	end
+
+	return self.prominentColor
+end
+
 function Tile:getSideAngle(side)
 	local point = side*2-1
 	local nextPoint = point+2

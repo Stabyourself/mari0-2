@@ -264,7 +264,11 @@ function Gui3.Element:render()
         love.graphics.setCanvas(self.canvas)
         love.graphics.clear(1, 1, 1, 0)
 
+        love.graphics.push()
+        love.graphics.origin()
+        love.graphics.scale(VAR("scale"), VAR("scale"))
         self:draw()
+        love.graphics.pop()
 
         love.graphics.setCanvas(canvas)
 
@@ -273,17 +277,15 @@ function Gui3.Element:render()
 end
 
 function Gui3.Element:rootDraw()
-    love.graphics.push()
-    love.graphics.origin()
-    if self.needsReRender and VAR("debug").reRenders then
-        print("Rerender @ " .. love.timer.getTime())
+    if self.needsReRender then
+        if VAR("debug").reRenders then
+            print("Rerender @ " .. love.timer.getTime())
+        end
+
+        self:render()
     end
 
-    self:render()
-
-    love.graphics.pop()
-
-    love.graphics.draw(self.canvas, self.x, self.y)
+    love.graphics.draw(self.canvas, self.x*VAR("scale"), self.y*VAR("scale"))
 
     if VAR("debug").canvas then
         self:debugDraw()
@@ -297,7 +299,7 @@ function Gui3.Element:draw()
             child:render() -- rerender children if necessary
 
             love.graphics.setColor(1, 1, 1)
-            love.graphics.draw(child.canvas, child.x-self.scroll[1]+self.childBox[1], child.y-self.scroll[2]+self.childBox[2])
+            love.graphics.draw(child.canvas, child.x-self.scroll[1]+self.childBox[1], child.y-self.scroll[2]+self.childBox[2], 0, 1/VAR("scale"), 1/VAR("scale"))
         end
     end
 
@@ -511,9 +513,9 @@ function Gui3.Element:sizeChanged()
     end
 
     -- Update canvas
-    if not self.canvas or self.canvas:getWidth() ~= self.w or self.canvas:getHeight() ~= self.h then -- canvas isn't current anymore
+    if not self.canvas or self.canvas:getWidth() ~= self.w*VAR("scale") or self.canvas:getHeight() ~= self.h*VAR("scale") then -- canvas isn't current anymore
         if self.w > 0 and self.h > 0 then -- but not 0 px wide or tall
-            self.canvas = love.graphics.newCanvas(self.w, self.h)
+            self.canvas = love.graphics.newCanvas(math.ceil(self.w*VAR("scale")), math.ceil(self.h*VAR("scale")))
         end
     end
 

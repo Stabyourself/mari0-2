@@ -29,11 +29,11 @@ end
 function Layer:render()
     local lx, ty = self.world:cameraToCoordinate(-16, -16)
     local rx, by = self.world:cameraToCoordinate(CAMERAWIDTH, CAMERAHEIGHT)
-    local xStart = lx
-    local xEnd = rx
+    local xStart = lx - VAR("canvasExtra")
+    local xEnd = rx + VAR("canvasExtra")
 
-    local yStart = ty
-    local yEnd = by
+    local yStart = ty - VAR("canvasExtra")
+    local yEnd = by + VAR("canvasExtra")
 
     local w = xEnd-xStart+1
     local h = yEnd-yStart+1

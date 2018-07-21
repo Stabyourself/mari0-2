@@ -615,6 +615,7 @@ function Editor:resize(w, h)
     self.menuBar:resize(w, self.menuBar.h)
 
     self.toolbar.h = CAMERAHEIGHT-14
+    self.toolbar:sizeChanged()
 
     local x = CAMERAWIDTH-113
     self.scaleBar.x = x

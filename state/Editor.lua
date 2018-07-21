@@ -759,7 +759,7 @@ end
 function Editor:updateMinimap()
     prof.push("updateMinimap")
     if VAR("minimapType") == "realistic" then
-        local minimapScale = 2*VAR("scale")
+        local minimapScale = 8/3*VAR("scale")
 
         local yStart = self.level:getYStart()
         local yEnd = self.level:getYEnd()
@@ -774,17 +774,27 @@ function Editor:updateMinimap()
         end
 
         love.graphics.setCanvas(self.minimapCanvas)
-        love.graphics.clear()
+        love.graphics.clear(self.level.backgroundColor)
         love.graphics.push()
         love.graphics.origin()
         love.graphics.scale(minimapScale/16)
+
+        -- set tilemaps' filter
+        for _, tileMap in ipairs(self.level.tileMaps) do
+            tileMap:setFilter("linear", "linear")
+        end
 
         for x = xStart, xEnd do
             for y = yStart, yEnd do
                 local cell = self.level.layers[1]:getCell(x, y)
 
-                cell:draw((x-1)*16, (y-1)*16)
+                cell:drawFrame((x-1)*16, (y-1)*16, 1)
             end
+        end
+
+        -- set it back!
+        for _, tileMap in ipairs(self.level.tileMaps) do
+            tileMap:setFilter("nearest", "nearest")
         end
 
         love.graphics.pop()

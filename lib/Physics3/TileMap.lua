@@ -18,7 +18,7 @@ function TileMap:initialize(path, name)
 	self.imgData = love.image.newImageData(self.path .. self.data.tileMap)
 
 	self.tiles = {}
-	self.updateTiles = {}
+	self.animatedTiles = {}
 
 	local i = 1
 	for y = 1, (self.img:getHeight()+self.tileMargin)/(self.tileSize+self.tileMargin) do
@@ -27,7 +27,7 @@ function TileMap:initialize(path, name)
 			table.insert(self.tiles, tile)
 
 			if tile.quads then
-				table.insert(self.updateTiles, tile)
+				table.insert(self.animatedTiles, tile)
 			end
 
 			i = i + 1
@@ -70,8 +70,16 @@ function TileMap:initialize(path, name)
 end
 
 function TileMap:update(dt)
-	for _, updateTile in ipairs(self.updateTiles) do
-		updateTile:update(dt)
+	for _, tile in ipairs(self.animatedTiles) do
+		tile:update(dt)
+	end
+end
+
+function TileMap:setFilter(min, mag)
+	self.img:setFilter(min, mag)
+
+	for _, tile in ipairs(self.animatedTiles) do
+		tile.img:setFilter(min, mag)
 	end
 end
 

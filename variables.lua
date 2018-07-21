@@ -37,7 +37,7 @@ return {
 
     cameraScrollRate = 300,
 
-    minimapType = "blocky", -- realistic, blocky
+    minimapType = "realistic", -- realistic, blocky
     blockyMinimapSource = "prominent", -- average, prominent
 
     tileTemplates = {

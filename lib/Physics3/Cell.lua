@@ -38,6 +38,18 @@ function Cell:draw(x, y)
     end
 end
 
+function Cell:drawFrame(x, y, frame)
+    if self.tile then
+        local off = 0
+
+        if self.bounceTimer < self.bounceTime then
+            off = self.bounceEase(self.bounceTimer, 0, 1, self.bounceTime)
+        end
+
+        self.tile:drawFrame(x, y-off*self.bounceHeight, frame)
+    end
+end
+
 function Cell:bounce()
     self.bounceTimer = 0
 end

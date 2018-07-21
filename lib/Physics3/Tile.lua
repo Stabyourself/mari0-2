@@ -141,6 +141,14 @@ function Tile:draw(x, y)
 	love.graphics.draw(self.img, self.quad, x, y)
 end
 
+function Tile:drawFrame(x, y, frame)
+	if self.animated then
+		love.graphics.draw(self.img, self.quads[frame], x, y)
+	else
+		love.graphics.draw(self.img, self.quad, x, y)
+	end
+end
+
 function Tile:getAverageColor()
 	if not self.averageColor then
 		local tr, tg, tb = 0, 0, 0

@@ -198,8 +198,6 @@ function Gui3.ComponentButton:initialize(x, y, elements, border, padding, func)
     local w = maxW+self.padding*2
     local h = elY-1+self.padding*2
 
-    print(w, h)
-
     self.childPadding = {self.padding, self.padding, self.padding, self.padding}
 
     Gui3.Element.initialize(self, x, y, w, h)

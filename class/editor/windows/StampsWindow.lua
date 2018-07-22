@@ -48,7 +48,6 @@ function StampsWindow:initialize(editor)
     end
 
     self.element.autoArrangeChildren = true
-    self.element.hasScrollbar[2] = true
     self.element:sizeChanged()
     self.element:mouseRegionChanged()
 end

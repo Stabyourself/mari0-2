@@ -134,6 +134,7 @@ end
 
 function Gui3.Element:updateScrollbars()
     self.childrenW, self.childrenH = self:getChildrenSize()
+    print(self.childrenH)
 
     self.hasScrollbar[1] = false
     self.hasScrollbar[2] = false
@@ -525,6 +526,7 @@ function Gui3.Element:sizeChanged()
         self.childBox[4] = self.h
     end
 
+
     -- Update canvas
     if not self.canvas or self.canvas:getWidth() ~= self.w*VAR("scale") or self.canvas:getHeight() ~= self.h*VAR("scale") then -- canvas isn't current anymore
         if self.w > 0 and self.h > 0 then -- but not 0 px wide or tall
@@ -538,10 +540,40 @@ function Gui3.Element:sizeChanged()
         end
     end
 
-    self:limitScroll()
-    self:updateScrollbars()
     self:mouseRegionChanged()
     self:updateRender()
+    if self.autoArrangeChildren then
+        self:arrangeChildren()
+    end
+    self:limitScroll()
+    self:updateScrollbars()
+end
+
+function Gui3.Element:arrangeChildren()
+    local offX = self.offX or 1
+    local offY = self.offY or 1
+
+    local x = offX
+    local y = offY
+    local maxHeight = 0
+
+    for _, child in ipairs(self.children) do
+        local width = child.w
+        local height = child.h
+
+        maxHeight = math.max(maxHeight, height)
+
+        if x ~= offX and x + width+2 > self:getInnerWidth() then
+            x = offX
+            y = y + maxHeight + offY
+            maxHeight = 0
+        end
+
+        child.x = x
+        child.y = y
+
+        x = x + width + offX
+    end
 end
 
 function Gui3.Element:mouseRegionChanged()

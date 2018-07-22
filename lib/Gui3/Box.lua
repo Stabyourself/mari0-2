@@ -241,38 +241,3 @@ function Gui3.Box:close()
     self.parent:removeChild(self)
     self.parent:updateRender()
 end
-
-function Gui3.Box:sizeChanged()
-    Gui3.Element.sizeChanged(self)
-
-    if self.autoArrangeChildren then
-        self:arrangeChildren()
-    end
-end
-
-function Gui3.Box:arrangeChildren()
-    local offX = self.offX or 1
-    local offY = self.offY or 1
-
-    local x = offX
-    local y = offY
-    local maxHeight = 0
-
-    for _, child in ipairs(self.children) do
-        local width = child.w
-        local height = child.h
-
-        maxHeight = math.max(maxHeight, height)
-
-        if x ~= offX and x + width+2 > self:getInnerWidth() then
-            x = offX
-            y = y + maxHeight + offY
-            maxHeight = 0
-        end
-
-        child.x = x
-        child.y = y
-
-        x = x + width + offX
-    end
-end

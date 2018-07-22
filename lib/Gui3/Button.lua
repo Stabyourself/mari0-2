@@ -27,76 +27,6 @@ function Gui3.Button:addSubDraw(func, y, w, h)
     self:addChild(subDraw)
 end
 
-function Gui3.Button:initialize(x, y, content, border, padding, func, sizeX, sizeY)
-    self.padding = padding or 1
-
-    self.border = border
-
-    if self.border then
-        self.padding = self.padding + 3
-    end
-
-    Gui3.Element.initialize(self, x, y, 0, 0)
-
-    local elY = 0
-    local maxW = 0
-
-    if type(content) ~= "table" then
-        content = {content}
-    end
-
-    for _, el in ipairs(content) do
-        if type(el) == "string" then
-            self:addText(el, elY)
-
-            elY = elY + 9
-            maxW = math.max(maxW, #el*8)
-
-        elseif type(el) == "userdata" then -- image
-            self:addImage(el, elY)
-
-            elY = elY + el:getHeight()+1
-            maxW = math.max(maxW, el:getWidth())
-
-        elseif type(el) == "table" then -- subDraw
-            self:addSubDraw(el.func, elY, el.w, el.h)
-
-        end
-    end
-
-    local w = maxW
-    local h = elY-1
-
-    if sizeX then
-        w = sizeX
-    end
-
-    if sizeY then
-        h = sizeY
-    end
-
-    self.childPadding = {self.padding, self.padding, self.padding, self.padding}
-
-    w = w + self.padding*2
-    h = h + self.padding*2
-
-    self.w = w
-    self.h = h
-
-    self:sizeChanged()
-
-    self.func = func
-
-    self.clip = true
-    self.pressing = false
-    self.color = {
-        background = {1, 1, 1},
-        normal = {0, 0, 0, 0},
-        hover = {0, 0, 0, 0.5},
-        active = {0, 0, 0, 0.6},
-    }
-end
-
 function Gui3.Button:draw()
     love.graphics.setColor(1, 1, 1)
 
@@ -174,4 +104,118 @@ function Gui3.Button:mouseleft(x, y)
     Gui3.Element.mouseleft(self, x, y)
 
     self:updateRender()
+end
+
+
+Gui3.TextButton = class("Gui3.TextButton", Gui3.Button)
+
+function Gui3.TextButton:initialize(x, y, s, border, padding, func)
+    self.border = border
+    self.padding = padding or 1
+    self.func = func
+
+    if self.border then
+        self.padding = self.padding + 3
+    end
+
+    self.childPadding = {self.padding, self.padding, self.padding, self.padding}
+
+    local text = Gui3.Text:new(s, 0, 0)
+
+    local w = text.w+self.padding*2
+    local h = text.h+self.padding*2
+
+    Gui3.Element.initialize(self, x, y, w, h)
+
+    self:addChild(text)
+
+    self.pressing = false
+    self.color = {
+        background = {1, 1, 1},
+        normal = {0, 0, 0, 0},
+        hover = {0, 0, 0, 0.5},
+        active = {0, 0, 0, 0.6},
+    }
+end
+
+
+Gui3.ImageButton = class("Gui3.ImageButton", Gui3.Button)
+
+function Gui3.ImageButton:initialize(x, y, img, border, padding, func)
+    self.border = border
+    self.padding = padding or 1
+    self.func = func
+
+    if self.border then
+        self.padding = self.padding + 3
+    end
+
+    self.childPadding = {self.padding, self.padding, self.padding, self.padding}
+
+    local image = Gui3.Image:new(img, 0, 0)
+
+    local w = image.w+self.padding*2
+    local h = image.h+self.padding*2
+
+    Gui3.Element.initialize(self, x, y, w, h)
+
+    self:addChild(image)
+
+    self.pressing = false
+    self.color = {
+        background = {1, 1, 1},
+        normal = {0, 0, 0, 0},
+        hover = {0, 0, 0, 0.5},
+        active = {0, 0, 0, 0.6},
+    }
+end
+
+
+Gui3.ComponentButton = class("Gui3.ComponentButton", Gui3.Button)
+
+function Gui3.ComponentButton:initialize(x, y, elements, border, padding, func)
+    self.padding = padding or 1
+
+    self.border = border
+
+    if self.border then
+        self.padding = self.padding + 3
+    end
+
+    local elY = 0
+    local maxW = 0
+
+    for _, element in ipairs(elements) do
+        element.y = elY
+
+        elY = elY + element.h + 1
+
+        if element.w > maxW then
+            maxW = element.w
+        end
+    end
+
+    local w = maxW+self.padding*2
+    local h = elY-1+self.padding*2
+
+    print(w, h)
+
+    self.childPadding = {self.padding, self.padding, self.padding, self.padding}
+
+    Gui3.Element.initialize(self, x, y, w, h)
+
+
+    for _, element in ipairs(elements) do
+        self:addChild(element)
+    end
+
+    self.func = func
+
+    self.pressing = false
+    self.color = {
+        background = {1, 1, 1},
+        normal = {0, 0, 0, 0},
+        hover = {0, 0, 0, 0.5},
+        active = {0, 0, 0, 0.6},
+    }
 end

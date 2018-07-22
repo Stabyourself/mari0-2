@@ -2,7 +2,7 @@ local Gui3 = ...
 Gui3.Dropdown = class("Gui3.Dropdown", Gui3.Element)
 
 function Gui3.Dropdown:initialize(x, y, s, boxCanvas)
-    self.button = Gui3.Button:new(0, 0, s, false, 3, function() self:toggle() end)
+    self.button = Gui3.TextButton:new(0, 0, s, false, 3, function() self:toggle() end)
     self.button.color.normal = {1, 1, 1, 0}
 
     self.box = Gui3.Box:new(x, y+14, 50, 100)

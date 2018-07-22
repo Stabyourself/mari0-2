@@ -73,8 +73,8 @@ function Editor:load()
 
     self.menuBar:addChild(self.fileDropdown)
 
-    self.fileDropdown.box:addChild(Gui3.Button:new(0, 0, "save", false, 1, function(button) self:saveLevel() end))
-    self.fileDropdown.box:addChild(Gui3.Button:new(0, 10, "load", false, 1, function(button) self:loadLevel("mappacks/smb3/1-1.lua") end))
+    self.fileDropdown.box:addChild(Gui3.TextButton:new(0, 0, "save", false, 1, function(button) self:saveLevel() end))
+    self.fileDropdown.box:addChild(Gui3.TextButton:new(0, 10, "load", false, 1, function(button) self:loadLevel("mappacks/smb3/1-1.lua") end))
 
     self.fileDropdown:autoSize()
 
@@ -87,11 +87,11 @@ function Editor:load()
 
     self.menuBar:addChild(self.newWindowDropdown)
 
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 0, "tiles", false, 1, function(button) self:newWindow(self.windowClasses.tiles, button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 10, "stamps", false, 1, function(button) self:newWindow(self.windowClasses.stamps, button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 20, "layers", false, 1, function(button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 30, "minimap", false, 1, function(button) self:newWindow(self.windowClasses.minimap, button) end))
-    self.newWindowDropdown.box:addChild(Gui3.Button:new(0, 40, "map options", false, 1, function(button) end))
+    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 0, "tiles", false, 1, function(button) self:newWindow(self.windowClasses.tiles, button) end))
+    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 10, "stamps", false, 1, function(button) self:newWindow(self.windowClasses.stamps, button) end))
+    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 20, "layers", false, 1, function(button) end))
+    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 30, "minimap", false, 1, function(button) self:newWindow(self.windowClasses.minimap, button) end))
+    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 40, "map options", false, 1, function(button) end))
 
     self.newWindowDropdown:autoSize()
 
@@ -131,15 +131,15 @@ function Editor:load()
 
     self:changeScale(self.level.camera.scale)
 
-    local minusButton = Gui3.Button:new(0, 0, "-", false, 3, function() self:zoom(-1) end)
+    local minusButton = Gui3.TextButton:new(0, 0, "-", false, 3, function() self:zoom(-1) end)
     minusButton.color.background = {0, 0, 0, 0}
     self.scaleBar:addChild(minusButton)
 
-    local plusButton = Gui3.Button:new(w+20, 0, "+", false, 3, function() self:zoom(1) end)
+    local plusButton = Gui3.TextButton:new(w+20, 0, "+", false, 3, function() self:zoom(1) end)
     plusButton.color.background = {0, 0, 0, 0}
     self.scaleBar:addChild(plusButton)
 
-    local oneToOneButton = Gui3.Button:new(w+34, 0, "1:1", false, 3, function() self:resetZoom() end)
+    local oneToOneButton = Gui3.TextButton:new(w+34, 0, "1:1", false, 3, function() self:resetZoom() end)
     oneToOneButton.color.background = {0, 0, 0, 0}
     self.scaleBar:addChild(oneToOneButton)
 
@@ -155,7 +155,7 @@ function Editor:load()
 
     local y = 0
     for i, tool in ipairs(self.toolbarOrder) do
-        local button = Gui3.Button:new(0, y, self.toolbarImg[i], false, 2, function(button) self:selectTool(string.lower(tool)) end)
+        local button = Gui3.ImageButton:new(0, y, self.toolbarImg[i], false, 2, function(button) self:selectTool(string.lower(tool)) end)
         button.color.background = {0, 0, 0, 0}
 
         self.toolButtons[string.lower(tool)] = button

@@ -262,9 +262,21 @@ function Tile:sidePortalable(side)
 	end
 end
 
+function Tile:addFrameChangedCallback(func)
+	table.insert(self.frameChangedCallbacks, func)
+end
+
 function Tile:frameChanged() -- todo
-	for _, callback in ipairs(self.frameChangedCallbacks) do
-		callback()
+	for _, func in ipairs(self.frameChangedCallbacks) do
+		func()
+	end
+end
+
+function Tile:removeFrameChangedCallback(removeFunc)
+	for i = #self.frameChangedCallbacks, 1, -1 do
+		if self.frameChangedCallbacks[i] == removeFunc then
+			table.remove(self.frameChangedCallbacks, i)
+		end
 	end
 end
 

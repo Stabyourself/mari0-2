@@ -16,12 +16,9 @@ function StampsWindow:initialize(editor)
     self.element.closeable = true
     self.element.scrollable = {true, true}
     self.element.title = "stamps"
-    self.element.clip = true
     self.editor.canvas:addChild(self.element)
 
     self.element.background = {0.5, 0.5, 0.5}
-
-    self.buttons = {}
 
     for _, tileMap in ipairs(self.level.tileMaps) do
         for _, stampMap in ipairs(tileMap.stampMaps) do
@@ -33,17 +30,19 @@ function StampsWindow:initialize(editor)
             local drawWidth = width*scale
             local drawHeight = height*scale
 
-            local button = Gui3.Button:new(0, 0, {stampMap.name,
-                {
-                    w = drawWidth*16,
-                    h = drawHeight*16,
-                    func = function()
-                        self:drawStampMap(stampMap, width, height, scale)
-                    end
-                }
-                }, true, 0, function() self:clickStampMap(stampMap) end, drawWidth*16, drawHeight*16+9)
+            local text = Gui3.Text:new(stampMap.name, 0, 0)
+            local subDraw = Gui3.SubDraw:new(function()
+                self:drawStampMap(stampMap, width, height, scale)
+            end,
+            0, 0, drawWidth*16, drawHeight*16)
 
-            table.insert(self.buttons, button)
+            subDraw.noMouseEvents = true
+
+            local button = Gui3.ComponentButton:new(0, 0, {
+                text,
+                subDraw,
+            }, true, 0, function() self:clickStampMap(stampMap) end)
+
             self.element:addChild(button)
         end
     end

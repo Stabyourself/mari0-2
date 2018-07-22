@@ -1,21 +1,48 @@
 local Gui3 = ...
 Gui3.TileGrid = class("Gui3.TileGrid", Gui3.Element)
 
-Gui3.TileGrid.perRow = 8
+Gui3.TileGrid.columns = 8
 Gui3.TileGrid.size = {16, 16}
 Gui3.TileGrid.gutter = {1, 1}
 
-function Gui3.TileGrid:initialize(x, y, tileMap, func)
+function Gui3.TileGrid:initialize(x, y, tileMap, func, fixedSize)
     self.tileMap = tileMap
     self.tiles = tileMap.tiles
     self.func = func
+    self.fixedSize = fixedSize or false
 
     Gui3.Element.initialize(self, x, y, 0, 0)
 
-    self:updateSize()
+    if not self.func then
+        self.noMouseEvents = true
+    end
+
 
     self.selected = nil
     self.hoveringTile = nil
+
+    -- Somehow bind tileMapButton to any animated tile?
+    self.animatedTileCallback = function()
+        self:updateRender()
+    end
+
+    for _, tile in ipairs(self.tileMap.tiles) do
+        if tile.animated then
+            tile:addFrameChangedCallback(self.animatedTileCallback)
+        end
+    end
+
+    if not self.fixedSize then
+        self:updateSize()
+    end
+end
+
+function Gui3.TileGrid:deleted()
+    for _, tile in ipairs(self.tileMap.tiles) do
+        if tile.animated then
+            tile:removeFrameChangedCallback(self.animatedTileCallback)
+        end
+    end
 end
 
 function Gui3.TileGrid:mousemoved(x, y)
@@ -25,16 +52,20 @@ function Gui3.TileGrid:mousemoved(x, y)
 end
 
 function Gui3.TileGrid:parentScrollChanged()
-    self:updateRender()
+    if not self.fixedSize then
+        self:updateRender()
+    end
 end
 
 function Gui3.TileGrid:parentSizeChanged()
-    local maxWidth = self.parent:getInnerWidth()
-    local newPerRow = math.max(1, math.floor((maxWidth-self.x)/(self.size[1]+self.gutter[1])))
+    if not self.fixedSize then
+        local maxWidth = self.parent:getInnerWidth()
+        local newColumns = math.max(1, math.floor((maxWidth-self.x)/(self.size[1]+self.gutter[1])))
 
-    if newPerRow ~= self.perRow then
-        self.perRow = newPerRow
-        self:updateSize()
+        if newColumns ~= self.columns then
+            self.columns = newColumns
+            self:updateSize()
+        end
     end
 end
 
@@ -46,8 +77,8 @@ function Gui3.TileGrid:setHoveringTile(hoveringTile)
 end
 
 function Gui3.TileGrid:updateSize()
-    self.w = self.perRow*(self.size[1]+self.gutter[1])-self.gutter[1]
-    self.h = math.ceil(#self.tiles/self.perRow)*(self.size[2]+self.gutter[2])
+    self.w = self.columns*(self.size[1]+self.gutter[1])-self.gutter[1]
+    self.h = math.ceil(#self.tiles/self.columns)*(self.size[2]+self.gutter[2])
 
     self:sizeChanged()
 end
@@ -56,11 +87,11 @@ function Gui3.TileGrid:getCollision(x, y)
     local tileX = math.floor(x/(self.size[1]+self.gutter[1]))+1
     local tileY = math.floor(y/(self.size[2]+self.gutter[2]))+1
 
-    if tileX < 1 or tileX > self.perRow then
+    if tileX < 1 or tileX > self.columns then
         return false
     end
 
-    local tileNum = (tileY-1)*self.perRow+tileX
+    local tileNum = (tileY-1)*self.columns+tileX
 
     if tileNum < 1 or tileNum > #self.tiles then
         return false
@@ -74,8 +105,8 @@ function Gui3.TileGrid:draw()
     local bottomY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]) + (self.parent:getInnerHeight())/(self.size[2]+self.gutter[2]))
 
     for tileY = topY, bottomY do
-        for tileX = 1, self.perRow do
-            local tileNum = (tileY-1)*self.perRow+tileX
+        for tileX = 1, self.columns do
+            local tileNum = (tileY-1)*self.columns+tileX
 
             if self.tiles[tileNum] then
                 local x = (tileX-1)*(self.size[1] + self.gutter[1])
@@ -93,8 +124,8 @@ function Gui3.TileGrid:draw()
     end
 
     if self.selected then
-        local tileX = (self.selected-1)%self.perRow+1
-        local tileY = math.ceil(self.selected/self.perRow)-1
+        local tileX = (self.selected-1)%self.columns+1
+        local tileY = math.ceil(self.selected/self.columns)-1
 
         local x = (tileX-1)*(self.size[1] + self.gutter[1])
         local y = tileY*(self.size[2] + self.gutter[2])

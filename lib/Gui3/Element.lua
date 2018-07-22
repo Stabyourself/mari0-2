@@ -70,15 +70,24 @@ end
 function Gui3.Element:removeChild(element)
     for i, child in ipairs(self.children) do
         if child == element then
+            child:deleted()
+
             table.remove(self.children, i)
+
             self:mouseRegionChanged()
         end
     end
 end
 
 function Gui3.Element:clearChildren()
+    for _, child in ipairs(self.children) do
+        child:deleted()
+    end
+
     iClearTable(self.children)
 end
+
+function Gui3.Element:deleted() end
 
 function Gui3.Element:getMouseZone(t, index, x, y, boxX, boxY, boxW, boxH)
     if self.visible and not self.noMouseEvents then

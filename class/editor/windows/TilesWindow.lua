@@ -17,7 +17,6 @@ function TilesWindow:initialize(editor)
     self.element.closeable = true
     self.element.scrollable = {true, true}
     self.element.title = "tiles"
-    self.element.clip = true
     self.editor.canvas:addChild(self.element)
 
     self:goToMenu()
@@ -35,8 +34,10 @@ function TilesWindow:goToMenu()
     for i, tileMap in ipairs(self.level.tileMaps) do
         local thumb = tileMap.thumbImg or tileMap.img
 
-        local tileMapButton = Gui3.Button:new(0, 0, {tileMap.name,
-            {
+        local tileMapButton = Gui3.Button:new(
+            0,
+            0,
+            {tileMap.name, {
                 func = function()
                     local i = 1
                     for y = 1, self.tileHeight do
@@ -50,27 +51,14 @@ function TilesWindow:goToMenu()
                 end,
                 w = self.tileWidth*17-1,
                 h = self.tileHeight*17-1,
-            }
-            }, true, 0,
+            }},
+            true,
+            0,
             function()
                 self:goToTileMap(tileMap)
             end,
-            self.tileWidth*17-1, self.tileHeight*17-1+9)
-
-        -- Somehow bind tileMapButton to any animated tile?
-        -- function reRender()
-        --     tileMapButton.children[2]:updateRender()
-        -- end
-
-        -- local i = 1
-        -- for y = 1, self.tileHeight do
-        --     for x = 1, self.tileWidth do
-        --         local tile = tileMap.tiles[i]
-        --         if tile and tile.animated then
-        --             table.insert(tile.frameChangedCallbacks, reRender) -- todo: tiles never forget a callback, bad for memory
-        --         end
-        --     end
-        -- end
+            self.tileWidth*17-1, self.tileHeight*17-1+9
+        )
 
         self.element:addChild(tileMapButton)
     end
@@ -87,7 +75,7 @@ function TilesWindow:goToTileMap(tileMap)
 
     self.element.background = self.editor.checkerboardImg
 
-    local backButton = Gui3.Button:new(1, 1, "< back", true, 0, function() self:goToMenu() end)
+    local backButton = Gui3.TextButton:new(1, 1, "< back", true, 0, function() self:goToMenu() end)
     backButton.ignoreForParentSize = true
     self.element:addChild(backButton)
 
@@ -103,6 +91,7 @@ function TilesWindow:goToTileMap(tileMap)
     if tileMap == self.editor.tools.paint.tile.tileMap then -- select it
         self.tileGrid:setSelected(self.editor.tools.paint.tile.num)
     end
+
 
     self.element:addChild(self.tileGrid)
     self.element.autoArrangeChildren = false

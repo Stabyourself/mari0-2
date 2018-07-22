@@ -5,13 +5,25 @@ Gui3.TileGrid.columns = 8
 Gui3.TileGrid.size = {16, 16}
 Gui3.TileGrid.gutter = {1, 1}
 
-function Gui3.TileGrid:initialize(x, y, tileMap, func, fixedSize)
+function Gui3.TileGrid:initialize(x, y, tileMap, func, fixedSize, columns, rows)
     self.tileMap = tileMap
     self.tiles = tileMap.tiles
     self.func = func
     self.fixedSize = fixedSize or false
+    local w = 0
+    local h = 0
 
-    Gui3.Element.initialize(self, x, y, 0, 0)
+    if columns then
+        self.columns = columns
+        w = self.columns*17-1
+    end
+
+    if rows then
+        self.rows = rows
+        h = self.rows*17-1
+    end
+
+    Gui3.Element.initialize(self, x, y, w, h)
 
     if not self.func then
         self.noMouseEvents = true
@@ -38,6 +50,8 @@ function Gui3.TileGrid:initialize(x, y, tileMap, func, fixedSize)
 end
 
 function Gui3.TileGrid:deleted()
+    Gui3.Element.deleted(self)
+
     for _, tile in ipairs(self.tileMap.tiles) do
         if tile.animated then
             tile:removeFrameChangedCallback(self.animatedTileCallback)
@@ -65,6 +79,7 @@ function Gui3.TileGrid:parentSizeChanged()
         if newColumns ~= self.columns then
             self.columns = newColumns
             self:updateSize()
+            self:parentScrollChanged()
         end
     end
 end
@@ -101,8 +116,16 @@ function Gui3.TileGrid:getCollision(x, y)
 end
 
 function Gui3.TileGrid:draw()
-    local topY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]))
-    local bottomY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]) + (self.parent:getInnerHeight())/(self.size[2]+self.gutter[2]))
+    local topY, bottomY
+
+    if self.fixedSize then
+        topY = 1
+        bottomY = topY + self.rows - 1
+
+    else
+        topY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]))
+        bottomY = math.ceil((self.parent.scroll[2]-self.y)/(self.size[2]+self.gutter[2]) + (self.parent:getInnerHeight())/(self.size[2]+self.gutter[2]))
+    end
 
     for tileY = topY, bottomY do
         for tileX = 1, self.columns do

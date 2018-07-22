@@ -87,7 +87,11 @@ function Gui3.Element:clearChildren()
     iClearTable(self.children)
 end
 
-function Gui3.Element:deleted() end
+function Gui3.Element:deleted()
+    for _, child in ipairs(self.children) do
+        child:deleted()
+    end
+end
 
 function Gui3.Element:getMouseZone(t, index, x, y, boxX, boxY, boxW, boxH)
     if self.visible and not self.noMouseEvents then

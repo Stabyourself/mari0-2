@@ -34,24 +34,16 @@ function TilesWindow:goToMenu()
     for i, tileMap in ipairs(self.level.tileMaps) do
         local thumb = tileMap.thumbImg or tileMap.img
 
-        local tileMapButton = Gui3.Button:new(
+        local text = Gui3.Text:new(tileMap.name, 0, 0)
+        local tileGrid = Gui3.TileGrid:new(0, 0, tileMap, nil, true, 8, 2)
+
+        local tileMapButton = Gui3.ComponentButton:new(
             0,
             0,
-            {tileMap.name, {
-                func = function()
-                    local i = 1
-                    for y = 1, self.tileHeight do
-                        for x = 1, self.tileWidth do
-                            if tileMap.tiles[i] then
-                                tileMap.tiles[i]:draw((x-1)*17, (y-1)*17)
-                                i = i + 1
-                            end
-                        end
-                    end
-                end,
-                w = self.tileWidth*17-1,
-                h = self.tileHeight*17-1,
-            }},
+            {
+                text,
+                tileGrid,
+            },
             true,
             0,
             function()

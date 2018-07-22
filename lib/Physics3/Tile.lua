@@ -266,7 +266,7 @@ function Tile:addFrameChangedCallback(func)
 	table.insert(self.frameChangedCallbacks, func)
 end
 
-function Tile:frameChanged() -- todo
+function Tile:frameChanged()
 	for _, func in ipairs(self.frameChangedCallbacks) do
 		func()
 	end

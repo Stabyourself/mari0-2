@@ -134,7 +134,6 @@ end
 
 function Gui3.Element:updateScrollbars()
     self.childrenW, self.childrenH = self:getChildrenSize()
-    print(self.childrenH)
 
     self.hasScrollbar[1] = false
     self.hasScrollbar[2] = false

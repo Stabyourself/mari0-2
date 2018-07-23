@@ -1,3 +1,0 @@
-[submodule "lib/jprof"]
-	path = lib/jprof
-	url = https://github.com/pfirsich/jprof.git

@@ -539,13 +539,13 @@ function Gui3.Element:sizeChanged()
         end
     end
 
-    self:mouseRegionChanged()
     self:updateRender()
     if self.autoArrangeChildren then
         self:arrangeChildren()
     end
     self:limitScroll()
     self:updateScrollbars()
+    self:mouseRegionChanged()
 end
 
 function Gui3.Element:arrangeChildren()

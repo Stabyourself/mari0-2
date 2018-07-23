@@ -43,6 +43,7 @@ function Gui3.Canvas:update(dt)
         end
 
         self.mouseRegionsOutdated = false
+        self.recheckMouse = true
     end
 end
 
@@ -50,7 +51,8 @@ function Gui3.Canvas:rootmousemoved(x, y)
     local diffX = x-self.lastMouseX
     local diffY = y-self.lastMouseY
 
-    if diffX ~= 0 or diffY ~= 0 then
+    if diffX ~= 0 or diffY ~= 0 or self.recheckMouse then
+        self.recheckMouse = false
         self.lastMouseX = x
         self.lastMouseY = y
 

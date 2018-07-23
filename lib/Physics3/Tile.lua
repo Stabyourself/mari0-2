@@ -266,17 +266,17 @@ function Tile:addFrameChangedCallback(func)
 	table.insert(self.frameChangedCallbacks, func)
 end
 
-function Tile:frameChanged()
-	for _, func in ipairs(self.frameChangedCallbacks) do
-		func()
-	end
-end
-
 function Tile:removeFrameChangedCallback(removeFunc)
 	for i = #self.frameChangedCallbacks, 1, -1 do
 		if self.frameChangedCallbacks[i] == removeFunc then
 			table.remove(self.frameChangedCallbacks, i)
 		end
+	end
+end
+
+function Tile:frameChanged()
+	for _, func in ipairs(self.frameChangedCallbacks) do
+		func()
 	end
 end
 

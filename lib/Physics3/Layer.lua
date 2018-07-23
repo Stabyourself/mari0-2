@@ -14,8 +14,9 @@ function Layer:initialize(world, x, y, width, height, map)
     self.movement = false
     self.movementTimer = 0
 
-    -- put cells into map oh man what a mess
     self.map = map or {}
+    self.tileRerenders = {}
+    self.tileRerenderCallbacks = {}
 end
 
 function Layer:update(dt)
@@ -26,21 +27,14 @@ function Layer:update(dt)
     end
 end
 
-function Layer:render()
-    local lx, ty = self.world:cameraToCoordinate(-16, -16)
-    local rx, by = self.world:cameraToCoordinate(CAMERAWIDTH, CAMERAHEIGHT)
-    local xStart = lx - VAR("canvasExtra")
-    local xEnd = rx + VAR("canvasExtra")
-
-    local yStart = ty - VAR("canvasExtra")
-    local yEnd = by + VAR("canvasExtra")
+function Layer:render(xStart, yStart)
+    local xEnd = xStart + math.ceil((CAMERAWIDTH+16)/self.world.camera.scale/16) + VAR("canvasExtra")*2
+    local yEnd = yStart + math.ceil((CAMERAHEIGHT+16)/self.world.camera.scale/16) + VAR("canvasExtra")*2
 
     local w = xEnd-xStart+1
     local h = yEnd-yStart+1
 
-    self.canvasX = xStart
-    self.canvasY = yStart
-
+    -- Adjust the tiles that are actually checked for performance
     xStart = math.clamp(xStart, self:getXStart(), self:getXEnd())
     yStart = math.clamp(yStart, self:getYStart(), self:getYEnd())
     xEnd = math.clamp(xEnd, self:getXStart(), self:getXEnd())
@@ -51,25 +45,80 @@ function Layer:render()
     end
 
     love.graphics.setCanvas(self.canvas)
+    love.graphics.clear()
+
     love.graphics.push()
     love.graphics.setScissor()
     love.graphics.origin()
-    love.graphics.clear()
+
     for x = xStart, xEnd do
         for y = yStart, yEnd do
             if self:inMap(x, y) then
                 self:getCell(x, y):draw((x-self.canvasX-1)*16, (y-self.canvasY-1)*16)
+
+                local tile = self:getTile(x, y)
+
+                if tile and tile.animated then
+                    local function reRenderCell()
+                        table.insert(self.tileRerenders, {x, y})
+                    end
+
+                    table.insert(self.tileRerenderCallbacks, {tile, reRenderCell})
+
+                    tile:addFrameChangedCallback(reRenderCell)
+                end
             end
         end
     end
+
     love.graphics.pop()
+
     love.graphics.setCanvas()
 end
 
 function Layer:draw()
-    if not self.canvas then
-        self:render()
+    -- check if canvas is outdated
+    local lx, ty = self.world:cameraToCoordinate(-16, -16)
+    local xStart = lx - VAR("canvasExtra")
+    local yStart = ty - VAR("canvasExtra")
+
+    if not self.canvas or xStart ~= self.canvasX or yStart ~= self.canvasY then
+        if VAR("debug").reCanvasLayers then
+            print("Rerendering layer!")
+        end
+
+        self.canvasX = xStart
+        self.canvasY = yStart
+
+        for _, tileRerenderCallback in ipairs(self.tileRerenderCallbacks) do
+            tileRerenderCallback[1]:removeFrameChangedCallback(tileRerenderCallback[2])
+        end
+
+        iClearTable(self.tileRerenders)
+        iClearTable(self.tileRerenderCallbacks)
+
+        self:render(xStart, yStart)
+
+    else -- work through tileRerenders if we have any
+        if #self.tileRerenders > 0 then
+            for _, tileRerender in ipairs(self.tileRerenders) do
+                love.graphics.setCanvas(self.canvas)
+
+                love.graphics.push()
+                love.graphics.setScissor()
+                love.graphics.origin()
+
+                self:getCell(tileRerender[1], tileRerender[2]):draw((tileRerender[1]-self.canvasX-1)*16, (tileRerender[2]-self.canvasY-1)*16)
+
+                love.graphics.pop()
+
+                love.graphics.setCanvas()
+            end
+        end
+
+        iClearTable(self.tileRerenders)
     end
+
 
     local x = math.ceil(self.xOffset)+self.canvasX*16
     local y = math.ceil(self.yOffset)+self.canvasY*16

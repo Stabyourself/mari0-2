@@ -15,8 +15,9 @@ function Layer:initialize(world, x, y, width, height, map)
     self.movementTimer = 0
 
     self.map = map or {}
-    self.tileRerenders = {}
-    self.tileRerenderCallbacks = {}
+    self.spriteBatches = {}
+    self.tileRerenderCallbackTiles = {}
+    self.tileRerenderCallbackFuncs = {}
 end
 
 function Layer:update(dt)
@@ -27,9 +28,13 @@ function Layer:update(dt)
     end
 end
 
-function Layer:render(xStart, yStart)
-    local xEnd = xStart + math.ceil((CAMERAWIDTH+16)/self.world.camera.scale/16) + VAR("canvasExtra")*2
-    local yEnd = yStart + math.ceil((CAMERAHEIGHT+16)/self.world.camera.scale/16) + VAR("canvasExtra")*2
+function Layer:buildSpriteBatch(xStart, yStart)
+    for _, spriteBatch in pairs(self.spriteBatches) do
+        spriteBatch:clear()
+    end
+
+    local xEnd = xStart + math.ceil((CAMERAWIDTH+16)/self.world.camera.scale/16)
+    local yEnd = yStart + math.ceil((CAMERAHEIGHT+16)/self.world.camera.scale/16)
 
     local w = xEnd-xStart+1
     local h = yEnd-yStart+1
@@ -40,90 +45,69 @@ function Layer:render(xStart, yStart)
     xEnd = math.clamp(xEnd, self:getXStart(), self:getXEnd())
     yEnd = math.clamp(yEnd, self:getYStart(), self:getYEnd())
 
-    if not self.canvas or self.canvas:getWidth() ~= w*16 or self.canvas:getHeight() ~= h*16 then
-        self.canvas = love.graphics.newCanvas(w*16, h*16)
-    end
-
-    love.graphics.setCanvas(self.canvas)
-    love.graphics.clear()
-
-    love.graphics.push()
-    love.graphics.setScissor()
-    love.graphics.origin()
 
     for x = xStart, xEnd do
         for y = yStart, yEnd do
-            if self:inMap(x, y) then
-                self:getCell(x, y):draw((x-self.canvasX-1)*16, (y-self.canvasY-1)*16)
+            local tile = self:getTile(x, y)
 
-                local tile = self:getTile(x, y)
-
-                if tile and tile.animated then
-                    local function reRenderCell()
-                        table.insert(self.tileRerenders, {x, y})
+            if tile then
+                if tile.animated then
+                    if not self.spriteBatches[tile] then
+                        self.spriteBatches[tile] = love.graphics.newSpriteBatch(tile.img)
                     end
 
-                    table.insert(self.tileRerenderCallbacks, {tile, reRenderCell})
+                    local i = self.spriteBatches[tile]:add(tile.quad, (x-1)*16, (y-1)*16)
+
+                    local function reRenderCell()
+                        self.spriteBatches[tile]:set(i, tile.quad, (x-1)*16, (y-1)*16)
+                    end
+
+                    table.insert(self.tileRerenderCallbackTiles, tile)
+                    table.insert(self.tileRerenderCallbackFuncs, reRenderCell)
 
                     tile:addFrameChangedCallback(reRenderCell)
+                else
+                    if not self.spriteBatches[tile.tileMap] then
+                        self.spriteBatches[tile.tileMap] = love.graphics.newSpriteBatch(tile.tileMap.img)
+                    end
+
+                    self.spriteBatches[tile.tileMap]:add(tile.quad, (x-1)*16, (y-1)*16)
                 end
             end
         end
     end
-
-    love.graphics.pop()
-
-    love.graphics.setCanvas()
 end
 
 function Layer:draw()
-    -- check if canvas is outdated
-    local lx, ty = self.world:cameraToCoordinate(-16, -16)
-    local xStart = lx - VAR("canvasExtra")
-    local yStart = ty - VAR("canvasExtra")
+    -- check if spriteBatch is outdated
+    local xStart, yStart = self.world:cameraToCoordinate(-16, -16)
 
-    if not self.canvas or xStart ~= self.canvasX or yStart ~= self.canvasY then
-        if VAR("debug").reCanvasLayers then
-            print("Rerendering layer!")
+    if xStart ~= self.spriteBatchX or yStart ~= self.spriteBatchY then
+        if VAR("debug").reSpriteBatchLayers then
+            print("SpriteBatching layer!")
         end
 
-        self.canvasX = xStart
-        self.canvasY = yStart
+        self.spriteBatchX = xStart
+        self.spriteBatchY = yStart
 
-        for _, tileRerenderCallback in ipairs(self.tileRerenderCallbacks) do
-            tileRerenderCallback[1]:removeFrameChangedCallback(tileRerenderCallback[2])
+        for i, tile in ipairs(self.tileRerenderCallbackTiles) do
+            tile:removeFrameChangedCallback(self.tileRerenderCallbackFuncs[i])
         end
 
-        iClearTable(self.tileRerenders)
-        iClearTable(self.tileRerenderCallbacks)
+        iClearTable(self.tileRerenderCallbackTiles)
+        iClearTable(self.tileRerenderCallbackFuncs)
 
-        self:render(xStart, yStart)
-
-    else -- work through tileRerenders if we have any
-        if #self.tileRerenders > 0 then
-            for _, tileRerender in ipairs(self.tileRerenders) do
-                love.graphics.setCanvas(self.canvas)
-
-                love.graphics.push()
-                love.graphics.setScissor()
-                love.graphics.origin()
-
-                self:getCell(tileRerender[1], tileRerender[2]):draw((tileRerender[1]-self.canvasX-1)*16, (tileRerender[2]-self.canvasY-1)*16)
-
-                love.graphics.pop()
-
-                love.graphics.setCanvas()
-            end
-        end
-
-        iClearTable(self.tileRerenders)
+        self:buildSpriteBatch(xStart, yStart)
     end
 
 
-    local x = math.ceil(self.xOffset)+self.canvasX*16
-    local y = math.ceil(self.yOffset)+self.canvasY*16
+    local x = math.ceil(self.xOffset)
+    local y = math.ceil(self.yOffset)
 
-    love.graphics.draw(self.canvas, x, y)
+    -- draw the spritebatch
+    for _, spriteBatch in pairs(self.spriteBatches) do
+        love.graphics.draw(spriteBatch)
+    end
 end
 
 function Layer:checkCollision(x, y, obj, vector)

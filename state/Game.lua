@@ -28,8 +28,6 @@ function Game:load()
 end
 
 function Game:update(dt)
-    prof.push("Game")
-
     self.level:update(dt)
 
     prof.push("UI")
@@ -43,11 +41,9 @@ function Game:update(dt)
         smb3ui:update(dt)
     end
     prof.pop("UI")
-    prof.pop("Game")
 end
 
 function Game:draw()
-    prof.push("Game")
     self.level:draw()
 
     love.graphics.setColor(1, 1, 1)
@@ -57,7 +53,6 @@ function Game:draw()
         smb3ui:draw()
     end
     prof.pop("UI")
-    prof.pop("Game")
 end
 
 function Game:resize(w, h)

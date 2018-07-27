@@ -101,24 +101,7 @@ function Selection:subtract(bTiles)
 end
 
 function Selection:intersect(bTiles)
-    local newSelection = {}
-
-    for _, bTile in ipairs(bTiles) do
-        local found = false
-
-        for _, aTile in ipairs(self.tiles) do
-            if bTile[1] == aTile[1] and bTile[2] == aTile[2] then
-                found = true
-                break
-            end
-        end
-
-        if found then
-            table.insert(newSelection, bTile)
-        end
-    end
-
-    self.tiles = newSelection
+    self.tiles = intersectTiles(self.tiles, bTiles)
 
     self:updateBorders()
 end

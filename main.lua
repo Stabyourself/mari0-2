@@ -65,8 +65,8 @@ function love.load()
 
     defaultUI = Gui3:new("img/gui/default")
 
-    local GameStateManager = require "lib.GameStateManager"
-    gameStateManager = GameStateManager:new()
+    local GameStateManager3 = require "lib.GameStateManager3"
+    gameStateManager = GameStateManager3:new()
 
     love.resize(400*VAR("scale"), 224*VAR("scale"))
 

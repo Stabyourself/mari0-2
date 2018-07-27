@@ -1,25 +1,27 @@
-local GameStateManager = class("GameStateManager")
+-- Game State thing for Mari0 2. Feel free to use it, MIT License
 
-GameStateManager.reversedEvents = {
+local GameStateManager3 = class("GameStateManager3")
+
+GameStateManager3.reversedEvents = {
     mousepressed = true,
     cmdpressed = true
 }
 
-function GameStateManager:initialize()
+function GameStateManager3:initialize()
     self.activeStates = {}
 end
 
-function GameStateManager:loadState(state)
+function GameStateManager3:loadState(state)
     self.activeStates = {state}
     state:load()
 end
 
-function GameStateManager:addState(state)
+function GameStateManager3:addState(state)
     table.insert(self.activeStates, state)
     state:load()
 end
 
-function GameStateManager:event(event, ...)
+function GameStateManager3:event(event, ...)
     prof.push(event)
     local from, to, step = 1, #self.activeStates, 1
 
@@ -31,15 +33,20 @@ function GameStateManager:event(event, ...)
         local state = self.activeStates[i]
 
         if type(state[event]) == "function" then
+            prof.push(state.class.name)
+
             if state[event](state, ...) then
+                prof.pop(state.class.name)
                 break
             end
+
+            prof.pop(state.class.name)
         end
     end
     prof.pop(event)
 end
 
-function GameStateManager:hasActiveState(stateClass)
+function GameStateManager3:hasActiveState(stateClass)
     for _, state in ipairs(self.activeStates) do
         if state.class == stateClass then
             return true
@@ -49,4 +56,4 @@ function GameStateManager:hasActiveState(stateClass)
     return false
 end
 
-return GameStateManager
+return GameStateManager3

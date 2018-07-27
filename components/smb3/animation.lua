@@ -190,9 +190,9 @@ function animation:postUpdate(dt)
         self.actor.animationState = "float"
 
     elseif self.actor.state.name == "jumping" or self.actor.state.name == "falling" then
-        if not self.actor.quadList.canFly and self.actor.pMeter == VAR("pMeterTicks") then -- todo wtf
+        if not self.actor:hasComponent("smb3.flying") and self.actor.pMeter == VAR("pMeterTicks") then
             self.actor.animationState = "fly"
-        elseif (not self.actor.quadList.canFly and self.actor.maxSpeedJump == MAXSPEEDS[3]) or self.actor.flying then
+        elseif (not self.actor:hasComponent("smb3.flying") and self.actor.maxSpeedJump == MAXSPEEDS[3]) or self.actor.flying then
             self.actor.animationState = "fly"
         else
             if self.actor.speed[2] < 0 then

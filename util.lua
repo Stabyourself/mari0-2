@@ -466,3 +466,24 @@ function compact(t)
 
     return out
 end
+
+function intersectTiles(aTiles, bTiles)
+    local newTiles = {}
+
+    for _, bTile in ipairs(bTiles) do
+        local found = false
+
+        for _, aTile in ipairs(aTiles) do
+            if bTile[1] == aTile[1] and bTile[2] == aTile[2] then
+                found = true
+                break
+            end
+        end
+
+        if found then
+            table.insert(newTiles, bTile)
+        end
+    end
+
+    return newTiles
+end

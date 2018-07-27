@@ -1,7 +1,7 @@
 local EditorState = require "class.editor.EditorState"
 local Selection = require "class.editor.Selection"
 local FloatingSelection = require "class.editor.FloatingSelection"
-local Editor = class("Editor") -- todo make it local again
+local Editor = class("Editor")
 
 Editor.toolbarOrder = {"Entity", "Paint", "Erase", "Move", "Select", "Wand", "Fill", "Stamp", "Portal"}
 Editor.toolbarImg = {}
@@ -186,7 +186,6 @@ function Editor:load()
 end
 
 function Editor:update(dt)
-    prof.push("Editor")
     prof.push("UI")
     self.canvas:update(dt)
     self.canvas:rootmousemoved(self.level:getMouse())
@@ -242,7 +241,6 @@ function Editor:update(dt)
         end
     end
     prof.pop()
-    prof.pop()
 end
 
 local stencilXStart
@@ -255,7 +253,6 @@ local function candyStencil()
 end
 
 function Editor:draw()
-    prof.push("Editor")
     self.level.camera:attach(CAMERAOFFSETX, CAMERAOFFSETY)
 
     local xl, yt = self.level:cameraToWorld(0, 0)
@@ -324,7 +321,6 @@ function Editor:draw()
     self.canvas:rootDraw()
     love.graphics.pop()
 
-    prof.pop()
     prof.pop()
 end
 

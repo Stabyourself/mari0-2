@@ -16,8 +16,8 @@ function Layer:initialize(world, x, y, width, height, map)
 
     self.map = map or {}
     self.spriteBatches = {}
-    self.tileRerenderCallbackTiles = {}
-    self.tileRerenderCallbackFuncs = {}
+
+    self.viewport = {}
 end
 
 function Layer:update(dt)
@@ -25,6 +25,25 @@ function Layer:update(dt)
         self.movementTimer = self.movementTimer + dt
 
         self.yOffset = math.sin(self.movementTimer)*8
+    end
+end
+
+function Layer:setBatchCoordinate(x, y, tile)
+    if tile.animated then
+        if not self.spriteBatches[tile] then
+            self.spriteBatches[tile] = love.graphics.newSpriteBatch(tile.img)
+        end
+
+        local i = self.spriteBatches[tile]:add(tile.quad, (x-1)*16, (y-1)*16)
+        self.batchMap[x][y] = {spriteBatch=self.spriteBatches[tile], i=i}
+    else
+        if not self.spriteBatches[tile.tileMap] then
+            self.spriteBatches[tile.tileMap] = love.graphics.newSpriteBatch(tile.tileMap.img)
+        end
+
+        local i = self.spriteBatches[tile.tileMap]:add(tile.quad, (x-1)*16, (y-1)*16)
+
+        self.batchMap[x][y] = {spriteBatch=self.spriteBatches[tile.tileMap], i=i}
     end
 end
 
@@ -40,39 +59,20 @@ function Layer:buildSpriteBatch(xStart, yStart)
     local h = yEnd-yStart+1
 
     -- Adjust the tiles that are actually checked for performance
-    xStart = math.clamp(xStart, self:getXStart(), self:getXEnd())
-    yStart = math.clamp(yStart, self:getYStart(), self:getYEnd())
-    xEnd = math.clamp(xEnd, self:getXStart(), self:getXEnd())
-    yEnd = math.clamp(yEnd, self:getYStart(), self:getYEnd())
+    self.viewport[1] = math.clamp(xStart, self:getXStart(), self:getXEnd())
+    self.viewport[2] = math.clamp(yStart, self:getYStart(), self:getYEnd())
+    self.viewport[3] = math.clamp(xEnd, self:getXStart(), self:getXEnd())
+    self.viewport[4] = math.clamp(yEnd, self:getYStart(), self:getYEnd())
 
+    self.batchMap = {}
+    for x = self.viewport[1], self.viewport[3] do
+        self.batchMap[x] = {}
 
-    for x = xStart, xEnd do
-        for y = yStart, yEnd do
+        for y = self.viewport[2], self.viewport[4] do
             local tile = self:getTile(x, y)
 
             if tile then
-                if tile.animated then
-                    if not self.spriteBatches[tile] then
-                        self.spriteBatches[tile] = love.graphics.newSpriteBatch(tile.img)
-                    end
-
-                    local i = self.spriteBatches[tile]:add(tile.quad, (x-1)*16, (y-1)*16)
-
-                    local function reRenderCell()
-                        self.spriteBatches[tile]:set(i, tile.quad, (x-1)*16, (y-1)*16)
-                    end
-
-                    table.insert(self.tileRerenderCallbackTiles, tile)
-                    table.insert(self.tileRerenderCallbackFuncs, reRenderCell)
-
-                    tile:addFrameChangedCallback(reRenderCell)
-                else
-                    if not self.spriteBatches[tile.tileMap] then
-                        self.spriteBatches[tile.tileMap] = love.graphics.newSpriteBatch(tile.tileMap.img)
-                    end
-
-                    self.spriteBatches[tile.tileMap]:add(tile.quad, (x-1)*16, (y-1)*16)
-                end
+                self:setBatchCoordinate(x, y, tile)
             end
         end
     end
@@ -89,13 +89,6 @@ function Layer:draw()
 
         self.spriteBatchX = xStart
         self.spriteBatchY = yStart
-
-        for i, tile in ipairs(self.tileRerenderCallbackTiles) do
-            tile:removeFrameChangedCallback(self.tileRerenderCallbackFuncs[i])
-        end
-
-        iClearTable(self.tileRerenderCallbackTiles)
-        iClearTable(self.tileRerenderCallbackFuncs)
 
         self:buildSpriteBatch(xStart, yStart)
     end
@@ -169,6 +162,19 @@ end
 
 function Layer:setCoordinate(x, y, tile)
     self.map[x-self.x][y-self.y].tile = tile
+
+    local batch = self.batchMap[x] and self.batchMap[x][y]
+
+    if batch then
+        batch.spriteBatch:set(batch.i, 0, 0, 0, 0, 0)
+    end
+
+    if tile then
+        if  x >= self.viewport[1] and x <= self.viewport[3] and
+            y >= self.viewport[2] and y <= self.viewport[4] then
+            self:setBatchCoordinate(x, y, tile)
+        end
+    end
 end
 
 function Layer:optimizeSize() -- cuts a layer to its content and moves it instead

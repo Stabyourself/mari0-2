@@ -81,7 +81,9 @@ function Level:update(dt)
     self.timeLeft = math.max(0, self.timeLeft-(60/42)*dt) -- that's 42.86% more second, per second!
 
     updateGroup(self.activeCells, dt)
+    prof.push("Portal Projectiles")
     updateGroup(self.portalProjectiles, dt)
+    prof.pop()
 
     prof.push("World")
     Physics3.World.update(self, dt)

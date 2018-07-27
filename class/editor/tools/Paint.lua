@@ -28,6 +28,11 @@ function Paint:update()
                 tiles = tilesInLine(self.lastX, self.lastY, x, y)
             end
 
+            -- intersect with selection if there is one
+            if self.editor.selection then
+                tiles = intersectTiles(tiles, self.editor.selection.tiles)
+            end
+
             for _, tile in ipairs(tiles) do
                 layer:setCoordinate(tile[1], tile[2], self.tile)
             end
@@ -79,6 +84,11 @@ function Paint:mousepressed(x, y, button)
         end
 
         local tiles = tilesInLine(self.lastX, self.lastY, coordX, coordY)
+
+        -- intersect with selection if there is one
+        if self.editor.selection then
+            tiles = intersectTiles(tiles, self.editor.selection.tiles)
+        end
 
         for _, tile in ipairs(tiles) do
             layer:setCoordinate(tile[1], tile[2], self.tile)

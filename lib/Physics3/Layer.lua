@@ -35,6 +35,7 @@ function Layer:setBatchCoordinate(x, y, tile)
         end
 
         local i = self.spriteBatches[tile]:add(tile.quad, (x-1)*16, (y-1)*16)
+
         self.batchMap[x][y] = {spriteBatch=self.spriteBatches[tile], i=i}
     else
         if not self.spriteBatches[tile.tileMap] then

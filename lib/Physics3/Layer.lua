@@ -53,8 +53,8 @@ function Layer:buildSpriteBatch(xStart, yStart)
         spriteBatch:clear()
     end
 
-    local xEnd = xStart + math.ceil((CAMERAWIDTH+16)/self.world.camera.scale/16)
-    local yEnd = yStart + math.ceil((CAMERAHEIGHT+16)/self.world.camera.scale/16)
+    local xEnd = xStart + math.ceil((self.world.camera.w+16)/self.world.camera.scale/16)
+    local yEnd = yStart + math.ceil((self.world.camera.h+16)/self.world.camera.scale/16)
 
     local w = xEnd-xStart+1
     local h = yEnd-yStart+1

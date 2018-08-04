@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
+-- Modified to include the offset as a member
+
 local _PATH = (...):match('^(.*[%./])[^%.%/]+$') or ''
 local cos, sin = math.cos, math.sin
 
@@ -60,13 +62,14 @@ function camera.smooth.damped(stiffness)
 end
 
 
-local function new(x,y, w, h, zoom, rot, smoother)
+local function new(x,y, w, h, offsetX, offsetY, zoom, rot, smoother)
 	x,y  = x or love.graphics.getWidth()/2, y or love.graphics.getHeight()/2
 	w, h = w or love.graphics.getWidth(), h or love.graphics.getHeight()
+	offsetX, offsetY = offsetX or 0, offsetY or 0
 	zoom = zoom or 1
 	rot  = rot or 0
 	smoother = smoother or camera.smooth.none() -- for locking, see below
-	return setmetatable({x = x, y = y, w = w, h = h, scale = zoom, rot = rot, smoother = smoother}, camera)
+	return setmetatable({x = x, y = y, w = w, h = h, offsetX = offsetX, offsetY = offsetY, scale = zoom, rot = rot, smoother = smoother}, camera)
 end
 
 function camera:lookAt(x,y)
@@ -111,15 +114,13 @@ function camera:zoomTo(zoom)
 	return self
 end
 
-function camera:attach(x,y, noclip)
-	x,y = x or 0, y or 0
-
+function camera:attach(noclip)
 	self._sx,self._sy,self._sw,self._sh = love.graphics.getScissor()
 	if not noclip then
-		love.graphics.setScissor(x,y,self.w*VAR("scale"),self.h*VAR("scale"))
+		love.graphics.setScissor(self.offsetX*VAR("scale"),self.offsetY*VAR("scale"),self.w*VAR("scale"),self.h*VAR("scale"))
 	end
 
-	local cx,cy = x+self.w/2, y+self.h/2
+	local cx,cy = self.offsetX+self.w/2, self.offsetY+self.h/2
 	love.graphics.push()
 	love.graphics.translate(cx, cy)
 	love.graphics.scale(self.scale)
@@ -151,34 +152,30 @@ function camera:draw(...)
 end
 
 -- world coordinates to camera coordinates
-function camera:cameraCoords(x,y, ox,oy)
-	ox, oy = ox or 0, oy or 0
-
+function camera:cameraCoords(x,y)
 	-- x,y = ((x,y) - (self.x, self.y)):rotated(self.rot) * self.scale + center
 	local c,s = cos(self.rot), sin(self.rot)
 	x,y = x - self.x, y - self.y
 	x,y = c*x - s*y, s*x + c*y
-	return x*self.scale + self.w/2 + ox, y*self.scale + self.h/2 + oy
+	return x*self.scale + self.w/2 + self.offsetX, y*self.scale + self.h/2 + self.offsetY
 end
 
 -- camera coordinates to world coordinates
-function camera:worldCoords(x,y, ox,oy)
-	ox, oy = ox or 0, oy or 0
-
+function camera:worldCoords(x,y)
 	-- x,y = (((x,y) - center) / self.scale):rotated(-self.rot) + (self.x,self.y)
 	local c,s = cos(-self.rot), sin(-self.rot)
-	x,y = (x - self.w/2 - ox) / self.scale, (y - self.h/2 - oy) / self.scale
+	x,y = (x - self.w/2 - self.offsetX) / self.scale, (y - self.h/2 - self.offsetY) / self.scale
 	x,y = c*x - s*y, s*x + c*y
 	return x+self.x, y+self.y
 end
 
-function camera:mousePosition(ox,oy)
+function camera:mousePosition()
 	local mx,my = love.mouse.getPosition()
 
 	mx = mx/VAR("scale")
 	my = my/VAR("scale")
 
-	return self:worldCoords(mx, my, ox,oy)
+	return self:worldCoords(mx, my, self.offsetX,self.offsetY)
 end
 
 -- camera scrolling utilities

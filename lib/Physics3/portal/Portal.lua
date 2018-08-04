@@ -135,6 +135,8 @@ function Portal:draw(side)
         portalThing:draw(side, self.color, mult)
     end
 
+    love.graphics.setColor(1, 1, 1)
+
     love.graphics.pop()
 end
 

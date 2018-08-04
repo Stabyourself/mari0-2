@@ -157,6 +157,7 @@ end
 local inPortals = {}
 
 function World:draw()
+    prof.push("World")
     prof.push("Layers")
     -- Layers
     for i = #self.layers, 1, -1 do -- draw layers in reverse order (1 on top)
@@ -300,7 +301,8 @@ function World:draw()
             obj:standingOnDebugDraw()
         end
     end
-    prof.pop()
+    prof.pop("Debug")
+    prof.pop("World")
 end
 
 function drawObject(obj, x, y, r, sx, sy, cx, cy)
@@ -509,12 +511,12 @@ end
 function World:advancedPhysicsDebug()
     if not self.advancedPhysicsDebugImg or true then
         if not self.advancedPhysicsDebugImgData then
-            self.advancedPhysicsDebugImgData = love.image.newImageData(CAMERAWIDTH, CAMERAHEIGHT)
+            self.advancedPhysicsDebugImgData = love.image.newImageData(self.camera.w, self.camera.h)
         end
 
         self.advancedPhysicsDebugImgData:mapPixel(function (x, y)
-            local worldX = math.round(self.camera.x-CAMERAWIDTH/2+x)
-            local worldY = math.round(self.camera.y-CAMERAHEIGHT/2+y)
+            local worldX = math.round(self.camera.x-self.camera.w/2+x)
+            local worldY = math.round(self.camera.y-self.camera.h/2+y)
             if self:checkCollision(worldX, worldY, game.players[1].actor) then
                 return 1, 1, 1, 1
             else
@@ -525,7 +527,7 @@ function World:advancedPhysicsDebug()
         self.advancedPhysicsDebugImg = love.graphics.newImage(self.advancedPhysicsDebugImgData)
     end
 
-    love.graphics.draw(self.advancedPhysicsDebugImg, math.round(self.camera.x-CAMERAWIDTH/2), math.round(self.camera.y-CAMERAHEIGHT/2))
+    love.graphics.draw(self.advancedPhysicsDebugImg, math.round(self.camera.x-self.camera.w/2), math.round(self.camera.y-self.camera.h/2))
 end
 
 function World:portalVectorDebug()

@@ -1,7 +1,7 @@
-local Camera = require "lib.Camera"
 local Actor = require("class.Actor")
 local Level = class("Level", Physics3.World)
 local BlockBounce = require("class.BlockBounce")
+local Viewport = require("class.Viewport")
 
 function Level:initialize(path)
     local mapCode = love.filesystem.read(path)
@@ -10,8 +10,6 @@ function Level:initialize(path)
     self:loadLevel(data)
 
     self.timeLeft = 400
-
-    self.camera.target = game.players[1].actor
 end
 
 function Level:loadLevel(data)
@@ -71,10 +69,12 @@ function Level:loadLevel(data)
         table.insert(self.actors, mario)
     end
 
-    self.camera = Camera.new(CAMERAWIDTH/2, CAMERAHEIGHT/2, CAMERAWIDTH, CAMERAHEIGHT)
-    self.camera:lookAt(game.players[1].actor.x, game.players[1].actor.y)
+    self.viewports = {}
+    table.insert(self.viewports, Viewport:new(self, 0, 0, CAMERAWIDTH, CAMERAHEIGHT, game.players[1].actor))
 
-    -- self:spawnActors(self.camera.x+WIDTH+VAR("enemiesSpawnAhead")+2)
+    self.camera = self.viewports[1].camera
+
+    self:spawnActors(self.viewports[1].camera.x+CAMERAWIDTH/16+VAR("enemiesSpawnAhead")+2)
 end
 
 function Level:update(dt)
@@ -89,7 +89,7 @@ function Level:update(dt)
     Physics3.World.update(self, dt)
     prof.pop()
 
-    self:updateCamera(dt)
+    updateGroup(self.viewports, dt)
 
     prof.push("Post Update")
     for _, obj in ipairs(self.objects) do
@@ -103,20 +103,20 @@ function Level:update(dt)
         game.players[1].actor.y = -1
     end
 
-    -- local newSpawnLine = self.camera.x/self.tileSize+WIDTH+VAR("enemiesSpawnAhead")+2
-    -- if newSpawnLine > self.spawnLine then
-    --     self:spawnActors(newSpawnLine)
-    -- end
+    local newSpawnLine = self.camera.x/self.tileSize+self.camera.w/16+VAR("enemiesSpawnAhead")+2
+    if newSpawnLine > self.spawnLine then
+        self:spawnActors(newSpawnLine)
+    end
 end
 
 function Level:draw()
-    self.camera:attach()
+    for _, viewport in ipairs(self.viewports) do
+        viewport.camera:attach()
 
-    prof.push("World")
-    Physics3.World.draw(self)
-    prof.pop()
+        Physics3.World.draw(self)
 
-    self.camera:detach()
+        viewport.camera:detach()
+    end
 end
 
 function Level:drawBehindObjects()
@@ -167,61 +167,6 @@ function Level:spawnActors(untilX)
     self.spawnLine = untilX
 end
 
-function Level:updateCamera(dt)
-    if self.camera.target then
-        local target = self.camera.target
-
-        -- Horizontal
-        local pX = target.x + target.width/2
-        local pXr = pX - self.camera.x
-
-        if pXr > RIGHTSCROLLBORDER then
-            self.camera.x = self.camera.x + VAR("cameraScrollRate")*dt
-
-            if pX - self.camera.x < RIGHTSCROLLBORDER then
-                self.camera.x = pX - RIGHTSCROLLBORDER
-            end
-
-        elseif pXr < LEFTSCROLLBORDER then
-            self.camera.x = self.camera.x - VAR("cameraScrollRate")*dt
-
-            if pX - self.camera.x > LEFTSCROLLBORDER then
-                self.camera.x = pX - LEFTSCROLLBORDER
-            end
-        end
-
-        -- Vertical
-        local pY = target.y + target.height/2
-        local pYr = pY - self.camera.y
-
-        if pYr > DOWNSCROLLBORDER then
-            self.camera.y = self.camera.y + VAR("cameraScrollRate")*dt
-
-            if pY - self.camera.y < DOWNSCROLLBORDER then
-                self.camera.y = pY - DOWNSCROLLBORDER
-            end
-        end
-
-        -- Only scroll up in flight mode
-        if target.flying or self.camera.y < self:getYEnd()*self.tileSize-CAMERAHEIGHT then -- ?
-            if pYr < UPSCROLLBORDER then
-                self.camera.y = self.camera.y - VAR("cameraScrollRate")*dt
-
-                if pY - self.camera.y > UPSCROLLBORDER then
-                    self.camera.y = pY - UPSCROLLBORDER
-                end
-            end
-        end
-
-        -- -- And clamp it to level boundaries
-        self.camera.x = math.min(self.camera.x, self:getXEnd()*self.tileSize-CAMERAWIDTH/2)
-        self.camera.x = math.max(self.camera.x, (self:getXStart()-1)*self.tileSize+CAMERAWIDTH/2)
-
-        self.camera.y = math.min(self.camera.y, self:getYEnd()*self.tileSize-CAMERAHEIGHT/2)
-        self.camera.y = math.max(self.camera.y, (self:getYStart()-1)*self.tileSize+CAMERAHEIGHT/2)
-    end
-end
-
 function Level:bumpBlock(cell, actor)
     local tile = cell.tile
 
@@ -253,7 +198,7 @@ end
 
 function Level:objVisible(x, y, w, h)
     local lx, ty = self.camera:worldCoords(0, 0)
-    local rx, by = self.camera:worldCoords(CAMERAWIDTH, CAMERAHEIGHT)
+    local rx, by = self.camera:worldCoords(self.camera.w, self.camera.h)
 
     return x+w > lx and x < rx and
         y+h > ty and y < by

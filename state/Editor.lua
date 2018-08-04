@@ -237,7 +237,7 @@ function Editor:update(dt)
             x = x/16 - self.level:getXStart()
             y = y/16 - self.level:getYStart()
 
-            --x*3, y*3, CAMERAWIDTH/16+1, CAMERAHEIGHT/16+1
+            --x*3, y*3, self.level.camera.w/16+1, self.level.camera.h/16+1
         end
     end
     prof.pop()
@@ -256,7 +256,7 @@ function Editor:draw()
     self.level.camera:attach(CAMERAOFFSETX, CAMERAOFFSETY)
 
     local xl, yt = self.level:cameraToWorld(0, 0)
-    local xr, yb = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)
+    local xr, yb = self.level:cameraToWorld(self.level.camera.w, self.level.camera.h)
 
     -- Map bounds graphics
     prof.push("Candy")
@@ -338,10 +338,10 @@ function Editor:toggleFreeCam(on)
     self.freeCameraCheckbox.value = on
 
     if on then
-        self.level.camera.target = nil
+        self.level.viewports[1].target = nil
         self.freeCamera = true
     else
-        self.level.camera.target = game.players[1].actor
+        self.level.viewports[1].target = game.players[1].actor
         self.freeCamera = false
     end
 end
@@ -598,6 +598,7 @@ function Editor:zoom(i, toMouse)
     end
 
     self.level.camera:zoom(zoom, x, y)
+    self.scaleSlider:setValue(self.level.camera.scale)
     self:toggleFreeCam(true)
 end
 
@@ -859,7 +860,7 @@ function Editor:drawMinimap()
     love.graphics.draw(self.minimapImg, 0, 0, 0, self.minimapScale/VAR("scale"), self.minimapScale/VAR("scale"))
 
     -- local lx, ty = self.level:cameraToWorld(0, 0)
-    -- local rx, by = self.level:cameraToWorld(CAMERAWIDTH, CAMERAHEIGHT)
+    -- local rx, by = self.level:cameraToWorld(self.level.camera.w, self.level.camera.h)
 
     -- love.graphics.push()
     -- love.graphics.scale(3, 3)

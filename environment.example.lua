@@ -19,6 +19,7 @@ return {
         canvas = false,
         reRenders = false,
         reMouses = false,
+        showFPSInTime = true,
 
         -- Misc stuff
         input = true,

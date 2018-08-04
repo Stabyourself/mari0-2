@@ -32,7 +32,12 @@ function Game:update(dt)
 
     prof.push("UI")
     if self.uiVisible then
-        smb3ui.time = love.timer.getFPS()--math.ceil(self.level.timeLeft)
+        if VAR("debug").showFPSinTime then
+            smb3ui.time = love.timer.getFPS()
+        else
+            smb3ui.time = math.ceil(self.level.timeLeft)
+        end
+
         smb3ui.pMeter = self.players[1].actor.pMeter or 0
         smb3ui.score = self.players[1].score
         smb3ui.lives = self.players[1].lives

@@ -151,7 +151,7 @@ function Gui3.Canvas:debugDraw()
         local region = self.mouseRegions[i]
         local r, g, b = region.element.debugColor:rgb()
         love.graphics.setColor(r, g, b, 0.5)
-        love.graphics.rectangle("fill", region.x, region.y, region.w, region.h)
+        love.graphics.rectangle("fill", region.x*VAR("scale"), region.y*VAR("scale"), region.w*VAR("scale"), region.h*VAR("scale"))
     end
 
     love.graphics.setColor(1, 1, 1, 1)

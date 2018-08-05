@@ -36,7 +36,7 @@ function Level:loadLevel(data)
     for _, entity in ipairs(self.data.entities) do
         local actorTemplate = actorTemplates[entity.type]
 
-        if actorTemplate and not VAR("noEnemies") then -- is enemy
+        if actorTemplate and not VAR("debug").noEnemies then -- is enemy
             table.insert(self.spawnList, {
                 actorTemplate = actorTemplate,
                 x = entity.x,

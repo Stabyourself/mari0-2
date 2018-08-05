@@ -134,10 +134,6 @@ function love.draw()
     if funkyImg then
         love.graphics.draw(funkyImg, love.graphics.getWidth(), 0, 0, 1, 1, 340)
     end
-
-    if VAR("debug").layerCanvas then
-        love.graphics.draw(game.level.layers[1].canvas)
-    end
 end
 
 function love.keypressed(key)

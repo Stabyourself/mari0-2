@@ -1,38 +1,39 @@
 return {
     debug = {
         -- Physics stuff
-        actorHitBox = false,
-        tracerDebug = false,
-        standingOn = false,
-        physicsAdvanced = false,
+        actorHitBox = false, -- shows the location of tracers and the hitbox
+        tracerDebug = false, -- shows which tracers were checked in the frame
+        standingOn = false, -- shows what object/actor an actor is standing on
+        physicsAdvanced = false, -- shows the collision for player 1 for every pixel on screen
 
         -- Actor stuff
-        actorQuad = false,
-        actorState = false,
-        actorComponents = false,
+        actorQuad = false, -- shows the bounding box of the quad in use
+        actorState = false, -- shows the actorState
+        actorComponents = false, -- shows all components an actor has
 
         -- Portal stuff
-        portalVector = false,
-        portalStencils = false,
+        portalVector = false, -- draws arrows after going through a portal with the velocity vectors
+        portalStencils = false, -- draws the region that is included/excluded to put actors into portals
 
         -- UI stuff
-        canvas = false,
-        reRenders = false,
-        reMouses = false,
-        showFPSInTime = true,
+        canvas = false, -- shows the mouse regions for UI elements
+        reRenders = false, -- prints to console when the UI is re-rendered
+        reMouses = false, -- prints to console when the mouse regions are re-calculated
+        showFPSInTime = true, -- shows the FPS instead of the level time in the SMB 3 UI
 
         -- Misc stuff
-        input = true,
-        layers = false,
-        jprof = false,
-        lovebird = false,
+        input = true, -- shows a little input display in the bottom left
+        layers = false, -- shows borders for level layers
+        jprof = true, -- logs frame data into a file on quit
+        lovebird = false, -- enable lövebird debugging (localhost:8000)
+        reSpriteBatchLayers = false, -- prints to console when a level layer's spritebatch is re-made
+        noEnemies = false, -- disables enemy spawning
+        musicDisabled = true, -- disables the music
     },
 
-    noEnemies = false,
-    musicDisabled = true,
     volume = 1,
     scale = 3,
-    vsync = false,
+    vsync = true,
     msaa = 0,
 
     ffKeys = {

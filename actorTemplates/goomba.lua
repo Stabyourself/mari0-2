@@ -22,6 +22,6 @@ return {
             dontTurnAnimation = true
         },
         ["misc.unrotate"] = {},
-        -- ["misc.stompable"] = {},
+        ["misc.stompable"] = {},
     }
 }

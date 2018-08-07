@@ -338,8 +338,9 @@ function getAngleFrame(actor)
 
     if actor.animationDirection == -1 then
         angle = -angle + math.pi
-        angle = normalizeAngle(angle)
     end
+
+        angle = normalizeAngle(angle)
 
     for i = 0, 8 do
         if angle < -math.pi*(0.875-i*0.25) then

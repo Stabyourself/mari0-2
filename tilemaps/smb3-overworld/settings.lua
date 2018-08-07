@@ -3,14 +3,14 @@ local tiles = {}
 local templates = VAR("tileTemplates")
 
 --collisions
-local cubes = {1, 2, 3, 7, 9, 10, 11}
+local cubes = {1, 2, 3, 9, 10, 11}
 
 for _, v in ipairs(cubes) do
     tiles[v] = {collision = templates.cube}
 end
 
 -- top colliding things
-local topThings = {17, 18, 19, 20, 21, 22, 41, 42, 43, 44, 45, 46}
+local topThings = {7, 17, 18, 19, 20, 21, 22, 41, 42, 43, 44, 45, 46}
 
 for _, v in ipairs(topThings) do
     tiles[v] = {

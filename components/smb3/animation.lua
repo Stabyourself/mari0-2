@@ -340,7 +340,7 @@ function getAngleFrame(actor)
         angle = -angle + math.pi
     end
 
-        angle = normalizeAngle(angle)
+    angle = normalizeAngle(angle)
 
     for i = 0, 8 do
         if angle < -math.pi*(0.875-i*0.25) then

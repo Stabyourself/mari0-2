@@ -48,22 +48,16 @@ function Layer:setBatchCoordinate(x, y, tile)
     end
 end
 
-function Layer:buildSpriteBatch(xStart, yStart)
+function Layer:buildSpriteBatch(xStart, yStart, xEnd, yEnd)
     for _, spriteBatch in pairs(self.spriteBatches) do
         spriteBatch:clear()
     end
 
-    local xEnd = xStart + math.ceil((self.world.camera.w+16)/self.world.camera.scale/16)
-    local yEnd = yStart + math.ceil((self.world.camera.h+16)/self.world.camera.scale/16)
-
-    local w = xEnd-xStart+1
-    local h = yEnd-yStart+1
-
     -- Adjust the tiles that are actually checked for performance
-    self.viewport[1] = math.clamp(xStart, self:getXStart(), self:getXEnd())
-    self.viewport[2] = math.clamp(yStart, self:getYStart(), self:getYEnd())
-    self.viewport[3] = math.clamp(xEnd, self:getXStart(), self:getXEnd())
-    self.viewport[4] = math.clamp(yEnd, self:getYStart(), self:getYEnd())
+    self.viewport[1] = xStart
+    self.viewport[2] = yStart
+    self.viewport[3] = xEnd
+    self.viewport[4] = yEnd
 
     self.batchMap = {}
     for x = self.viewport[1], self.viewport[3] do
@@ -81,17 +75,22 @@ end
 
 function Layer:draw()
     -- check if spriteBatch is outdated
-    local xStart, yStart = self.world:cameraToCoordinate(-16, -16)
+    local xStart, yStart = self.world:cameraToCoordinate(0, 0)
+    local xEnd = xStart + math.ceil((self.world.camera.w+16)/self.world.camera.scale/16)
+    local yEnd = yStart + math.ceil((self.world.camera.h+16)/self.world.camera.scale/16)
 
-    if xStart ~= self.spriteBatchX or yStart ~= self.spriteBatchY then
+    xStart = math.clamp(xStart, self:getXStart(), self:getXEnd())
+    yStart = math.clamp(yStart, self:getYStart(), self:getYEnd())
+    xEnd = math.clamp(xEnd, self:getXStart(), self:getXEnd())
+    yEnd = math.clamp(yEnd, self:getYStart(), self:getYEnd())
+
+    if  xStart ~= self.viewport[1] or yStart ~= self.viewport[2] or
+        xEnd ~= self.viewport[3] or yEnd ~= self.viewport[4] then
         if VAR("debug").reSpriteBatchLayers then
             print("SpriteBatching layer!")
         end
 
-        self.spriteBatchX = xStart
-        self.spriteBatchY = yStart
-
-        self:buildSpriteBatch(xStart, yStart)
+        self:buildSpriteBatch(xStart, yStart, xEnd, yEnd)
     end
 
 

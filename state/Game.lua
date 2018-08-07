@@ -1,4 +1,5 @@
 local Smb3Ui = require "class.Smb3Ui"
+local Mari02UI = require "class.Mari02UI"
 local Player = require "class.Player"
 local Level = require "class.Level"
 local Mappack = require "class.Mappack"
@@ -24,7 +25,7 @@ function Game:load()
 
     self.uiVisible = true -- should this be part of Game?
 
-    smb3ui = Smb3Ui:new()
+    ui = Mari02UI:new()
 end
 
 function Game:update(dt)
@@ -33,17 +34,17 @@ function Game:update(dt)
     prof.push("UI")
     if self.uiVisible then
         if VAR("debug").showFPSInTime then
-            smb3ui.time = love.timer.getFPS()
+            ui.time = love.timer.getFPS()
         else
-            smb3ui.time = math.ceil(self.level.timeLeft)
+            ui.time = math.ceil(self.level.timeLeft)
         end
 
-        smb3ui.pMeter = self.players[1].actor.pMeter or 0
-        smb3ui.score = self.players[1].score
-        smb3ui.lives = self.players[1].lives
-        smb3ui.coins = self.players[1].coins
-        smb3ui.world = 1
-        smb3ui:update(dt)
+        ui:setPMeter(1, self.players[1].actor.pMeter or 0)
+        ui:setLives(1, self.players[1].lives)
+        ui.score = self.players[1].score
+        ui.coins = self.players[1].coins
+        ui.world = 1
+        ui:update(dt)
     end
     prof.pop("UI")
 end
@@ -55,13 +56,13 @@ function Game:draw()
 
     prof.push("UI")
     if self.uiVisible then
-        smb3ui:draw()
+        ui:draw()
     end
     prof.pop("UI")
 end
 
 function Game:resize(w, h)
-    smb3ui:resize(w, h)
+    ui:resize(w, h)
     self.level:resize(w, h)
 end
 

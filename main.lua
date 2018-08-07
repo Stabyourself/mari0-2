@@ -74,7 +74,7 @@ function love.load()
     game = Game:new("smb3", 1)
 
     gameStateManager:loadState(game)
-    gameStateManager:addState(Editor:new(game.level))
+    -- gameStateManager:addState(Editor:new(game.level))
 
     prof.enabled(true)
 end
@@ -202,8 +202,8 @@ function updateSizes()
     CAMERAHEIGHT = SCREENHEIGHT
 
     -- Remove the UI's height if present
-    if not game or game.uiVisible then
-        CAMERAHEIGHT = CAMERAHEIGHT-VAR("uiLineHeight")-VAR("uiHeight")
+    if (not game or game.uiVisible) and ui then
+        CAMERAHEIGHT = CAMERAHEIGHT-ui.height
     end
 
     RIGHTSCROLLBORDER = VAR("cameraScrollRightBorder")

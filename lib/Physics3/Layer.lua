@@ -35,16 +35,12 @@ function Layer:setBatchCoordinate(x, y, tile)
         end
 
         local i = self.spriteBatches[tile]:add(tile.quad, (x-1)*16, (y-1)*16)
-
-        self.batchMap[x][y] = {spriteBatch=self.spriteBatches[tile], i=i}
     else
         if not self.spriteBatches[tile.tileMap] then
             self.spriteBatches[tile.tileMap] = love.graphics.newSpriteBatch(tile.tileMap.img)
         end
 
         local i = self.spriteBatches[tile.tileMap]:add(tile.quad, (x-1)*16, (y-1)*16)
-
-        self.batchMap[x][y] = {spriteBatch=self.spriteBatches[tile.tileMap], i=i}
     end
 end
 
@@ -59,10 +55,7 @@ function Layer:buildSpriteBatch(xStart, yStart, xEnd, yEnd)
     self.viewport[3] = xEnd
     self.viewport[4] = yEnd
 
-    self.batchMap = {}
     for x = self.viewport[1], self.viewport[3] do
-        self.batchMap[x] = {}
-
         for y = self.viewport[2], self.viewport[4] do
             local tile = self:getTile(x, y)
 
@@ -163,18 +156,12 @@ end
 function Layer:setCoordinate(x, y, tile)
     self.map[x-self.x][y-self.y].tile = tile
 
-    local batch = self.batchMap[x] and self.batchMap[x][y]
-
-    if batch then
-        batch.spriteBatch:set(batch.i, 0, 0, 0, 0, 0)
-    end
-
-    if tile then
-        if  x >= self.viewport[1] and x <= self.viewport[3] and
-            y >= self.viewport[2] and y <= self.viewport[4] then
-            self:setBatchCoordinate(x, y, tile)
-        end
-    end
+    -- if tile then
+    --     if  x >= self.viewport[1] and x <= self.viewport[3] and
+    --         y >= self.viewport[2] and y <= self.viewport[4] then
+    --         self:setBatchCoordinate(x, y, tile)
+    --     end
+    -- end
 end
 
 function Layer:optimizeSize() -- cuts a layer to its content and moves it instead

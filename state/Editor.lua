@@ -182,7 +182,7 @@ function Editor:load()
     self:mapChanged()
     self:toggleGrid(false)
     self:toggleFreeCam(false)
-    self:toggleUI(true)
+    self:toggleUI(false)
 end
 
 function Editor:update(dt)
@@ -361,7 +361,7 @@ function Editor:toggleUI(hidden)
 
         self.toggleUICheckbox.value = hidden
 
-        local offset = (VAR("uiLineHeight")+VAR("uiHeight"))/2/self.level.camera.scale
+        local offset = (ui.height)/2/self.level.camera.scale
 
         if off then
             self.level.camera:move(0, -offset)

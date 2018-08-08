@@ -2,7 +2,7 @@
 -- require "errorhandler"
 require "loop"
 
-local Game, Editor
+local Game, Editor, replay3
 
 function love.load()
     require "util"
@@ -47,6 +47,8 @@ function love.load()
 
     -- Misc
     require "cheats"
+    replay3 = require "lib.replay3"
+    replay3.init()
 
     -- States
     Game = require "state.Game"
@@ -80,6 +82,7 @@ function love.load()
 end
 
 function love.update(dt)
+    replay3.update(dt)
     if VAR("debug").lovebird then
         require("lib/lovebird").update()
     end
@@ -137,6 +140,7 @@ function love.draw()
 end
 
 function love.keypressed(key)
+    boop = true
     local cmds, any = controls3.getCmdsForKey(key)
 
     if cmds["quit"] then
@@ -195,6 +199,8 @@ function love.quit()
     if PROF_CAPTURE then
         prof.write("lastrun.prof")
     end
+
+    replay3.save()
 end
 
 function updateSizes()

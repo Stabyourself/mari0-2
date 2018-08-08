@@ -7,6 +7,8 @@ local advanceDT = 1/60
 local playing = true
 local advanceFrame = false
 
+local replay3 = require "lib.replay3"
+
 function FrameDebug3.update(dt)
     local mul = 1
 
@@ -35,9 +37,16 @@ function FrameDebug3.pausePlay()
     playing = not playing
 end
 
+function FrameDebug3.pause()
+    playing = false
+end
+
 function FrameDebug3.frameAdvance()
     playing = false
     advanceFrame = true
+    if VAR("replayState") == "recording" then
+        replay3.storeFrame()
+    end
 end
 
 return FrameDebug3

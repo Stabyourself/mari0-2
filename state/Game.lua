@@ -26,6 +26,7 @@ function Game:load()
     self.uiVisible = true -- should this be part of Game?
 
     ui = Mari02UI:new()
+    self:updateUI(0)
 end
 
 function Game:update(dt)
@@ -33,18 +34,7 @@ function Game:update(dt)
 
     prof.push("UI")
     if self.uiVisible then
-        if VAR("debug").showFPSInTime then
-            ui.time = love.timer.getFPS()
-        else
-            ui.time = math.ceil(self.level.timeLeft)
-        end
-
-        ui:setPMeter(1, self.players[1].actor.pMeter or 0)
-        ui:setLives(1, self.players[1].lives)
-        ui.score = self.players[1].score
-        ui.coins = self.players[1].coins
-        ui.world = 1
-        ui:update(dt)
+        self:updateUI(dt)
     end
     prof.pop("UI")
 end
@@ -59,6 +49,21 @@ function Game:draw()
         ui:draw()
     end
     prof.pop("UI")
+end
+
+function Game:updateUI(dt)
+    if VAR("debug").showFPSInTime then
+        ui.time = love.timer.getFPS()
+    else
+        ui.time = math.ceil(self.level.timeLeft)
+    end
+
+    ui:setPMeter(1, self.players[1].actor.pMeter or 0)
+    ui:setLives(1, self.players[1].lives)
+    ui.score = self.players[1].score
+    ui.coins = self.players[1].coins
+    ui.world = 1
+    ui:update(dt)
 end
 
 function Game:resize(w, h)

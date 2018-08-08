@@ -75,6 +75,7 @@ function Level:loadLevel(data)
     self.camera = self.viewports[1].camera
 
     self:spawnActors(self.viewports[1].camera.x+CAMERAWIDTH/16+VAR("enemiesSpawnAhead")+2)
+    updateGroup(self.viewports, 0)
 end
 
 function Level:update(dt)

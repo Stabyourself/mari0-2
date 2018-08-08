@@ -28,6 +28,7 @@ function Portal:initialize(world, x1, y1, x2, y2, color)
 
     self.open = false
 
+    self.openProgress = 0
     self.timer = 0
     self.openTimer = 0
     self.particleTimer = 0

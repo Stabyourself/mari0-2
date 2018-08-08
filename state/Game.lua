@@ -25,7 +25,8 @@ function Game:load()
 
     self.uiVisible = true -- should this be part of Game?
 
-    ui = Mari02UI:new()
+    ui = Smb3Ui:new()
+    updateSizes()
 end
 
 function Game:update(dt)

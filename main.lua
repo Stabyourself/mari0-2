@@ -74,7 +74,9 @@ function love.load()
     game = Game:new("smb3", 1)
 
     gameStateManager:loadState(game)
-    -- gameStateManager:addState(Editor:new(game.level))
+    gameStateManager:addState(Editor:new(game.level))
+
+    gameStateManager:event("resize", SCREENWIDTH, SCREENHEIGHT)
 
     prof.enabled(true)
 end
@@ -84,7 +86,7 @@ function love.update(dt)
         require("lib/lovebird").update()
     end
 
-    dt = math.min(1/30, dt) -- Min 30 FPS
+    dt = math.min(1/60, dt) -- Min 60 FPS
 
     dt = FrameDebug3.update(dt)
 

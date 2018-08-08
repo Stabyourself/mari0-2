@@ -1,5 +1,7 @@
 local Smb3Ui = class("Smb3Ui")
 
+Smb3Ui.height = VAR("uiHeight") + VAR("uiLineHeight")
+
 local pMeterQuad = {
     love.graphics.newQuad(0, 0, 16, 8, 32, 8),
     love.graphics.newQuad(16, 0, 16, 8, 32, 8),
@@ -135,6 +137,14 @@ end
 
 function Smb3Ui:getTimeText()
     return string.format("◔%03d", self.time)
+end
+
+function Smb3Ui:setPMeter(i, val)
+    self.pMeter = val
+end
+
+function Smb3Ui:setLives(i, val)
+    self.lives = val
 end
 
 return Smb3Ui

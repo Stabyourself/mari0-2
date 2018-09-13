@@ -48,17 +48,21 @@ function World:update(dt)
         obj.prevX = obj.x
         obj.prevY = obj.y
 
-        obj.frameMovementX = obj.speed[1] * dt
-        obj.frameMovementY = obj.speed[2] * dt
-
-		-- Add gravity
-        obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * dt
+		-- Add half of gravity
+        obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * dt * 0.5
         obj.speed[2] = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed[2]) -- Cap speed[2]
 
         local oldX, oldY = obj.x, obj.y
 
-        obj.x = obj.x + obj.speed[1] * dt
-        obj.y = obj.y + obj.speed[2] * dt
+        obj.frameMovementX = obj.speed[1] * dt
+        obj.frameMovementY = obj.speed[2] * dt
+
+        obj.x = obj.x + obj.frameMovementX
+        obj.y = obj.y + obj.frameMovementY
+
+		-- Add other half of gravity
+        obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * dt * 0.5
+        obj.speed[2] = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed[2]) -- Cap speed[2]
 
         self:checkPortaling(obj, oldX, oldY)
 

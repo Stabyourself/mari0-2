@@ -74,17 +74,7 @@ function Gui3.Box:draw()
     Gui3.drawBox(borderImg, quad, 0, 0, self.w, self.h)
 
     if self.title then
-        local scissorX, scissorY, scissorW, scissorH = love.graphics.getScissor()
-        -- love.graphics.intersectScissor(
-        --     (self.absPos[1]+3)*VAR("scale"),
-        --     (self.absPos[2]+2)*VAR("scale"),
-        --     (self.w-16)*VAR("scale"),
-        --     8*VAR("scale")
-        -- )
-
         love.graphics.print(self.title, 3, 2)
-
-        love.graphics.setScissor(scissorX, scissorY, scissorW, scissorH)
     end
 
     if self.closeable then

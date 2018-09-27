@@ -3,14 +3,11 @@ return {
     scale = 1,
     volume = 1,
 
-    uiHeight = 38, -- Move these to SMB3UI?
-    uiLineHeight = 1,
-
     canvasExtra = 0,
 
     gravity = 1125,
     gravityJumping = 225, --gravity while jumping (Only for mario)
-    maxYSpeed = 1000, --258.75
+    maxYSpeed = math.huge, --258.75
 
     rotationSpeed = 14, --only a visual effect
 

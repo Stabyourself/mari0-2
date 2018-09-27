@@ -16,6 +16,7 @@ function Layer:initialize(world, x, y, width, height, map)
 
     self.map = map or {}
     self.spriteBatches = {}
+    self.sprites = {}
 
     self.viewport = {}
 end
@@ -29,19 +30,41 @@ function Layer:update(dt)
 end
 
 function Layer:setBatchCoordinate(x, y, tile)
+    local spriteBatch
+
     if tile.animated then
         if not self.spriteBatches[tile] then
             self.spriteBatches[tile] = love.graphics.newSpriteBatch(tile.img)
         end
 
-        local i = self.spriteBatches[tile]:add(tile.quad, (x-1)*16, (y-1)*16)
+        spriteBatch = self.spriteBatches[tile]
     else
         if not self.spriteBatches[tile.tileMap] then
             self.spriteBatches[tile.tileMap] = love.graphics.newSpriteBatch(tile.tileMap.img)
         end
 
-        local i = self.spriteBatches[tile.tileMap]:add(tile.quad, (x-1)*16, (y-1)*16)
+        spriteBatch = self.spriteBatches[tile.tileMap]
     end
+
+    local i = spriteBatch:add(tile.quad, (x-1)*16, (y-1)*16)
+
+    if not self.sprites[x] then
+        self.sprites[x] = {}
+    end
+
+    self.sprites[x][y] = {spriteBatch = spriteBatch, i = i}
+end
+
+function Layer:updateBatchCoordinate(x, y, tile)
+    local sprite = self.sprites[x][y]
+
+    sprite.spriteBatch:set(sprite.i, tile.quad, (x-1)*16, (y-1)*16)
+end
+
+function Layer:removeBatchCoordinate(x, y)
+    local sprite = self.sprites[x][y]
+
+    sprite.spriteBatch:set(sprite.i, 0, 0, 0, 0, 0)
 end
 
 function Layer:buildSpriteBatch(xStart, yStart, xEnd, yEnd)
@@ -156,12 +179,30 @@ end
 function Layer:setCoordinate(x, y, tile)
     self.map[x-self.x][y-self.y].tile = tile
 
-    -- if tile then
-    --     if  x >= self.viewport[1] and x <= self.viewport[3] and
-    --         y >= self.viewport[2] and y <= self.viewport[4] then
-    --         self:setBatchCoordinate(x, y, tile)
-    --     end
-    -- end
+    if tile then -- need to update our spriteBatches!
+        if  x >= self.viewport[1] and x <= self.viewport[3] and
+            y >= self.viewport[2] and y <= self.viewport[4] then -- but only if it's in the active region
+            if self.sprites[x][y] then -- check if there's already a sprite at that position and if so, deal with it
+                local match = false
+
+                -- figure out whether the existing tile's spriteBatch matches the new one's
+                if tile.animated then
+                    match = (self.sprites[x][y].spriteBatch == self.spriteBatches[tile])
+                else
+                    match = (self.sprites[x][y].spriteBatch == self.spriteBatches[tile.tileMap])
+                end
+
+                if match then -- removing and setting is less efficient; so don't do it if the spriteBatch matches
+                    self:updateBatchCoordinate(x, y, tile)
+                else
+                    self:removeBatchCoordinate(x, y)
+                    self:setBatchCoordinate(x, y, tile)
+                end
+            else
+                self:setBatchCoordinate(x, y, tile)
+            end
+        end
+    end
 end
 
 function Layer:optimizeSize() -- cuts a layer to its content and moves it instead

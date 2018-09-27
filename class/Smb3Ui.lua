@@ -1,6 +1,10 @@
 local Smb3Ui = class("Smb3Ui")
 
-Smb3Ui.height = VAR("uiHeight") + VAR("uiLineHeight")
+
+local uiHeight = 38
+local uiLineHeight = 1
+
+Smb3Ui.height = uiHeight + 1
 
 local pMeterQuad = {
     love.graphics.newQuad(0, 0, 16, 8, 32, 8),
@@ -19,7 +23,7 @@ function Smb3Ui:initialize()
     self.coins = 0
     self.lives = 0
 
-    self.canvas = Gui3.Canvas:new(0, SCREENHEIGHT-VAR("uiHeight"), SCREENWIDTH, VAR("uiHeight"))
+    self.canvas = Gui3.Canvas:new(0, SCREENHEIGHT-uiHeight, SCREENWIDTH, uiHeight)
     self.canvas.gui = defaultUI
     self.canvas.background = {0, 0, 0}
 
@@ -73,7 +77,7 @@ end
 
 function Smb3Ui:resize()
     self.canvas:resize(SCREENWIDTH, self.canvas.h)
-    self.canvas.y = SCREENHEIGHT-VAR("uiHeight")
+    self.canvas.y = SCREENHEIGHT-uiHeight
 
     self.uiBox.x = (SCREENWIDTH-256)/2+13
     for i, cardBox in ipairs(self.cardBoxes) do

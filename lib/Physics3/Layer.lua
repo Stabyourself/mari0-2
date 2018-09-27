@@ -71,6 +71,7 @@ function Layer:buildSpriteBatch(xStart, yStart, xEnd, yEnd)
     for _, spriteBatch in pairs(self.spriteBatches) do
         spriteBatch:clear()
     end
+    iClearTable(self.sprites)
 
     -- Adjust the tiles that are actually checked for performance
     self.viewport[1] = xStart
@@ -201,6 +202,10 @@ function Layer:setCoordinate(x, y, tile)
             else
                 self:setBatchCoordinate(x, y, tile)
             end
+        end
+    else -- may need to delete an existing tile.
+        if self.sprites[x][y] then
+            self:removeBatchCoordinate(x, y)
         end
     end
 end

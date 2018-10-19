@@ -11,6 +11,8 @@ local pMeterQuad = {
     love.graphics.newQuad(16, 0, 16, 8, 32, 8),
 }
 
+local lifeQuad = love.graphics.newQuad(0, 0, 16, 8, 16, 72)
+
 function Smb3Ui:initialize()
     self.pMeter = 0
 
@@ -48,7 +50,7 @@ function Smb3Ui:initialize()
 
     self.element.coins = Gui3.Text:new("", 121, 2)
 
-    self.element.livesImg = Gui3.Image:new("img/ui/mario.png", 1, 10)
+    self.element.livesImg = Gui3.Image:new("img/ui/mario.png", 1, 10, lifeQuad)
     self.element.lives = Gui3.Text:new("", 17, 10)
 
     self.element.score = Gui3.Text:new("", 49, 10)

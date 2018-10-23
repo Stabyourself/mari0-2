@@ -18,6 +18,8 @@ function Layer:initialize(world, x, y, width, height, map)
     self.spriteBatches = {}
     self.sprites = {}
 
+    self.callbacks = {}
+
     self.viewport = {}
 end
 
@@ -38,6 +40,17 @@ function Layer:setBatchCoordinate(x, y, tile)
         end
 
         spriteBatch = self.spriteBatches[tile]
+
+        -- let the tile know to let us know if it changes
+        -- TODO: This is relatively bad for performance, perhaps find a different way to do this
+
+        local func = function()
+            self:updateBatchCoordinate(x, y, tile)
+        end
+
+        tile:addFrameChangedCallback(func)
+
+        table.insert(self.callbacks, {tile=tile, func=func, x=x, y=y})
     else
         if not self.spriteBatches[tile.tileMap] then
             self.spriteBatches[tile.tileMap] = love.graphics.newSpriteBatch(tile.tileMap.img)
@@ -68,6 +81,12 @@ function Layer:removeBatchCoordinate(x, y)
 end
 
 function Layer:buildSpriteBatch(xStart, yStart, xEnd, yEnd)
+    -- remove anim callbacks
+    for _, callback in ipairs(self.callbacks) do
+        callback.tile:removeFrameChangedCallback(callback.func)
+    end
+    self.callbacks = {}
+
     for _, spriteBatch in pairs(self.spriteBatches) do
         spriteBatch:clear()
     end
@@ -93,8 +112,8 @@ end
 function Layer:draw()
     -- check if spriteBatch is outdated
     local xStart, yStart = self.world:cameraToCoordinate(0, 0)
-    local xEnd = xStart + math.ceil((self.world.camera.w+16)/self.world.camera.scale/16)
-    local yEnd = yStart + math.ceil((self.world.camera.h+16)/self.world.camera.scale/16)
+    local xEnd = xStart + math.ceil((self.world.camera.w)/self.world.camera.scale/16)
+    local yEnd = yStart + math.ceil((self.world.camera.h)/self.world.camera.scale/16)
 
     xStart = math.clamp(xStart, self:getXStart(), self:getXEnd())
     yStart = math.clamp(yStart, self:getYStart(), self:getYEnd())
@@ -179,6 +198,16 @@ end
 
 function Layer:setCoordinate(x, y, tile)
     self.map[x-self.x][y-self.y].tile = tile
+
+    -- check if that tile has a pending update callback
+    for i, callback in ipairs(self.callbacks) do -- TODO: this is very meh
+        if callback.x == x and callback.y == y then
+            -- remove it
+            print("!")
+            callback.tile:removeFrameChangedCallback(callback.func)
+            table.remove(self.callbacks, i)
+        end
+    end
 
     if tile then -- need to update our spriteBatches!
         if  x >= self.viewport[1] and x <= self.viewport[3] and
@@ -396,7 +425,7 @@ function Layer:expandTo(x, y)
             local emptyRow = {}
 
             for ly = 1, self.height do
-                table.insert(emptyRow, Cell:new(nil))
+                table.insert(emptyRow, Cell:new(x, ly, self, nil))
             end
 
             table.insert(self.map, 1, emptyRow)
@@ -412,7 +441,7 @@ function Layer:expandTo(x, y)
         for i = 1, newColumns do
             local emptyRow = {}
             for ly = 1, self.height do
-                table.insert(emptyRow, Cell:new(nil))
+                table.insert(emptyRow, Cell:new(x, ly, self, nil))
             end
 
             table.insert(self.map, emptyRow)
@@ -426,7 +455,7 @@ function Layer:expandTo(x, y)
 
         for i = 1, newRows do
             for lx = 1, self.width do
-                table.insert(self.map[lx], 1, Cell:new(nil))
+                table.insert(self.map[lx], 1, Cell:new(lx, y, self, nil))
             end
         end
 
@@ -439,7 +468,7 @@ function Layer:expandTo(x, y)
 
         for i = 1, newRows do
             for lx = 1, self.width do
-                table.insert(self.map[lx], Cell:new(nil))
+                table.insert(self.map[lx], Cell:new(lx, y, self, nil))
             end
         end
 

@@ -23,6 +23,7 @@ function Actor:initialize(world, x, y, actorTemplate)
     }
 
     self.animationDirection = -1
+    self.aimingAngle = 0
 
     self.caching = {
         "x",

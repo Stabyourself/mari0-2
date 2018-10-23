@@ -178,7 +178,7 @@ function Level:bumpBlock(cell, actor)
         if tile.props.turnsInto then
             local turnIntoTile = tile.tileMap.tiles[tile.props.turnsInto]
 
-            cell.tile = turnIntoTile
+            cell.layer:setCoordinate(cell.x, cell.y, turnIntoTile)
         end
 
         -- Check what's inside

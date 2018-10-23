@@ -6,7 +6,7 @@ local Portal = require((...):gsub('%.World$', '') .. ".portal.Portal")
 local World = class("Physics3.World")
 
 local fakeTileInstance = Tile:new()
-local fakeCellInstance = Cell:new(fakeTileInstance)
+local fakeCellInstance = Cell:new(nil, nil, nil, fakeTileInstance)
 
 function World:initialize()
     self.tileSize = 16 --lol hardcode
@@ -348,9 +348,7 @@ function World:loadLevel(data)
         table.insert(self.tileLookups, self.tileMaps[tileMap].tiles[tileNo])
     end
 
-    for i = 1, #data.layers do
-        local dataLayer = data.layers[i]
-
+    for i, dataLayer in ipairs(data.layers) do
         local layerX = dataLayer.x or 0
         local layerY = dataLayer.y or 0
 
@@ -372,14 +370,20 @@ function World:loadLevel(data)
 
                     assert(tile, string.format("Couldn't load real tile at x=%s, y=%s for requested lookup \"%s\". This may mean that the map is corrupted.", x, y, mapTile))
 
-                    map[x][y] = Cell:new(tile)
+                    map[x][y] = Cell:new(x, y, dataLayer, tile)
                 else
-                    map[x][y] = Cell:new(nil)
+                    map[x][y] = Cell:new(x, y, dataLayer, nil)
                 end
             end
         end
 
         self.layers[i] = Layer:new(self, layerX, layerY, width, height, map)
+
+        for x = 1, #dataLayer.map do
+            for y = 1, #dataLayer.map[1] do
+                self.layers[i].map[x][y].layer = self.layers[i]
+            end
+        end
     end
 end
 

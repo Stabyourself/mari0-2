@@ -12,7 +12,10 @@ function Cell.bounceEase(t, b, c, d)
     end
 end
 
-function Cell:initialize(tile)
+function Cell:initialize(x, y, layer, tile)
+    self.x = x
+    self.y = y
+    self.layer = layer
     self.tile = tile
 
     self.bounceTimer = self.bounceTime

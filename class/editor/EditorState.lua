@@ -70,11 +70,17 @@ function EditorState:load()
             map[x] = {}
 
             for y = 1, layer.height do
-                map[x][y] = Physics3.Cell:new(layer.map[x][y])
+                map[x][y] = Physics3.Cell:new(x, y, nil, layer.map[x][y])
             end
         end
 
         world.layers[i] = Layer:new(world, layer.x, layer.y, layer.width, layer.height, map)
+
+        for x = 1, layer.width do
+            for y = 1, layer.height do
+                world.layers[i].map[x][y].layer = world.layers[i]
+            end
+        end
     end
 
     self.editor.activeLayer = self.editor.level.layers[1]

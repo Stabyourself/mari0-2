@@ -334,7 +334,7 @@ function getAngleFrame(actor)
         return "noGun"
     end
 
-    local angle = actor.portalGunAngle-actor.angle
+    local angle = actor.aimingAngle-actor.angle
 
     if actor.animationDirection == -1 then
         angle = -angle + math.pi

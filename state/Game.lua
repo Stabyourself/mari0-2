@@ -60,6 +60,13 @@ function Game:draw()
         ui:draw()
     end
     prof.pop("UI")
+
+    if VAR("debug").animatedTileCallbacks then
+        for i, layer in ipairs(self.level.layers) do
+            local s = string.format("layer %d: %d", i, #layer.callbacks)
+            love.graphics.print(s, 20, 12+i*8)
+        end
+    end
 end
 
 function Game:resize(w, h)

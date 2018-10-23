@@ -11,7 +11,6 @@ function portalGun:initialize(actor, args)
     Component.initialize(self, actor, args)
 
     self.actor.hasPortalGun = true
-    self.actor.portalGunAngle = 0
 
     self.portals = {}
 end

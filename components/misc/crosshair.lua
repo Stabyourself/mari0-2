@@ -17,7 +17,7 @@ function hasCrosshair:postUpdate(dt)
 
     self.crosshair.angle = math.atan2(my-y, mx-x)
 
-    self.actor.portalGunAngle = self.crosshair.angle
+    self.actor.aimingAngle = self.crosshair.angle
 
     prof.push("Crosshair")
     self.crosshair:update(dt)

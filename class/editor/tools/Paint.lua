@@ -34,7 +34,9 @@ function Paint:update()
             end
 
             for _, tile in ipairs(tiles) do
-                layer:setCoordinate(tile[1], tile[2], self.tile)
+                if layer.map[tile[1]][tile[2]].tile ~= self.tile then -- don't set the same tile
+                    layer:setCoordinate(tile[1], tile[2], self.tile)
+                end
             end
 
             self.lastX = x

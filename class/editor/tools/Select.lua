@@ -46,23 +46,25 @@ function Select:draw()
         end
     end
 
-    local addition = ""
+    if self.editor.selection or self.editor.floatingSelection then -- only show +, - and intersect when there's already a selection
+        if not self.editor.floatingSelection or not self.editor.floatingSelection.dragging then -- but not if we're already dragging a floating selection
+            local addition = ""
 
-    if not self.editor.floatingSelection or not self.editor.floatingSelection.dragging then
-        if controls3.cmdDown("editor.select.add") and controls3.cmdDown("editor.select.subtract") then
-            addition = "∩"
-        elseif controls3.cmdDown("editor.select.add") then
-            addition = "+"
-        elseif controls3.cmdDown("editor.select.subtract") then
-            addition = "-"
-        elseif  self.editor.selection and self.editor.selection:collision(mouseX, mouseY) or
-                self.editor.floatingSelection and self.editor.floatingSelection:collision(mouseX, mouseY) then
-            addition = "⇔"
+            if controls3.cmdDown("editor.select.add") and controls3.cmdDown("editor.select.subtract") then
+                addition = "∩"
+            elseif controls3.cmdDown("editor.select.add") then
+                addition = "+"
+            elseif controls3.cmdDown("editor.select.subtract") then
+                addition = "-"
+            elseif  self.editor.selection and self.editor.selection:collision(mouseX, mouseY) or
+                    self.editor.floatingSelection and self.editor.floatingSelection:collision(mouseX, mouseY) then
+                addition = "⇔"
+            end
+
+            if addition ~= "" then
+                love.graphics.print(addition, worldX-utf8.len(addition)*8-1, worldY+2)
+            end
         end
-    end
-
-    if addition ~= "" then
-        love.graphics.print(addition, worldX-utf8.len(addition)*8-1, worldY+2)
     end
 end
 

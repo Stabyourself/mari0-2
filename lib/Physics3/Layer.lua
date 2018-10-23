@@ -200,10 +200,9 @@ function Layer:setCoordinate(x, y, tile)
     self.map[x-self.x][y-self.y].tile = tile
 
     -- check if that tile has a pending update callback
-    for i, callback in ipairs(self.callbacks) do -- TODO: this is very meh
+    for i, callback in ipairs(self.callbacks) do -- TODO: lookup table?
         if callback.x == x and callback.y == y then
             -- remove it
-            print("!")
             callback.tile:removeFrameChangedCallback(callback.func)
             table.remove(self.callbacks, i)
         end

@@ -16,12 +16,14 @@ function Wand:draw()
         addition = addition .. "G"
     end
 
-    if controls3.cmdDown("editor.select.add") and controls3.cmdDown("editor.select.subtract") then
-        addition = addition .. "∩"
-    elseif controls3.cmdDown("editor.select.add") then
-        addition = addition .. "+"
-    elseif controls3.cmdDown("editor.select.subtract") then
-        addition = addition .. "-"
+    if self.editor.selection or self.editor.floatingSelection then -- only show +, - and intersect when there's already a selection
+        if controls3.cmdDown("editor.select.add") and controls3.cmdDown("editor.select.subtract") then
+            addition = addition .. "∩"
+        elseif controls3.cmdDown("editor.select.add") then
+            addition = addition .. "+"
+        elseif controls3.cmdDown("editor.select.subtract") then
+            addition = addition .. "-"
+        end
     end
 
     if addition ~= "" then

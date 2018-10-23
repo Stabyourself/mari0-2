@@ -869,8 +869,8 @@ function Editor:drawMinimap()
 end
 
 function Editor:clickMinimap(x, y, button)
-    x = x/3
-    y = y/3
+    x = x/(8/3)
+    y = y/(8/3)
 
     x, y = self.level:coordinateToWorld(x, y)
 
@@ -878,8 +878,8 @@ function Editor:clickMinimap(x, y, button)
         self.level.camera:lookAt(x, y)
         self:toggleFreeCam(true)
     elseif button == 2 then
-        game.players[1].actor.x = x
-        game.players[1].actor.y = y
+        game.players[1].actor.x = x - game.players[1].actor.width/2
+        game.players[1].actor.y = y - game.players[1].actor.height
     end
 end
 

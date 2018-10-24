@@ -221,14 +221,14 @@ function Tile:getProminentColor()
 			end
 		end
 
-			local r, g, b, a = unpack(result:split(","))
+		local r, g, b, a = unpack(result:split(","))
 
-			self.prominentColor = {
-				tonumber(r),
-				tonumber(g),
-				tonumber(b),
-				tonumber(a),
-			}
+		self.prominentColor = {
+			tonumber(r),
+			tonumber(g),
+			tonumber(b),
+			tonumber(a),
+		}
 
 		if self.prominentColor[4] == 0 then
 			self.prominentColor = game.level.backgroundColor

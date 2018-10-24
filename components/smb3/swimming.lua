@@ -34,7 +34,7 @@ function swimming:update(dt, actorEvent)
     end
 
     if tile then
-        self:setUnderWater(tile.props.water)
+        self:setUnderWater(tile.props.water == true)
     else
         self:setUnderWater(false)
     end

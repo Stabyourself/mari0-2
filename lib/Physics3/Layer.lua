@@ -21,6 +21,7 @@ function Layer:initialize(world, x, y, width, height, map)
     self.callbacks = {}
 
     self.viewport = {}
+    self.bouncingCells = {}
 end
 
 function Layer:update(dt)
@@ -29,6 +30,8 @@ function Layer:update(dt)
 
         self.yOffset = math.sin(self.movementTimer)*8
     end
+
+    updateGroup(self.bouncingCells, dt)
 end
 
 function Layer:setBatchCoordinate(x, y, tile)
@@ -135,7 +138,17 @@ function Layer:draw()
 
     -- draw the spritebatch
     for _, spriteBatch in pairs(self.spriteBatches) do
-        love.graphics.draw(spriteBatch)
+        love.graphics.draw(spriteBatch, x, y)
+    end
+
+    -- overwrite any bouncing cells
+    for _, bouncingCell in ipairs(self.bouncingCells) do
+        -- overwrite with backgroundcolor
+        love.graphics.setColor(love.graphics.getBackgroundColor())
+        love.graphics.rectangle("fill", (bouncingCell.x-1)*16+x, (bouncingCell.y-1)*16+y, 16, 16)
+
+        love.graphics.setColor(1, 1, 1)
+        bouncingCell:draw()
     end
 end
 
@@ -236,6 +249,13 @@ function Layer:setCoordinate(x, y, tile)
             self:removeBatchCoordinate(x, y)
         end
     end
+end
+
+function Layer:bounceCell(x, y)
+    local cell = self.map[x][y]
+
+    cell:bounce()
+    table.insert(self.bouncingCells, cell)
 end
 
 function Layer:optimizeSize() -- cuts a layer to its content and moves it instead

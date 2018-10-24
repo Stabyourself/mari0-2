@@ -29,7 +29,7 @@ function Cell:update(dt)
     end
 end
 
-function Cell:draw(x, y)
+function Cell:draw()
     if self.tile then
         local off = 0
 
@@ -37,11 +37,11 @@ function Cell:draw(x, y)
             off = self.bounceEase(self.bounceTimer, 0, 1, self.bounceTime)
         end
 
-        self.tile:draw(x, y-off*self.bounceHeight)
+        self.tile:draw((self.x-1)*16, (self.y-1)*16-off*self.bounceHeight)
     end
 end
 
-function Cell:drawFrame(x, y, frame)
+function Cell:drawFrame(frame)
     if self.tile then
         local off = 0
 
@@ -49,7 +49,7 @@ function Cell:drawFrame(x, y, frame)
             off = self.bounceEase(self.bounceTimer, 0, 1, self.bounceTime)
         end
 
-        self.tile:drawFrame(x, y-off*self.bounceHeight, frame)
+        self.tile:drawFrame((self.x-1)*16, (self.y-1)*16-off*self.bounceHeight, frame)
     end
 end
 

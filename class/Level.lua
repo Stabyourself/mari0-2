@@ -28,7 +28,6 @@ function Level:loadLevel(data)
     self.spawnLine = 0
     self.spawnI = 1
 
-    self.activeCells = {} -- These cells will have :update called on them until they remove themselves from this list. Used for block bouncing.
     self.portalProjectiles = {} -- Portal projectiles, duh.
 
     self.spawnList = {}
@@ -80,7 +79,6 @@ end
 function Level:update(dt)
     self.timeLeft = math.max(0, self.timeLeft-(60/42)*dt) -- that's 42.86% more second, per second!
 
-    updateGroup(self.activeCells, dt)
     prof.push("Portal Projectiles")
     updateGroup(self.portalProjectiles, dt)
     prof.pop()
@@ -172,8 +170,7 @@ function Level:bumpBlock(cell, actor)
 
     if tile.breakable or tile.props.holdsItems then
         -- Make it bounce
-        cell:bounce()
-        table.insert(self.activeCells, cell)
+        cell.layer:bounceCell(cell.x, cell.y)
 
         if tile.props.turnsInto then
             local turnIntoTile = tile.tileMap.tiles[tile.props.turnsInto]

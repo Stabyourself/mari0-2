@@ -786,7 +786,7 @@ function Editor:updateMinimap()
             for y = yStart, yEnd do
                 local cell = self.level.layers[1]:getCell(x, y)
 
-                cell:drawFrame((x-1)*16, (y-1)*16, 1)
+                cell:drawFrame(1)
             end
         end
 

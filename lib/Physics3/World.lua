@@ -559,16 +559,16 @@ function World:checkCollision(x, y, obj, vector)
             if portal.open and objectWithinPortalRange(portal, obj.x+obj.width/2, obj.y+obj.height/2) then -- only if the player is "in front" of the portal
                 -- check if pixel is inside portal wallspace
                 -- rotate x, y around portal origin
-                local nx, ny = pointAroundPoint(x+.5, y+.5, portal.x1, portal.y1, -portal.angle)
+                local nx, ny = pointAroundPoint(x, y, portal.x1, portal.y1, -portal.angle)
 
-                nx, ny = math.ceil(nx), math.ceil(ny)
+                -- nx, ny = math.round(nx), math.round(ny)
 
                 -- comments use an up-pointing portal as example
-                if ny > portal.y1 then -- point is low enough
+                if ny >= portal.y1 then -- point is low enough
                     local newX, newY = self:portalPoint(x, y, portal, portal.connectsTo)
 
-                    if nx > portal.x1 and nx < portal.x1+portal.size+1 then -- point is horizontally within the portal
-                        return self:checkCollision(newX, newY, obj, vector)
+                    if nx > portal.x1 and nx < portal.x1+portal.size then -- point is horizontally within the portal
+                        return self:checkCollision(newX, newY, obj, vector, true)
                     end
 
                     -- else
@@ -589,7 +589,7 @@ function World:checkCollision(x, y, obj, vector)
 
     -- World
     for _, layer in ipairs(self.layers) do
-        local cell = layer:checkCollision(x, y, obj, vector)
+        local cell = layer:checkCollision(math.round(x), math.round(y), obj, vector)
 
         if cell then
             return cell
@@ -958,11 +958,11 @@ function World:attemptPortal(layer, tileX, tileY, side, x, y, color, ignoreP)
             local mX = x1 + (x2-x1)*middleProgress
             local mY = y1 + (y2-y1)*middleProgress
 
-            local p1x = math.cos(angle+math.pi)*VAR("portalSize")/2+mX
-            local p1y = math.sin(angle+math.pi)*VAR("portalSize")/2+mY
+            local p1x = math.cos(angle+math.pi)*VAR("portalSize")/2+mX - .5
+            local p1y = math.sin(angle+math.pi)*VAR("portalSize")/2+mY - .5
 
-            local p2x = math.cos(angle)*VAR("portalSize")/2+mX
-            local p2y = math.sin(angle)*VAR("portalSize")/2+mY
+            local p2x = math.cos(angle)*VAR("portalSize")/2+mX - .5
+            local p2y = math.sin(angle)*VAR("portalSize")/2+mY - .5
 
             local portal = Portal:new(self, p1x, p1y, p2x, p2y, color)
             table.insert(self.portals, portal)

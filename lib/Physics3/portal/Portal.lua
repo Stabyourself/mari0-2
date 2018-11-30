@@ -106,7 +106,7 @@ end
 function Portal:draw(side)
     love.graphics.push()
 
-    love.graphics.translate(self.x1, self.y1)
+    love.graphics.translate(self.x1+.5, self.y1+.5)
     love.graphics.rotate(self.angle)
     love.graphics.translate(self.size/2, 0)
 

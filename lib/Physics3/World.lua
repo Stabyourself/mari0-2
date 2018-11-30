@@ -554,27 +554,30 @@ end
 function World:checkCollision(x, y, obj, vector)
     if obj then
         -- Portal hijacking
-        for _, p in ipairs(self.portals) do
+        for _, portal in ipairs(self.portals) do
             -- TODO: objectWithinPortalRange could be cached (definitely do this!)
-            if p.open and objectWithinPortalRange(p, obj.x+obj.width/2, obj.y+obj.height/2) then -- only if the player is "in front" of the portal
+            if portal.open and objectWithinPortalRange(portal, obj.x+obj.width/2, obj.y+obj.height/2) then -- only if the player is "in front" of the portal
                 -- check if pixel is inside portal wallspace
                 -- rotate x, y around portal origin
-                local nx, ny = pointAroundPoint(x+.5, y+.5, p.x1, p.y1, -p.angle)
+                local nx, ny = pointAroundPoint(x+.5, y+.5, portal.x1, portal.y1, -portal.angle)
 
                 nx, ny = math.ceil(nx), math.ceil(ny)
 
                 -- comments use an up-pointing portal as example
-                if ny > p.y1-1 then -- point is low enough
-                    if nx > p.x1 and nx < p.x1+p.size+1 then -- point is horizontally within the portal
-                        return false
+                if ny > portal.y1 then -- point is low enough
+                    local newX, newY = self:portalPoint(x, y, portal, portal.connectsTo)
 
-                    else
-                        if ny > p.y1 and ny <= p.y1+2 then -- point is "on" the line of the portal
-                            return fakeCellInstance
-                        elseif ny > p.y1 then
-                            return false
-                        end
+                    if nx > portal.x1 and nx < portal.x1+portal.size+1 then -- point is horizontally within the portal
+                        return self:checkCollision(newX, newY, obj, vector)
                     end
+
+                    -- else
+                    --     if ny > p.y1 and ny <= p.y1+2 then -- point is "on" the line of the portal
+                    --         return fakeCellInstance
+                    --     elseif ny > p.y1 then
+                    --         return false
+                    --     end
+                    -- end
                 end
             end
         end
@@ -969,14 +972,42 @@ function World:attemptPortal(layer, tileX, tileY, side, x, y, color, ignoreP)
     end
 end
 
+function World:portalGetReversed(inPortal, outPortal)
+    return  inPortal.angle+math.pi < outPortal.angle+math.pi+VAR("portalReverseRange") and
+            inPortal.angle+math.pi > outPortal.angle+math.pi-VAR("portalReverseRange")
+end
+
+function World:portalPoint(x, y, inPortal, outPortal, reversed)
+    if reversed == nil then
+        reversed = self:portalGetReversed(inPortal, outPortal)
+    end
+
+    if not reversed then
+        -- Rotate around entry portal (+ half a turn)
+        newX, newY = pointAroundPoint(x, y, inPortal.x2, inPortal.y2, -inPortal.angle-math.pi)
+
+        -- Translate by portal offset (from opposite sides)
+        newX = newX + (outPortal.x1 - inPortal.x2)
+        newY = newY + (outPortal.y1 - inPortal.y2)
+    else
+        -- Rotate around entry portal
+	    newX, newY = pointAroundPoint(x, y, inPortal.x1, inPortal.y1, -inPortal.angle)
+
+        -- mirror along entry portal
+        newY = newY + (inPortal.y1-newY)*2
+
+        -- Translate by portal offset
+        newX = newX + (outPortal.x1 - inPortal.x1)
+        newY = newY + (outPortal.y1 - inPortal.y1)
+    end
+
+	-- Rotate around exit portal
+    return pointAroundPoint(newX, newY, outPortal.x1, outPortal.y1, outPortal.angle)
+end
+
 function World:doPortal(portal, x, y, angle)
     -- Check whether to reverse portal direction (when portal face the same way)
-    local reversed = false
-
-    if  portal.angle+math.pi < portal.connectsTo.angle+math.pi+VAR("portalReverseRange") and
-        portal.angle+math.pi > portal.connectsTo.angle+math.pi-VAR("portalReverseRange") then
-        reversed = true
-    end
+    local reversed = self:portalGetReversed(portal, portal.connectsTo)
 
 	-- Modify speed
     local r
@@ -990,30 +1021,8 @@ function World:doPortal(portal, x, y, angle)
         r = portal.connectsTo.angle + portal.angle - angle
     end
 
-	-- Modify position
-    local newX, newY
-
-    if not reversed then
-        -- Rotate around entry portal (+ half a turn)
-        newX, newY = pointAroundPoint(x, y, portal.x2, portal.y2, -portal.angle-math.pi)
-
-        -- Translate by portal offset (from opposite sides)
-        newX = newX + (portal.connectsTo.x1 - portal.x2)
-        newY = newY + (portal.connectsTo.y1 - portal.y2)
-    else
-        -- Rotate around entry portal
-	    newX, newY = pointAroundPoint(x, y, portal.x1, portal.y1, -portal.angle)
-
-        -- mirror along entry portal
-        newY = newY + (portal.y1-newY)*2
-
-        -- Translate by portal offset
-        newX = newX + (portal.connectsTo.x1 - portal.x1)
-        newY = newY + (portal.connectsTo.y1 - portal.y1)
-    end
-
-	-- Rotate around exit portal
-    newX, newY = pointAroundPoint(newX, newY, portal.connectsTo.x1, portal.connectsTo.y1, portal.connectsTo.angle)
+    -- Modify position
+    local newX, newY = self:portalPoint(x, y, portal, portal.connectsTo, reversed)
 
     return newX, newY, r, rDiff, reversed
 end

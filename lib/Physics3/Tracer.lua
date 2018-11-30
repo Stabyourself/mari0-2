@@ -23,7 +23,7 @@ function Tracer:cacheCoordinates()
 	end
 end
 
-function Tracer:trace(stopAt)
+function Tracer:trace()
 	local i = 1
 
 	while i <= self.len do

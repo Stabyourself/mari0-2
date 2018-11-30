@@ -46,7 +46,6 @@ function Select:draw()
         end
     end
 
-    if self.editor.selection or self.editor.floatingSelection then -- only show +, - and intersect when there's already a selection
         if not self.editor.floatingSelection or not self.editor.floatingSelection.dragging then -- but not if we're already dragging a floating selection
             local addition = ""
 
@@ -65,7 +64,6 @@ function Select:draw()
                 love.graphics.print(addition, worldX-utf8.len(addition)*8-1, worldY+2)
             end
         end
-    end
 end
 
 function Select:mousepressed(x, y, button)

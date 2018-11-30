@@ -18,10 +18,10 @@ return {
         },
 
         ["animation.mirror"] = {},
-        ["movement.truffleShuffle"] = {
-            dontTurnAnimation = true
-        },
+        -- ["movement.truffleShuffle"] = {
+        --     dontTurnAnimation = true
+        -- },
         ["misc.unrotate"] = {},
-        ["misc.stompable"] = {},
+        -- ["misc.stompable"] = {},
     }
 }

@@ -551,7 +551,7 @@ function World:portalVectorDebug()
     end
 end
 
-function World:checkCollision(x, y, obj, vector)
+function World:checkCollision(x, y, obj, vector, portalled)
     if obj then
         -- Portal hijacking
         for _, portal in ipairs(self.portals) do
@@ -561,29 +561,24 @@ function World:checkCollision(x, y, obj, vector)
                 -- rotate x, y around portal origin
                 local nx, ny = pointAroundPoint(x, y, portal.x1, portal.y1, -portal.angle)
 
-                -- nx, ny = math.round(nx), math.round(ny)
+                -- todo: portals connecting to 45° still get some stray pixels that are just barely "in front" of the exit portal.
 
                 -- comments use an up-pointing portal as example
-                if ny > portal.y1 then -- point is low enough
-
-                    if nx > portal.x1 and nx < portal.x1+portal.size then -- point is horizontally within the portal
+                if nx > portal.x1 and nx < portal.x1+portal.size then -- point is horizontally within the portal
+                    if ny > portal.y1 and not portalled then -- point is inside portal
                         local newX, newY = self:portalPoint(x, y, portal, portal.connectsTo) -- warp point or something
 
                         return self:checkCollision(newX, newY, obj, vector, true)
-                    end
 
-                    -- else
-                    --     if ny > p.y1 and ny <= p.y1+2 then -- point is "on" the line of the portal
-                    --         return fakeCellInstance
-                    --     elseif ny > p.y1 then
-                    --         return false
-                    --     end
-                    -- end
+                    elseif ny > portal.y1 - 0.00000001 then -- stops a thin line covering 45° portals
+                        return false
+                    end
                 end
             end
         end
     end
 
+    -- level boundaries
     if x < 0 or x >= self:getXEnd()*16 then -- todo: bad for performance due to recalculation of XEnd!
         return fakeCellInstance
     end

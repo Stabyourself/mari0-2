@@ -564,10 +564,11 @@ function World:checkCollision(x, y, obj, vector)
                 -- nx, ny = math.round(nx), math.round(ny)
 
                 -- comments use an up-pointing portal as example
-                if ny >= portal.y1 then -- point is low enough
-                    local newX, newY = self:portalPoint(x, y, portal, portal.connectsTo)
+                if ny > portal.y1 then -- point is low enough
 
                     if nx > portal.x1 and nx < portal.x1+portal.size then -- point is horizontally within the portal
+                        local newX, newY = self:portalPoint(x, y, portal, portal.connectsTo) -- warp point or something
+
                         return self:checkCollision(newX, newY, obj, vector, true)
                     end
 

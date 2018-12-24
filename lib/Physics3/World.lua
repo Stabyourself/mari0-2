@@ -552,7 +552,7 @@ function World:portalVectorDebug()
 end
 
 function World:checkCollision(x, y, obj, vector, portalled)
-    if obj then
+    if obj and not portalled then -- don't re-portal points because that's still
         -- Portal hijacking
         for _, portal in ipairs(self.portals) do
             -- TODO: objectWithinPortalRange could be cached (definitely do this!)
@@ -561,17 +561,30 @@ function World:checkCollision(x, y, obj, vector, portalled)
                 -- rotate x, y around portal origin
                 local nx, ny = pointAroundPoint(x, y, portal.x1, portal.y1, -portal.angle)
 
-                -- todo: portals connecting to 45° still get some stray pixels that are just barely "in front" of the exit portal.
-
                 -- comments use an up-pointing portal as example
                 if nx > portal.x1 and nx < portal.x1+portal.size then -- point is horizontally within the portal
-                    if ny > portal.y1 and not portalled then -- point is inside portal
-                        local newX, newY = self:portalPoint(x, y, portal, portal.connectsTo) -- warp point or something
+                    if ny > portal.y1 then
+                        if ny < portal.y1 + 1 then -- first pixel's free, because bumpy conversion from vector positions to pixel collision can create some bad effects
+                            return false
+                        else -- point is inside portal
+                            local newX, newY = self:portalPoint(x, y, portal, portal.connectsTo) -- warp point or something
 
-                        return self:checkCollision(newX, newY, obj, vector, true)
+                            return self:checkCollision(newX, newY, obj, vector, true)
+                        end
 
                     elseif ny > portal.y1 - 0.00000001 then -- stops a thin line covering 45° portals
                         return false
+                    end
+                else
+                    if ny > portal.y1 then
+
+                        if ny < portal.y1 + 2 then -- add a thin line of collision to the portal's edges
+                            return fakeCellInstance
+                        else
+                            local newX, newY = self:portalPoint(x, y, portal, portal.connectsTo) -- warp point or something
+
+                            return self:checkCollision(newX, newY, obj, vector, true)
+                        end
                     end
                 end
             end
@@ -1260,6 +1273,9 @@ function World:checkPortalSurface(layer, tileX, tileY, side, worldX, worldY, ign
     -- Do some magic to determine whether there's portals blocking off sections of our portal surface
     local angle = tile:getSideAngle(side)
 
+    worldX = worldX - 0.5 -- necessary because portals live on off-pixels
+    worldY = worldY - 0.5
+
     for _, p in ipairs(self.portals) do
         if p ~= ignoreP then
             if math.abs(p.angle - angle) < 0.00001 or p.angle + angle < 0.00001 then -- angle is the same! (also good code on that 0.00001)
@@ -1268,15 +1284,15 @@ function World:checkPortalSurface(layer, tileX, tileY, side, worldX, worldY, ign
                     if onLine >= 0 then -- Check on which side of the same surface portal we are
                         if math.abs(startX-worldX) > math.abs(p.x2-worldX) or
                             math.abs(startY-worldY) > math.abs(p.y2-worldY) then -- finally check that we are not accidentally lengthening the portal surface
-                            startX = p.x2
-                            startY = p.y2
+                            startX = p.x2+.5
+                            startY = p.y2+.5
                         end
 
                     else
                         if math.abs(endX-worldX) > math.abs(p.x1-worldX) or
                             math.abs(endY-worldY) > math.abs(p.y1-worldY) then
-                            endX = p.x1
-                            endY = p.y1
+                            endX = p.x1+.5
+                            endY = p.y1+.5
                         end
                     end
                 end

@@ -555,8 +555,7 @@ function World:checkCollision(x, y, obj, vector, portalled)
     if obj and not portalled then -- don't re-portal points because that's still
         -- Portal hijacking
         for _, portal in ipairs(self.portals) do
-            -- TODO: objectWithinPortalRange could be cached (definitely do this!)
-            if portal.open and objectWithinPortalRange(portal, obj.x+obj.width/2, obj.y+obj.height/2) then -- only if the player is "in front" of the portal
+            if portal.open and obj.inPortals[portal] then -- only if the player is "in front" of the portal
                 -- check if pixel is inside portal wallspace
                 -- rotate x, y around portal origin
                 local nx, ny = pointAroundPoint(x, y, portal.x1, portal.y1, -portal.angle)

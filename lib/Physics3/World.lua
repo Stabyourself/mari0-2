@@ -609,7 +609,7 @@ function World:checkCollision(x, y, obj, vector, portalled)
 
     for _, obj2 in ipairs(self.objects) do
         if obj ~= obj2 then
-            if obj2:checkCollision(x, y) then
+            if obj2:checkCollision(math.round(x), math.round(y)) then
                 return obj2
             end
         end

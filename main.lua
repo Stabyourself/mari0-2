@@ -109,6 +109,11 @@ function love.draw()
     love.graphics.push()
     love.graphics.scale(VAR("scale"), VAR("scale"))
 
+    if not bla then bla = 0 end
+    bla = bla + 0.002
+
+    love.graphics.print("in memory of noahkiq", 150+math.cos(bla)*50, 120+math.sin(bla)*50)
+
     gameStateManager:event("draw")
 
     -- For the stream

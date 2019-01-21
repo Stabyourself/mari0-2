@@ -402,7 +402,7 @@ function Gui3.Element:mousepressed(x, y, button)
     end
 
     -- rearrange UI elements
-    -- todo: only move to front if not at the front?
+    -- todo: only move to front if not at the front? Helps performance! Probably!
     self:moveToFront()
 
     -- custom hook

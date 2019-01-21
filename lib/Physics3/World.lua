@@ -703,8 +703,8 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
         local xEnd = self:getXEnd()
         local yEnd = self:getYEnd()
 
-        local rayPos2X = rayPosX + rayDirX*1000000000000
-        local rayPos2Y = rayPosY + rayDirY*1000000000000 -- GOOD CODE (todo? may be fine)
+        local rayPos2X = rayPosX + rayDirX*100000
+        local rayPos2Y = rayPosY + rayDirY*100000 -- GOOD CODE (todo? may be fine)
 
         if not rectangleOnLine(xStart, yStart, xEnd-xStart+1, yEnd-yStart+1, rayPosX, rayPosY, rayPos2X, rayPos2Y) then
             return false

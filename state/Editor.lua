@@ -37,6 +37,7 @@ Editor.windowClasses = {
     tiles = require("class.editor.windows.TilesWindow"),
     stamps = require("class.editor.windows.StampsWindow"),
     minimap = require("class.editor.windows.MinimapWindow"),
+    mapOptions = require("class.editor.windows.MapOptionsWindow"),
 }
 
 function Editor:initialize(level)
@@ -73,8 +74,8 @@ function Editor:load()
 
     self.menuBar:addChild(self.fileDropdown)
 
-    self.fileDropdown.box:addChild(Gui3.TextButton:new(0, 0, "save", false, 1, function(button) self:saveLevel() end))
-    self.fileDropdown.box:addChild(Gui3.TextButton:new(0, 10, "load", false, 1, function(button) self:loadLevel("mappacks/smb3/1-1.lua") end))
+    self.fileDropdown.box:addChild(Gui3.TextButton:new(0, 0, "save", false, nil, function(button) self:saveLevel() end))
+    self.fileDropdown.box:addChild(Gui3.TextButton:new(0, 10, "load", false, nil, function(button) self:loadLevel("mappacks/smb3/1-1.lua") end))
 
     self.fileDropdown:autoSize()
 
@@ -87,11 +88,11 @@ function Editor:load()
 
     self.menuBar:addChild(self.newWindowDropdown)
 
-    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 0, "tiles", false, 1, function(button) self:newWindow(self.windowClasses.tiles, button) end))
-    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 10, "stamps", false, 1, function(button) self:newWindow(self.windowClasses.stamps, button) end))
-    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 20, "layers", false, 1, function(button) end))
-    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 30, "minimap", false, 1, function(button) self:newWindow(self.windowClasses.minimap, button) end))
-    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 40, "map options", false, 1, function(button) end))
+    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 0, "tiles", false, nil, function(button) self:newWindow(self.windowClasses.tiles, button) end))
+    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 10, "stamps", false, nil, function(button) self:newWindow(self.windowClasses.stamps, button) end))
+    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 20, "layers", false, nil, function(button) end))
+    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 30, "minimap", false, nil, function(button) self:newWindow(self.windowClasses.minimap, button) end))
+    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 40, "map options", false, nil, function(button) self:newWindow(self.windowClasses.mapOptions, button) end))
 
     self.newWindowDropdown:autoSize()
 

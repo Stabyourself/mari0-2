@@ -18,6 +18,7 @@ local toLoad = {
     "Dropdown",
     "SubDraw",
     "Rectangle",
+    "TextInput",
 }
 
 for _, fileName in ipairs(toLoad) do

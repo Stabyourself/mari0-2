@@ -21,19 +21,22 @@ return {
         reMouses = false, -- prints to console when the mouse regions are re-calculated
         showFPSInTime = true, -- shows the FPS instead of the level time in the SMB 3 UI
 
+        -- World stuff
+        animatedTileCallbacks = false,
+        layers = false, -- shows borders for level layers
+        reSpriteBatchLayers = false, -- prints to console when a level layer's spritebatch is re-made
+
         -- Misc stuff
         input = true, -- shows a little input display in the bottom left
-        layers = false, -- shows borders for level layers
-        jprof = true, -- logs frame data into a file on quit
+        jprof = false, -- logs frame data into a file on quit
         lovebird = false, -- enable lövebird debugging (localhost:8000)
-        reSpriteBatchLayers = false, -- prints to console when a level layer's spritebatch is re-made
-        noEnemies = false, -- disables enemy spawning
+        noEnemies = true, -- disables enemy spawning
         musicDisabled = true, -- disables the music
     },
 
     volume = 1,
     scale = 3,
-    vsync = true,
+    vsync = false,
     msaa = 0,
 
     ffKeys = {

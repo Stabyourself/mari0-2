@@ -24,12 +24,16 @@ function DebugWindow:initialize(editor)
     self.editor.canvas:addChild(self.element)
 
     self.element:addChild(Gui3.Text:new("change actorstate", 0, 0))
-    self.element:addChild(Gui3.TextButton:new(0, 10, "small", true, 0, function(button) changeTemplate(actorTemplates.smb3_small) end))
-    self.element:addChild(Gui3.TextButton:new(50, 10, "fire", true, 0, function(button) changeTemplate(actorTemplates.smb3_fire) end))
-    self.element:addChild(Gui3.TextButton:new(92, 10, "hammer", true, 0, function(button) changeTemplate(actorTemplates.smb3_hammer) end))
-    self.element:addChild(Gui3.TextButton:new(0, 28, "big", true, 0, function(button) changeTemplate(actorTemplates.smb3_big) end))
-    self.element:addChild(Gui3.TextButton:new(34, 28, "racc.", true, 0, function(button) changeTemplate(actorTemplates.smb3_raccoon) end))
-    self.element:addChild(Gui3.TextButton:new(84, 28, "tanooki", true, 0, function(button) changeTemplate(actorTemplates.smb3_tanooki) end))
+    self.element:addChild(Gui3.TextButton:new(0, 0, "small", true, 0, function(button) changeTemplate(actorTemplates.smb3_small) end))
+    self.element:addChild(Gui3.TextButton:new(0, 0, "fire", true, 0, function(button) changeTemplate(actorTemplates.smb3_fire) end))
+    self.element:addChild(Gui3.TextButton:new(0, 0, "hammer", true, 0, function(button) changeTemplate(actorTemplates.smb3_hammer) end))
+    self.element:addChild(Gui3.TextButton:new(0, 0, "big", true, 0, function(button) changeTemplate(actorTemplates.smb3_big) end))
+    self.element:addChild(Gui3.TextButton:new(0, 0, "raccoon", true, 0, function(button) changeTemplate(actorTemplates.smb3_raccoon) end))
+    self.element:addChild(Gui3.TextButton:new(0, 0, "tanooki", true, 0, function(button) changeTemplate(actorTemplates.smb3_tanooki) end))
+    self.element:addChild(Gui3.TextButton:new(0, 0, "frog", true, 0, function(button) changeTemplate(actorTemplates.smb3_frog) end))
+
+    self.element.autoArrangeChildren = true
+    self.element:sizeChanged()
 end
 
 

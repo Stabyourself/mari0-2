@@ -980,14 +980,9 @@ function World:attemptPortal(layer, tileX, tileY, side, x, y, color, ignoreP)
     end
 end
 
-function World:portalGetReversed(inPortal, outPortal)
-    return  inPortal.angle+math.pi < outPortal.angle+math.pi+VAR("portalReverseRange") and
-            inPortal.angle+math.pi > outPortal.angle+math.pi-VAR("portalReverseRange")
-end
-
 function World:portalPoint(x, y, inPortal, outPortal, reversed)
     if reversed == nil then
-        reversed = self:portalGetReversed(inPortal, outPortal)
+        reversed = inPortal:getReversed(outPortal)
     end
 
     if not reversed then
@@ -1015,7 +1010,7 @@ end
 
 function World:doPortal(portal, x, y, angle)
     -- Check whether to reverse portal direction (when portal face the same way)
-    local reversed = self:portalGetReversed(portal, portal.connectsTo)
+    local reversed = portal:getReversed(portal.connectsTo)
 
 	-- Modify speed
     local r

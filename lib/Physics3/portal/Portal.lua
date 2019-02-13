@@ -161,4 +161,9 @@ function Portal:stencilRectangle(way)
     love.graphics.pop()
 end
 
+function Portal:getReversed(portal2)
+    return  self.angle+math.pi < portal2.angle+math.pi+VAR("portalReverseRange") and
+            self.angle+math.pi > portal2.angle+math.pi-VAR("portalReverseRange")
+end
+
 return Portal

@@ -38,6 +38,7 @@ Editor.windowClasses = {
     stamps = require("class.editor.windows.StampsWindow"),
     minimap = require("class.editor.windows.MinimapWindow"),
     mapOptions = require("class.editor.windows.MapOptionsWindow"),
+    debug = require("class.editor.windows.DebugWindow"),
 }
 
 function Editor:initialize(level)
@@ -93,6 +94,7 @@ function Editor:load()
     self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 20, "layers", false, nil, function(button) end))
     self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 30, "minimap", false, nil, function(button) self:newWindow(self.windowClasses.minimap, button) end))
     self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 40, "map options", false, nil, function(button) self:newWindow(self.windowClasses.mapOptions, button) end))
+    self.newWindowDropdown.box:addChild(Gui3.TextButton:new(0, 50, "debug", false, nil, function(button) self:newWindow(self.windowClasses.debug, button) end))
 
     self.newWindowDropdown:autoSize()
 

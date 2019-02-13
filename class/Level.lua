@@ -56,7 +56,7 @@ function Level:loadLevel(data)
     for i = 1, #game.players do
         local player = game.players[i]
 
-        local mario = Actor:new(self, x, y, actorTemplates.smb3_raccoon)
+        local mario = Actor:new(self, x, y, actorTemplates.smb3_small)
         mario.player = player
         player.actor = mario
 

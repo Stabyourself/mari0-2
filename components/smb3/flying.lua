@@ -1,11 +1,11 @@
 local Component = require "class.Component"
 local flying = class("smb3.flying", Component)
 
-local FLYINGUPTIME = 16/60
-local FLYTIME = 4.25
-local MAXSPEEDFLY = 86.25
+local FLYINGUPTIME = 16/60 -- time spent in "fly up" state
+local FLYTIME = 4.25 -- duration of flight after first jump
+local MAXSPEEDFLY = 86.25 -- maximum horizontal velocity while flying
 local MAXSPEEDS = {90, 150, 210}
-local FLYINGASCENSION = -90
+local FLYINGASCENSION = -90 -- yVelocity while in "fly up" state
 local ACCELERATION = 196.875
 local FRICTIONFLYSMALL = 56.25
 local FRICTIONFLYBIG = 225

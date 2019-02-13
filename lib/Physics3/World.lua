@@ -48,7 +48,7 @@ function World:update(dt)
         obj.prevX = obj.x
         obj.prevY = obj.y
 
-		-- Add half of gravity
+        -- Add half of gravity
         obj.speed[2] = obj.speed[2] + (obj.gravity or VAR("gravity")) * dt * 0.5
         obj.speed[2] = math.min((obj.maxSpeedY or VAR("maxYSpeed")), obj.speed[2]) -- Cap speed[2]
 

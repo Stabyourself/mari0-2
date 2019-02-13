@@ -1,12 +1,12 @@
 return {
     width = 12,
-    height = 24,
+    height = 12,
 
-    img = "characters/smb3_mario/raccoon.png",
-    quadWidth = 40,
-    quadHeight = 40,
-    centerX = 23,
-    centerY = 24,
+    img = "characters/smb3_mario/small.png",
+    quadWidth = 24,
+    quadHeight = 24,
+    centerX = 11,
+    centerY = 14,
 
     dontAutoQuad = true,
 
@@ -31,8 +31,6 @@ return {
 
                         "run",
                         "run",
-                        "run",
-                        "run",
 
                         "skid",
 
@@ -40,14 +38,6 @@ return {
 
                         "fall",
 
-                        "float",
-                        "float",
-                        "float",
-
-                        "duck",
-
-                        "swim",
-                        "swim",
                         "swim",
                         "swim",
 
@@ -65,11 +55,7 @@ return {
                     names = {
                         "sprint",
                         "sprint",
-                        "sprint",
-                        "sprint",
 
-                        "fly",
-                        "fly",
                         "fly",
 
                         "die",
@@ -81,15 +67,9 @@ return {
                         "spin",
                         "spin",
 
-                        "spinAir",
-                        "spinAir",
-                        "spinAir",
-                        "spinAir",
 
                         "holdIdle",
 
-                        "holdRun",
-                        "holdRun",
                         "holdRun",
                         "holdRun",
 
@@ -97,34 +77,13 @@ return {
 
                         "climb",
                         "climb",
-
-                        "somerSault",
-                        "somerSault",
-                        "somerSault",
-                        "somerSault",
-                        "somerSault",
-                        "somerSault",
-                        "somerSault",
-                        "somerSault",
-
-                        "shoot",
-                        "shoot",
-                        "shoot",
-
-                        "shootAir",
-                        "shootAir",
-                        "shootAir",
                     }
                 }
             }
         },
         ["smb3.movement"] = {},
         ["smb3.jumping"] = {},
-        ["smb3.flying"] = {},
         ["smb3.swimming"] = {},
-        ["smb3.ducking"] = {},
-        ["smb3.floating"] = {},
-        ["smb3.spinning"] = {},
         ["misc.unrotate"] = {},
         ["misc.crosshair"] = {},
         ["misc.portalGun"] = {},

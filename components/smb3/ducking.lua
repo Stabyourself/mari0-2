@@ -45,7 +45,7 @@ function ducking:update(dt)
     end
 
     if wasDucking ~= self.actor.ducking then
-        if self.actor.ducking then
+        if self.actor.ducking then -- todo: make configurable
             self.actor:changeSize(12, 12)
             self.actor.centerY = 30
         else

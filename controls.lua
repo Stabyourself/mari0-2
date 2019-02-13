@@ -35,6 +35,11 @@ return {
     ["f"] = "editor.tool.fill",
     ["t"] = "editor.tool.stamp",
 
+    ["up"] = "editor.up",
+    ["right"] = "editor.right",
+    ["down"] = "editor.down",
+    ["left"] = "editor.left",
+
     ["p"] = "debug.star",
 
     ["pause"] = "debug.pausePlay",

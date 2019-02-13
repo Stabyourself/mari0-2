@@ -203,19 +203,19 @@ function Editor:update(dt)
     if self.freeCamera then
         local cameraSpeed = dt*VAR("editor").cameraSpeed*(1/self.level.camera.scale)
 
-        if controls3.cmdDown("right") then
+        if controls3.cmdDown("editor.right") then
             self.level.camera.x = self.level.camera.x + cameraSpeed
         end
 
-        if controls3.cmdDown("left") then
+        if controls3.cmdDown("editor.left") then
             self.level.camera.x = self.level.camera.x - cameraSpeed
         end
 
-        if controls3.cmdDown("down") then
+        if controls3.cmdDown("editor.down") then
             self.level.camera.y = self.level.camera.y + cameraSpeed
         end
 
-        if controls3.cmdDown("up") then
+        if controls3.cmdDown("editor.up") then
             self.level.camera.y = self.level.camera.y - cameraSpeed
         end
     end

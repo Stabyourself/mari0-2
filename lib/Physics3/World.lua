@@ -1276,15 +1276,15 @@ function World:checkPortalSurface(layer, tileX, tileY, side, worldX, worldY, ign
                 local onLine = pointOnLine(p.x1, p.y1, p.x2, p.y2, worldX, worldY)
                 if onLine then -- surface is the same! (or at least on the same line which is good enough)
                     if onLine >= 0 then -- Check on which side of the same surface portal we are
-                        if math.abs(startX-worldX) > math.abs(p.x2-worldX) or
-                            math.abs(startY-worldY) > math.abs(p.y2-worldY) then -- finally check that we are not accidentally lengthening the portal surface
+                        if math.abs(startX-.5-worldX) > math.abs(p.x2-worldX) or
+                            math.abs(startY-.5-worldY) > math.abs(p.y2-worldY) then -- finally check that we are not accidentally lengthening the portal surface
                             startX = p.x2+.5
                             startY = p.y2+.5
                         end
 
                     else
-                        if math.abs(endX-worldX) > math.abs(p.x1-worldX) or
-                            math.abs(endY-worldY) > math.abs(p.y1-worldY) then
+                        if math.abs(endX-.5-worldX) > math.abs(p.x1-worldX) or
+                            math.abs(endY-.5-worldY) > math.abs(p.y1-worldY) then
                             endX = p.x1+.5
                             endY = p.y1+.5
                         end

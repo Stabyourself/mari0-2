@@ -5,7 +5,7 @@ return {
     img = "characters/smb3_mario/small.png",
     quadWidth = 24,
     quadHeight = 24,
-    centerX = 11,
+    centerX = 11.5,
     centerY = 14,
 
     dontAutoQuad = true,

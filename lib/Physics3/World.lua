@@ -1263,10 +1263,9 @@ function World:checkPortalSurface(layer, tileX, tileY, side, worldX, worldY, ign
     startX, startY = self:coordinateToWorld(startX, startY)
     endX, endY = self:coordinateToWorld(endX, endY)
 
-
-    -- Do some magic to determine whether there's portals blocking off sections of our portal surface
     local angle = tile:getSideAngle(side)
 
+    -- Do some magic to determine whether there's portals blocking off sections of our portal surface
     worldX = worldX - 0.5 -- necessary because portals live on off-pixels
     worldY = worldY - 0.5
 

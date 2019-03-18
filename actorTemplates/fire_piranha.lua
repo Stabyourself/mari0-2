@@ -1,28 +1,29 @@
 return {
     width = 12,
-    height = 12,
+    height = 32,
 
-    img = "img/actors/goomba.png",
+    img = "img/actors/fire_piranha.png",
     quadWidth = 16,
-    quadHeight = 16,
+    quadHeight = 32,
     centerX = 8,
-    centerY = 9,
+    centerY = 16,
 
     components = {
         ["misc.palettable"] = {
             ["imgPalette"] = {
-                {252, 188, 176},
-                {252, 152,  56},
+                {181,  49,  32},
+                { 92, 228,  48},
+                {255, 255, 255},
                 {  0,   0,   0}
             }
         },
 
-        ["animation.mirror"] = {},
+        ["animation.frames"] = {
+            frames = {1, 2}
+        },
         ["movement.truffleShuffle"] = {
             dontTurnAnimation = true,
             maxSpeed = 32,
         },
-        ["misc.unrotate"] = {},
-        ["misc.stompable"] = {},
     }
 }

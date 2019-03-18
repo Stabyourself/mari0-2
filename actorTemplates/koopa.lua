@@ -18,7 +18,6 @@ return {
         },
 
         ["animation.frames"] = {
-            frames = {1, 2}
         },
 
         ["movement.truffleShuffle"] = {},

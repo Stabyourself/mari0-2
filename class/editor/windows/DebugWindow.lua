@@ -23,7 +23,7 @@ function DebugWindow:initialize(editor)
     self.element.title = "debug"
     self.editor.canvas:addChild(self.element)
 
-    self.element:addChild(Gui3.Text:new("change actorstate", 0, 0))
+    self.element:addChild(Gui3.Text:new("powerup state", 0, 0))
     self.element:addChild(Gui3.TextButton:new(0, 0, "small", true, 0, function(button) changeTemplate(actorTemplates.smb3_small) end))
     self.element:addChild(Gui3.TextButton:new(0, 0, "fire", true, 0, function(button) changeTemplate(actorTemplates.smb3_fire) end))
     self.element:addChild(Gui3.TextButton:new(0, 0, "hammer", true, 0, function(button) changeTemplate(actorTemplates.smb3_hammer) end))

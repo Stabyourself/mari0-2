@@ -2,6 +2,8 @@
 
 local VARIABLES = require "variables"
 
+assert(love.filesystem.getInfo("environment.lua"), "Missing environment. You need to copy environment.example.lua to environment.lua")
+
 local fileInfo = love.filesystem.getInfo("environment.lua")
 
 if fileInfo and fileInfo.type == "file" then

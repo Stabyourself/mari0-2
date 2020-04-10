@@ -179,9 +179,9 @@ function DottedCrosshair:draw()
 
     -- Target
     if self.target.portalPossible then
-        love.graphics.setColor(0, 0.88, 0, a)
+        love.graphics.setColor(0, 0.88, 0)
     else
-        love.graphics.setColor(1, 0, 0, a)
+        love.graphics.setColor(1, 0, 0)
     end
 
     love.graphics.draw(self.targetImg, self.target.worldX, self.target.worldY, self.target.angle, 1, 1, 4, 8)

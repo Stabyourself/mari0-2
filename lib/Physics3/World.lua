@@ -160,6 +160,22 @@ end
 
 local inPortals = {}
 
+local function drawObject(obj, x, y, r, sx, sy, cx, cy)
+    if obj.imgPalette and obj.palette then
+        paletteShader.on(obj.imgPalette, obj.palette)
+    end
+
+    if obj.quad then
+        love.graphics.draw(obj.img, obj.quad, x, y, r, sx, sy, cx, cy)
+    else
+        love.graphics.draw(obj.img, x, y, r, sx, sy, cx, cy)
+    end
+
+    if obj.imgPalette and obj.palette then
+        paletteShader.off()
+    end
+end
+
 function World:draw()
     prof.push("World")
     prof.push("Layers")
@@ -309,22 +325,6 @@ function World:draw()
     prof.pop("World")
 end
 
-function drawObject(obj, x, y, r, sx, sy, cx, cy)
-    if obj.imgPalette and obj.palette then
-        paletteShader.on(obj.imgPalette, obj.palette)
-    end
-
-    if obj.quad then
-        love.graphics.draw(obj.img, obj.quad, x, y, r, sx, sy, cx, cy)
-    else
-        love.graphics.draw(obj.img, x, y, r, sx, sy, cx, cy)
-    end
-
-    if obj.imgPalette and obj.palette then
-        paletteShader.off()
-    end
-end
-
 function World:addObject(PhysObj)
 	table.insert(self.objects, PhysObj)
 	PhysObj.World = self
@@ -368,7 +368,7 @@ function World:loadLevel(data)
                 if unresolvedTile ~= 0 then -- 0 means no tile
                     local tile = self.tileLookups[unresolvedTile] -- convert from the saved file's specific tile lookup to the actual tileMap's number
 
-                    assert(tile, string.format("Couldn't load real tile at x=%s, y=%s for requested lookup \"%s\". This may mean that the map is corrupted.", x, y, mapTile))
+                    assert(tile, string.format("Couldn't load real tile at x=%s, y=%s for requested lookup \"%s\". This may mean that the map is corrupted.", x, y, unresolvedTile))
 
                     map[x][y] = Cell:new(x, y, dataLayer, tile)
                 else
@@ -721,6 +721,7 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
 
     local hit = false -- was there a wall hit?
     local side -- was a NS or a EW wall hit?
+    local sideDistX, sideDistY
     -- calculate step and initial sideDist
     if rayDirX < 0 then
         stepX = -1
@@ -822,12 +823,12 @@ function World:rayCast(x, y, dir) -- Uses code from http://lodev.org/cgtutor/ray
 
                     if side == "ver" then
                         local dist = (mapX - rayPosX + (1 - stepX) / 2) / rayDirX
-                        hitDist = rayPosY + dist * rayDirY - math.floor(mapY)
+                        local hitDist = rayPosY + dist * rayDirY - math.floor(mapY)
 
                         absY = absY + hitDist
                     else
                         local dist = (mapY - rayPosY + (1 - stepY) / 2) / rayDirY
-                        hitDist = rayPosX + dist * rayDirX - math.floor(mapX)
+                        local hitDist = rayPosX + dist * rayDirX - math.floor(mapX)
 
                         absX = absX + hitDist
                     end
@@ -984,6 +985,8 @@ function World:portalPoint(x, y, inPortal, outPortal, reversed)
     if reversed == nil then
         reversed = inPortal:getReversed(outPortal)
     end
+
+    local newX, newY
 
     if not reversed then
         -- Rotate around entry portal (+ half a turn)

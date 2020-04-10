@@ -32,7 +32,7 @@ function Gui3.Dropdown:toggle(status)
 end
 
 function Gui3.Dropdown:mousepressed(x, y, button)
-    Gui3.Element.mousepressed(self, x, y, button)
+    local toReturn = Gui3.Element.mousepressed(self, x, y, button)
 
     return toReturn
 end

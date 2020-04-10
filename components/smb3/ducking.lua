@@ -35,9 +35,9 @@ function ducking:update(dt)
             else
                 self.actor.ducking = true
 
-                -- Stop spinning in case
-                self.actor.spinning = false
-                self.actor.spinTimer = SPINTIME
+                -- Stop spinning in case TODO: move this to an event or something
+                -- self.actor.spinning = false
+                -- self.actor.spinTimer = SPINTIME
             end
         else
             self.actor.ducking = false

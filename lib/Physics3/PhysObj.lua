@@ -61,7 +61,7 @@ function PhysObj:createTracers()
 
 
 	-- Create bottom tracers
-	yOff = self.height/2
+	local yOff = self.height/2
 	distance = self.height/2+Physics3.TRACER_BOTTOM_EXTEND
 
 	--from left side
@@ -114,7 +114,7 @@ function PhysObj:unRotate(dt)
 end
 
 function PhysObj:leftColCheck()
-	local colX, colY
+	local colX, colY, colObj
 
 	for _, tracer in ipairs(self.tracers.left) do
 		local traceX, traceY, traceObj = tracer:trace()
@@ -128,7 +128,7 @@ function PhysObj:leftColCheck()
 end
 
 function PhysObj:rightColCheck()
-	local colX, colY
+	local colX, colY, colObj
 
 	for _, tracer in ipairs(self.tracers.right) do
 		local traceX, traceY, traceObj = tracer:trace()
@@ -142,7 +142,7 @@ function PhysObj:rightColCheck()
 end
 
 function PhysObj:topColCheck()
-	local colX, colY
+	local colX, colY, colObj
 
 	for _, tracer in ipairs(self.tracers.up) do
 		local traceX, traceY, traceObj = tracer:trace()
@@ -156,7 +156,7 @@ function PhysObj:topColCheck()
 end
 
 function PhysObj:bottomColCheck()
-	local colX, colY
+	local colX, colY, colObj
 
 	for _, tracer in ipairs(self.tracers.down) do
 		local traceX, traceY, traceObj = tracer:trace()

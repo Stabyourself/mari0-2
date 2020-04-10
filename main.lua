@@ -10,7 +10,7 @@ function love.load()
     love.window.setMode(400*VAR("scale"), 224*VAR("scale"), {
         vsync = VAR("vsync"),
         resizable = true,
-        msaa = msaa,
+        msaa = VAR("msaa"),
         minwidth = 243*VAR("scale"),
         minheight = 165*VAR("scale"),
     })

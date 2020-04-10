@@ -332,7 +332,7 @@ function convertPalette(palette)
             out[i][j] = channel/255
         end
 
-        if not out[i][j] then
+        if not out[i][4] then
             out[i][4] = 1
         end
     end

@@ -256,7 +256,7 @@ local function candyStencil()
 end
 
 function Editor:draw()
-    self.level.camera:attach(CAMERAOFFSETX, CAMERAOFFSETY)
+    self.level.camera:attach()
 
     local xl, yt = self.level:cameraToWorld(0, 0)
     local xr, yb = self.level:cameraToWorld(self.level.camera.w, self.level.camera.h)
@@ -366,11 +366,7 @@ function Editor:toggleUI(hidden)
 
         local offset = (ui.height)/2/self.level.camera.scale
 
-        if off then
-            self.level.camera:move(0, -offset)
-        else
-            self.level.camera:move(0, offset)
-        end
+        self.level.camera:move(0, offset)
     end
 end
 
@@ -539,7 +535,7 @@ end
 
 function Editor:mousemoved(x, y)
     if self.tool.mousemoved then
-        self.tool:mousemoved(x, y, button)
+        self.tool:mousemoved(x, y)
     end
 end
 

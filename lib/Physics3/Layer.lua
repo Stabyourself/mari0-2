@@ -392,7 +392,7 @@ function Layer:getFloodArea(startX, startY) -- Based off https://github.com/Yona
 	local spanLeft, spanRight
 
     local tileTable = {}
-    stack = {{startX, startY}}
+    local stack = {{startX, startY}}
 
     while #stack > 0 do
         local p = table.remove(stack)

@@ -63,13 +63,13 @@ function movement:initialize(actor, args)
 end
 
 function movement:update(dt, actorEvent)
-    if self.actor.shooting then
-        self.actor.shootTimer = self.actor.shootTimer + dt
+    -- if self.actor.shooting then -- todo: this won't work
+    --     self.actor.shootTimer = self.actor.shootTimer + dt
 
-        if self.actor.shootTimer >= SHOOTTIME then
-            self.actor.shooting = false
-        end
-    end
+    --     if self.actor.shootTimer >= SHOOTTIME then
+    --         self.actor.shooting = false
+    --     end
+    -- end
 
     if self.actor.state.name == "grounded" then
         if not controls3.cmdDown("left") and not controls3.cmdDown("right") then
@@ -95,7 +95,7 @@ function movement:update(dt, actorEvent)
         if self.actor.underWater then
             maxSpeed = UW_MAXWALKSPEED
             acceleration = UW_WALKACCELERATION
-            fricton = UW_WALKFRICTION
+            friction = UW_WALKFRICTION
         end
 
         -- Normal left/right acceleration
@@ -198,7 +198,7 @@ function movement:startFall()
     end
 end
 
-function skid(dt, actor, friction)
+local function skid(dt, actor, friction)
     if controls3.cmdDown("right") and actor.speed[1] < 0 then
         actor.speed[1] = math.min(0, actor.speed[1] + friction*dt)
     end
@@ -208,7 +208,7 @@ function skid(dt, actor, friction)
     end
 end
 
-function accelerate(dt, actor, acceleration, maxSpeed)
+local function accelerate(dt, actor, acceleration, maxSpeed)
     if math.abs(actor.speed[1]) < maxSpeed then
         if controls3.cmdDown("left") and not controls3.cmdDown("right") and actor.speed[1] <= 0 then
             actor.speed[1] = math.max(-maxSpeed, actor.speed[1] - acceleration*dt)

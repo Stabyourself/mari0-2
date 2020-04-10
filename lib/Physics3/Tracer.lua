@@ -30,6 +30,8 @@ function Tracer:trace()
 		local x = self.coordinateCache[i][1] + self.physObj.x
 		local y = self.coordinateCache[i][2] + self.physObj.y
 
+		local xRounded, yRounded
+
 		if self.vector.y < 0 then -- don't ask me why
 			yRounded = math.ceil(y)
 		else
@@ -42,7 +44,7 @@ function Tracer:trace()
 			xRounded = math.floor(x)
 		end
 
-		col = self.physObj.world:checkCollision(xRounded, yRounded, self.physObj, self.vectorNormalized)
+		local col = self.physObj.world:checkCollision(xRounded, yRounded, self.physObj, self.vectorNormalized)
 		if col then
 			self.tracedLength = i
 			return xRounded, yRounded, col

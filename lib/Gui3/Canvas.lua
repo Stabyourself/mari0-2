@@ -89,6 +89,14 @@ function Gui3.Canvas:rootmousemoved(x, y)
 end
 
 function Gui3.Canvas:rootmousepressed(x, y, button)
+    for i = 2, #self.mouseRegions do -- 1 is this canvas, and mouse clicks should go through it
+        local region = self.mouseRegions[i]
+
+        if not pointInRectangle(x, y, region.x, region.y, region.w, region.h) then
+            region.element:blur()
+        end
+    end
+
     for i = #self.mouseRegions, 2, -1 do -- 1 is this canvas, and mouse clicks should go through it
         local region = self.mouseRegions[i]
 

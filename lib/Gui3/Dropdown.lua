@@ -13,6 +13,10 @@ function Gui3.Dropdown:initialize(x, y, s, boxCanvas)
 
     self:addChild(self.button)
     boxCanvas:addChild(self.box)
+
+    self.box.blur = function(box)
+        self:toggle(false)
+    end
 end
 
 function Gui3.Dropdown:onAssign()
@@ -21,7 +25,13 @@ function Gui3.Dropdown:onAssign()
 end
 
 function Gui3.Dropdown:toggle(status)
-    self.box.visible = status or not self.box.visible
+    if status ~= nil then
+        self.box.visible = status
+    else
+        self.box.visible = not self.box.visible
+    end
+
+    print(self.box.visible)
 
     if self.box.visible then
         self.box:moveToFront()

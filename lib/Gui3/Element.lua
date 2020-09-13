@@ -603,3 +603,5 @@ function Gui3.Element:updateRender()
 end
 
 function Gui3.Element:onAssign() end
+
+function Gui3.Element:blur() end

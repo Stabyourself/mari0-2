@@ -30,7 +30,7 @@ return {
         input = true, -- shows a little input display in the bottom left
         jprof = false, -- logs frame data into a file on quit
         lovebird = false, -- enable lövebird debugging (localhost:8000)
-        noEnemies = true, -- disables enemy spawning
+        noEnemies = false, -- disables enemy spawning
         musicDisabled = true, -- disables the music
     },
 

@@ -1,6 +1,6 @@
 actorTemplates = {}
 
-local dir = "actortemplates/"
+local dir = "actorTemplates/"
 
 local files = love.filesystem.getDirectoryItems(dir)
 

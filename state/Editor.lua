@@ -9,7 +9,7 @@ Editor.toolClasses = {}
 
 for _, toolName in ipairs(Editor.toolbarOrder) do
     Editor.toolClasses[toolName] = require("class.editor.tools." .. toolName)
-    table.insert(Editor.toolbarImg, love.graphics.newImage("img/editor/" .. toolName .. ".png"))
+    table.insert(Editor.toolbarImg, love.graphics.newImage("img/editor/" .. toolName:lower() .. ".png"))
 end
 
 Editor.checkerboardImg = love.graphics.newImage("img/editor/checkerboard.png")

@@ -59,10 +59,6 @@ function love.load()
     debugCandyImg = love.graphics.newImage("img/debug-candy.png")
     debugCandyImg:setWrap("repeat")
 
-    if love.math.random() > 0.99 then
-        funkyImg = love.graphics.newImage("img/funky.png")
-    end
-
     defaultUI = Gui3:new("img/gui/default")
 
     local GameStateManager3 = require "lib.GameStateManager3"
@@ -132,10 +128,6 @@ function love.draw()
     end
 
     love.graphics.pop()
-
-    if funkyImg then
-        love.graphics.draw(funkyImg, love.graphics.getWidth(), 0, 0, 1, 1, 340)
-    end
 end
 
 function love.keypressed(key)
